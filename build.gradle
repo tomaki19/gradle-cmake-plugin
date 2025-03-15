@@ -1,0 +1,42 @@
+plugins {
+  id 'java-gradle-plugin'
+  id 'com.gradle.plugin-publish' version '1.2.1'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testImplementation libs.junit
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+}
+
+group = 'ch.tomaki'
+version = '1.0.0'
+
+gradlePlugin {
+  website = 'https://github.com/tomaki19/gradle-cmake-plugin'
+  vcsUrl = 'https://github.com/tomaki19/gradle-cmake-plugin.git'
+  plugins {
+    simplePlugin {
+      id = "${project.group}.${project.name}"
+      displayName = 'CMake Build Plugin'
+      description = 'A Gradle plugin that uses the CMake build framework for C/C++ builds.'
+      tags.set(['gradle', 'cmake', 'c', 'cpp', 'c++'])
+      implementationClass = 'ch.tomaki.gradle.cmake.CMakePlugin'
+    }
+  }
+}
+
+test {
+  useJUnitPlatform()
+}
+
+tasks.withType(AbstractPublishToMaven) {
+  dependsOn check
+}
