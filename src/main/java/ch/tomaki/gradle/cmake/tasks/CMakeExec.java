@@ -3,10 +3,11 @@ package ch.tomaki.gradle.cmake.tasks;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.InputFile;
 import org.gradle.internal.os.OperatingSystem;
 
 public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
@@ -15,19 +16,24 @@ public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
     super(CMakeExec.class);
   }
 
-  private final List<String> baseCommandLine = new ArrayList<>();
+  @InputFile
+  public abstract RegularFileProperty getEnvironemtFile();
+
+  @Input
+  public abstract SetProperty<String> getBaseCommandLine();
 
   @Input
   public abstract SetProperty<String> getAdditionalArguments();
 
-  @Internal
-  protected List<String> getBaseCommandLine() {
-    return baseCommandLine;
-  }
-
   @Override
   protected void exec() {
-    final List<String> commandLine = new ArrayList<>(getBaseCommandLine());
+    final List<String> commandLine = new ArrayList<>();
+    if (getEnvironemtFile().isPresent()) {
+      commandLine.add(".");
+      commandLine.add(getEnvironemtFile().get().getAsFile().getAbsolutePath());
+      commandLine.add("&&");
+    }
+    commandLine.addAll(getBaseCommandLine().get());
     commandLine.addAll(getAdditionalArguments().get());
     if (OperatingSystem.current().isUnix()) {
       setCommandLine("sh", "-c", String.join(" ", commandLine));

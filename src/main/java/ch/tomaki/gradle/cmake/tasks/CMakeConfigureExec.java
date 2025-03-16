@@ -19,11 +19,9 @@ public abstract class CMakeConfigureExec extends CMakeExec {
     getOutputs().dir(outputDirectory);
     setWorkingDir(getProject().getProjectDir());
     this.toolchainName = toolchain.getName();
-    if (toolchain.getEnvironmentFile().isPresent()) {
-      getBaseCommandLine().add(".");
-      getBaseCommandLine().add(toolchain.getEnvironmentFile().get().getAbsolutePath());
-      getBaseCommandLine().add("&&");
-    }
+    toolchain.getEnvironmentFile().ifPresent((file) -> {
+      getEnvironemtFile().set(file);
+    });
     getBaseCommandLine().add("cmake");
     getBaseCommandLine().add("-S %s"
         .formatted(getProject().getLayout().getProjectDirectory().getAsFile().getAbsolutePath()));

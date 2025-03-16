@@ -14,11 +14,9 @@ public abstract class CMakeTestExec extends CMakeExec {
     setGroup(CMakeTasksConventions.GROUP_CHECK);
     setWorkingDir(getProject().getProjectDir());
     this.buildTarget = buildTarget;
-    if (test.getToolchain().getEnvironmentFile().isPresent()) {
-      getBaseCommandLine().add(".");
-      getBaseCommandLine().add(test.getToolchain().getEnvironmentFile().get().getAbsolutePath());
-      getBaseCommandLine().add("&&");
-    }
+    test.getToolchain().getEnvironmentFile().ifPresent((file) -> {
+      getEnvironemtFile().set(file);
+    });
     getBaseCommandLine().add("ctest");
     getBaseCommandLine().add("--tests-regex");
     getBaseCommandLine().add(buildTarget);

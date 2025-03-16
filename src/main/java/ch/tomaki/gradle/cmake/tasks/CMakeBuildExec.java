@@ -20,12 +20,10 @@ public abstract class CMakeBuildExec extends CMakeExec {
     setGroup(CMakeTasksConventions.GROUP_BUILD);
     setWorkingDir(getProject().getProjectDir());
     this.buildTarget = buildTarget;
-    if (binary.getToolchain().getEnvironmentFile().isPresent()) {
-      getBaseCommandLine().add(".");
-      getBaseCommandLine().add(binary.getToolchain().getEnvironmentFile().get().getAbsolutePath());
-      getBaseCommandLine().add("&&");
-    }
-    if (!buildTarget.endsWith("interface")) {
+    binary.getToolchain().getEnvironmentFile().ifPresent((file) -> {
+      getEnvironemtFile().set(file);
+    });
+    if (!binary.getSources().isEmpty()) {
       getBaseCommandLine().add("cmake");
       getBaseCommandLine().add("--build");
       getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
