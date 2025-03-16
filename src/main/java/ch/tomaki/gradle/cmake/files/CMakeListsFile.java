@@ -27,10 +27,11 @@ public class CMakeListsFile extends CMakeFileOutputStream {
 
   private static final String CMAKE_MINIMUM_VERSION = "3.21";
 
-  public CMakeListsFile(final Directory projectDirectory) throws FileNotFoundException {
-    super(projectDirectory.file(FILE_NAME));
+  public CMakeListsFile(final Project project) throws FileNotFoundException {
+    super(project.getLayout().getProjectDirectory().file(FILE_NAME));
   }
 
+  @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
     writeProjectDependencies(build.getProjectModuleDependencies(), project);

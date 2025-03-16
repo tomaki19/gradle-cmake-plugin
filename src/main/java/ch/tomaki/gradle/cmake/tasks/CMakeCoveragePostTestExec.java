@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import org.gradle.api.tasks.Exec;
 import org.gradle.internal.os.OperatingSystem;
 
-public class CMakeCoveragePostTestExec extends Exec {
+public abstract class CMakeCoveragePostTestExec extends Exec {
 
   @Inject
   public CMakeCoveragePostTestExec() {
@@ -28,13 +28,6 @@ public class CMakeCoveragePostTestExec extends Exec {
     } else {
       commandLine("cmd", "/c", String.join(" ", command));
     }
-  }
-
-  @Override
-  protected void exec() {
-    getLogger().debug(String.join(" ", getCommandLine()));
-    getWorkingDir().mkdirs();
-    super.exec();
   }
 
 }

@@ -1,42 +1,40 @@
 package ch.tomaki.gradle.cmake.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
-import org.gradle.api.tasks.Exec;
-import org.gradle.internal.os.OperatingSystem;
+import org.gradle.api.provider.SetProperty;
+import org.gradle.api.tasks.Input;
 
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 
-public abstract class CMakeBuildExec extends Exec {
+public abstract class CMakeBuildExec extends CMakeExec {
+
+  public final String buildTarget;
+
+  @Input
+  public abstract SetProperty<String> getAdditionalArguments();
 
   @Inject
   public CMakeBuildExec(final String buildTarget, final CMakeResolvedBinary binary) {
     setGroup(CMakeTasksConventions.GROUP_BUILD);
-    final List<String> command = new ArrayList<>();
+    setWorkingDir(getProject().getProjectDir());
+    this.buildTarget = buildTarget;
     if (binary.getToolchain().getEnvironmentFile().isPresent()) {
-      command.add(".");
-      command.add(binary.getToolchain().getEnvironmentFile().get().getAbsolutePath());
-      command.add("&&");
+      getBaseCommandLine().add(".");
+      getBaseCommandLine().add(binary.getToolchain().getEnvironmentFile().get().getAbsolutePath());
+      getBaseCommandLine().add("&&");
     }
     if (!buildTarget.endsWith("interface")) {
-      command.add("cmake");
-      command.add("--build");
-      command.add(getProject().getLayout().getBuildDirectory()
+      getBaseCommandLine().add("cmake");
+      getBaseCommandLine().add("--build");
+      getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
           .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, binary.getToolchain().getName())).get()
           .getAsFile().getAbsolutePath());
-      command.add("--target");
-      command.add(buildTarget);
-      command.add("--config");
-      command.add(binary.getBuildConfig());
-    }
-    if (OperatingSystem.current().isUnix()) {
-      commandLine("sh", "-c", String.join(" ", command));
-    } else {
-      commandLine("cmd", "/c", String.join(" ", command));
+      getBaseCommandLine().add("--target");
+      getBaseCommandLine().add(buildTarget);
+      getBaseCommandLine().add("--config");
+      getBaseCommandLine().add(binary.getBuildConfig());
     }
   }
 

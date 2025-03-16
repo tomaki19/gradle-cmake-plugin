@@ -30,15 +30,17 @@ public interface CMakeToolchain extends CMakeNamedObject {
 
   public RegularFileProperty getToolchainFile();
 
-  public SetProperty<String> getPrivateLinkDependencies();
+  public SetProperty<String> getPrivateLibraryLinkDependencies();
+
+  public SetProperty<String> getPrivateApplicationLinkDependencies();
+
+  public SetProperty<String> getPrivateTestLinkDependencies();
 
   public Property<Boolean> getBuildStatic();
 
   public Property<Boolean> getBuildShared();
 
   public Property<Boolean> getStripDebug();
-
-  public Property<Boolean> getCreateTestResultsXml();
 
   public Property<Boolean> getPackageBuildOutputs();
 

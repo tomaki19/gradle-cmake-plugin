@@ -1,8 +1,8 @@
 # gradle-cmake-plugin
-A gradle plugin for C/C++ builds that utilizes cmake.
+A Gradle plugin that uses the CMake build framework for C/C++ builds.
 
 # Intention
-Organizing software projects is hard, especially in large teams. To allow for a certain degree of standardization for build scripting, this gradle plugin combines the powerful and feature rich cmake framework with the flexibile gradle framework to produce standardized modern cmake configurations. This enforces some build scripting rules for the project, while keeping a certain degree of freedom for developers to build their projects.
+Organizing multi-project C/C++ builds is hard, especially in multi language environments. The Gradle build framework does a great job in integrating multiple languages, while still enforcing some basic build guidelines. This plugin combines the powerful and feature rich CMake build framework with the flexibile Gradle framework to produce modern CMake multi-project configurations. Some build scripting rules are enforced onto the projects, while keeping a certain degree of freedom for developers to build their own setups.
 
 # Features
 

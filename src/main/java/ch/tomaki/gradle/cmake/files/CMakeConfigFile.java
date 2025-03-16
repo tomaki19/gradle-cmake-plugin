@@ -19,6 +19,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
         .file("%s-config.cmake".formatted(project.getName().toLowerCase())));
   }
 
+  @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     for (final CMakeResolvedLibrary library : build.getLibraries()) {
       if (library.getSources().isEmpty()) {

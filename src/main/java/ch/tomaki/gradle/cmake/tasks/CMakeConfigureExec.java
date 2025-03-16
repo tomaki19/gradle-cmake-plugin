@@ -1,18 +1,15 @@
 package ch.tomaki.gradle.cmake.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.gradle.api.file.Directory;
-import org.gradle.api.tasks.Exec;
-import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
-public abstract class CMakeConfigureExec extends Exec {
+public abstract class CMakeConfigureExec extends CMakeExec {
+
+  public final String toolchainName;
 
   @Inject
   public CMakeConfigureExec(final CMakeResolvedToolchain toolchain) {
@@ -20,29 +17,26 @@ public abstract class CMakeConfigureExec extends Exec {
         .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, toolchain.getName())).get();
     // tasks with same output directory are not run in parallel
     getOutputs().dir(outputDirectory);
-    final List<String> command = new ArrayList<>();
+    setWorkingDir(getProject().getProjectDir());
+    this.toolchainName = toolchain.getName();
     if (toolchain.getEnvironmentFile().isPresent()) {
-      command.add(".");
-      command.add(toolchain.getEnvironmentFile().get().getAbsolutePath());
-      command.add("&&");
+      getBaseCommandLine().add(".");
+      getBaseCommandLine().add(toolchain.getEnvironmentFile().get().getAbsolutePath());
+      getBaseCommandLine().add("&&");
     }
-    command.add("cmake");
-    command.add("-S %s".formatted(getProject().getLayout().getProjectDirectory().getAsFile().getAbsolutePath()));
-    command.add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
-    command.add("-G \"%s\"".formatted(toolchain.getGenerator()));
+    getBaseCommandLine().add("cmake");
+    getBaseCommandLine().add("-S %s"
+        .formatted(getProject().getLayout().getProjectDirectory().getAsFile().getAbsolutePath()));
+    getBaseCommandLine().add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
+    getBaseCommandLine().add("-G \"%s\"".formatted(toolchain.getGenerator()));
     if (toolchain.getToolchainFile().isPresent()) {
-      command.add("--toolchain");
-      command.add(" \"%s\"".formatted(
-          toolchain.getToolchainFile().get().getAsFile().getAbsolutePath()));
+      getBaseCommandLine().add("--toolchain");
+      getBaseCommandLine().add(" \"%s\""
+          .formatted(toolchain.getToolchainFile().get().getAsFile().getAbsolutePath()));
     }
     if (!toolchain.getBuildConfigs().isEmpty()) {
-      command.add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(
+      getBaseCommandLine().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(
           String.join(";", toolchain.getBuildConfigs())));
-    }
-    if (OperatingSystem.current().isUnix()) {
-      commandLine("sh", "-c", String.join(" ", command));
-    } else {
-      commandLine("cmd", "/c", String.join(" ", command));
     }
   }
 

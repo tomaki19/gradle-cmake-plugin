@@ -21,11 +21,12 @@ public final class CMakeResolvedToolchain {
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<RegularFile> toolchainFile;
-  private final Set<String> privateLinkDependencies;
+  private final Set<String> privateLibraryLinkDependencies;
+  private final Set<String> privateApplicationLinkDependencies;
+  private final Set<String> privateTestLinkDependencies;
   private final boolean buildStatic;
   private final boolean buildShared;
   private final boolean stripDebug;
-  private final boolean createTestResultsXml;
   private final boolean packageBuildOutputs;
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
@@ -38,11 +39,12 @@ public final class CMakeResolvedToolchain {
     this.environment = toolchain.getEnvironment().get();
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
-    this.privateLinkDependencies = toolchain.getPrivateLinkDependencies().get();
+    this.privateLibraryLinkDependencies = toolchain.getPrivateLibraryLinkDependencies().get();
+    this.privateApplicationLinkDependencies = toolchain.getPrivateApplicationLinkDependencies().get();
+    this.privateTestLinkDependencies = toolchain.getPrivateTestLinkDependencies().get();
     this.buildStatic = toolchain.getBuildStatic().getOrElse(Boolean.FALSE);
     this.buildShared = toolchain.getBuildShared().getOrElse(Boolean.TRUE);
     this.stripDebug = toolchain.getStripDebug().getOrElse(Boolean.FALSE);
-    this.createTestResultsXml = toolchain.getCreateTestResultsXml().getOrElse(Boolean.FALSE);
     this.packageBuildOutputs = toolchain.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
   }
 
@@ -82,8 +84,16 @@ public final class CMakeResolvedToolchain {
     return toolchainFile;
   }
 
-  public Set<String> getPrivateLinkDependencies() {
-    return privateLinkDependencies;
+  public Set<String> getPrivateLibraryLinkDependencies() {
+    return privateLibraryLinkDependencies;
+  }
+
+  public Set<String> getPrivateApplicationLinkDependencies() {
+    return privateApplicationLinkDependencies;
+  }
+
+  public Set<String> getPrivateTestLinkDependencies() {
+    return privateTestLinkDependencies;
   }
 
   public boolean isBuildStatic() {
@@ -96,10 +106,6 @@ public final class CMakeResolvedToolchain {
 
   public boolean isStripDebug() {
     return stripDebug;
-  }
-
-  public boolean isCreateTestResultsXml() {
-    return createTestResultsXml;
   }
 
   public boolean isPackageBuildOutputs() {
