@@ -8,6 +8,7 @@ import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.Optional;
 import org.gradle.internal.os.OperatingSystem;
 
 public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
@@ -16,21 +17,23 @@ public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
     super(CMakeExec.class);
   }
 
-  @InputFile
-  public abstract RegularFileProperty getEnvironemtFile();
-
   @Input
   public abstract SetProperty<String> getBaseCommandLine();
 
+  @Optional
   @Input
   public abstract SetProperty<String> getAdditionalArguments();
+
+  @Optional
+  @InputFile
+  public abstract RegularFileProperty getEnvironmentFile();
 
   @Override
   protected void exec() {
     final List<String> commandLine = new ArrayList<>();
-    if (getEnvironemtFile().isPresent()) {
+    if (getEnvironmentFile().isPresent()) {
       commandLine.add(".");
-      commandLine.add(getEnvironemtFile().get().getAsFile().getAbsolutePath());
+      commandLine.add(getEnvironmentFile().get().getAsFile().getAbsolutePath());
       commandLine.add("&&");
     }
     commandLine.addAll(getBaseCommandLine().get());

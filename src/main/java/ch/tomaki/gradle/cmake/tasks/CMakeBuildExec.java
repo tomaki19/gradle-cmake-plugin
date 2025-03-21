@@ -21,7 +21,7 @@ public abstract class CMakeBuildExec extends CMakeExec {
     setWorkingDir(getProject().getProjectDir());
     this.buildTarget = buildTarget;
     binary.getToolchain().getEnvironmentFile().ifPresent((file) -> {
-      getEnvironemtFile().set(file);
+      getEnvironmentFile().set(file);
     });
     if (!binary.getSources().isEmpty()) {
       getBaseCommandLine().add("cmake");

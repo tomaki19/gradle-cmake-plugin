@@ -15,7 +15,7 @@ public abstract class CMakeTestExec extends CMakeExec {
     setWorkingDir(getProject().getProjectDir());
     this.buildTarget = buildTarget;
     test.getToolchain().getEnvironmentFile().ifPresent((file) -> {
-      getEnvironemtFile().set(file);
+      getEnvironmentFile().set(file);
     });
     getBaseCommandLine().add("ctest");
     getBaseCommandLine().add("--tests-regex");
@@ -26,7 +26,6 @@ public abstract class CMakeTestExec extends CMakeExec {
         .getAbsolutePath());
     getBaseCommandLine().add("--build-config");
     getBaseCommandLine().add(test.getBuildConfig());
-    getBaseCommandLine().add("--output-on-failure");
   }
 
 }

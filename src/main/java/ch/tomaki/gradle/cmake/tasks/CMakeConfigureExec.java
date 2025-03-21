@@ -20,7 +20,7 @@ public abstract class CMakeConfigureExec extends CMakeExec {
     setWorkingDir(getProject().getProjectDir());
     this.toolchainName = toolchain.getName();
     toolchain.getEnvironmentFile().ifPresent((file) -> {
-      getEnvironemtFile().set(file);
+      getEnvironmentFile().set(file);
     });
     getBaseCommandLine().add("cmake");
     getBaseCommandLine().add("-S %s"
