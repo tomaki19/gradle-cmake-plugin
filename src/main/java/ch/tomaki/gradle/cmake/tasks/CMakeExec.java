@@ -1,8 +1,13 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
@@ -45,5 +50,4 @@ public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
     }
     super.exec();
   }
-
 }

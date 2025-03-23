@@ -1,3 +1,9 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.extensions;
 
 import org.gradle.api.NamedDomainObjectContainer;
@@ -17,5 +23,4 @@ public interface CMakeExtension {
   public static String getName() {
     return "cmake";
   }
-
 }

@@ -1,3 +1,9 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.model;
 
 public final class CMakeResolvedFindPackageDependency {
@@ -6,8 +12,8 @@ public final class CMakeResolvedFindPackageDependency {
   private final String buildTarget;
   private final CMakeResolvedToolchain toolchain;
 
-  public CMakeResolvedFindPackageDependency(final String name, final String buildTarget,
-      final CMakeResolvedToolchain toolchain) {
+  public CMakeResolvedFindPackageDependency(
+      final String name, final String buildTarget, final CMakeResolvedToolchain toolchain) {
     this.name = name;
     this.buildTarget = buildTarget;
     this.toolchain = toolchain;
@@ -36,24 +42,16 @@ public final class CMakeResolvedFindPackageDependency {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     CMakeResolvedFindPackageDependency other = (CMakeResolvedFindPackageDependency) obj;
     if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
     if (buildTarget == null) {
-      if (other.buildTarget != null)
-        return false;
-    } else if (!buildTarget.equals(other.buildTarget))
-      return false;
+      if (other.buildTarget != null) return false;
+    } else if (!buildTarget.equals(other.buildTarget)) return false;
     return true;
   }
-
 }

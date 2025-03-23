@@ -1,3 +1,9 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.files;
 
 public class CMakePaths {
@@ -16,7 +22,8 @@ public class CMakePaths {
 
   public CMakePaths() {
     this.buildRootPath = CMakePath.get(BUILD_PATH, TEMP_PATH, CMAKE_PATH, BINARIES_PATH);
-    this.buildDependenciesPath = CMakePath.get(BUILD_PATH, TEMP_PATH, CMAKE_PATH, DEPENDENCIES_PATH);
+    this.buildDependenciesPath =
+        CMakePath.get(BUILD_PATH, TEMP_PATH, CMAKE_PATH, DEPENDENCIES_PATH);
     this.outputPath = CMakePath.get(BUILD_PATH, CMAKE_PATH);
     this.installPath = CMakePath.get(BUILD_PATH, INSTALL_PATH);
   }
@@ -30,7 +37,7 @@ public class CMakePaths {
   }
 
   public String getBuildDependenciesPath(final String... extraDirs) {
-    return buildDependenciesPath.append( extraDirs).toString();
+    return buildDependenciesPath.append(extraDirs).toString();
   }
 
   public String getInstallPath() {
@@ -40,5 +47,4 @@ public class CMakePaths {
   public String getOutputPath() {
     return outputPath.toString();
   }
-
 }

@@ -1,14 +1,18 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.model;
 
+import ch.tomaki.gradle.cmake.extensions.CMakeToolchain;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import org.gradle.api.file.RegularFile;
 import org.gradle.internal.os.OperatingSystem;
-
-import ch.tomaki.gradle.cmake.extensions.CMakeToolchain;
 
 public final class CMakeResolvedToolchain {
 
@@ -40,7 +44,8 @@ public final class CMakeResolvedToolchain {
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
     this.privateLibraryLinkDependencies = toolchain.getPrivateLibraryLinkDependencies().get();
-    this.privateApplicationLinkDependencies = toolchain.getPrivateApplicationLinkDependencies().get();
+    this.privateApplicationLinkDependencies =
+        toolchain.getPrivateApplicationLinkDependencies().get();
     this.privateTestLinkDependencies = toolchain.getPrivateTestLinkDependencies().get();
     this.buildStatic = toolchain.getBuildStatic().getOrElse(Boolean.FALSE);
     this.buildShared = toolchain.getBuildShared().getOrElse(Boolean.TRUE);
@@ -122,19 +127,13 @@ public final class CMakeResolvedToolchain {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     CMakeResolvedToolchain other = (CMakeResolvedToolchain) obj;
     if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
     return true;
   }
-
 }

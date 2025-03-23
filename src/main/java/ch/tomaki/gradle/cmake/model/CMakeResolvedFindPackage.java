@@ -1,10 +1,15 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.model;
 
+import ch.tomaki.gradle.cmake.extensions.CMakeFindPackage;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import ch.tomaki.gradle.cmake.extensions.CMakeFindPackage;
 
 public final class CMakeResolvedFindPackage {
 
@@ -40,19 +45,13 @@ public final class CMakeResolvedFindPackage {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     CMakeResolvedFindPackage other = (CMakeResolvedFindPackage) obj;
     if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
     return true;
   }
-
 }

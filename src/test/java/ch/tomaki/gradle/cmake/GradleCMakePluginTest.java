@@ -1,9 +1,17 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import ch.tomaki.gradle.cmake.extensions.CMakeExtension;
+import ch.tomaki.gradle.cmake.extensions.CMakeToolchain;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
@@ -12,14 +20,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.tomaki.gradle.cmake.extensions.CMakeExtension;
-import ch.tomaki.gradle.cmake.extensions.CMakeToolchain;
 class GradleCMakePluginTest {
 
   @BeforeAll
-  static void setup() {
-
-  }
+  static void setup() {}
 
   @Test
   @DisplayName("Single test successful")
@@ -35,7 +39,7 @@ class GradleCMakePluginTest {
     final Project project = ProjectBuilder.builder().build();
     project.getPluginManager().apply(CMakePlugin.class);
 
-    assertNotNull( project.getExtensions().getByName("cmake"));
+    assertNotNull(project.getExtensions().getByName("cmake"));
   }
 
   @Test
@@ -50,12 +54,17 @@ class GradleCMakePluginTest {
     final String compiler = "mscv";
     final String generator = "Visual Studio 2022";
 
-    final NamedDomainObjectProvider<CMakeToolchain> toolchainProvider = extension.getToolchains().register(toolchainName, (toolchain)->{
-      toolchain.getArchitecture().set(architecture);
-      toolchain.getOperatingSystem().set(operatingSystem);
-      toolchain.getCompiler().set(compiler);
-      toolchain.getGenerator().set(generator);
-    });
+    final NamedDomainObjectProvider<CMakeToolchain> toolchainProvider =
+        extension
+            .getToolchains()
+            .register(
+                toolchainName,
+                (toolchain) -> {
+                  toolchain.getArchitecture().set(architecture);
+                  toolchain.getOperatingSystem().set(operatingSystem);
+                  toolchain.getCompiler().set(compiler);
+                  toolchain.getGenerator().set(generator);
+                });
     assertTrue(toolchainProvider.isPresent());
     assertEquals(toolchainName, toolchainProvider.getName());
     assertEquals(architecture, toolchainProvider.get().getArchitecture().get());

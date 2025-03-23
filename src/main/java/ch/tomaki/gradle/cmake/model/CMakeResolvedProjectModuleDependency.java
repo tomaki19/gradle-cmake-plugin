@@ -1,10 +1,15 @@
-package ch.tomaki.gradle.cmake.model;
 
-import org.gradle.api.Project;
-import org.gradle.api.file.Directory;
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
+package ch.tomaki.gradle.cmake.model;
 
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
+import org.gradle.api.Project;
+import org.gradle.api.file.Directory;
 
 public class CMakeResolvedProjectModuleDependency {
 
@@ -16,14 +21,18 @@ public class CMakeResolvedProjectModuleDependency {
   private final Directory installDirectory;
   private final boolean buildable;
 
-  public CMakeResolvedProjectModuleDependency(final String buildTarget, final boolean buildable,
-      final CMakeResolvedToolchain toolchain, final Project project) {
+  public CMakeResolvedProjectModuleDependency(
+      final String buildTarget,
+      final boolean buildable,
+      final CMakeResolvedToolchain toolchain,
+      final Project project) {
     this.buildTarget = "%s::%s".formatted(project.getName(), buildTarget);
     this.projectName = project.getName();
     this.toolchainName = toolchain.getName();
     this.buildTargetName = buildTarget;
     this.projectDirectory = project.getLayout().getProjectDirectory();
-    this.installDirectory = project.getLayout().getBuildDirectory().dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get();
+    this.installDirectory =
+        project.getLayout().getBuildDirectory().dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get();
     this.buildable = buildable;
   }
 
@@ -36,7 +45,8 @@ public class CMakeResolvedProjectModuleDependency {
   }
 
   public String getConfigTaskName() {
-    return ":%s:%s".formatted(projectName, CMakeTasksConventions.configureToolchainTaskName(toolchainName));
+    return ":%s:%s"
+        .formatted(projectName, CMakeTasksConventions.configureToolchainTaskName(toolchainName));
   }
 
   public String getBuildTaskName() {
@@ -65,19 +75,13 @@ public class CMakeResolvedProjectModuleDependency {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     CMakeResolvedProjectModuleDependency other = (CMakeResolvedProjectModuleDependency) obj;
     if (buildTarget == null) {
-      if (other.buildTarget != null)
-        return false;
-    } else if (!buildTarget.equals(other.buildTarget))
-      return false;
+      if (other.buildTarget != null) return false;
+    } else if (!buildTarget.equals(other.buildTarget)) return false;
     return true;
   }
-
 }

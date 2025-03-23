@@ -1,3 +1,9 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.tasks;
 
 public final class CMakeTasksConventions {
@@ -30,7 +36,5 @@ public final class CMakeTasksConventions {
     return "package-%s".formatted(buildTarget);
   }
 
-  private CMakeTasksConventions() {
-  }
-
+  private CMakeTasksConventions() {}
 }

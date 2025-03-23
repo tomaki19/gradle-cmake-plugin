@@ -1,13 +1,17 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.files;
 
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import org.gradle.api.Project;
 import org.gradle.api.file.RegularFile;
-
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 
 public abstract class CMakeFileOutputStream implements AutoCloseable {
 
@@ -22,7 +26,8 @@ public abstract class CMakeFileOutputStream implements AutoCloseable {
     this.outputStream = new FileOutputStream(file.getAsFile());
   }
 
-  public abstract void write(final CMakeResolvedBuild build, final Project project) throws IOException;
+  public abstract void write(final CMakeResolvedBuild build, final Project project)
+      throws IOException;
 
   public RegularFile getFile() {
     return file;
@@ -41,7 +46,8 @@ public abstract class CMakeFileOutputStream implements AutoCloseable {
     writeLine();
   }
 
-  protected void write(final int indent, final String input, final Object... parameter) throws IOException {
+  protected void write(final int indent, final String input, final Object... parameter)
+      throws IOException {
     writeOutput(input.formatted(parameter).indent(indent * INDENT_SIZE));
   }
 
@@ -50,5 +56,4 @@ public abstract class CMakeFileOutputStream implements AutoCloseable {
     outputStream.flush();
     outputStream.close();
   }
-
 }

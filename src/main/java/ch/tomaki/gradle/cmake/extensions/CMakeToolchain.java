@@ -1,7 +1,12 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.extensions;
 
 import java.io.File;
-
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
@@ -43,5 +48,4 @@ public interface CMakeToolchain extends CMakeNamedObject {
   public Property<Boolean> getStripDebug();
 
   public Property<Boolean> getPackageBuildOutputs();
-
 }

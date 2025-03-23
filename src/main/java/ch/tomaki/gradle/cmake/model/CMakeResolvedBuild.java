@@ -1,3 +1,9 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.model;
 
 import java.util.Collection;
@@ -12,7 +18,8 @@ public class CMakeResolvedBuild {
   private final Map<String, CMakeResolvedToolchain> toolchains = new HashMap<>();
   private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
   private final Set<CMakeResolvedFindPackageDependency> findPackageDependencies = new HashSet<>();
-  private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new HashSet<>();
+  private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies =
+      new HashSet<>();
   private final Set<CMakeResolvedApplication> applications = new HashSet<>();
   private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
   private final Set<CMakeResolvedTest> tests = new HashSet<>();
@@ -95,19 +102,13 @@ public class CMakeResolvedBuild {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     CMakeResolvedBuild other = (CMakeResolvedBuild) obj;
     if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
     return true;
   }
-
 }

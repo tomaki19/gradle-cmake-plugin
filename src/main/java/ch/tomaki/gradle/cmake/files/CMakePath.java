@@ -1,7 +1,13 @@
+
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package ch.tomaki.gradle.cmake.files;
 
 import java.util.Arrays;
-import java.util.List; 
+import java.util.List;
 
 public class CMakePath {
 
@@ -27,5 +33,4 @@ public class CMakePath {
   public static CMakePath get(final String... elements) {
     return new CMakePath(elements);
   }
-
 }
