@@ -1,0 +1,109 @@
+# The Extension
+
+The `cmake` extension offers the following main configuration blocks:
+
+```groovy
+cmake {
+  findPackages
+  toolchains
+  libraries
+  applications
+  tests
+}
+```
+
+## FindPackages
+
+The `findPackages` configuration block lets you specify exernal libraries that can be referenced by your build. Each component has a mandatory, unique name and thw following optional configuration options:
+
+```groovy
+findPackages {
+  <name> {
+    components = //optional, String
+    properties = //optional, Map<String,String>
+}
+```
+
+## Toolchains
+
+```groovy
+toolchains {
+  '<name>' {
+    operatingSystem = //mandatory: type org.gradle.internal.os.OperatingSystem
+    compiler = //mandatory: String
+    architecture = //mandatory: String
+    generator = //mandatory: String
+    buildConfigs = //mandatory: List<String>
+    environment = //optional, Map<String,String>
+    environmentFile = //optional, File
+    toolchainFile = //optional, File
+    privateLibraryLinkDependencies= //optional: List<String>
+    privateTestLinkDependencies = //optional: List<String>
+    privateTestLinkDependencies = //optional: List<String>
+    buildStatic = //optional, boolean, default: false
+    buildShared = //optional, boolean, default: true
+    stripDebug = //optional, boolean, default: false
+    packageBuildOutputs = //optional, boolean, default: false
+  }
+}
+```
+
+## Libraries
+
+```groovy
+libraries {
+  '<name>' {
+    buildToolchains = //mandatory: List<String>
+    includes = //mandatory: List<String>
+    sources = //optional: List<String>
+    privateCompileOptions = //optional: List<String>
+    publicCompileOptions = //optional: List<String>
+    privateCompileDefinitions = //optional: List<String>
+    publicCompileDefinitions = //optional: List<String>
+    privateLinkDependencies = //optional: List<String>
+    publicLinkDependencies = //optional: List<String>
+    buildStatic = //optional, boolean, default: false
+    buildShared = //optional, boolean, default: true
+    stripDebug = //optional, boolean, default: false
+    packageBuildOutputs = //optional, boolean, default: false
+  }
+}
+```
+
+## Applications
+
+```groovy
+applications {
+  '<name>' {
+    buildToolchains = //mandatory: List<String>
+    includes = //mandatory: List<String>
+    sources = //optional: List<String>
+    privateCompileOptions = //optional: List<String>
+    privateCompileDefinitions = //optional: List<String>
+    privateLinkDependencies = //optional: List<String>
+    buildStatic = //optional, boolean, default: false
+    buildShared = //optional, boolean, default: true
+    stripDebug = //optional, boolean, default: false
+    packageBuildOutputs = //optional, boolean, default: false
+  }
+}
+```
+
+## Tests
+
+```groovy
+tests {
+  '<name>' {
+    buildToolchains = //mandatory: List<String>
+    includes = //mandatory: List<String>
+    sources = //optional: List<String>
+    privateCompileOptions = //optional: List<String>
+    privateCompileDefinitions = //optional: List<String>
+    privateLinkDependencies = //optional: List<String>
+    buildStatic = //optional, boolean, default: false
+    buildShared = //optional, boolean, default: true
+    stripDebug = //optional, boolean, default: false
+    packageBuildOutputs = //optional, boolean, default: false
+  }
+}
+```
