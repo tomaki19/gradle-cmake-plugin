@@ -6,10 +6,12 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-import ch.tomaki.gradle.cmake.extensions.CMakeFindPackage;
-import ch.tomaki.gradle.cmake.extensions.CMakeTest;
 import java.util.Map;
+
 import org.gradle.api.Project;
+
+import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.extension.CMakeTest;
 
 public final class CMakeResolvedTest extends CMakeResolvedBinary {
 

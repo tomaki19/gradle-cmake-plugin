@@ -4,9 +4,10 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extensions;
+package ch.tomaki.gradle.cmake.extension;
 
 import java.io.File;
+
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
@@ -19,9 +20,9 @@ public interface CMakeToolchain extends CMakeNamedObject {
   public static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
   public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
-  public Property<String> getCompiler();
-
   public Property<OperatingSystem> getOperatingSystem();
+
+  public Property<String> getCompiler();
 
   public Property<String> getArchitecture();
 

@@ -6,12 +6,26 @@
  */
 package ch.tomaki.gradle.cmake;
 
-import ch.tomaki.gradle.cmake.extensions.CMakeBinary;
-import ch.tomaki.gradle.cmake.extensions.CMakeExtension;
-import ch.tomaki.gradle.cmake.extensions.CMakeFindPackage;
-import ch.tomaki.gradle.cmake.extensions.CMakeLibrary;
-import ch.tomaki.gradle.cmake.extensions.CMakeTest;
-import ch.tomaki.gradle.cmake.extensions.CMakeToolchain;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.gradle.api.GradleException;
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.plugins.BasePlugin;
+import org.gradle.api.tasks.TaskProvider;
+import org.gradle.internal.os.OperatingSystem;
+
+import ch.tomaki.gradle.cmake.extension.CMakeBinary;
+import ch.tomaki.gradle.cmake.extension.CMakeExtension;
+import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.extension.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.CMakeTest;
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import ch.tomaki.gradle.cmake.files.CMakeConfigFile;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.files.CMakeListsFile;
@@ -28,18 +42,6 @@ import ch.tomaki.gradle.cmake.tasks.CMakeConfigureExec;
 import ch.tomaki.gradle.cmake.tasks.CMakePackage;
 import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
 import ch.tomaki.gradle.cmake.tasks.CMakeTestExec;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import org.gradle.api.GradleException;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.api.plugins.BasePlugin;
-import org.gradle.api.tasks.TaskProvider;
-import org.gradle.internal.os.OperatingSystem;
 
 public class CMakePlugin implements Plugin<Project> {
 

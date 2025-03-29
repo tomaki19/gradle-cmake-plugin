@@ -4,15 +4,19 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extensions;
+package ch.tomaki.gradle.cmake.extension;
 
 import org.gradle.api.NamedDomainObjectContainer;
 
 public interface CMakeExtension {
 
-  public NamedDomainObjectContainer<CMakeToolchain> getToolchains();
+  public static String getName() {
+    return "cmake";
+  }
 
   public NamedDomainObjectContainer<CMakeFindPackage> getFindPackages();
+
+  public NamedDomainObjectContainer<CMakeToolchain> getToolchains();
 
   public NamedDomainObjectContainer<CMakeLibrary> getLibraries();
 
@@ -20,7 +24,4 @@ public interface CMakeExtension {
 
   public NamedDomainObjectContainer<CMakeTest> getTests();
 
-  public static String getName() {
-    return "cmake";
-  }
 }

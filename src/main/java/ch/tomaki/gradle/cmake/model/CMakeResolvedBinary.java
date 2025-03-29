@@ -6,14 +6,16 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-import ch.tomaki.gradle.cmake.extensions.CMakeBinary;
-import ch.tomaki.gradle.cmake.extensions.CMakeFindPackage;
-import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.gradle.api.Project;
+
+import ch.tomaki.gradle.cmake.extension.CMakeBinary;
+import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 
 public abstract class CMakeResolvedBinary {
 
