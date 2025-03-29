@@ -24,29 +24,15 @@ public abstract class CMakeBuildExec extends CMakeExec {
     setGroup(CMakeTasksConventions.GROUP_BUILD);
     setWorkingDir(getProject().getProjectDir());
     this.buildTarget = buildTarget;
-    binary
-        .getToolchain()
-        .getEnvironmentFile()
-        .ifPresent(
-            (file) -> {
-              getEnvironmentFile().set(file);
-            });
+    binary.getToolchain().getEnvironmentFile().ifPresent((file) -> {
+      getEnvironmentFile().set(file);
+    });
     if (!binary.getSources().isEmpty()) {
       getBaseCommandLine().add("cmake");
       getBaseCommandLine().add("--build");
-      getBaseCommandLine()
-          .add(
-              getProject()
-                  .getLayout()
-                  .getBuildDirectory()
-                  .dir(
-                      "%s/%s"
-                          .formatted(
-                              CMakeListsConventions.CMAKE_BUILD_PATH,
-                              binary.getToolchain().getName()))
-                  .get()
-                  .getAsFile()
-                  .getAbsolutePath());
+      getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
+          .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, binary.getToolchain().getName()))
+          .get().getAsFile().getAbsolutePath());
       getBaseCommandLine().add("--target");
       getBaseCommandLine().add(buildTarget);
       getBaseCommandLine().add("--config");

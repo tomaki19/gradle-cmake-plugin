@@ -17,18 +17,9 @@ public abstract class CMakePackage extends Zip {
   public CMakePackage(final String buildTarget, final CMakeResolvedToolchain toolchain) {
     setGroup(CMakeTasksConventions.GROUP_PACKAGE);
     getArchiveBaseName().set(buildTarget);
-    getDestinationDirectory()
-        .set(getProject().getLayout().getBuildDirectory().dir("install").get());
-    final String toolchainPath =
-        "%s/%s".formatted(CMakeListsConventions.CMAKE_INSTALL_PATH, toolchain.getName());
-    from(getProject()
-            .getLayout()
-            .getBuildDirectory()
-            .dir(toolchainPath)
-            .get()
-            .getAsFile()
-            .toURI()
-            .getPath())
-        .include("%s.*".formatted(buildTarget));
+    getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().dir("install").get());
+    final String toolchainPath = "%s/%s".formatted(CMakeListsConventions.CMAKE_INSTALL_PATH, toolchain.getName());
+    from(getProject().getLayout().getBuildDirectory()
+        .dir(toolchainPath).get().getAsFile().toURI().getPath()).include("%s.*".formatted(buildTarget));
   }
 }

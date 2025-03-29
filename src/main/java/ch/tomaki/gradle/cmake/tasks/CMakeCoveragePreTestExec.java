@@ -24,16 +24,9 @@ public abstract class CMakeCoveragePreTestExec extends Exec {
     command.add("--directory");
     command.add(getProject().getLayout().getProjectDirectory().getAsFile().toURI().getPath());
     command.add("--output-file");
-    final String coverageResultPath =
-        "reports/coverage/%s-pre.info".formatted(getProject().getName());
-    command.add(
-        getProject()
-            .getLayout()
-            .getBuildDirectory()
-            .dir(coverageResultPath)
-            .get()
-            .getAsFile()
-            .getAbsolutePath());
+    final String coverageResultPath = "reports/coverage/%s-pre.info".formatted(getProject().getName());
+    command.add(getProject().getLayout().getBuildDirectory()
+        .dir(coverageResultPath).get().getAsFile().getAbsolutePath());
     if (OperatingSystem.current().isUnix()) {
       commandLine("sh", "-c", String.join(" ", command));
     } else {
