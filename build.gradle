@@ -21,13 +21,7 @@ spotless {
   java {
     importOrder()
     removeUnusedImports()
-    licenseHeader '''
-/*
- * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
- * SPDX-License-Identifier: MIT
- */
-'''
+    licenseHeaderFile file('gradle/license-header.txt')
   }
 }
 
@@ -50,6 +44,10 @@ gradlePlugin {
 
 test {
   useJUnitPlatform()
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:-missing', '-quiet')
 }
 
 tasks.withType(AbstractPublishToMaven) {

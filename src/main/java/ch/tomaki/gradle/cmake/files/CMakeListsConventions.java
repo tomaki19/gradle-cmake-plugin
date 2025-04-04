@@ -1,4 +1,3 @@
-
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
  *
