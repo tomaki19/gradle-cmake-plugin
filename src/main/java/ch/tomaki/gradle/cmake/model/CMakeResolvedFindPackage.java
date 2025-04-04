@@ -6,11 +6,10 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 
 public final class CMakeResolvedFindPackage {
 

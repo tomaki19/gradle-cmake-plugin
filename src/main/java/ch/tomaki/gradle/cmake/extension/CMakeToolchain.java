@@ -7,7 +7,6 @@
 package ch.tomaki.gradle.cmake.extension;
 
 import java.io.File;
-
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;

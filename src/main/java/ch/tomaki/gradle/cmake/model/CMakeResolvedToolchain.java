@@ -6,15 +6,13 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import org.gradle.api.file.RegularFile;
 import org.gradle.internal.os.OperatingSystem;
-
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 
 public final class CMakeResolvedToolchain {
 
