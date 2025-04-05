@@ -5,7 +5,12 @@
  */
 package ch.tomaki.gradle.cmake;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
@@ -61,19 +66,17 @@ public class CMakePlugin implements Plugin<Project> {
     try {
       final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
       if (Objects.nonNull(extension)) {
+
         final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild(project.getName());
         final String assembleConfigTaskName = CMakeTasksConventions.assembleConfigTaskName();
         project.getTasks()
             .register(assembleConfigTaskName, CMakeAssemble.class, new CMakeConfigFile(project), resolvedBuild);
+
         final String assembleListsTaskName = CMakeTasksConventions.assembleListsTaskName();
         project.getTasks()
             .register(assembleListsTaskName, CMakeAssemble.class, new CMakeListsFile(project), resolvedBuild)
-            .configure((task) -> {
-              task.dependsOn(assembleConfigTaskName);
-            });
-        project.getTasks().named("assemble").configure((task) -> {
-          task.dependsOn(assembleListsTaskName);
-        });
+            .configure((task) -> task.dependsOn(assembleConfigTaskName));
+        project.getTasks().named("assemble").configure((task) -> task.dependsOn(assembleListsTaskName));
 
         project.getLogger().debug("%s: Evaluating %d Toolchains..."
             .formatted(project.getName(), extension.getToolchains().size()));
@@ -91,7 +94,7 @@ public class CMakePlugin implements Plugin<Project> {
           for (final String toolchainName : customTask.getValue()) {
             if (resolvedBuild.getToolchains().containsKey(toolchainName)) {
               final CMakeResolvedToolchain resolvedToolchain = resolvedBuild.getToolchains().get(toolchainName);
-              configureTasks(project, resolvedToolchain, customTask.getKey());
+              configureTask(customTask.getKey(), project, resolvedToolchain);
             }
           }
         }
@@ -118,6 +121,7 @@ public class CMakePlugin implements Plugin<Project> {
                 projectModuleDependencies.addAll(resolvedLibrary.getPrivateProjectModuleDependencies());
                 projectModuleDependencies.addAll(resolvedLibrary.getPublicProjectModuleDependencies());
                 if (!resolvedLibrary.getSources().isEmpty()) {
+
                   if (resolvedLibrary.isBuildStatic()) {
                     final String buildTarget = CMakeListsConventions.staticLibraryTarget(resolvedLibrary.getName(),
                         resolvedToolchain, buildConfig);
@@ -125,6 +129,7 @@ public class CMakePlugin implements Plugin<Project> {
                     resolvedBuild.addAll(resolvedLibrary.getPrivateProjectModuleDependencies());
                     resolvedBuild.addAll(resolvedLibrary.getPublicProjectModuleDependencies());
                   }
+
                   if (resolvedLibrary.isBuildShared()) {
                     final String buildTarget = CMakeListsConventions.sharedLibraryTarget(resolvedLibrary.getName(),
                         resolvedToolchain, buildConfig);
@@ -190,28 +195,29 @@ public class CMakePlugin implements Plugin<Project> {
     }
   }
 
+  private void configureTask(final String name, final Project project, final CMakeResolvedToolchain toolchain) {
+    final String cmakeCustomTaskName = CMakeTasksConventions.customTaskName(name, toolchain.getName());
+    final String cmakeConfigureTaskName = CMakeTasksConventions.configureTaskName(toolchain.getName());
+    project.getTasks().register(cmakeCustomTaskName, CMakeExec.class, toolchain)
+        .configure((task) -> task.dependsOn(cmakeConfigureTaskName));
+  }
+
   private void configureTasks(final Project project, final CMakeResolvedToolchain resolvedToolchain) {
     final String cmakeConfigureTaskName = CMakeTasksConventions.configureTaskName(resolvedToolchain.getName());
     final TaskProvider<CMakeConfigureExec> cmakeConfigureTask = project.getTasks().register(cmakeConfigureTaskName,
         CMakeConfigureExec.class, resolvedToolchain);
-    cmakeConfigureTask.configure((task) -> {
-      task.dependsOn(CMakeTasksConventions.assembleListsTaskName());
-    });
-    project.getTasks().named("assemble").configure((task) -> {
-      task.dependsOn(cmakeConfigureTaskName);
-    });
+    cmakeConfigureTask.configure((task) -> task.dependsOn(CMakeTasksConventions.assembleListsTaskName()));
+    project.getTasks().named("assemble").configure((task) -> task.dependsOn(cmakeConfigureTaskName));
     cmakeConfigureTaskMap.put(cmakeConfigureTaskName, cmakeConfigureTask);
+
     final String cmakeToolchainBuildTaskName = CMakeTasksConventions.buildTaskName(resolvedToolchain.getName());
     final TaskProvider<Task> cmakeToolchainBuildTask = project.getTasks().register(cmakeToolchainBuildTaskName);
-    cmakeToolchainBuildTask.configure((task) -> {
-      task.setGroup(CMakeTasksConventions.GROUP_BUILD);
-    });
+    cmakeToolchainBuildTask.configure((task) -> task.setGroup(CMakeTasksConventions.GROUP_BUILD));
     cmakeBuildTaskMap.put(cmakeToolchainBuildTaskName, cmakeToolchainBuildTask);
+
     final String cmakeToolchainCheckTaskName = CMakeTasksConventions.checkTaskName(resolvedToolchain.getName());
     final TaskProvider<Task> cmakeToolchainCheckTask = project.getTasks().register(cmakeToolchainCheckTaskName);
-    cmakeToolchainCheckTask.configure((task) -> {
-      task.setGroup(CMakeTasksConventions.GROUP_CHECK);
-    });
+    cmakeToolchainCheckTask.configure((task) -> task.setGroup(CMakeTasksConventions.GROUP_CHECK));
     cmakeCheckTaskMap.put(cmakeToolchainCheckTaskName, cmakeToolchainCheckTask);
   }
 
@@ -224,24 +230,20 @@ public class CMakePlugin implements Plugin<Project> {
         .configureTaskName(resolvedLibrary.getToolchain().getName());
     cmakeBuildTask.configure((task) -> {
       task.dependsOn(cmakeConfigureTaskName);
-        setTaskDependencyOfProjectModuleDependencies(projectModuleDependencies, task);
+      setTaskDependencyForProjectModuleDependencies(projectModuleDependencies, task);
     });
+
     final String cmakeToolchainBuildTaskName = CMakeTasksConventions
         .buildTaskName(resolvedLibrary.getToolchain().getName());
     cmakeBuildTaskMap.get(cmakeToolchainBuildTaskName)
-        .configure((task) -> {
-          task.dependsOn(cmakeBuildTaskName);
-        });
-    project.getTasks().named("build").configure((task) -> {
-      task.dependsOn(cmakeBuildTaskName);
-    });
+        .configure((task) -> task.dependsOn(cmakeBuildTaskName));
+
+    project.getTasks().named("build").configure((task) -> task.dependsOn(cmakeBuildTaskName));
     if (resolvedLibrary.isPackageBuildOutputs()) {
       final String packageTaskName = CMakeTasksConventions.packageTaskName(buildTarget);
       final TaskProvider<CMakePackage> packageTask = project.getTasks().register(packageTaskName,
           CMakePackage.class, buildTarget, resolvedLibrary.getToolchain());
-      packageTask.configure((task) -> {
-        task.dependsOn(cmakeBuildTaskName);
-      });
+      packageTask.configure((task) -> task.dependsOn(cmakeBuildTaskName));
     }
   }
 
@@ -254,15 +256,13 @@ public class CMakePlugin implements Plugin<Project> {
         .configureTaskName(resolvedApplication.getToolchain().getName());
     cmakeBuildTask.configure((task) -> {
       task.dependsOn(cmakeConfigureTaskName);
-        setTaskDependencyOfProjectModuleDependencies(projectModuleDependencies, task);
+      setTaskDependencyForProjectModuleDependencies(projectModuleDependencies, task);
     });
-    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure((task) ->
-        updateTaskMapConfiguration(projectModuleDependencies,project,task)
-    );
+    cmakeConfigureTaskMap.get(cmakeConfigureTaskName)
+        .configure((task) -> updateTaskMapConfiguration(projectModuleDependencies, task, project));
     cmakeBuildTaskMap.get(CMakeTasksConventions.buildTaskName(resolvedApplication.getToolchain().getName()))
-        .configure((task) -> {
-          task.dependsOn(cmakeBuildTaskName);
-        });
+        .configure((task) -> task.dependsOn(cmakeBuildTaskName));
+
     project.getTasks().named("build").configure((task) -> {
       task.dependsOn(cmakeBuildTaskName);
     });
@@ -270,9 +270,7 @@ public class CMakePlugin implements Plugin<Project> {
       final String packageTaskName = CMakeTasksConventions.packageTaskName(buildTarget);
       final TaskProvider<CMakePackage> packageTask = project.getTasks()
           .register(packageTaskName, CMakePackage.class, buildTarget, resolvedApplication.getToolchain());
-      packageTask.configure((task) -> {
-        task.dependsOn(cmakeBuildTaskName);
-      });
+      packageTask.configure((task) -> task.dependsOn(cmakeBuildTaskName));
     }
   }
 
@@ -285,49 +283,35 @@ public class CMakePlugin implements Plugin<Project> {
         .configureTaskName(resolvedTest.getToolchain().getName());
     cmakeBuildTask.configure((task) -> {
       task.dependsOn(cmakeConfigureTaskName);
-        setTaskDependencyOfProjectModuleDependencies(resolvedTest.getPrivateProjectModuleDependencies(), task);
+      setTaskDependencyForProjectModuleDependencies(resolvedTest.getPrivateProjectModuleDependencies(), task);
     });
-    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure((task) ->
-        updateTaskMapConfiguration(resolvedTest.getPrivateProjectModuleDependencies(),project,task)
-    );
+    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure(
+        (task) -> updateTaskMapConfiguration(resolvedTest.getPrivateProjectModuleDependencies(), task, project));
     final String cmakeTestTaskName = CMakeTasksConventions.checkTaskName(buildTarget);
     final TaskProvider<CMakeTestExec> cmakeTestTask = project.getTasks().register(cmakeTestTaskName,
         CMakeTestExec.class, buildTarget, resolvedTest);
-    cmakeTestTask.configure((task) -> {
-      task.dependsOn(cmakeBuildTaskName);
-    });
+    cmakeTestTask.configure((task) -> task.dependsOn(cmakeBuildTaskName));
     cmakeCheckTaskMap.get(CMakeTasksConventions.checkTaskName(resolvedTest.getToolchain().getName()))
-        .configure((task) -> {
-          task.dependsOn(cmakeBuildTaskName);
-        });
-    project.getTasks().named("check").configure((task) -> {
-      task.dependsOn(cmakeTestTaskName);
-    });
+        .configure((task) -> task.dependsOn(cmakeBuildTaskName));
+
+    project.getTasks().named("check").configure((task) -> task.dependsOn(cmakeTestTaskName));
   }
 
-  private void configureTasks(final Project project, final CMakeResolvedToolchain toolchain, final String name) {
-    final String cmakeCustomTaskName = CMakeTasksConventions.customTaskName(name, toolchain.getName());
-    final String cmakeConfigureTaskName = CMakeTasksConventions.configureTaskName(toolchain.getName());
-    project.getTasks().register(cmakeCustomTaskName, CMakeExec.class, toolchain)
-        .configure((task) -> {
-          task.dependsOn(cmakeConfigureTaskName);
-        });
+  private <T extends Task> void setTaskDependencyForProjectModuleDependencies(
+      final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, final T task) {
+    projectModuleDependencies.stream()
+        .filter(dependency -> dependency.isBuildable())
+        .map(dependency -> dependency.getBuildTaskName())
+        .filter(taskName -> !task.getDependsOn().contains(taskName))
+        .forEach(taskName -> task.dependsOn(taskName));
   }
 
-    private <T extends Task> void setTaskDependencyOfProjectModuleDependencies(Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, T task) {
-        projectModuleDependencies.stream()
-                .filter(pmd -> pmd.isBuildable())
-                .map(pmd -> pmd.getBuildTaskName())
-                .filter(taskName -> !task.getDependsOn().contains(taskName))
-                .forEach(taskName -> task.dependsOn(taskName));
-    }
-
-    private <T extends Task> void updateTaskMapConfiguration(Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, Project project, T task) {
-        projectModuleDependencies.stream()
-                .filter(pmd -> !Objects.equals(pmd.getProjectName(), project.getName()))
-                .map(pmd -> pmd.getConfigTaskName())
-                .forEach(configTaskName -> task.mustRunAfter(configTaskName));
-    }
+  private <T extends Task> void updateTaskMapConfiguration(
+      final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, final T task,
+      final Project project) {
+    projectModuleDependencies.stream()
+        .filter(dependency -> !Objects.equals(dependency.getProjectName(), project.getName()))
+        .map(dependency -> dependency.getConfigTaskName())
+        .forEach(configTaskName -> task.mustRunAfter(configTaskName));
+  }
 }
-
-
