@@ -47,11 +47,11 @@ public class CMakePlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    project.allprojects(this::allprojects);
+    project.allprojects(this::allProjects);
     project.afterEvaluate(this::afterEvaluate);
   }
 
-  private void allprojects(final Project project) {
+  private void allProjects(final Project project) {
     project.getPluginManager().apply(BasePlugin.class);
     project.getExtensions().create(CMakeExtension.getName(), CMakeExtension.class);
   }
