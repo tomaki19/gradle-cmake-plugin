@@ -5,10 +5,11 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
-import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
+
+import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
+import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
 
 public class CMakeResolvedProjectModuleDependency {
 
@@ -30,8 +31,7 @@ public class CMakeResolvedProjectModuleDependency {
     this.toolchainName = toolchain.getName();
     this.buildTargetName = buildTarget;
     this.projectDirectory = project.getLayout().getProjectDirectory();
-    this.installDirectory =
-        project.getLayout().getBuildDirectory().dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get();
+    this.installDirectory = project.getLayout().getBuildDirectory().dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get();
     this.buildable = buildable;
   }
 
@@ -45,7 +45,7 @@ public class CMakeResolvedProjectModuleDependency {
 
   public String getConfigTaskName() {
     return ":%s:%s"
-        .formatted(projectName, CMakeTasksConventions.configureToolchainTaskName(toolchainName));
+        .formatted(projectName, CMakeTasksConventions.configureTaskName(toolchainName));
   }
 
   public String getBuildTaskName() {
@@ -74,13 +74,18 @@ public class CMakeResolvedProjectModuleDependency {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     CMakeResolvedProjectModuleDependency other = (CMakeResolvedProjectModuleDependency) obj;
     if (buildTarget == null) {
-      if (other.buildTarget != null) return false;
-    } else if (!buildTarget.equals(other.buildTarget)) return false;
+      if (other.buildTarget != null)
+        return false;
+    } else if (!buildTarget.equals(other.buildTarget))
+      return false;
     return true;
   }
 }

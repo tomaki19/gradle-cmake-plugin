@@ -20,12 +20,10 @@ public abstract class CMakeBuildExec extends CMakeExec {
 
   @Inject
   public CMakeBuildExec(final String buildTarget, final CMakeResolvedBinary binary) {
+    super(binary.getToolchain());
+    this.buildTarget = buildTarget;
     setGroup(CMakeTasksConventions.GROUP_BUILD);
     setWorkingDir(getProject().getProjectDir());
-    this.buildTarget = buildTarget;
-    binary.getToolchain().getEnvironmentFile().ifPresent((file) -> {
-      getEnvironmentFile().set(file);
-    });
     if (!binary.getSources().isEmpty()) {
       getBaseCommandLine().add("cmake");
       getBaseCommandLine().add("--build");

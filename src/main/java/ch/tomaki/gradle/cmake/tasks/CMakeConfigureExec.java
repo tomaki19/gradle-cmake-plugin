@@ -16,15 +16,13 @@ public abstract class CMakeConfigureExec extends CMakeExec {
 
   @Inject
   public CMakeConfigureExec(final CMakeResolvedToolchain toolchain) {
+    super(toolchain);
+    this.toolchainName = toolchain.getName();
     final Directory outputDirectory = getProject().getLayout().getBuildDirectory()
         .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, toolchain.getName())).get();
     // tasks with same output directory are not run in parallel
     getOutputs().dir(outputDirectory);
     setWorkingDir(getProject().getProjectDir());
-    this.toolchainName = toolchain.getName();
-    toolchain.getEnvironmentFile().ifPresent((file) -> {
-      getEnvironmentFile().set(file);
-    });
     getBaseCommandLine().add("cmake");
     getBaseCommandLine().add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));

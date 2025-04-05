@@ -47,4 +47,5 @@ public interface CMakeToolchain extends CMakeNamedObject {
   public Property<Boolean> getStripDebug();
 
   public Property<Boolean> getPackageBuildOutputs();
+
 }

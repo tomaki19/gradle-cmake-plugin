@@ -7,6 +7,9 @@ package ch.tomaki.gradle.cmake.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
@@ -15,10 +18,16 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Optional;
 import org.gradle.internal.os.OperatingSystem;
 
+import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
+
 public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
-  public CMakeExec() {
+  @Inject
+  public CMakeExec(final CMakeResolvedToolchain toolchain) {
     super(CMakeExec.class);
+    toolchain.getEnvironmentFile().ifPresent((file) -> {
+      getEnvironmentFile().set(file);
+    });
   }
 
   @Input

@@ -19,8 +19,6 @@ java {
 
 spotless {
   java {
-    importOrder()
-    removeUnusedImports()
     licenseHeaderFile file('gradle/license-header.txt')
   }
 }

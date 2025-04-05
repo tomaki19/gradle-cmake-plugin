@@ -15,12 +15,10 @@ public abstract class CMakeTestExec extends CMakeExec {
 
   @Inject
   public CMakeTestExec(final String buildTarget, final CMakeResolvedTest test) {
+    super(test.getToolchain());
+    this.buildTarget = buildTarget;
     setGroup(CMakeTasksConventions.GROUP_CHECK);
     setWorkingDir(getProject().getProjectDir());
-    this.buildTarget = buildTarget;
-    test.getToolchain().getEnvironmentFile().ifPresent((file) -> {
-      getEnvironmentFile().set(file);
-    });
     getBaseCommandLine().add("ctest");
     getBaseCommandLine().add("--tests-regex");
     getBaseCommandLine().add(buildTarget);

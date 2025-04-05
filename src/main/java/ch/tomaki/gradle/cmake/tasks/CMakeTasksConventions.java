@@ -19,8 +19,12 @@ public final class CMakeTasksConventions {
     return "assemble-cmake-lists";
   }
 
-  public static String configureToolchainTaskName(final String toolchainName) {
-    return "configure-toolchain-%s".formatted(toolchainName);
+  public static String customTaskName(final String name, final String toolchainName) {
+    return "custom-%s-%s".formatted(name, toolchainName);
+  }
+
+  public static String configureTaskName(final String toolchainName) {
+    return "configure-%s".formatted(toolchainName);
   }
 
   public static String buildTaskName(final String buildTarget) {
@@ -35,5 +39,6 @@ public final class CMakeTasksConventions {
     return "package-%s".formatted(buildTarget);
   }
 
-  private CMakeTasksConventions() {}
+  private CMakeTasksConventions() {
+  }
 }
