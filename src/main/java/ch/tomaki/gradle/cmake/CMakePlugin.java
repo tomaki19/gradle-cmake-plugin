@@ -324,9 +324,9 @@ public class CMakePlugin implements Plugin<Project> {
 
     private <T extends Task> void updateTaskMapConfiguration(Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, Project project, T task) {
         projectModuleDependencies.stream()
-                .map(pmd -> pmd.getProjectName())
-                .filter(moduleName -> !Objects.equals(moduleName, project.getName()))
-                .forEach(moduleName -> task.mustRunAfter(moduleName));
+                .filter(pmd -> !Objects.equals(pmd.getProjectName(), project.getName()))
+                .map(pmd -> pmd.getConfigTaskName())
+                .forEach(configTaskName -> task.mustRunAfter(configTaskName));
     }
 }
 
