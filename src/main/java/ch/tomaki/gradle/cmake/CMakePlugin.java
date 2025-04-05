@@ -5,11 +5,7 @@
  */
 package ch.tomaki.gradle.cmake;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
@@ -228,13 +224,7 @@ public class CMakePlugin implements Plugin<Project> {
         .configureTaskName(resolvedLibrary.getToolchain().getName());
     cmakeBuildTask.configure((task) -> {
       task.dependsOn(cmakeConfigureTaskName);
-      for (final CMakeResolvedProjectModuleDependency projectModule : projectModuleDependencies) {
-        final String projectModuleBuildTaskName = projectModule.getBuildTaskName();
-        if (projectModule.isBuildable()
-            && !task.getDependsOn().contains(projectModuleBuildTaskName)) {
-          task.dependsOn(projectModuleBuildTaskName);
-        }
-      }
+        setTaskDependencyOfProjectModuleDependencies(projectModuleDependencies, task);
     });
     final String cmakeToolchainBuildTaskName = CMakeTasksConventions
         .buildTaskName(resolvedLibrary.getToolchain().getName());
@@ -264,20 +254,11 @@ public class CMakePlugin implements Plugin<Project> {
         .configureTaskName(resolvedApplication.getToolchain().getName());
     cmakeBuildTask.configure((task) -> {
       task.dependsOn(cmakeConfigureTaskName);
-      for (final CMakeResolvedProjectModuleDependency projectModule : projectModuleDependencies) {
-        final String projectModuleBuildTaskName = projectModule.getBuildTaskName();
-        if (projectModule.isBuildable() && !task.getDependsOn().contains(projectModuleBuildTaskName)) {
-          task.dependsOn(projectModuleBuildTaskName);
-        }
-      }
+        setTaskDependencyOfProjectModuleDependencies(projectModuleDependencies, task);
     });
-    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure((task) -> {
-      for (final CMakeResolvedProjectModuleDependency projectModule : projectModuleDependencies) {
-        if (!Objects.equals(projectModule.getProjectName(), project.getName())) {
-          task.mustRunAfter(projectModule.getConfigTaskName());
-        }
-      }
-    });
+    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure((task) ->
+        updateTaskMapConfiguration(projectModuleDependencies,project,task)
+    );
     cmakeBuildTaskMap.get(CMakeTasksConventions.buildTaskName(resolvedApplication.getToolchain().getName()))
         .configure((task) -> {
           task.dependsOn(cmakeBuildTaskName);
@@ -304,23 +285,11 @@ public class CMakePlugin implements Plugin<Project> {
         .configureTaskName(resolvedTest.getToolchain().getName());
     cmakeBuildTask.configure((task) -> {
       task.dependsOn(cmakeConfigureTaskName);
-      for (final CMakeResolvedProjectModuleDependency projectModule : resolvedTest
-          .getPrivateProjectModuleDependencies()) {
-        final String projectModuleBuildTaskName = projectModule.getBuildTaskName();
-        if (projectModule.isBuildable()
-            && !task.getDependsOn().contains(projectModuleBuildTaskName)) {
-          task.dependsOn(projectModuleBuildTaskName);
-        }
-      }
+        setTaskDependencyOfProjectModuleDependencies(resolvedTest.getPrivateProjectModuleDependencies(), task);
     });
-    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure((task) -> {
-      for (final CMakeResolvedProjectModuleDependency projectModule : resolvedTest
-          .getPrivateProjectModuleDependencies()) {
-        if (!Objects.equals(projectModule.getProjectName(), project.getName())) {
-          task.mustRunAfter(projectModule.getConfigTaskName());
-        }
-      }
-    });
+    cmakeConfigureTaskMap.get(cmakeConfigureTaskName).configure((task) ->
+        updateTaskMapConfiguration(resolvedTest.getPrivateProjectModuleDependencies(),project,task)
+    );
     final String cmakeTestTaskName = CMakeTasksConventions.checkTaskName(buildTarget);
     final TaskProvider<CMakeTestExec> cmakeTestTask = project.getTasks().register(cmakeTestTaskName,
         CMakeTestExec.class, buildTarget, resolvedTest);
@@ -345,4 +314,20 @@ public class CMakePlugin implements Plugin<Project> {
         });
   }
 
+    private <T extends Task> void setTaskDependencyOfProjectModuleDependencies(Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, T task) {
+        projectModuleDependencies.stream()
+                .filter(pmd -> pmd.isBuildable())
+                .map(pmd -> pmd.getBuildTaskName())
+                .filter(taskName -> !task.getDependsOn().contains(taskName))
+                .forEach(taskName -> task.dependsOn(taskName));
+    }
+
+    private <T extends Task> void updateTaskMapConfiguration(Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies, Project project, T task) {
+        projectModuleDependencies.stream()
+                .map(pmd -> pmd.getProjectName())
+                .filter(moduleName -> !Objects.equals(moduleName, project.getName()))
+                .forEach(moduleName -> task.mustRunAfter(moduleName));
+    }
 }
+
+
