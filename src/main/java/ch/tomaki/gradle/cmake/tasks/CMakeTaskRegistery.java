@@ -63,6 +63,7 @@ public class CMakeTaskRegistery {
     return task;
   }
 
+  @SuppressWarnings("unchecked")
   public TaskProvider<Task> configure(final String name, final Action<? super Task> action) {
     return (TaskProvider<Task>) cmakeTaskMap.computeIfPresent(name, (key, value) -> {
       value.configure(action);
