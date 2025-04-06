@@ -21,11 +21,8 @@ public class CMakeResolvedProjectModuleDependency {
   private final Directory installDirectory;
   private final boolean buildable;
 
-  public CMakeResolvedProjectModuleDependency(
-      final String buildTarget,
-      final boolean buildable,
-      final CMakeResolvedToolchain toolchain,
-      final Project project) {
+  public CMakeResolvedProjectModuleDependency(final String buildTarget, final boolean buildable,
+      final CMakeResolvedToolchain toolchain, final Project project) {
     this.buildTarget = "%s::%s".formatted(project.getName(), buildTarget);
     this.projectName = project.getName();
     this.toolchainName = toolchain.getName();

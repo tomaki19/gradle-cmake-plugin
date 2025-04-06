@@ -12,6 +12,8 @@ import org.gradle.api.NamedDomainObjectContainer;
 
 public abstract class CMakeExtension {
 
+  public static final String NAME = "cmake";
+
   private final Map<String, String[]> customTasks = new HashMap<>();
 
   public void register(final String taskName, final String... toolChainNames) {
@@ -31,9 +33,5 @@ public abstract class CMakeExtension {
   public abstract NamedDomainObjectContainer<CMakeBinary> getApplications();
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
-
-  public static String getName() {
-    return "cmake";
-  }
 
 }
