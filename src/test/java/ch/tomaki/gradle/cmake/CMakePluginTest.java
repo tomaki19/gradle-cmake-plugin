@@ -9,8 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
@@ -19,7 +17,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class GradleCMakePluginTest {
+import ch.tomaki.gradle.cmake.extension.CMakeExtension;
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
+
+class CMakePluginTest {
 
   @BeforeAll
   static void setup() {}

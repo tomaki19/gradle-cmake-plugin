@@ -190,6 +190,7 @@ public class CMakePlugin implements Plugin<Project> {
   }
 
   private void configureTasks(final CMakeTaskRegistery taskRegistery, final CMakeResolvedToolchain resolvedToolchain) {
+    
     final String cmakeConfigureTaskName = CMakeTasksConventions.configureTaskName(resolvedToolchain.getName());
     taskRegistery.register(cmakeConfigureTaskName, CMakeConfigureExec.class, resolvedToolchain)
         .configure((task) -> task.dependsOn(CMakeTasksConventions.assembleListsTaskName()));
@@ -206,6 +207,7 @@ public class CMakePlugin implements Plugin<Project> {
 
   private void configureTasks(final CMakeTaskRegistery taskRegistery, final CMakeResolvedLibrary resolvedLibrary,
       final String buildTarget, final List<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
+
     final String cmakeConfigureTaskName = CMakeTasksConventions
         .configureTaskName(resolvedLibrary.getToolchain().getName());
     taskRegistery.configureTaskProjectModuleConfigureDependencies(cmakeConfigureTaskName, projectModuleDependencies);
