@@ -70,18 +70,6 @@ public class CMakeTaskRegistery {
     });
   }
 
-  public TaskProvider<Task> getGradleAssembleTask() {
-    return taskContainer.named(GradleTasks.ASSEMBLE.toString());
-  }
-
-  public TaskProvider<Task> getGradleBuildTask() {
-    return taskContainer.named(GradleTasks.BUILD.toString());
-  }
-
-  public TaskProvider<Task> getGradleCheckTask() {
-    return taskContainer.named(GradleTasks.CHECK.toString());
-  }
-
   public <T extends Task> void configureTaskProjectModuleConfigureDependencies(final String taskName,
       final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
@@ -101,5 +89,17 @@ public class CMakeTaskRegistery {
           .filter(buildTaskName -> !task.getDependsOn().contains(buildTaskName))
           .forEach(buildTaskName -> task.dependsOn(buildTaskName));
     });
+  }
+
+  public TaskProvider<Task> getGradleAssembleTask() {
+    return taskContainer.named(GradleTasks.ASSEMBLE.toString());
+  }
+
+  public TaskProvider<Task> getGradleBuildTask() {
+    return taskContainer.named(GradleTasks.BUILD.toString());
+  }
+
+  public TaskProvider<Task> getGradleCheckTask() {
+    return taskContainer.named(GradleTasks.CHECK.toString());
   }
 }
