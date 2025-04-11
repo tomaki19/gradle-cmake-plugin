@@ -22,9 +22,12 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
+  public final String toolchainName;
+
   @Inject
   public CMakeExec(final CMakeResolvedToolchain toolchain) {
     super(CMakeExec.class);
+    this.toolchainName = toolchain.getName();
     toolchain.getEnvironmentFile().ifPresent((file) -> {
       getEnvironmentFile().set(file);
     });
