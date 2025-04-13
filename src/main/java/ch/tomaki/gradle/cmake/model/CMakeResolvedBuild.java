@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class CMakeResolvedBuild {
 
@@ -17,8 +18,7 @@ public class CMakeResolvedBuild {
   private final Map<String, CMakeResolvedToolchain> toolchains = new HashMap<>();
   private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
   private final Set<CMakeResolvedFindPackageDependency> findPackageDependencies = new HashSet<>();
-  private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies =
-      new HashSet<>();
+  private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new HashSet<>();
   private final Set<CMakeResolvedApplication> applications = new HashSet<>();
   private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
   private final Set<CMakeResolvedTest> tests = new HashSet<>();
@@ -35,8 +35,11 @@ public class CMakeResolvedBuild {
     toolchains.put(name, toolchain);
   }
 
-  public Map<String, CMakeResolvedToolchain> getToolchains() {
-    return toolchains;
+  public void forToolchain(final String name, final Consumer<CMakeResolvedToolchain> consumer) {
+    toolchains.computeIfPresent(name, (key, toolchain) -> {
+      consumer.accept(toolchain);
+      return toolchain;
+    });
   }
 
   public void add(final CMakeResolvedFindPackage findPackage) {
@@ -101,13 +104,18 @@ public class CMakeResolvedBuild {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     CMakeResolvedBuild other = (CMakeResolvedBuild) obj;
     if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
     return true;
   }
 }

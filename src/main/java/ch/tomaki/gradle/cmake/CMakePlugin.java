@@ -85,10 +85,9 @@ public class CMakePlugin implements Plugin<Project> {
             .formatted(project.getName(), extension.getCustomTasks().size()));
         for (final Map.Entry<String, String[]> customTask : extension.getCustomTasks().entrySet()) {
           for (final String toolchainName : customTask.getValue()) {
-            if (resolvedBuild.getToolchains().containsKey(toolchainName)) {
-              final CMakeResolvedToolchain resolvedToolchain = resolvedBuild.getToolchains().get(toolchainName);
-              configureTask(taskRegistry, customTask.getKey(), resolvedToolchain);
-            }
+            resolvedBuild.forToolchain(toolchainName, (toolchain) -> {
+              configureTask(taskRegistry, customTask.getKey(), toolchain);
+            });
           }
         }
 
@@ -101,7 +100,7 @@ public class CMakePlugin implements Plugin<Project> {
 
         project.getLogger().debug("%s: Evaluating %d Libraries..."
             .formatted(project.getName(), extension.getLibraries().size()));
-        consumeEachValidBuildConfig(resolvedBuild, extension.getLibraries(),
+        forBinaries(extension.getLibraries(), resolvedBuild,
             (CMakeLibrary library, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(
                   library, extension.getFindPackages().getAsMap(), resolvedToolchain, buildConfig, project);
@@ -131,7 +130,7 @@ public class CMakePlugin implements Plugin<Project> {
 
         project.getLogger().debug("%s: Evaluating %d Applications..."
             .formatted(project.getName(), extension.getApplications().size()));
-        consumeEachValidBuildConfig(resolvedBuild, extension.getApplications(),
+        forBinaries(extension.getApplications(), resolvedBuild,
             (CMakeBinary application, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
               final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(application,
                   extension.getFindPackages().getAsMap(), resolvedToolchain, buildConfig, project);
@@ -146,7 +145,7 @@ public class CMakePlugin implements Plugin<Project> {
 
         project.getLogger().debug("%s: Evaluating %d Tests..."
             .formatted(project.getName(), extension.getTests().size()));
-        consumeEachValidBuildConfig(resolvedBuild, extension.getTests(),
+        forBinaries(extension.getTests(), resolvedBuild,
             (CMakeTest test, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
               final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(test, extension.getFindPackages().getAsMap(),
                   resolvedToolchain, buildConfig, project);
@@ -165,19 +164,18 @@ public class CMakePlugin implements Plugin<Project> {
   }
 
   private interface ValidBuildConfigConsumer<T extends CMakeBinary> {
-    void accept(T cmakeBinary, CMakeResolvedToolchain resolvedToolchain, String buildConfigName);
+    void accept(final T cmakeBinary, final CMakeResolvedToolchain resolvedToolchain, final String buildConfigName);
   }
 
-  private <T extends CMakeBinary> void consumeEachValidBuildConfig(final CMakeResolvedBuild resolvedBuild,
-      NamedDomainObjectContainer<T> cmakeBinaries, ValidBuildConfigConsumer<T> consumer) {
+  private static <T extends CMakeBinary> void forBinaries(final NamedDomainObjectContainer<T> cmakeBinaries,
+      final CMakeResolvedBuild resolvedBuild, final ValidBuildConfigConsumer<T> consumer) {
     for (final T cmakeBinary : cmakeBinaries) {
       for (final String toolchainName : cmakeBinary.getBuildToolchains().get()) {
-        if (resolvedBuild.getToolchains().containsKey(toolchainName)) {
-          final CMakeResolvedToolchain resolvedToolchain = resolvedBuild.getToolchains().get(toolchainName);
-          for (final String buildConfig : resolvedToolchain.getBuildConfigs()) {
-            consumer.accept(cmakeBinary, resolvedToolchain, buildConfig);
+        resolvedBuild.forToolchain(toolchainName, (toolchain) -> {
+          for (final String buildConfig : toolchain.getBuildConfigs()) {
+            consumer.accept(cmakeBinary, toolchain, buildConfig);
           }
-        }
+        });
       }
     }
   }
