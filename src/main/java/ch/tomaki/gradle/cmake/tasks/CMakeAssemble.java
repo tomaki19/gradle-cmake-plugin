@@ -28,7 +28,7 @@ public abstract class CMakeAssemble extends DefaultTask {
   }
 
   @TaskAction
-  protected void assemble() throws FileNotFoundException, IOException {
+  protected void assemble() throws IOException {
     outputStream.write(build, project);
   }
 }

@@ -19,7 +19,7 @@ import org.gradle.api.tasks.TaskProvider;
 
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 
-public class CMakeTaskRegistery {
+public class CMakeTaskRegistry {
 
   private final String projectName;
   private final TaskContainer taskContainer;
@@ -41,7 +41,7 @@ public class CMakeTaskRegistery {
     }
   }
 
-  public CMakeTaskRegistery(final Project project) {
+  public CMakeTaskRegistry(final Project project) {
     this.projectName = project.getName();
     this.taskContainer = project.getTasks();
   }

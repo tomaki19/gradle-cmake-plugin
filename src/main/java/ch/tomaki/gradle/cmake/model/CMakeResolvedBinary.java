@@ -48,7 +48,7 @@ public abstract class CMakeResolvedBinary {
     this.privateLinkOptions = resolveLinkOptions(binary.getPrivateLinkDependencies().get());
     this.privateFindPackageDependencies =
         resolveFindPackageDependencies(
-            binary.getPrivateLinkDependencies().get(), findPackages, toolchain, project);
+            binary.getPrivateLinkDependencies().get(), findPackages, toolchain);
     this.privateProjectModuleDependencies =
         resolveProjectModuleDependencies(
             binary.getPrivateLinkDependencies().get(), buildConfig, toolchain, project);
@@ -97,7 +97,7 @@ public abstract class CMakeResolvedBinary {
       throws IllegalArgumentException {
     privateLinkOptions.addAll(resolveLinkOptions(dependencies));
     privateFindPackageDependencies.addAll(
-        resolveFindPackageDependencies(dependencies, findPackages, toolchain, project));
+        resolveFindPackageDependencies(dependencies, findPackages, toolchain));
     privateProjectModuleDependencies.addAll(
         resolveProjectModuleDependencies(dependencies, buildConfig, toolchain, project));
   }
@@ -150,8 +150,7 @@ public abstract class CMakeResolvedBinary {
   protected Set<CMakeResolvedFindPackageDependency> resolveFindPackageDependencies(
       final Set<String> dependencies,
       final Map<String, CMakeFindPackage> findPackages,
-      final CMakeResolvedToolchain toolchain,
-      final Project project)
+      final CMakeResolvedToolchain toolchain)
       throws IllegalArgumentException {
     final Set<CMakeResolvedFindPackageDependency> resolvedFindPackageDependencies = new HashSet<>();
     for (final String dependency : dependencies) {
@@ -194,8 +193,7 @@ public abstract class CMakeResolvedBinary {
                     dependencyTokens[2],
                     buildConfig,
                     dependencyTokens[1],
-                    toolchain,
-                    dependencyProject);
+                    toolchain);
             final CMakeResolvedProjectModuleDependency resolvedProjectModule =
                 new CMakeResolvedProjectModuleDependency(
                     buildTarget, isBuildable(dependencyTokens[2]), toolchain, dependencyProject);
@@ -217,22 +215,12 @@ public abstract class CMakeResolvedBinary {
       final String buildType,
       final String buildConfig,
       final String libraryName,
-      final CMakeResolvedToolchain toolchain,
-      final Project project) {
-    switch (CMakeResolvedBuildTypes.valueOf(buildType.toUpperCase())) {
-      case STATIC:
-        {
-          return CMakeListsConventions.staticLibraryTarget(libraryName, toolchain, buildConfig);
-        }
-      case SHARED:
-        {
-          return CMakeListsConventions.sharedLibraryTarget(libraryName, toolchain, buildConfig);
-        }
-      default:
-        {
-          return CMakeListsConventions.interfaceLibraryTarget(libraryName, toolchain, buildConfig);
-        }
-    }
+      final CMakeResolvedToolchain toolchain) {
+     return switch (CMakeResolvedBuildTypes.valueOf(buildType.toUpperCase())) {
+      case STATIC -> CMakeListsConventions.staticLibraryTarget(libraryName, toolchain, buildConfig);
+      case SHARED -> CMakeListsConventions.sharedLibraryTarget(libraryName, toolchain, buildConfig);
+      default -> CMakeListsConventions.interfaceLibraryTarget(libraryName, toolchain, buildConfig);
+    };
   }
 
   private static boolean isBuildable(final String libraryType) {

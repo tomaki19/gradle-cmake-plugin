@@ -32,7 +32,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
     this.publicLinkOptions = resolveLinkOptions(library.getPublicLinkDependencies().get());
     this.publicFindPackageDependencies =
         resolveFindPackageDependencies(
-            library.getPublicLinkDependencies().get(), findPackages, toolchain, project);
+            library.getPublicLinkDependencies().get(), findPackages, toolchain);
     this.publicProjectModuleDependencies =
         resolveProjectModuleDependencies(
             library.getPublicLinkDependencies().get(), buildConfig, toolchain, project);
