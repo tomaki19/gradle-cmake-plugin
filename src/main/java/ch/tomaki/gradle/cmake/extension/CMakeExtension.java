@@ -6,6 +6,7 @@
 package ch.tomaki.gradle.cmake.extension;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectContainer;
@@ -14,13 +15,13 @@ public abstract class CMakeExtension {
 
   public static final String NAME = "cmake";
 
-  private final Map<String, String[]> customTasks = new HashMap<>();
+  private final Map<String, List<String>> customTasks = new HashMap<>();
 
-  public void register(final String taskName, final String... toolChainNames) {
+  public void register(final String taskName, final List<String> toolChainNames) {
     customTasks.put(taskName, toolChainNames);
   }
 
-  public Map<String, String[]> getCustomTasks() {
+  public Map<String, List<String>> getCustomTasks() {
     return customTasks;
   }
 

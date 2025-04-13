@@ -7,11 +7,9 @@ package ch.tomaki.gradle.cmake;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.gradle.api.GradleException;
-import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
@@ -19,10 +17,8 @@ import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.CMakeBinary;
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.CMakeLibrary;
 import ch.tomaki.gradle.cmake.extension.CMakeTest;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import ch.tomaki.gradle.cmake.files.CMakeConfigFile;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.files.CMakeListsFile;
@@ -33,6 +29,7 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
+import ch.tomaki.gradle.cmake.model.CMakeResolver;
 import ch.tomaki.gradle.cmake.tasks.CMakeAssemble;
 import ch.tomaki.gradle.cmake.tasks.CMakeBuildExec;
 import ch.tomaki.gradle.cmake.tasks.CMakeConfigureExec;
@@ -73,34 +70,34 @@ public class CMakePlugin implements Plugin<Project> {
 
         project.getLogger().debug("%s: Evaluating %d Toolchains..."
             .formatted(project.getName(), extension.getToolchains().size()));
-        for (final CMakeToolchain toolchain : extension.getToolchains()) {
-          if (Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().getOrNull())) {
-            final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-            configureTasks(taskRegistry, resolvedToolchain);
-            resolvedBuild.put(resolvedToolchain.getName(), resolvedToolchain);
-          }
-        }
+        extension.getToolchains().parallelStream().filter(
+            (toolchain) -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().getOrNull()))
+            .forEach((toolchain) -> {
+              final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+              configureTasks(taskRegistry, resolvedToolchain);
+              resolvedBuild.put(resolvedToolchain.getName(), resolvedToolchain);
+            });
 
         project.getLogger().debug("%s: Evaluating %d Custom Tasks..."
             .formatted(project.getName(), extension.getCustomTasks().size()));
-        for (final Map.Entry<String, String[]> customTask : extension.getCustomTasks().entrySet()) {
-          for (final String toolchainName : customTask.getValue()) {
+        extension.getCustomTasks().forEach((taskName, toolchainNames) -> {
+          toolchainNames.parallelStream().forEach((toolchainName) -> {
             resolvedBuild.forToolchain(toolchainName, (toolchain) -> {
-              configureTask(taskRegistry, customTask.getKey(), toolchain);
+              configureTask(taskRegistry, taskName, toolchain);
             });
-          }
-        }
+          });
+        });
 
         project.getLogger().debug("%s: Evaluating %d FindPackages..."
             .formatted(project.getName(), extension.getFindPackages().size()));
-        for (final CMakeFindPackage findPackage : extension.getFindPackages()) {
+        extension.getFindPackages().parallelStream().forEach((findPackage) -> {
           final CMakeResolvedFindPackage resolvedFindPackage = new CMakeResolvedFindPackage(findPackage);
           resolvedBuild.add(resolvedFindPackage);
-        }
+        });
 
         project.getLogger().debug("%s: Evaluating %d Libraries..."
             .formatted(project.getName(), extension.getLibraries().size()));
-        forBinaries(extension.getLibraries(), resolvedBuild,
+        CMakeResolver.forBinaries(extension.getLibraries(), resolvedBuild,
             (CMakeLibrary library, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(
                   library, extension.getFindPackages().getAsMap(), resolvedToolchain, buildConfig, project);
@@ -110,14 +107,12 @@ public class CMakePlugin implements Plugin<Project> {
               projectModuleDependencies.addAll(resolvedLibrary.getPrivateProjectModuleDependencies());
               projectModuleDependencies.addAll(resolvedLibrary.getPublicProjectModuleDependencies());
               if (!resolvedLibrary.getSources().isEmpty()) {
-
                 if (resolvedLibrary.isBuildStatic()) {
                   final String buildTarget = CMakeListsConventions.staticLibraryTarget(resolvedLibrary.getName(),
                       resolvedToolchain, buildConfig);
                   configureTasks(taskRegistry, resolvedLibrary, buildTarget, projectModuleDependencies);
                   resolvedBuild.addAll(projectModuleDependencies);
                 }
-
                 if (resolvedLibrary.isBuildShared()) {
                   final String buildTarget = CMakeListsConventions.sharedLibraryTarget(resolvedLibrary.getName(),
                       resolvedToolchain, buildConfig);
@@ -130,7 +125,7 @@ public class CMakePlugin implements Plugin<Project> {
 
         project.getLogger().debug("%s: Evaluating %d Applications..."
             .formatted(project.getName(), extension.getApplications().size()));
-        forBinaries(extension.getApplications(), resolvedBuild,
+        CMakeResolver.forBinaries(extension.getApplications(), resolvedBuild,
             (CMakeBinary application, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
               final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(application,
                   extension.getFindPackages().getAsMap(), resolvedToolchain, buildConfig, project);
@@ -145,7 +140,7 @@ public class CMakePlugin implements Plugin<Project> {
 
         project.getLogger().debug("%s: Evaluating %d Tests..."
             .formatted(project.getName(), extension.getTests().size()));
-        forBinaries(extension.getTests(), resolvedBuild,
+        CMakeResolver.forBinaries(extension.getTests(), resolvedBuild,
             (CMakeTest test, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
               final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(test, extension.getFindPackages().getAsMap(),
                   resolvedToolchain, buildConfig, project);
@@ -160,23 +155,6 @@ public class CMakePlugin implements Plugin<Project> {
       }
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
-    }
-  }
-
-  private interface ValidBuildConfigConsumer<T extends CMakeBinary> {
-    void accept(final T cmakeBinary, final CMakeResolvedToolchain resolvedToolchain, final String buildConfigName);
-  }
-
-  private static <T extends CMakeBinary> void forBinaries(final NamedDomainObjectContainer<T> cmakeBinaries,
-      final CMakeResolvedBuild resolvedBuild, final ValidBuildConfigConsumer<T> consumer) {
-    for (final T cmakeBinary : cmakeBinaries) {
-      for (final String toolchainName : cmakeBinary.getBuildToolchains().get()) {
-        resolvedBuild.forToolchain(toolchainName, (toolchain) -> {
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
-            consumer.accept(cmakeBinary, toolchain, buildConfig);
-          }
-        });
-      }
     }
   }
 

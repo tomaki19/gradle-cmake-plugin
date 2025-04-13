@@ -5,15 +5,17 @@
  */
 package ch.tomaki.gradle.cmake.files;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.gradle.api.Project;
+import org.gradle.internal.os.OperatingSystem;
+
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import org.gradle.api.Project;
-import org.gradle.internal.os.OperatingSystem;
 
 public class CMakeConfigFile extends CMakeFileOutputStream {
 
