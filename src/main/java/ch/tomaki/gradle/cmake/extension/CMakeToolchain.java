@@ -6,6 +6,7 @@
 package ch.tomaki.gradle.cmake.extension;
 
 import java.io.File;
+
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
@@ -14,38 +15,38 @@ import org.gradle.internal.os.OperatingSystem;
 
 public interface CMakeToolchain extends CMakeNamedObject {
 
-  public static final OperatingSystem Linux = OperatingSystem.LINUX;
-  public static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
-  public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
+  static final OperatingSystem Linux = OperatingSystem.LINUX;
+  static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
+  static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
-  public Property<OperatingSystem> getOperatingSystem();
+  Property<OperatingSystem> getOperatingSystem();
 
-  public Property<String> getCompiler();
+  Property<String> getCompiler();
 
-  public Property<String> getArchitecture();
+  Property<String> getArchitecture();
 
-  public Property<String> getGenerator(); // Ninja Multi Config
+  Property<String> getGenerator(); // Ninja Multi Config
 
-  public SetProperty<String> getBuildConfigs(); // Debug, Release, MinSizeRel, RelWithDebInfo
+  SetProperty<String> getBuildConfigs(); // Debug, Release, MinSizeRel, RelWithDebInfo
 
-  public MapProperty<String, String> getEnvironment();
+  MapProperty<String, String> getEnvironment();
 
-  public Property<File> getEnvironmentFile();
+  Property<File> getEnvironmentFile();
 
-  public RegularFileProperty getToolchainFile();
+  RegularFileProperty getToolchainFile();
 
-  public SetProperty<String> getPrivateLibraryLinkDependencies();
+  SetProperty<String> getPrivateLibraryLinkDependencies();
 
-  public SetProperty<String> getPrivateApplicationLinkDependencies();
+  SetProperty<String> getPrivateApplicationLinkDependencies();
 
-  public SetProperty<String> getPrivateTestLinkDependencies();
+  SetProperty<String> getPrivateTestLinkDependencies();
 
-  public Property<Boolean> getBuildStatic();
+  Property<Boolean> getBuildStatic();
 
-  public Property<Boolean> getBuildShared();
+  Property<Boolean> getBuildShared();
 
-  public Property<Boolean> getStripDebug();
+  Property<Boolean> getStripDebug();
 
-  public Property<Boolean> getPackageBuildOutputs();
+  Property<Boolean> getPackageBuildOutputs();
 
 }

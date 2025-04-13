@@ -9,9 +9,9 @@ import org.gradle.api.provider.SetProperty;
 
 public interface CMakeLibrary extends CMakeBinary {
 
-  public SetProperty<String> getPublicCompileOptions();
+  SetProperty<String> getPublicCompileOptions();
 
-  public SetProperty<String> getPublicCompileDefinitions();
+  SetProperty<String> getPublicCompileDefinitions();
 
-  public SetProperty<String> getPublicLinkDependencies();
+  SetProperty<String> getPublicLinkDependencies();
 }

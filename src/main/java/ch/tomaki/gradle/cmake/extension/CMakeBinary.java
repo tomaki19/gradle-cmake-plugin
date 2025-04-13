@@ -10,23 +10,23 @@ import org.gradle.api.provider.SetProperty;
 
 public interface CMakeBinary extends CMakeNamedObject {
 
-  public SetProperty<String> getBuildToolchains();
+  SetProperty<String> getBuildToolchains();
 
-  public SetProperty<String> getIncludes();
+  SetProperty<String> getIncludes();
 
-  public SetProperty<String> getSources();
+  SetProperty<String> getSources();
 
-  public SetProperty<String> getPrivateCompileOptions();
+  SetProperty<String> getPrivateCompileOptions();
 
-  public SetProperty<String> getPrivateCompileDefinitions();
+  SetProperty<String> getPrivateCompileDefinitions();
 
-  public SetProperty<String> getPrivateLinkDependencies();
+  SetProperty<String> getPrivateLinkDependencies();
 
-  public Property<Boolean> getBuildStatic();
+  Property<Boolean> getBuildStatic();
 
-  public Property<Boolean> getBuildShared();
+  Property<Boolean> getBuildShared();
 
-  public Property<Boolean> getStripDebug();
+  Property<Boolean> getStripDebug();
 
-  public Property<Boolean> getPackageBuildOutputs();
+  Property<Boolean> getPackageBuildOutputs();
 }

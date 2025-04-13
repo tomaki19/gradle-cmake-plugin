@@ -9,5 +9,5 @@ import org.gradle.api.provider.Property;
 
 public interface CMakeTest extends CMakeBinary {
 
-  public Property<Boolean> getTestResultsXmlOutput();
+  Property<Boolean> getTestResultsXmlOutput();
 }
