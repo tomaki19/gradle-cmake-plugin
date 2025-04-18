@@ -8,4 +8,5 @@ package ch.tomaki.gradle.cmake.extension;
 public interface CMakeNamedObject {
 
   String getName();
+
 }

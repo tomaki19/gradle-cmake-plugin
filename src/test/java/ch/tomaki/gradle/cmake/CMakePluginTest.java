@@ -23,7 +23,8 @@ import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 class CMakePluginTest {
 
   @BeforeAll
-  static void setup() {}
+  static void setup() {
+  }
 
   @Test
   @DisplayName("Single test successful")
@@ -54,17 +55,16 @@ class CMakePluginTest {
     final String compiler = "mscv";
     final String generator = "Visual Studio 2022";
 
-    final NamedDomainObjectProvider<CMakeToolchain> toolchainProvider =
-        extension
-            .getToolchains()
-            .register(
-                toolchainName,
-                (toolchain) -> {
-                  toolchain.getArchitecture().set(architecture);
-                  toolchain.getOperatingSystem().set(operatingSystem);
-                  toolchain.getCompiler().set(compiler);
-                  toolchain.getGenerator().set(generator);
-                });
+    final NamedDomainObjectProvider<CMakeToolchain> toolchainProvider = extension
+        .getToolchains()
+        .register(
+            toolchainName,
+            (toolchain) -> {
+              toolchain.getArchitecture().set(architecture);
+              toolchain.getOperatingSystem().set(operatingSystem);
+              toolchain.getCompiler().set(compiler);
+              toolchain.getGenerator().set(generator);
+            });
     assertTrue(toolchainProvider.isPresent());
     assertEquals(toolchainName, toolchainProvider.getName());
     assertEquals(architecture, toolchainProvider.get().getArchitecture().get());

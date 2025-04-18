@@ -5,15 +5,6 @@
  */
 package ch.tomaki.gradle.cmake.files;
 
-import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackage;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,8 +12,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
+
+import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackage;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedInterface;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeListsFile extends CMakeFileOutputStream {
 
@@ -39,6 +42,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     writeHeader(project);
     writeProjectDependencies(build.getProjectModuleDependencies(), project);
     writeFindPackages(build.getFindPackages());
+    writeInterfaces(build.getInterfaces(), project);
     writeLibraries(build.getLibraries(), project);
     writeApplications(build.getApplications(), project);
     writeTests(build.getTests(), project);
@@ -54,20 +58,6 @@ public class CMakeListsFile extends CMakeFileOutputStream {
         set( CMAKE_CONFIGURATION_TYPES $ENV{CMAKE_CONFIGURATION_TYPES} )
         set( CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE} )
         set( CMAKE_BUILD_TYPE $ENV{CMAKE_BUILD_TYPE} )
-        # set( CXX_STANDARD 17 )
-        # set( CXX_STANDARD_REQUIRED ON )
-        # set( CMAKE_CXX_EXTENSIONS ON )
-
-        include( CMakePrintHelpers )
-        cmake_print_variables( CMAKE_CONFIGURATION_TYPES )
-        cmake_print_variables( CMAKE_BUILD_TYPE )
-        cmake_print_variables( CONFIGURATION )
-        cmake_print_variables( CMAKE_TOOLCHAIN_FILE )
-        cmake_print_variables( PROJECT_SOURCE_DIR )
-        cmake_print_variables( CMAKE_SOURCE_DIR )
-        cmake_print_variables( CMAKE_CURRENT_SOURCE_DIR )
-        cmake_print_variables( CMAKE_INSTALL_INCLUDEDIR )
-        cmake_print_variables( CMAKE_BUILD_DYNAMIC_LINKER_PATH )
         """);
   }
 
@@ -109,30 +99,33 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
+  private void writeInterfaces(final Set<CMakeResolvedInterface> interfaces, final Project project) throws IOException {
+    for (final CMakeResolvedInterface object : interfaces) {
+      writeLine();
+      writeInterfaceLibrary(object, project);
+    }
+  }
+
   private void writeLibraries(final Set<CMakeResolvedLibrary> libraries, final Project project)
       throws IOException {
-    for (final CMakeResolvedLibrary library : libraries) {
+    for (final CMakeResolvedLibrary object : libraries) {
       writeLine();
-      if (library.getSources().isEmpty()) {
-        writeInterfaceLibrary(library, project);
-      } else {
-        if (library.isBuildStatic()) {
-          writeStaticLibrary(library, project);
-        }
-        if (library.isBuildShared()) {
-          writeSharedLibrary(library, project);
-        }
+      if (object.isBuildStatic()) {
+        writeStaticLibrary(object, project);
+      }
+      if (object.isBuildShared()) {
+        writeSharedLibrary(object, project);
       }
     }
   }
 
   private void writeApplications(final Set<CMakeResolvedApplication> applications, final Project project)
       throws IOException {
-    for (final CMakeResolvedApplication application : applications) {
-      final String target = CMakeListsConventions.applicationTarget(application.getName(), application.getToolchain(),
-          application.getBuildConfig());
+    for (final CMakeResolvedApplication object : applications) {
+      final String target = CMakeListsConventions.applicationTarget(object.getName(), object.getToolchain(),
+          object.getBuildConfig());
       writeLine();
-      writeExecutable(target, application, project);
+      writeExecutable(target, object, project);
     }
   }
 
@@ -141,73 +134,70 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     if (!tests.isEmpty()) {
       writeLine();
       write("enable_testing()");
-      for (final CMakeResolvedTest test : tests) {
-        final String target = CMakeListsConventions.testTarget(test.getName(), test.getToolchain(),
-            test.getBuildConfig());
+      for (final CMakeResolvedTest object : tests) {
+        final String target = CMakeListsConventions.testTarget(object.getName(), object.getToolchain(),
+            object.getBuildConfig());
         writeLine();
-        writeExecutable(target, test, project);
+        writeExecutable(target, object, project);
         writeAddTest(target);
       }
     }
   }
 
-  private void writeInterfaceLibrary(final CMakeResolvedLibrary library, final Project project)
+  private void writeInterfaceLibrary(final CMakeResolvedInterface object, final Project project)
       throws IOException {
-    final String target = CMakeListsConventions.interfaceLibraryTarget(
-        library.getName(), library.getToolchain(), library.getBuildConfig());
+    final String target = CMakeListsConventions.interfaceLibraryTarget(object.getName());
     write("add_library( %s INTERFACE )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
-    writeTargetIncludeDirectories(target, "INTERFACE", library.getIncludes(), project);
-    writePrivateCompiling(target, library);
-    writePublicCompiling(target, library);
+    writeTargetIncludeDirectories(target, "INTERFACE", object.getIncludes(), project);
   }
 
-  private void writeStaticLibrary(final CMakeResolvedLibrary library, final Project project)
+  private void writeStaticLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
     final String target = CMakeListsConventions.staticLibraryTarget(
-        library.getName(), library.getToolchain(), library.getBuildConfig());
+        object.getName(), object.getToolchain(), object.getBuildConfig());
     write("add_library( %s STATIC )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
-    writeTargetSources(target, "PUBLIC", library.getSources(), project);
-    writeTargetIncludeDirectories(target, "PUBLIC", library.getIncludes(), project);
-    writePrivateCompiling(target, library);
-    writePublicCompiling(target, library);
-    writePrivateLinking(target, library);
-    writePublicLinking(target, library);
-    writeOutputTargetProperties(target, library.getToolchain(), project);
-    if (library.isStripDebug()) {
-      writeStripDebugCommand(target, library.getToolchain(), project);
+    writeTargetSources(target, "PUBLIC", object.getSources(), project);
+    writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
+    writePrivateCompiling(target, object);
+    writePublicCompiling(target, object);
+    writePrivateLinking(target, object);
+    writePublicLinking(target, object);
+    writeOutputTargetProperties(target, object.getToolchain(), project);
+    if (object.isStripDebug()) {
+      writeStripDebugCommand(target, object.getToolchain(), project);
     }
   }
 
-  private void writeSharedLibrary(final CMakeResolvedLibrary library, final Project project)
+  private void writeSharedLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
-    final String target = CMakeListsConventions.sharedLibraryTarget(library.getName(), library.getToolchain(),
-        library.getBuildConfig());
+    final String target = CMakeListsConventions.sharedLibraryTarget(object.getName(), object.getToolchain(),
+        object.getBuildConfig());
     write("add_library( %s SHARED )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
-    writeTargetIncludeDirectories(target, "PUBLIC", library.getIncludes(), project);
-    writeTargetSources(target, "PUBLIC", library.getSources(), project);
-    writePrivateCompiling(target, library);
-    writePublicCompiling(target, library);
-    writePrivateLinking(target, library);
-    writePublicLinking(target, library);
-    writeOutputTargetProperties(target, library.getToolchain(), project);
-    if (library.isStripDebug()) {
-      writeStripDebugCommand(target, library.getToolchain(), project);
+    writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
+    writeTargetSources(target, "PUBLIC", object.getSources(), project);
+    writePrivateCompiling(target, object);
+    writePublicCompiling(target, object);
+    writePrivateLinking(target, object);
+    writePublicLinking(target, object);
+    writeOutputTargetProperties(target, object.getToolchain(), project);
+    if (object.isStripDebug()) {
+      writeStripDebugCommand(target, object.getToolchain(), project);
     }
   }
 
-  private void writeExecutable(final String target, final CMakeResolvedBinary binary, final Project project)
+  private void writeExecutable(final String target, final CMakeResolvedBinary object, final Project project)
       throws IOException {
     write("add_executable( %s )", target);
-    writeTargetIncludeDirectories(target, "PUBLIC", binary.getIncludes(), project);
-    writeTargetSources(target, "PRIVATE", binary.getSources(), project);
-    writePrivateCompiling(target, binary);
-    writePrivateLinking(target, binary);
-    writeOutputTargetProperties(target, binary.getToolchain(), project);
-    if (binary.isStripDebug()) {
-      writeStripDebugCommand(target, binary.getToolchain(), project);
+    writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
+    writeTargetSources(target, "PRIVATE", object.getSources(), project);
+    writePrivateCompiling(target, object);
+    writePrivateLinking(target, object);
+    writeOutputTargetProperties(target, object.getToolchain(), project);
+    if (object.isStripDebug()) {
+      writeStripDebugCommand(target, object.getToolchain(), project);
     }
   }
 

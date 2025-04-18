@@ -7,11 +7,12 @@ package ch.tomaki.gradle.cmake.extension;
 
 import org.gradle.api.provider.SetProperty;
 
-public interface CMakeLibrary extends CMakeBinary {
+public interface CMakeLibrary extends CMakeObject {
 
   SetProperty<String> getPublicCompileOptions();
 
   SetProperty<String> getPublicCompileDefinitions();
 
   SetProperty<String> getPublicLinkDependencies();
+
 }

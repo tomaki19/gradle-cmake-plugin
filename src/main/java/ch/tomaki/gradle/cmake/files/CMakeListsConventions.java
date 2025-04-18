@@ -22,9 +22,8 @@ public class CMakeListsConventions {
     return "library-%s-%s-shared-%s".formatted(name, toolchain.getName(), buildConfig);
   }
 
-  public static String interfaceLibraryTarget(
-      final String name, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "library-%s-%s-interface-%s".formatted(name, toolchain.getName(), buildConfig);
+  public static String interfaceLibraryTarget(final String name) {
+    return "library-%s-interface".formatted(name);
   }
 
   public static String applicationTarget(
@@ -37,5 +36,6 @@ public class CMakeListsConventions {
     return "test-%s-%s-%s".formatted(name, toolchain.getName(), buildConfig);
   }
 
-  private CMakeListsConventions() {}
+  private CMakeListsConventions() {
+  }
 }

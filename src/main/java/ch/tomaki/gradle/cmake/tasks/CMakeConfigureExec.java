@@ -5,10 +5,12 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
+import javax.inject.Inject;
+
+import org.gradle.api.file.Directory;
+
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
-import javax.inject.Inject;
-import org.gradle.api.file.Directory;
 
 public abstract class CMakeConfigureExec extends CMakeExec {
 

@@ -19,8 +19,9 @@ public class CMakeResolvedBuild {
   private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
   private final Set<CMakeResolvedFindPackageDependency> findPackageDependencies = new HashSet<>();
   private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new HashSet<>();
-  private final Set<CMakeResolvedApplication> applications = new HashSet<>();
+  private final Set<CMakeResolvedInterface> interfaces = new HashSet<>();
   private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
+  private final Set<CMakeResolvedApplication> applications = new HashSet<>();
   private final Set<CMakeResolvedTest> tests = new HashSet<>();
 
   public CMakeResolvedBuild(final String name) {
@@ -50,44 +51,52 @@ public class CMakeResolvedBuild {
     return findPackages;
   }
 
-  public void add(final CMakeResolvedFindPackageDependency findPackageDependency) {
-    findPackageDependencies.add(findPackageDependency);
+  public void add(final CMakeResolvedFindPackageDependency dependency) {
+    findPackageDependencies.add(dependency);
   }
 
   public Set<CMakeResolvedFindPackageDependency> getFindPackageDependencies() {
     return findPackageDependencies;
   }
 
-  public void add(final CMakeResolvedProjectModuleDependency projectDependency) {
-    projectModuleDependencies.add(projectDependency);
+  public void add(final CMakeResolvedProjectModuleDependency dependency) {
+    projectModuleDependencies.add(dependency);
   }
 
-  public void addAll(final Collection<CMakeResolvedProjectModuleDependency> projectDependencies) {
-    projectModuleDependencies.addAll(projectDependencies);
+  public void addAll(final Collection<CMakeResolvedProjectModuleDependency> dependencies) {
+    projectModuleDependencies.addAll(dependencies);
   }
 
   public Set<CMakeResolvedProjectModuleDependency> getProjectModuleDependencies() {
     return projectModuleDependencies;
   }
 
-  public void add(final CMakeResolvedApplication application) {
-    applications.add(application);
+  public void add(final CMakeResolvedInterface object) {
+    interfaces.add(object);
   }
 
-  public Set<CMakeResolvedApplication> getApplications() {
-    return applications;
+  public Set<CMakeResolvedInterface> getInterfaces() {
+    return interfaces;
   }
 
-  public void add(final CMakeResolvedLibrary library) {
-    libraries.add(library);
+  public void add(final CMakeResolvedLibrary object) {
+    libraries.add(object);
   }
 
   public Set<CMakeResolvedLibrary> getLibraries() {
     return libraries;
   }
 
-  public void add(final CMakeResolvedTest test) {
-    tests.add(test);
+  public void add(final CMakeResolvedApplication object) {
+    applications.add(object);
+  }
+
+  public Set<CMakeResolvedApplication> getApplications() {
+    return applications;
+  }
+
+  public void add(final CMakeResolvedTest object) {
+    tests.add(object);
   }
 
   public Set<CMakeResolvedTest> getTests() {

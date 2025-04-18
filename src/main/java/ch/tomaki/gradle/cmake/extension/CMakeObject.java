@@ -8,7 +8,7 @@ package ch.tomaki.gradle.cmake.extension;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 
-public interface CMakeBinary extends CMakeNamedObject {
+public interface CMakeObject extends CMakeNamedObject {
 
   SetProperty<String> getBuildToolchains();
 
@@ -29,4 +29,5 @@ public interface CMakeBinary extends CMakeNamedObject {
   Property<Boolean> getStripDebug();
 
   Property<Boolean> getPackageBuildOutputs();
+
 }

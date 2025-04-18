@@ -7,7 +7,8 @@ package ch.tomaki.gradle.cmake.extension;
 
 import org.gradle.api.provider.Property;
 
-public interface CMakeTest extends CMakeBinary {
+public interface CMakeTest extends CMakeObject {
 
   Property<Boolean> getTestResultsXmlOutput();
+
 }

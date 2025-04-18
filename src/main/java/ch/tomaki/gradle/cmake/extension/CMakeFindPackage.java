@@ -13,4 +13,5 @@ public interface CMakeFindPackage extends CMakeNamedObject {
   SetProperty<String> getComponents();
 
   MapProperty<String, String> getProperties();
+
 }
