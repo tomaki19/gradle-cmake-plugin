@@ -21,9 +21,10 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
   private final Set<String> publicLinkOptions;
   private final Set<CMakeResolvedFindPackage> publicFindPackages;
   private final Set<CMakeResolvedFindPackageDependency> publicFindPackageDependencies;
+  private final Set<CMakeResolvedProjectModule> publicProjectModules;
   private final Set<CMakeResolvedProjectModuleDependency> publicProjectModuleDependencies;
 
-  public CMakeResolvedLibrary(final CMakeLibrary object, final CMakeResolvedToolchain toolchain,
+  CMakeResolvedLibrary(final CMakeLibrary object, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Map<String, CMakeFindPackage> findPackages, final Project project) {
     super(object, toolchain, buildConfig, findPackages, project);
     this.publicCompileOptions = new HashSet<>(object.getPublicCompileOptions().get());
@@ -33,9 +34,10 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
     this.publicFindPackageDependencies = new HashSet<>();
     resolveFindPackageDependencies(publicFindPackages, publicFindPackageDependencies, toolchain, findPackages,
         object.getPrivateLinkDependencies().get());
+    this.publicProjectModules = new HashSet<>();
     this.publicProjectModuleDependencies = new HashSet<>();
-    resolveProjectModuleDependencies(publicProjectModuleDependencies, project, toolchain, buildConfig,
-        object.getPublicLinkDependencies().get());
+    resolveProjectModuleDependencies(publicProjectModules, publicProjectModuleDependencies, project, toolchain,
+        buildConfig, object.getPublicLinkDependencies().get());
   }
 
   public final Set<String> getPublicCompileOptions() {
@@ -50,15 +52,20 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
     return publicLinkOptions;
   }
 
+  public Set<CMakeResolvedFindPackage> getPublicFindPackages() {
+    return publicFindPackages;
+  }
+
   public Set<CMakeResolvedFindPackageDependency> getPublicFindPackageDependencies() {
     return publicFindPackageDependencies;
+  }
+
+  public Set<CMakeResolvedProjectModule> getPublicProjectModules() {
+    return publicProjectModules;
   }
 
   public Set<CMakeResolvedProjectModuleDependency> getPublicProjectModuleDependencies() {
     return publicProjectModuleDependencies;
   }
 
-  public Set<CMakeResolvedFindPackage> getPublicFindPackages() {
-    return publicFindPackages;
-  }
 }

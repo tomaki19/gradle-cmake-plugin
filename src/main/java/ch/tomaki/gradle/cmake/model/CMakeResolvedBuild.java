@@ -11,45 +11,20 @@ import java.util.Set;
 
 public class CMakeResolvedBuild {
 
-  private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
   private final Set<CMakeResolvedToolchain> toolchains = new HashSet<>();
-  private final Set<CMakeResolvedFindPackageDependency> findPackageDependencies = new HashSet<>();
-  private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new HashSet<>();
+  private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
+  private final Set<CMakeResolvedProjectModule> projectModules = new HashSet<>();
   private final Set<CMakeResolvedInterface> interfaces = new HashSet<>();
   private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
   private final Set<CMakeResolvedApplication> applications = new HashSet<>();
   private final Set<CMakeResolvedTest> tests = new HashSet<>();
 
-  public void add(final CMakeResolvedToolchain toolchain) {
+  void add(final CMakeResolvedToolchain toolchain) {
     this.toolchains.add(toolchain);
   }
 
   public Set<CMakeResolvedToolchain> getToolchains() {
     return toolchains;
-  }
-
-  public void addFindPackageDependency(final CMakeResolvedFindPackageDependency dependency) {
-    this.findPackageDependencies.add(dependency);
-  }
-
-  public void addFindPackageDependencies(final Collection<CMakeResolvedFindPackageDependency> dependencies) {
-    this.findPackageDependencies.addAll(dependencies);
-  }
-
-  public Set<CMakeResolvedFindPackageDependency> getFindPackageDependencies() {
-    return findPackageDependencies;
-  }
-
-  public void addProjectModuleDependency(final CMakeResolvedProjectModuleDependency dependency) {
-    this.projectModuleDependencies.add(dependency);
-  }
-
-  public void addProjectModuleDependencies(final Collection<CMakeResolvedProjectModuleDependency> dependencies) {
-    this.projectModuleDependencies.addAll(dependencies);
-  }
-
-  public Set<CMakeResolvedProjectModuleDependency> getProjectModuleDependencies() {
-    return projectModuleDependencies;
   }
 
   public void addFindPackage(final CMakeResolvedFindPackage findPackage) {
@@ -62,6 +37,18 @@ public class CMakeResolvedBuild {
 
   public Set<CMakeResolvedFindPackage> getFindPackages() {
     return findPackages;
+  }
+
+  public void addProjectModule(final CMakeResolvedProjectModule projectModule) {
+    this.projectModules.add(projectModule);
+  }
+
+  public void addProjectModules(final Collection<CMakeResolvedProjectModule> projectModules) {
+    this.projectModules.addAll(projectModules);
+  }
+
+  public Set<CMakeResolvedProjectModule> getProjectModules() {
+    return projectModules;
   }
 
   public void add(final CMakeResolvedInterface object) {

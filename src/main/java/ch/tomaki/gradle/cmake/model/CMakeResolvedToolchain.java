@@ -5,13 +5,15 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import org.gradle.api.file.RegularFile;
 import org.gradle.internal.os.OperatingSystem;
+
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 
 public final class CMakeResolvedToolchain {
 
@@ -32,7 +34,7 @@ public final class CMakeResolvedToolchain {
   private final boolean stripDebug;
   private final boolean packageBuildOutputs;
 
-  public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
+  CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     this.name = toolchain.getName();
     this.operatingSystem = toolchain.getOperatingSystem().getOrNull();
     this.architecture = toolchain.getArchitecture().getOrElse("").toLowerCase();

@@ -8,9 +8,7 @@ package ch.tomaki.gradle.cmake.files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.gradle.api.Project;
@@ -23,6 +21,7 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackage;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedInterface;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModule;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
@@ -41,7 +40,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
     writeFindPackages(build.getFindPackages());
-    writeProjectDependencies(build.getProjectModuleDependencies(), project);
+    writeProjectDependencies(build.getProjectModules(), project);
     writeInterfaces(build.getInterfaces(), project);
     writeLibraries(build.getLibraries(), project);
     writeApplications(build.getApplications(), project);
@@ -88,19 +87,15 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeProjectDependencies(final Set<CMakeResolvedProjectModuleDependency> projects, final Project project)
+  private void writeProjectDependencies(final Set<CMakeResolvedProjectModule> projects, final Project project)
       throws IOException {
-    final Set<String> processed = new HashSet<>();
-    for (final CMakeResolvedProjectModuleDependency object : projects) {
-      if (!processed.contains(object.getProjectName())) {
-        writeLine();
-        if (!Objects.equals(project.getName(), object.getProjectName())) {
-          write("set( %s_DIR \"%s\" )", object.getProjectName(),
-              object.getInstallDirectory().getAsFile().toURI().getPath());
-          write("find_package( %s REQUIRED )", object.getProjectName());
-        }
-        processed.add(object.getProjectName());
-      }
+    for (final CMakeResolvedProjectModule object : projects) {
+      writeLine();
+      write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
+      write("set( %s_DIR \"%s\" )", object.getName(),
+          object.getInstallDirectory().getAsFile().toURI().getPath());
+      write("find_package( %s REQUIRED )", object.getName());
+      write("endif()");
     }
   }
 
@@ -316,7 +311,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       final Set<String> options) throws IOException {
     write("target_link_libraries( %s %s", target, type);
     for (final CMakeResolvedProjectModuleDependency projectModule : projectModules) {
-      write(1, projectModule.getBuildTarget());
+      write(1, projectModule.getIdentifier());
     }
     for (final CMakeResolvedFindPackageDependency findPackage : findPackages) {
       write(1, findPackage.getIdentifier());

@@ -56,13 +56,10 @@ public class CMakePlugin implements Plugin<Project> {
         /* Build */
         final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild();
 
-        final CMakeResolver cmakeResolver = new CMakeResolver(project,
-            extension.getToolchains().stream(), extension.getFindPackages().getAsMap(), resolvedBuild);
-        cmakeResolver.processLibraries(extension.getLibraries().stream(), resolvedBuild);
-        cmakeResolver.processApplications(extension.getApplications().stream(), resolvedBuild);
-        cmakeResolver.processTests(extension.getTests().stream(), resolvedBuild);
-
-        /* Tasks */
+        final CMakeResolver cmakeResolver = new CMakeResolver(resolvedBuild, project,
+            extension.getFindPackages().getAsMap(), extension.getToolchains().stream(),
+            extension.getLibraries().stream(), extension.getApplications().stream(),
+            extension.getTests().stream());
 
         final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry(project);
 
@@ -75,7 +72,7 @@ public class CMakePlugin implements Plugin<Project> {
         taskRegistry.register(assembleListsTaskName, CMakeAssemble.class, new CMakeListsFile(project), resolvedBuild)
             .configure((task) -> task.dependsOn(assembleConfigTaskName));
         taskRegistry.configureAssembleConfigTaskProjectModuleDependencies(assembleListsTaskName,
-            resolvedBuild.getProjectModuleDependencies());
+            resolvedBuild.getProjectModules());
         taskRegistry.getGradleAssembleTask().configure((task) -> task.dependsOn(assembleListsTaskName));
 
         // toolchain configure tasks

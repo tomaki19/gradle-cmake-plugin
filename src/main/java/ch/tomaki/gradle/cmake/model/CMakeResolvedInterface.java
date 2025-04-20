@@ -9,7 +9,7 @@ import ch.tomaki.gradle.cmake.extension.CMakeObject;
 
 public final class CMakeResolvedInterface extends CMakeResolvedObject {
 
-  public CMakeResolvedInterface(final CMakeObject object) throws IllegalArgumentException {
+  CMakeResolvedInterface(final CMakeObject object) throws IllegalArgumentException {
     super(object);
   }
 

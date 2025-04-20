@@ -9,7 +9,7 @@ public final class CMakeResolvedFindPackageDependency {
 
   private final String identifier;
 
-  public CMakeResolvedFindPackageDependency(final String identifier) {
+  CMakeResolvedFindPackageDependency(final String identifier) {
     this.identifier = identifier;
   }
 

@@ -26,13 +26,14 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
   private final Set<String> privateLinkOptions;
   private final Set<CMakeResolvedFindPackage> privateFindPackages;
   private final Set<CMakeResolvedFindPackageDependency> privateFindPackageDependencies;
+  private final Set<CMakeResolvedProjectModule> privateProjectModules;
   private final Set<CMakeResolvedProjectModuleDependency> privateProjectModuleDependencies;
   private final boolean buildStatic;
   private final boolean buildShared;
   private final boolean stripDebug;
   private final boolean packageBuildOutputs;
 
-  public CMakeResolvedBinary(final CMakeObject object, final CMakeResolvedToolchain toolchain, final String buildConfig,
+  CMakeResolvedBinary(final CMakeObject object, final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Map<String, CMakeFindPackage> findPackages, final Project project) throws IllegalArgumentException {
     super(object);
     this.sources = new HashSet<>(object.getSources().get());
@@ -43,9 +44,10 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     this.privateFindPackageDependencies = new HashSet<>();
     resolveFindPackageDependencies(privateFindPackages, privateFindPackageDependencies, toolchain, findPackages,
         object.getPrivateLinkDependencies().get());
+    this.privateProjectModules = new HashSet<>();
     this.privateProjectModuleDependencies = new HashSet<>();
-    resolveProjectModuleDependencies(privateProjectModuleDependencies, project, toolchain, buildConfig,
-        object.getPrivateLinkDependencies().get());
+    resolveProjectModuleDependencies(privateProjectModules, privateProjectModuleDependencies, project, toolchain,
+        buildConfig, object.getPrivateLinkDependencies().get());
     this.buildStatic = object.getBuildStatic().getOrElse(Boolean.FALSE) || toolchain.isBuildStatic();
     this.buildShared = object.getBuildShared().getOrElse(Boolean.FALSE) || toolchain.isBuildShared();
     this.stripDebug = object.getStripDebug().getOrElse(Boolean.FALSE) || toolchain.isStripDebug();
@@ -71,16 +73,20 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     return privateLinkOptions;
   }
 
+  public Set<CMakeResolvedFindPackage> getPrivateFindPackages() {
+    return privateFindPackages;
+  }
+
   public Set<CMakeResolvedFindPackageDependency> getPrivateFindPackageDependencies() {
     return privateFindPackageDependencies;
   }
 
-  public Set<CMakeResolvedProjectModuleDependency> getPrivateProjectModuleDependencies() {
-    return privateProjectModuleDependencies;
+  public Set<CMakeResolvedProjectModule> getPrivateProjectModules() {
+    return privateProjectModules;
   }
 
-  public Set<CMakeResolvedFindPackage> getPrivateFindPackages() {
-    return privateFindPackages;
+  public Set<CMakeResolvedProjectModuleDependency> getPrivateProjectModuleDependencies() {
+    return privateProjectModuleDependencies;
   }
 
   public boolean isBuildStatic() {
@@ -104,8 +110,8 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     privateLinkOptions.addAll(resolveLinkOptions(dependencies));
     resolveFindPackageDependencies(privateFindPackages, privateFindPackageDependencies, toolchain, findPackages,
         dependencies);
-    resolveProjectModuleDependencies(privateProjectModuleDependencies, project, toolchain, buildConfig,
-        dependencies);
+    resolveProjectModuleDependencies(privateProjectModules, privateProjectModuleDependencies, project, toolchain,
+        buildConfig, dependencies);
   }
 
   protected Set<String> resolveLinkOptions(final Set<String> dependencies)
@@ -145,7 +151,7 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     }
   }
 
-  protected static void resolveProjectModuleDependencies(
+  protected static void resolveProjectModuleDependencies(final Set<CMakeResolvedProjectModule> projectModules,
       final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies, final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig, final Set<String> dependencies)
       throws IllegalArgumentException {
@@ -155,6 +161,11 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
         if (dependencyTokens.length == 3) {
           final Project dependencyProject = project.findProject(":%s".formatted(dependencyTokens[0]));
           if (Objects.nonNull(dependencyProject)) {
+            if (!Objects.equals(project, dependencyProject)) {
+              final CMakeResolvedProjectModule projectModule = new CMakeResolvedProjectModule(dependencyProject,
+                  toolchain);
+              projectModules.add(projectModule);
+            }
             final String buildTarget = getBuildTarget(dependencyTokens[2], dependencyTokens[1], toolchain, buildConfig);
             final CMakeResolvedProjectModuleDependency resolvedProjectModule = new CMakeResolvedProjectModuleDependency(
                 buildTarget, isBuildable(dependencyTokens[2]), toolchain, dependencyProject);

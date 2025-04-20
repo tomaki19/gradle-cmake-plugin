@@ -6,61 +6,40 @@
 package ch.tomaki.gradle.cmake.model;
 
 import org.gradle.api.Project;
-import org.gradle.api.file.Directory;
 
-import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
 
 public class CMakeResolvedProjectModuleDependency {
 
-  private final String buildTarget;
+  private final String identifier;
   private final String projectName;
   private final String toolchainName;
-  private final String buildTargetName;
-  private final Directory projectDirectory;
-  private final Directory installDirectory;
+  private final String buildTarget;
   private final boolean buildable;
 
-  public CMakeResolvedProjectModuleDependency(final String buildTarget, final boolean buildable,
+  CMakeResolvedProjectModuleDependency(final String buildTarget, final boolean buildable,
       final CMakeResolvedToolchain toolchain, final Project project) {
-    this.buildTarget = "%s::%s".formatted(project.getName(), buildTarget);
+    this.identifier = "%s::%s".formatted(project.getName(), buildTarget);
     this.projectName = project.getName();
     this.toolchainName = toolchain.getName();
-    this.buildTargetName = buildTarget;
-    this.projectDirectory = project.getLayout().getProjectDirectory();
-    this.installDirectory = project.getLayout().getBuildDirectory().dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get();
+    this.buildTarget = buildTarget;
     this.buildable = buildable;
   }
 
-  public String getBuildTarget() {
-    return buildTarget;
+  public String getIdentifier() {
+    return identifier;
   }
 
   public String getProjectName() {
     return projectName;
   }
 
-  public String getAssembleConfigTaskName() {
-    final String name = ":%s:%s".formatted(projectName, CMakeTasksConventions.assembleConfigTaskName());
-    return name;
-  }
-
   public String getConfigTaskName() {
-    final String name = ":%s:%s".formatted(projectName, CMakeTasksConventions.configureTaskName(toolchainName));
-    return name;
+    return ":%s:%s".formatted(projectName, CMakeTasksConventions.configureTaskName(toolchainName));
   }
 
   public String getBuildTaskName() {
-    final String name = ":%s:%s".formatted(projectName, CMakeTasksConventions.buildTaskName(buildTargetName));
-    return name;
-  }
-
-  public Directory getProjectDirectory() {
-    return projectDirectory;
-  }
-
-  public Directory getInstallDirectory() {
-    return installDirectory;
+    return ":%s:%s".formatted(projectName, CMakeTasksConventions.buildTaskName(buildTarget));
   }
 
   public boolean isBuildable() {
@@ -71,7 +50,7 @@ public class CMakeResolvedProjectModuleDependency {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((buildTarget == null) ? 0 : buildTarget.hashCode());
+    result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
     return result;
   }
 
@@ -84,10 +63,10 @@ public class CMakeResolvedProjectModuleDependency {
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectModuleDependency other = (CMakeResolvedProjectModuleDependency) obj;
-    if (buildTarget == null) {
-      if (other.buildTarget != null)
+    if (identifier == null) {
+      if (other.identifier != null)
         return false;
-    } else if (!buildTarget.equals(other.buildTarget))
+    } else if (!identifier.equals(other.identifier))
       return false;
     return true;
   }

@@ -102,7 +102,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
       }
       for (final CMakeResolvedProjectModuleDependency projectModuleDependency : library
           .getPublicProjectModuleDependencies()) {
-        write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", projectModuleDependency.getBuildTarget());
+        write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", projectModuleDependency.getIdentifier());
       }
       for (final String linkOption : library.getPublicLinkOptions()) {
         write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", linkOption);

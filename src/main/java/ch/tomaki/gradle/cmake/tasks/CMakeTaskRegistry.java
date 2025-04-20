@@ -17,11 +17,11 @@ import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
+import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModule;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 
 public class CMakeTaskRegistry {
 
-  private final String projectName;
   private final TaskContainer taskContainer;
 
   private final Map<String, TaskProvider<? extends Task>> cmakeTaskMap = new HashMap<>();
@@ -42,12 +42,7 @@ public class CMakeTaskRegistry {
   }
 
   public CMakeTaskRegistry(final Project project) {
-    this.projectName = project.getName();
     this.taskContainer = project.getTasks();
-  }
-
-  public String getProjectName() {
-    return projectName;
   }
 
   public <T extends Task> TaskProvider<T> register(String name, Class<T> type, Object... constructorArgs)
@@ -72,10 +67,9 @@ public class CMakeTaskRegistry {
   }
 
   public void configureAssembleConfigTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
+      final Collection<CMakeResolvedProjectModule> projectModules) {
     taskContainer.named(taskName).configure((task) -> {
-      projectModuleDependencies.stream()
-          .filter(dependency -> !Objects.equals(dependency.getProjectName(), projectName))
+      projectModules.stream()
           .map(dependency -> dependency.getAssembleConfigTaskName())
           .forEach(assembleConfigTaskName -> task.dependsOn(assembleConfigTaskName));
     });
@@ -85,7 +79,7 @@ public class CMakeTaskRegistry {
       final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
-          .filter(dependency -> !Objects.equals(dependency.getProjectName(), projectName))
+          .filter(dependency -> !Objects.equals(dependency.getProjectName(), task.getProject().getName()))
           .filter(dependency -> dependency.isBuildable())
           .map(dependency -> dependency.getConfigTaskName())
           .forEach(configTaskName -> task.mustRunAfter(configTaskName));

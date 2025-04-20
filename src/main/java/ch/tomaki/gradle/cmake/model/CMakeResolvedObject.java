@@ -15,7 +15,7 @@ public abstract class CMakeResolvedObject {
   private final String name;
   private final Set<String> includes;
 
-  public CMakeResolvedObject(final CMakeObject object) throws IllegalArgumentException {
+  CMakeResolvedObject(final CMakeObject object) throws IllegalArgumentException {
     this.name = object.getName();
     this.includes = new HashSet<>(object.getIncludes().get());
   }

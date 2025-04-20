@@ -14,7 +14,7 @@ import ch.tomaki.gradle.cmake.extension.CMakeTest;
 
 public final class CMakeResolvedTest extends CMakeResolvedBinary {
 
-  public CMakeResolvedTest(final CMakeTest test, final CMakeResolvedToolchain toolchain, final String buildConfig,
+  CMakeResolvedTest(final CMakeTest test, final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Map<String, CMakeFindPackage> findPackages, final Project project) {
     super(test, toolchain, buildConfig, findPackages, project);
   }
