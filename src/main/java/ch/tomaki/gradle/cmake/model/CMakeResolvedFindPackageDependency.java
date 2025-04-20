@@ -5,47 +5,31 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 
 public final class CMakeResolvedFindPackageDependency {
 
+  private final String findPackageName;
   private final String identifier;
-  private final String packageName;
-  private final Set<String> components;
-  private final Map<String, String> properties;
   private final CMakeResolvedToolchain toolchain;
 
-  public CMakeResolvedFindPackageDependency(final String identifier, final CMakeFindPackage findPackage,
-      final CMakeResolvedToolchain toolchain) {
-    this.identifier = identifier;
-    this.packageName = findPackage.getName();
-    this.components = new HashSet<>(findPackage.getComponents().get());
-    this.properties = findPackage.getProperties().get();
+  public CMakeResolvedFindPackageDependency(final CMakeFindPackage findPackage, final CMakeResolvedToolchain toolchain,
+      final String identifier) {
+    this.findPackageName = findPackage.getName();
     this.toolchain = toolchain;
+    this.identifier = identifier;
   }
 
-  public String getIdentifier() {
-    return identifier;
-  }
-
-  public String getPackageName() {
-    return packageName;
-  }
-
-  public Set<String> getComponents() {
-    return components;
-  }
-
-  public Map<String, String> getProperties() {
-    return properties;
+  public String getFindPackageName() {
+    return findPackageName;
   }
 
   public CMakeResolvedToolchain getToolchain() {
     return toolchain;
+  }
+
+  public String getIdentifier() {
+    return identifier;
   }
 
   @Override

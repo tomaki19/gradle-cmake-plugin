@@ -8,6 +8,7 @@ package ch.tomaki.gradle.cmake.files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +20,7 @@ import org.gradle.api.file.Directory;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackage;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedInterface;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
@@ -40,7 +42,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
     writeProjectDependencies(build.getProjectModuleDependencies(), project);
-    writeFindPackages(build.getFindPackageDependencies());
+    writeFindPackages(build);
     writeInterfaces(build.getInterfaces(), project);
     writeLibraries(build.getLibraries(), project);
     writeApplications(build.getApplications(), project);
@@ -64,30 +66,33 @@ public class CMakeListsFile extends CMakeFileOutputStream {
         """);
   }
 
-  private void writeFindPackages(final Set<CMakeResolvedFindPackageDependency> findPackages)
-      throws IOException {
-    final Set<String> processed = new HashSet<>();
-    for (final CMakeResolvedFindPackageDependency object : findPackages) {
-      if (!processed.contains(object.getPackageName())) {
+  private void writeFindPackages(final CMakeResolvedBuild build) throws IOException {
+    final Map<CMakeResolvedToolchain, Set<String>> processed = new HashMap<>();
+    for (final CMakeResolvedFindPackageDependency object : build.getFindPackageDependencies()) {
+      if (!processed.containsKey(object.getToolchain())) {
+        processed.put(object.getToolchain(), new HashSet<>());
+      }
+      if (!processed.get(object.getToolchain()).contains(object.getFindPackageName())) {
+        final CMakeResolvedFindPackage findPackage = build.getFindPackage(object.getFindPackageName());
         writeLine();
         write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
-        if (object.getComponents().isEmpty()) {
-          write("find_package( %s CONFIG REQUIRED )", object.getPackageName());
+        if (findPackage.getComponents().isEmpty()) {
+          write("find_package( %s CONFIG REQUIRED )", findPackage.getName());
         } else {
-          write("find_package( %s CONFIG REQUIRED", object.getPackageName());
-          for (final String component : object.getComponents()) {
-            write(1, "%s::%s", object.getPackageName(), component);
+          write("find_package( %s CONFIG REQUIRED", findPackage.getName());
+          for (final String component : findPackage.getComponents()) {
+            write(1, "%s::%s", findPackage.getName(), component);
           }
           write(")");
         }
-        if (!object.getProperties().isEmpty()) {
-          for (final Map.Entry<String, String> property : object.getProperties().entrySet()) {
-            write("set( %s_%s %s )", object.getPackageName(), property.getKey().toUpperCase(),
+        if (!findPackage.getProperties().isEmpty()) {
+          for (final Map.Entry<String, String> property : findPackage.getProperties().entrySet()) {
+            write("set( %s_%s %s )", findPackage.getName(), property.getKey().toUpperCase(),
                 property.getValue().toUpperCase());
           }
         }
         write("endif()");
-        processed.add(object.getPackageName());
+        processed.get(object.getToolchain()).add(object.getFindPackageName());
       }
     }
   }

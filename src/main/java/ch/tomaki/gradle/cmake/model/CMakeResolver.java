@@ -47,6 +47,12 @@ public final class CMakeResolver {
         });
   }
 
+  public void processFindPackages(final Stream<CMakeFindPackage> findPackages, final CMakeResolvedBuild resolvedBuild) {
+    findPackages.forEach((findPackage) -> {
+      resolvedBuild.add(new CMakeResolvedFindPackage(findPackage));
+    });
+  }
+
   public void processLibraries(final Stream<CMakeLibrary> libraries, final CMakeResolvedBuild resolvedBuild) {
     process(libraries, resolvedBuild,
         (CMakeLibrary library, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {

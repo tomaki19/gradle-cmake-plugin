@@ -125,12 +125,11 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
         final String[] dependencyTokens = dependency.split("::");
         if (dependencyTokens.length <= 2) {
           if (findPackages.containsKey(dependencyTokens[0])) {
-            final CMakeResolvedFindPackageDependency resolvedFindPackage = new CMakeResolvedFindPackageDependency(
-                dependency, findPackages.get(dependencyTokens[0]), toolchain);
-            resolvedFindPackageDependencies.add(resolvedFindPackage);
+            resolvedFindPackageDependencies
+                .add(new CMakeResolvedFindPackageDependency(findPackages.get(dependencyTokens[0]), toolchain,
+                    dependency));
           } else {
-            throw new IllegalArgumentException(
-                "Missing find package declaration for '%s'!".formatted(dependency));
+            throw new IllegalArgumentException("Missing find package declaration for '%s'!".formatted(dependency));
           }
         }
       }
