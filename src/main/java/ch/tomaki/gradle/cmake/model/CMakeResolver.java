@@ -47,25 +47,22 @@ public final class CMakeResolver {
         });
   }
 
-  public void processFindPackages(final Stream<CMakeFindPackage> findPackages, final CMakeResolvedBuild resolvedBuild) {
-    findPackages.forEach((findPackage) -> {
-      resolvedBuild.add(new CMakeResolvedFindPackage(findPackage));
-    });
-  }
-
-  public void processLibraries(final Stream<CMakeLibrary> libraries, final CMakeResolvedBuild resolvedBuild) {
-    process(libraries, resolvedBuild,
+  public void processLibraries(final Stream<CMakeLibrary> libraries, final CMakeResolvedBuild build) {
+    process(libraries, build,
         (CMakeLibrary library, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
           return new CMakeResolvedLibrary(library, resolvedToolchain, buildConfig, availableFindPackages, project);
         },
         (CMakeResolvedLibrary library, CMakeResolvedToolchain toolchain) -> {
-          library.addLibraryDependencies(toolchain.getPrivateLibraryLinkDependencies(), availableFindPackages, project);
-          resolvedBuild.addFindPackageDependencies(library.getPrivateFindPackageDependencies());
-          resolvedBuild.addFindPackageDependencies(library.getPublicFindPackageDependencies());
-          resolvedBuild.addProjectModuleDependencies(library.getPrivateProjectModuleDependencies());
-          resolvedBuild.addProjectModuleDependencies(library.getPublicProjectModuleDependencies());
-          resolvedBuild.add(library);
-          resolvedBuild.add(toolchain);
+          library.addPrivateLinkDependencies(toolchain.getPrivateLibraryLinkDependencies(), availableFindPackages,
+              project);
+          build.addFindPackageDependencies(library.getPrivateFindPackageDependencies());
+          build.addFindPackageDependencies(library.getPublicFindPackageDependencies());
+          build.addProjectModuleDependencies(library.getPrivateProjectModuleDependencies());
+          build.addProjectModuleDependencies(library.getPublicProjectModuleDependencies());
+          build.addFindPackages(library.getPrivateFindPackages());
+          build.addFindPackages(library.getPublicFindPackages());
+          build.add(library);
+          build.add(toolchain);
         });
   }
 
@@ -75,10 +72,12 @@ public final class CMakeResolver {
           return new CMakeResolvedApplication(application, toolchain, buildConfig, availableFindPackages, project);
         },
         (CMakeResolvedApplication application, CMakeResolvedToolchain toolchain) -> {
-          application.addLibraryDependencies(toolchain.getPrivateApplicationLinkDependencies(), availableFindPackages,
+          application.addPrivateLinkDependencies(toolchain.getPrivateApplicationLinkDependencies(),
+              availableFindPackages,
               project);
           build.addFindPackageDependencies(application.getPrivateFindPackageDependencies());
           build.addProjectModuleDependencies(application.getPrivateProjectModuleDependencies());
+          build.addFindPackages(application.getPrivateFindPackages());
           build.add(application);
           build.add(toolchain);
         });
@@ -90,9 +89,11 @@ public final class CMakeResolver {
           return new CMakeResolvedTest(test, toolchain, buildConfig, availableFindPackages, project);
         },
         (CMakeResolvedTest test, CMakeResolvedToolchain toolchain) -> {
-          test.addLibraryDependencies(toolchain.getPrivateTestLinkDependencies(), availableFindPackages, project);
+          test.addPrivateLinkDependencies(toolchain.getPrivateTestLinkDependencies(), availableFindPackages,
+              project);
           build.addFindPackageDependencies(test.getPrivateFindPackageDependencies());
           build.addProjectModuleDependencies(test.getPrivateProjectModuleDependencies());
+          build.addFindPackages(test.getPrivateFindPackages());
           build.add(test);
           build.add(toolchain);
         });

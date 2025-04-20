@@ -6,15 +6,12 @@
 package ch.tomaki.gradle.cmake.model;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class CMakeResolvedBuild {
 
-  private final String name;
-  private final Map<String, CMakeResolvedFindPackage> findPackages = new HashMap<>();
+  private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
   private final Set<CMakeResolvedToolchain> toolchains = new HashSet<>();
   private final Set<CMakeResolvedFindPackageDependency> findPackageDependencies = new HashSet<>();
   private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new HashSet<>();
@@ -23,24 +20,8 @@ public class CMakeResolvedBuild {
   private final Set<CMakeResolvedApplication> applications = new HashSet<>();
   private final Set<CMakeResolvedTest> tests = new HashSet<>();
 
-  public CMakeResolvedBuild(final String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void add(final CMakeResolvedFindPackage findPackage) {
-    findPackages.put(findPackage.getName(), findPackage);
-  }
-
-  public CMakeResolvedFindPackage getFindPackage(final String name) {
-    return findPackages.get(name);
-  }
-
   public void add(final CMakeResolvedToolchain toolchain) {
-    toolchains.add(toolchain);
+    this.toolchains.add(toolchain);
   }
 
   public Set<CMakeResolvedToolchain> getToolchains() {
@@ -48,11 +29,11 @@ public class CMakeResolvedBuild {
   }
 
   public void addFindPackageDependency(final CMakeResolvedFindPackageDependency dependency) {
-    findPackageDependencies.add(dependency);
+    this.findPackageDependencies.add(dependency);
   }
 
   public void addFindPackageDependencies(final Collection<CMakeResolvedFindPackageDependency> dependencies) {
-    findPackageDependencies.addAll(dependencies);
+    this.findPackageDependencies.addAll(dependencies);
   }
 
   public Set<CMakeResolvedFindPackageDependency> getFindPackageDependencies() {
@@ -60,19 +41,31 @@ public class CMakeResolvedBuild {
   }
 
   public void addProjectModuleDependency(final CMakeResolvedProjectModuleDependency dependency) {
-    projectModuleDependencies.add(dependency);
+    this.projectModuleDependencies.add(dependency);
   }
 
   public void addProjectModuleDependencies(final Collection<CMakeResolvedProjectModuleDependency> dependencies) {
-    projectModuleDependencies.addAll(dependencies);
+    this.projectModuleDependencies.addAll(dependencies);
   }
 
   public Set<CMakeResolvedProjectModuleDependency> getProjectModuleDependencies() {
     return projectModuleDependencies;
   }
 
+  public void addFindPackage(final CMakeResolvedFindPackage findPackage) {
+    this.findPackages.add(findPackage);
+  }
+
+  public void addFindPackages(final Collection<CMakeResolvedFindPackage> findPackages) {
+    this.findPackages.addAll(findPackages);
+  }
+
+  public Set<CMakeResolvedFindPackage> getFindPackages() {
+    return findPackages;
+  }
+
   public void add(final CMakeResolvedInterface object) {
-    interfaces.add(object);
+    this.interfaces.add(object);
   }
 
   public Set<CMakeResolvedInterface> getInterfaces() {
@@ -80,7 +73,7 @@ public class CMakeResolvedBuild {
   }
 
   public void add(final CMakeResolvedLibrary object) {
-    libraries.add(object);
+    this.libraries.add(object);
   }
 
   public Set<CMakeResolvedLibrary> getLibraries() {
@@ -88,7 +81,7 @@ public class CMakeResolvedBuild {
   }
 
   public void add(final CMakeResolvedApplication object) {
-    applications.add(object);
+    this.applications.add(object);
   }
 
   public Set<CMakeResolvedApplication> getApplications() {
@@ -96,35 +89,11 @@ public class CMakeResolvedBuild {
   }
 
   public void add(final CMakeResolvedTest object) {
-    tests.add(object);
+    this.tests.add(object);
   }
 
   public Set<CMakeResolvedTest> getTests() {
     return tests;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    CMakeResolvedBuild other = (CMakeResolvedBuild) obj;
-    if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
-    return true;
-  }
 }

@@ -54,11 +54,10 @@ public class CMakePlugin implements Plugin<Project> {
       if (Objects.nonNull(extension)) {
 
         /* Build */
-        final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild(project.getName());
+        final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild();
 
         final CMakeResolver cmakeResolver = new CMakeResolver(project,
             extension.getToolchains().stream(), extension.getFindPackages().getAsMap(), resolvedBuild);
-        cmakeResolver.processFindPackages(extension.getFindPackages().stream(), resolvedBuild);
         cmakeResolver.processLibraries(extension.getLibraries().stream(), resolvedBuild);
         cmakeResolver.processApplications(extension.getApplications().stream(), resolvedBuild);
         cmakeResolver.processTests(extension.getTests().stream(), resolvedBuild);

@@ -8,7 +8,6 @@ package ch.tomaki.gradle.cmake.files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -41,8 +40,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
+    writeFindPackages(build.getFindPackages());
     writeProjectDependencies(build.getProjectModuleDependencies(), project);
-    writeFindPackages(build);
     writeInterfaces(build.getInterfaces(), project);
     writeLibraries(build.getLibraries(), project);
     writeApplications(build.getApplications(), project);
@@ -66,34 +65,26 @@ public class CMakeListsFile extends CMakeFileOutputStream {
         """);
   }
 
-  private void writeFindPackages(final CMakeResolvedBuild build) throws IOException {
-    final Map<CMakeResolvedToolchain, Set<String>> processed = new HashMap<>();
-    for (final CMakeResolvedFindPackageDependency object : build.getFindPackageDependencies()) {
-      if (!processed.containsKey(object.getToolchain())) {
-        processed.put(object.getToolchain(), new HashSet<>());
-      }
-      if (!processed.get(object.getToolchain()).contains(object.getFindPackageName())) {
-        final CMakeResolvedFindPackage findPackage = build.getFindPackage(object.getFindPackageName());
-        writeLine();
-        write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
-        if (findPackage.getComponents().isEmpty()) {
-          write("find_package( %s CONFIG REQUIRED )", findPackage.getName());
-        } else {
-          write("find_package( %s CONFIG REQUIRED", findPackage.getName());
-          for (final String component : findPackage.getComponents()) {
-            write(1, "%s::%s", findPackage.getName(), component);
-          }
-          write(")");
+  private void writeFindPackages(final Set<CMakeResolvedFindPackage> findPackages) throws IOException {
+    for (final CMakeResolvedFindPackage object : findPackages) {
+      writeLine();
+      write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
+      if (object.getComponents().isEmpty()) {
+        write("find_package( %s CONFIG REQUIRED )", object.getName());
+      } else {
+        write("find_package( %s CONFIG REQUIRED", object.getName());
+        for (final String component : object.getComponents()) {
+          write(1, "%s::%s", object.getName(), component);
         }
-        if (!findPackage.getProperties().isEmpty()) {
-          for (final Map.Entry<String, String> property : findPackage.getProperties().entrySet()) {
-            write("set( %s_%s %s )", findPackage.getName(), property.getKey().toUpperCase(),
-                property.getValue().toUpperCase());
-          }
-        }
-        write("endif()");
-        processed.get(object.getToolchain()).add(object.getFindPackageName());
+        write(")");
       }
+      if (!object.getProperties().isEmpty()) {
+        for (final Map.Entry<String, String> property : object.getProperties().entrySet()) {
+          write("set( %s_%s %s )", object.getName(), property.getKey().toUpperCase(),
+              property.getValue().toUpperCase());
+        }
+      }
+      write("endif()");
     }
   }
 
@@ -170,7 +161,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       throws IOException {
     final String target = CMakeListsConventions.staticLibraryTarget(
         object.getName(), object.getToolchain(), object.getBuildConfig());
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_library( %s STATIC )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetSources(target, "PUBLIC", object.getSources(), project);
@@ -190,7 +181,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       throws IOException {
     final String target = CMakeListsConventions.sharedLibraryTarget(object.getName(), object.getToolchain(),
         object.getBuildConfig());
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_library( %s SHARED )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
@@ -208,7 +199,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
 
   private void writeExecutable(final String target, final CMakeResolvedBinary object, final Project project)
       throws IOException {
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_executable( %s )", target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
     writeTargetSources(target, "PRIVATE", object.getSources(), project);
@@ -222,7 +213,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   }
 
   private void writeAddTest(final String target, final CMakeResolvedBinary object) throws IOException {
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_test(");
     write(1, "NAME %s", target);
     write(1, "COMMAND $<TARGET_FILE:%s>", target);

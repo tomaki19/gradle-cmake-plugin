@@ -16,11 +16,13 @@ public class CMakeResolvedFindPackage {
   private final String name;
   private final Set<String> components;
   private final Map<String, String> properties;
+  private final CMakeResolvedToolchain toolchain;
 
-  CMakeResolvedFindPackage(final CMakeFindPackage findPackage) {
+  CMakeResolvedFindPackage(final CMakeFindPackage findPackage, final CMakeResolvedToolchain toolchain) {
     this.name = findPackage.getName();
     this.components = new HashSet<>(findPackage.getComponents().get());
     this.properties = findPackage.getProperties().get();
+    this.toolchain = toolchain;
   }
 
   public String getName() {
@@ -35,11 +37,16 @@ public class CMakeResolvedFindPackage {
     return properties;
   }
 
+  public CMakeResolvedToolchain getToolchain() {
+    return toolchain;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
     return result;
   }
 
@@ -56,6 +63,11 @@ public class CMakeResolvedFindPackage {
       if (other.name != null)
         return false;
     } else if (!name.equals(other.name))
+      return false;
+    if (toolchain == null) {
+      if (other.toolchain != null)
+        return false;
+    } else if (!toolchain.equals(other.toolchain))
       return false;
     return true;
   }

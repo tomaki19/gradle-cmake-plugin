@@ -19,19 +19,23 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
   private final Set<String> publicCompileOptions;
   private final Set<String> publicCompileDefinitions;
   private final Set<String> publicLinkOptions;
+  private final Set<CMakeResolvedFindPackage> publicFindPackages;
   private final Set<CMakeResolvedFindPackageDependency> publicFindPackageDependencies;
   private final Set<CMakeResolvedProjectModuleDependency> publicProjectModuleDependencies;
 
-  public CMakeResolvedLibrary(final CMakeLibrary library, final CMakeResolvedToolchain toolchain,
+  public CMakeResolvedLibrary(final CMakeLibrary object, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Map<String, CMakeFindPackage> findPackages, final Project project) {
-    super(library, toolchain, buildConfig, findPackages, project);
-    this.publicCompileOptions = new HashSet<>(library.getPublicCompileOptions().get());
-    this.publicCompileDefinitions = new HashSet<>(library.getPublicCompileDefinitions().get());
-    this.publicLinkOptions = resolveLinkOptions(library.getPublicLinkDependencies().get());
-    this.publicFindPackageDependencies = resolveFindPackageDependencies(
-        library.getPublicLinkDependencies().get(), findPackages, toolchain);
-    this.publicProjectModuleDependencies = resolveProjectModuleDependencies(
-        library.getPublicLinkDependencies().get(), buildConfig, toolchain, project);
+    super(object, toolchain, buildConfig, findPackages, project);
+    this.publicCompileOptions = new HashSet<>(object.getPublicCompileOptions().get());
+    this.publicCompileDefinitions = new HashSet<>(object.getPublicCompileDefinitions().get());
+    this.publicLinkOptions = resolveLinkOptions(object.getPublicLinkDependencies().get());
+    this.publicFindPackages = new HashSet<>();
+    this.publicFindPackageDependencies = new HashSet<>();
+    resolveFindPackageDependencies(publicFindPackages, publicFindPackageDependencies, toolchain, findPackages,
+        object.getPrivateLinkDependencies().get());
+    this.publicProjectModuleDependencies = new HashSet<>();
+    resolveProjectModuleDependencies(publicProjectModuleDependencies, project, toolchain, buildConfig,
+        object.getPublicLinkDependencies().get());
   }
 
   public final Set<String> getPublicCompileOptions() {
@@ -52,5 +56,9 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
 
   public Set<CMakeResolvedProjectModuleDependency> getPublicProjectModuleDependencies() {
     return publicProjectModuleDependencies;
+  }
+
+  public Set<CMakeResolvedFindPackage> getPublicFindPackages() {
+    return publicFindPackages;
   }
 }
