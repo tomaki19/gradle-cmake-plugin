@@ -31,7 +31,7 @@ public abstract class CMakeExtension {
 
   public abstract NamedDomainObjectContainer<CMakeLibrary> getLibraries();
 
-  public abstract NamedDomainObjectContainer<CMakeObject> getApplications();
+  public abstract NamedDomainObjectContainer<CMakeApplication> getApplications();
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
 

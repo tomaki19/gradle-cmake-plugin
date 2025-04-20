@@ -22,7 +22,7 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
-  public final String toolchainName;
+  protected final String toolchainName;
 
   @Inject
   public CMakeExec(final CMakeResolvedToolchain toolchain) {

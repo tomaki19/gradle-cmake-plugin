@@ -40,13 +40,19 @@ public class CMakeResolvedProjectModuleDependency {
     return projectName;
   }
 
+  public String getAssembleConfigTaskName() {
+    final String name = ":%s:%s".formatted(projectName, CMakeTasksConventions.assembleConfigTaskName());
+    return name;
+  }
+
   public String getConfigTaskName() {
-    return ":%s:%s"
-        .formatted(projectName, CMakeTasksConventions.configureTaskName(toolchainName));
+    final String name = ":%s:%s".formatted(projectName, CMakeTasksConventions.configureTaskName(toolchainName));
+    return name;
   }
 
   public String getBuildTaskName() {
-    return ":%s:%s".formatted(projectName, CMakeTasksConventions.buildTaskName(buildTargetName));
+    final String name = ":%s:%s".formatted(projectName, CMakeTasksConventions.buildTaskName(buildTargetName));
+    return name;
   }
 
   public Directory getProjectDirectory() {

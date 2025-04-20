@@ -5,19 +5,17 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import java.util.Map;
+
+import org.gradle.api.Project;
+
 import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.CMakeTest;
-import java.util.Map;
-import org.gradle.api.Project;
 
 public final class CMakeResolvedTest extends CMakeResolvedBinary {
 
-  public CMakeResolvedTest(
-      final CMakeTest test,
-      final Map<String, CMakeFindPackage> findPackages,
-      final CMakeResolvedToolchain toolchain,
-      final String buildConfig,
-      final Project project) {
-    super(test, findPackages, toolchain, buildConfig, project);
+  public CMakeResolvedTest(final CMakeTest test, final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final Map<String, CMakeFindPackage> findPackages, final Project project) {
+    super(test, toolchain, buildConfig, findPackages, project);
   }
 }

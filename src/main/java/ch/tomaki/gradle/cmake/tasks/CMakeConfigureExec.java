@@ -14,12 +14,9 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeConfigureExec extends CMakeExec {
 
-  public final String toolchainName;
-
   @Inject
   public CMakeConfigureExec(final CMakeResolvedToolchain toolchain) {
     super(toolchain);
-    this.toolchainName = toolchain.getName();
     final Directory outputDirectory = getProject().getLayout().getBuildDirectory()
         .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, toolchain.getName())).get();
     // tasks with same output directory are not run in parallel
@@ -34,6 +31,7 @@ public abstract class CMakeConfigureExec extends CMakeExec {
       getBaseCommandLine().add("--toolchain");
       getBaseCommandLine().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAsFile().getAbsolutePath()));
     }
+    getBaseCommandLine().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
     if (!toolchain.getBuildConfigs().isEmpty()) {
       getBaseCommandLine().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\""
           .formatted(String.join(";", toolchain.getBuildConfigs())));

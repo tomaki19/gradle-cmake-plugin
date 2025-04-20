@@ -71,23 +71,33 @@ public class CMakeTaskRegistry {
     });
   }
 
-  public <T extends Task> void configureTaskProjectModuleConfigureDependencies(final String taskName,
+  public void configureAssembleConfigTaskProjectModuleDependencies(final String taskName,
       final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
-      projectModuleDependencies.parallelStream()
+      projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getProjectName(), projectName))
+          .map(dependency -> dependency.getAssembleConfigTaskName())
+          .forEach(assembleConfigTaskName -> task.dependsOn(assembleConfigTaskName));
+    });
+  }
+
+  public void configureConfigureTaskProjectModuleDependencies(final String taskName,
+      final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
+    taskContainer.named(taskName).configure((task) -> {
+      projectModuleDependencies.stream()
+          .filter(dependency -> !Objects.equals(dependency.getProjectName(), projectName))
+          .filter(dependency -> dependency.isBuildable())
           .map(dependency -> dependency.getConfigTaskName())
           .forEach(configTaskName -> task.mustRunAfter(configTaskName));
     });
   }
 
-  public <T extends Task> void configureTaskProjectModuleBuildDependencies(final String taskName,
+  public void configureBuildTaskProjectModuleDependencies(final String taskName,
       final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
-      projectModuleDependencies.parallelStream()
+      projectModuleDependencies.stream()
           .filter(dependency -> dependency.isBuildable())
           .map(dependency -> dependency.getBuildTaskName())
-          .filter(buildTaskName -> !task.getDependsOn().contains(buildTaskName))
           .forEach(buildTaskName -> task.dependsOn(buildTaskName));
     });
   }

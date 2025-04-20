@@ -32,20 +32,20 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
       write("add_library( %s::%s INTERFACE IMPORTED )", project.getName(), libraryTarget);
       setTargetProperties(object, libraryTarget, project);
     }
-    for (final CMakeResolvedLibrary library : build.getLibraries()) {
-      if (library.isBuildStatic()) {
+    for (final CMakeResolvedLibrary object : build.getLibraries()) {
+      if (object.isBuildStatic()) {
         final String libraryTarget = CMakeListsConventions.staticLibraryTarget(
-            library.getName(), library.getToolchain(), library.getBuildConfig());
+            object.getName(), object.getToolchain(), object.getBuildConfig());
         write("add_library( %s::%s STATIC IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
-            library, libraryTarget, OperatingSystem.current().getStaticLibrarySuffix(), project);
+            object, libraryTarget, OperatingSystem.current().getStaticLibrarySuffix(), project);
       }
-      if (library.isBuildShared()) {
+      if (object.isBuildShared()) {
         final String libraryTarget = CMakeListsConventions.sharedLibraryTarget(
-            library.getName(), library.getToolchain(), library.getBuildConfig());
+            object.getName(), object.getToolchain(), object.getBuildConfig());
         write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
-            library, libraryTarget, OperatingSystem.current().getSharedLibrarySuffix(), project);
+            object, libraryTarget, OperatingSystem.current().getSharedLibrarySuffix(), project);
       }
     }
   }
@@ -64,12 +64,8 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
     write(")");
   }
 
-  private void setTargetProperties(
-      final CMakeResolvedLibrary library,
-      final String libraryTarget,
-      final String librarySuffix,
-      final Project project)
-      throws IOException {
+  private void setTargetProperties(final CMakeResolvedLibrary library, final String libraryTarget,
+      final String librarySuffix, final Project project) throws IOException {
     write("set_target_properties( %s::%s PROPERTIES", project.getName(), libraryTarget);
     final File installDir = project.getLayout().getBuildDirectory().get()
         .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_INSTALL_PATH, library.getToolchain().getName()))
@@ -102,7 +98,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
         || !library.getPublicLinkOptions().isEmpty()) {
       for (final CMakeResolvedFindPackageDependency findPackageDependency : library
           .getPublicFindPackageDependencies()) {
-        write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", findPackageDependency.getBuildTarget());
+        write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", findPackageDependency.getIdentifier());
       }
       for (final CMakeResolvedProjectModuleDependency projectModuleDependency : library
           .getPublicProjectModuleDependencies()) {

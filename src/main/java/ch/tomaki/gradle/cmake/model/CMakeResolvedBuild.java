@@ -6,17 +6,13 @@
 package ch.tomaki.gradle.cmake.model;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class CMakeResolvedBuild {
 
   private final String name;
-  private final Map<String, CMakeResolvedToolchain> toolchains = new HashMap<>();
-  private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
+  private final Set<CMakeResolvedToolchain> toolchains = new HashSet<>();
   private final Set<CMakeResolvedFindPackageDependency> findPackageDependencies = new HashSet<>();
   private final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new HashSet<>();
   private final Set<CMakeResolvedInterface> interfaces = new HashSet<>();
@@ -32,38 +28,31 @@ public class CMakeResolvedBuild {
     return name;
   }
 
-  public void put(final String name, final CMakeResolvedToolchain toolchain) {
-    toolchains.put(name, toolchain);
+  public void add(final CMakeResolvedToolchain toolchain) {
+    toolchains.add(toolchain);
   }
 
-  public void forToolchain(final String name, final Consumer<CMakeResolvedToolchain> consumer) {
-    toolchains.computeIfPresent(name, (key, toolchain) -> {
-      consumer.accept(toolchain);
-      return toolchain;
-    });
+  public Set<CMakeResolvedToolchain> getToolchains() {
+    return toolchains;
   }
 
-  public void add(final CMakeResolvedFindPackage findPackage) {
-    findPackages.add(findPackage);
-  }
-
-  public Set<CMakeResolvedFindPackage> getFindPackages() {
-    return findPackages;
-  }
-
-  public void add(final CMakeResolvedFindPackageDependency dependency) {
+  public void addFindPackageDependency(final CMakeResolvedFindPackageDependency dependency) {
     findPackageDependencies.add(dependency);
+  }
+
+  public void addFindPackageDependencies(final Collection<CMakeResolvedFindPackageDependency> dependencies) {
+    findPackageDependencies.addAll(dependencies);
   }
 
   public Set<CMakeResolvedFindPackageDependency> getFindPackageDependencies() {
     return findPackageDependencies;
   }
 
-  public void add(final CMakeResolvedProjectModuleDependency dependency) {
+  public void addProjectModuleDependency(final CMakeResolvedProjectModuleDependency dependency) {
     projectModuleDependencies.add(dependency);
   }
 
-  public void addAll(final Collection<CMakeResolvedProjectModuleDependency> dependencies) {
+  public void addProjectModuleDependencies(final Collection<CMakeResolvedProjectModuleDependency> dependencies) {
     projectModuleDependencies.addAll(dependencies);
   }
 

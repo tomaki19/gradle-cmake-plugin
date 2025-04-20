@@ -19,7 +19,6 @@ import org.gradle.api.file.Directory;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackage;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedInterface;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
@@ -41,7 +40,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
     writeProjectDependencies(build.getProjectModuleDependencies(), project);
-    writeFindPackages(build.getFindPackages());
+    writeFindPackages(build.getFindPackageDependencies());
     writeInterfaces(build.getInterfaces(), project);
     writeLibraries(build.getLibraries(), project);
     writeApplications(build.getApplications(), project);
@@ -58,43 +57,53 @@ public class CMakeListsFile extends CMakeFileOutputStream {
         set( CMAKE_CONFIGURATION_TYPES $ENV{CMAKE_CONFIGURATION_TYPES} )
         set( CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE} )
         set( CMAKE_BUILD_TYPE $ENV{CMAKE_BUILD_TYPE} )
+        set( CMAKE_TOOLCHAIN_NAME $ENV{CMAKE_TOOLCHAIN_NAME} )
+
+        include(CMakePrintHelpers)
+        cmake_print_variables(CMAKE_TOOLCHAIN_NAME)
         """);
   }
 
-  private void writeProjectDependencies(final Set<CMakeResolvedProjectModuleDependency> projects, final Project project)
+  private void writeFindPackages(final Set<CMakeResolvedFindPackageDependency> findPackages)
       throws IOException {
-    final Set<String> projectModules = new HashSet<>();
-    for (final CMakeResolvedProjectModuleDependency resolvedProjectModule : projects) {
-      if (!projectModules.contains(resolvedProjectModule.getProjectName())) {
-        if (!Objects.equals(project.getName(), resolvedProjectModule.getProjectName())) {
-          write("set( %s_DIR \"%s\" )", resolvedProjectModule.getProjectName(),
-              resolvedProjectModule.getInstallDirectory().getAsFile().toURI().getPath());
-          write("find_package( %s CONFIG REQUIRED )", resolvedProjectModule.getProjectName());
+    final Set<String> processed = new HashSet<>();
+    for (final CMakeResolvedFindPackageDependency object : findPackages) {
+      if (!processed.contains(object.getPackageName())) {
+        writeLine();
+        write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
+        if (object.getComponents().isEmpty()) {
+          write("find_package( %s CONFIG REQUIRED )", object.getPackageName());
+        } else {
+          write("find_package( %s CONFIG REQUIRED", object.getPackageName());
+          for (final String component : object.getComponents()) {
+            write(1, "%s::%s", object.getPackageName(), component);
+          }
+          write(")");
         }
-        projectModules.add(resolvedProjectModule.getProjectName());
+        if (!object.getProperties().isEmpty()) {
+          for (final Map.Entry<String, String> property : object.getProperties().entrySet()) {
+            write("set( %s_%s %s )", object.getPackageName(), property.getKey().toUpperCase(),
+                property.getValue().toUpperCase());
+          }
+        }
+        write("endif()");
+        processed.add(object.getPackageName());
       }
     }
   }
 
-  private void writeFindPackages(final Set<CMakeResolvedFindPackage> findPackages)
+  private void writeProjectDependencies(final Set<CMakeResolvedProjectModuleDependency> projects, final Project project)
       throws IOException {
-    final Set<String> findPackageNames = new HashSet<>();
-    for (final CMakeResolvedFindPackage findPackage : findPackages) {
-      if (!findPackageNames.contains(findPackage.getName())) {
-        write("find_package( %s CONFIG REQUIRED", findPackage.getName());
-        if (!findPackage.getComponents().isEmpty()) {
-          for (final String component : findPackage.getComponents()) {
-            write(1, "%s::%s", findPackage.getName(), component);
-          }
+    final Set<String> processed = new HashSet<>();
+    for (final CMakeResolvedProjectModuleDependency object : projects) {
+      if (!processed.contains(object.getProjectName())) {
+        writeLine();
+        if (!Objects.equals(project.getName(), object.getProjectName())) {
+          write("set( %s_DIR \"%s\" )", object.getProjectName(),
+              object.getInstallDirectory().getAsFile().toURI().getPath());
+          write("find_package( %s REQUIRED )", object.getProjectName());
         }
-        write(")");
-        if (!findPackage.getProperties().isEmpty()) {
-          for (final Map.Entry<String, String> property : findPackage.getProperties().entrySet()) {
-            write("set( %s_%s %s )", findPackage.getName(), property.getKey().toUpperCase(),
-                property.getValue().toUpperCase());
-          }
-        }
-        findPackageNames.add(findPackage.getName());
+        processed.add(object.getProjectName());
       }
     }
   }
@@ -139,7 +148,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
             object.getBuildConfig());
         writeLine();
         writeExecutable(target, object, project);
-        writeAddTest(target);
+        writeAddTest(target, object);
       }
     }
   }
@@ -156,6 +165,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       throws IOException {
     final String target = CMakeListsConventions.staticLibraryTarget(
         object.getName(), object.getToolchain(), object.getBuildConfig());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
     write("add_library( %s STATIC )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetSources(target, "PUBLIC", object.getSources(), project);
@@ -168,12 +178,14 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     if (object.isStripDebug()) {
       writeStripDebugCommand(target, object.getToolchain(), project);
     }
+    write("endif()");
   }
 
   private void writeSharedLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
     final String target = CMakeListsConventions.sharedLibraryTarget(object.getName(), object.getToolchain(),
         object.getBuildConfig());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
     write("add_library( %s SHARED )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
@@ -186,10 +198,12 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     if (object.isStripDebug()) {
       writeStripDebugCommand(target, object.getToolchain(), project);
     }
+    write("endif()");
   }
 
   private void writeExecutable(final String target, final CMakeResolvedBinary object, final Project project)
       throws IOException {
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
     write("add_executable( %s )", target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
     writeTargetSources(target, "PRIVATE", object.getSources(), project);
@@ -199,13 +213,16 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     if (object.isStripDebug()) {
       writeStripDebugCommand(target, object.getToolchain(), project);
     }
+    write("endif()");
   }
 
-  private void writeAddTest(final String target) throws IOException {
+  private void writeAddTest(final String target, final CMakeResolvedBinary object) throws IOException {
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\"	)", object.getToolchain().getName());
     write("add_test(");
     write(1, "NAME %s", target);
     write(1, "COMMAND $<TARGET_FILE:%s>", target);
     write(")");
+    write("endif()");
   }
 
   private void writeTargetIncludeDirectories(final String target, final String access, final Set<String> includes,
@@ -306,7 +323,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       write(1, projectModule.getBuildTarget());
     }
     for (final CMakeResolvedFindPackageDependency findPackage : findPackages) {
-      write(1, findPackage.getBuildTarget());
+      write(1, findPackage.getIdentifier());
     }
     for (final String option : options) {
       write(1, option);

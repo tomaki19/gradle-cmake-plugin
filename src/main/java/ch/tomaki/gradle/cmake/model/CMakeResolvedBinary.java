@@ -31,12 +31,9 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
   private final boolean stripDebug;
   private final boolean packageBuildOutputs;
 
-  public CMakeResolvedBinary(final CMakeObject object, final Map<String, CMakeFindPackage> findPackages,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project)
-      throws IllegalArgumentException {
+  public CMakeResolvedBinary(final CMakeObject object, final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final Map<String, CMakeFindPackage> findPackages, final Project project) throws IllegalArgumentException {
     super(object);
-    this.buildConfig = buildConfig;
-    this.toolchain = toolchain;
     this.sources = new HashSet<>(object.getSources().get());
     this.privateCompileOptions = new HashSet<>(object.getPrivateCompileOptions().get());
     this.privateCompileDefinitions = new HashSet<>(object.getPrivateCompileDefinitions().get());
@@ -50,14 +47,8 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     this.stripDebug = object.getStripDebug().getOrElse(Boolean.FALSE) || toolchain.isStripDebug();
     this.packageBuildOutputs = object.getPackageBuildOutputs().getOrElse(Boolean.FALSE)
         || toolchain.isPackageBuildOutputs();
-  }
-
-  public String getBuildConfig() {
-    return buildConfig;
-  }
-
-  public CMakeResolvedToolchain getToolchain() {
-    return toolchain;
+    this.toolchain = toolchain;
+    this.buildConfig = buildConfig;
   }
 
   public Set<String> getSources() {
@@ -72,16 +63,12 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     return privateCompileDefinitions;
   }
 
-  public void addLibraryDependencies(
-      final Set<String> dependencies,
-      final Map<String, CMakeFindPackage> findPackages,
-      final Project project)
-      throws IllegalArgumentException {
+  public void addLibraryDependencies(final Set<String> dependencies,
+      final Map<String, CMakeFindPackage> findPackages, final Project project) throws IllegalArgumentException {
     privateLinkOptions.addAll(resolveLinkOptions(dependencies));
-    privateFindPackageDependencies.addAll(
-        resolveFindPackageDependencies(dependencies, findPackages, toolchain));
-    privateProjectModuleDependencies.addAll(
-        resolveProjectModuleDependencies(dependencies, buildConfig, toolchain, project));
+    privateFindPackageDependencies.addAll(resolveFindPackageDependencies(dependencies, findPackages, toolchain));
+    privateProjectModuleDependencies
+        .addAll(resolveProjectModuleDependencies(dependencies, buildConfig, toolchain, project));
   }
 
   public Set<String> getPrivateLinkOptions() {
@@ -138,9 +125,8 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
         final String[] dependencyTokens = dependency.split("::");
         if (dependencyTokens.length <= 2) {
           if (findPackages.containsKey(dependencyTokens[0])) {
-            final CMakeFindPackage findPackage = findPackages.get(dependencyTokens[0]);
             final CMakeResolvedFindPackageDependency resolvedFindPackage = new CMakeResolvedFindPackageDependency(
-                findPackage.getName(), dependency, toolchain);
+                dependency, findPackages.get(dependencyTokens[0]), toolchain);
             resolvedFindPackageDependencies.add(resolvedFindPackage);
           } else {
             throw new IllegalArgumentException(
@@ -162,7 +148,7 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
         if (dependencyTokens.length == 3) {
           final Project dependencyProject = project.findProject(":%s".formatted(dependencyTokens[0]));
           if (Objects.nonNull(dependencyProject)) {
-            final String buildTarget = getBuildTarget(dependencyTokens[2], buildConfig, dependencyTokens[1], toolchain);
+            final String buildTarget = getBuildTarget(dependencyTokens[2], dependencyTokens[1], toolchain, buildConfig);
             final CMakeResolvedProjectModuleDependency resolvedProjectModule = new CMakeResolvedProjectModuleDependency(
                 buildTarget, isBuildable(dependencyTokens[2]), toolchain, dependencyProject);
             resolvedProjectModuleDependencies.add(resolvedProjectModule);
@@ -179,12 +165,12 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     return resolvedProjectModuleDependencies;
   }
 
-  private static String getBuildTarget(final String buildType, final String buildConfig, final String libraryName,
-      final CMakeResolvedToolchain toolchain) {
+  private static String getBuildTarget(final String buildType, final String name, CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
     return switch (buildType.toLowerCase()) {
-      case "static" -> CMakeListsConventions.staticLibraryTarget(libraryName, toolchain, buildConfig);
-      case "shared" -> CMakeListsConventions.sharedLibraryTarget(libraryName, toolchain, buildConfig);
-      default -> CMakeListsConventions.interfaceLibraryTarget(libraryName);
+      case "static" -> CMakeListsConventions.staticLibraryTarget(name, toolchain, buildConfig);
+      case "shared" -> CMakeListsConventions.sharedLibraryTarget(name, toolchain, buildConfig);
+      default -> CMakeListsConventions.interfaceLibraryTarget(name);
     };
   }
 
@@ -195,12 +181,20 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     };
   }
 
+  public CMakeResolvedToolchain getToolchain() {
+    return toolchain;
+  }
+
+  public String getBuildConfig() {
+    return buildConfig;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((buildConfig == null) ? 0 : buildConfig.hashCode());
     result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
+    result = prime * result + ((buildConfig == null) ? 0 : buildConfig.hashCode());
     return result;
   }
 
@@ -213,15 +207,15 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedBinary other = (CMakeResolvedBinary) obj;
-    if (buildConfig == null) {
-      if (other.buildConfig != null)
-        return false;
-    } else if (!buildConfig.equals(other.buildConfig))
-      return false;
     if (toolchain == null) {
       if (other.toolchain != null)
         return false;
     } else if (!toolchain.equals(other.toolchain))
+      return false;
+    if (buildConfig == null) {
+      if (other.buildConfig != null)
+        return false;
+    } else if (!buildConfig.equals(other.buildConfig))
       return false;
     return true;
   }

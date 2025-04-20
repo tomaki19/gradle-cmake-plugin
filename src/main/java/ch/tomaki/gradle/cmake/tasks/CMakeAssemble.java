@@ -5,14 +5,16 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import ch.tomaki.gradle.cmake.files.CMakeFileOutputStream;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import javax.inject.Inject;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
+
+import ch.tomaki.gradle.cmake.files.CMakeFileOutputStream;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 
 public abstract class CMakeAssemble extends DefaultTask {
 

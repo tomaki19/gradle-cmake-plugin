@@ -14,12 +14,8 @@ import ch.tomaki.gradle.cmake.extension.CMakeObject;
 
 public final class CMakeResolvedApplication extends CMakeResolvedBinary {
 
-  public CMakeResolvedApplication(
-      final CMakeObject object,
-      final Map<String, CMakeFindPackage> findPackages,
-      final CMakeResolvedToolchain toolchain,
-      final String buildConfig,
-      final Project project) {
-    super(object, findPackages, toolchain, buildConfig, project);
+  public CMakeResolvedApplication(final CMakeObject object, final CMakeResolvedToolchain toolchain,
+      final String buildConfig, final Map<String, CMakeFindPackage> findPackages, final Project project) {
+    super(object, toolchain, buildConfig, findPackages, project);
   }
 }
