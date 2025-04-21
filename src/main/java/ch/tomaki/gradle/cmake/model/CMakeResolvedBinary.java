@@ -14,6 +14,7 @@ import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.CMakeObject;
+import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 
 public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
@@ -166,9 +167,11 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
                   toolchain);
               projectModules.add(projectModule);
             }
-            final String buildTarget = getBuildTarget(dependencyTokens[2], dependencyTokens[1], toolchain, buildConfig);
+            final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
+            final String buildTarget = CMakeListsConventions.libraryTarget(dependencyTokens[1], toolchain, type,
+                buildConfig);
             final CMakeResolvedProjectModuleDependency resolvedProjectModule = new CMakeResolvedProjectModuleDependency(
-                buildTarget, isBuildable(dependencyTokens[2]), toolchain, dependencyProject);
+                dependencyProject, toolchain, type, buildTarget);
             projectModuleDependencies.add(resolvedProjectModule);
           } else {
             throw new IllegalArgumentException(
@@ -180,22 +183,6 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
         }
       }
     }
-  }
-
-  private static String getBuildTarget(final String buildType, final String name, CMakeResolvedToolchain toolchain,
-      final String buildConfig) {
-    return switch (buildType.toLowerCase()) {
-      case "static" -> CMakeListsConventions.staticLibraryTarget(name, toolchain, buildConfig);
-      case "shared" -> CMakeListsConventions.sharedLibraryTarget(name, toolchain, buildConfig);
-      default -> CMakeListsConventions.interfaceLibraryTarget(name);
-    };
-  }
-
-  private static boolean isBuildable(final String libraryType) {
-    return switch (libraryType.toLowerCase()) {
-      case "interface" -> false;
-      default -> true;
-    };
   }
 
   public CMakeResolvedToolchain getToolchain() {

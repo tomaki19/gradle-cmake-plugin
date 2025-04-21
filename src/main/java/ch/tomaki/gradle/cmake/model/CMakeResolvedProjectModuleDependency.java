@@ -7,50 +7,46 @@ package ch.tomaki.gradle.cmake.model;
 
 import org.gradle.api.Project;
 
-import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
+import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 
 public class CMakeResolvedProjectModuleDependency {
 
-  private final String identifier;
-  private final String projectName;
-  private final String toolchainName;
+  private final Project project;
+  private final CMakeResolvedToolchain toolchain;
+  private final CMakeLinkType type;
   private final String buildTarget;
-  private final boolean buildable;
 
-  CMakeResolvedProjectModuleDependency(final String buildTarget, final boolean buildable,
-      final CMakeResolvedToolchain toolchain, final Project project) {
-    this.identifier = "%s::%s".formatted(project.getName(), buildTarget);
-    this.projectName = project.getName();
-    this.toolchainName = toolchain.getName();
+  CMakeResolvedProjectModuleDependency(final Project project, final CMakeResolvedToolchain toolchain,
+      final CMakeLinkType type, final String buildTarget) {
+    this.project = project;
+    this.toolchain = toolchain;
+    this.type = type;
     this.buildTarget = buildTarget;
-    this.buildable = buildable;
   }
 
-  public String getIdentifier() {
-    return identifier;
+  public Project getProject() {
+    return project;
   }
 
-  public String getProjectName() {
-    return projectName;
+  public CMakeResolvedToolchain getToolchain() {
+    return toolchain;
   }
 
-  public String getConfigTaskName() {
-    return ":%s:%s".formatted(projectName, CMakeTasksConventions.configureTaskName(toolchainName));
+  public CMakeLinkType getType() {
+    return type;
   }
 
-  public String getBuildTaskName() {
-    return ":%s:%s".formatted(projectName, CMakeTasksConventions.buildTaskName(buildTarget));
-  }
-
-  public boolean isBuildable() {
-    return buildable;
+  public String getBuildTarget() {
+    return buildTarget;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
+    result = prime * result + ((project == null) ? 0 : project.hashCode());
+    result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
+    result = prime * result + ((buildTarget == null) ? 0 : buildTarget.hashCode());
     return result;
   }
 
@@ -63,11 +59,22 @@ public class CMakeResolvedProjectModuleDependency {
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectModuleDependency other = (CMakeResolvedProjectModuleDependency) obj;
-    if (identifier == null) {
-      if (other.identifier != null)
+    if (project == null) {
+      if (other.project != null)
         return false;
-    } else if (!identifier.equals(other.identifier))
+    } else if (!project.equals(other.project))
+      return false;
+    if (toolchain == null) {
+      if (other.toolchain != null)
+        return false;
+    } else if (!toolchain.equals(other.toolchain))
+      return false;
+    if (buildTarget == null) {
+      if (other.buildTarget != null)
+        return false;
+    } else if (!buildTarget.equals(other.buildTarget))
       return false;
     return true;
   }
+
 }

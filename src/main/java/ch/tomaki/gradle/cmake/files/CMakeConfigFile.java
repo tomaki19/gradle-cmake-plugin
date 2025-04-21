@@ -28,21 +28,21 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
   @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     for (final CMakeResolvedInterface object : build.getInterfaces()) {
-      final String libraryTarget = CMakeListsConventions.interfaceLibraryTarget(object.getName());
+      final String libraryTarget = CMakeListsConventions.libraryInterfaceTarget(object.getName());
       write("add_library( %s::%s INTERFACE IMPORTED )", project.getName(), libraryTarget);
       setTargetProperties(object, libraryTarget, project);
     }
     for (final CMakeResolvedLibrary object : build.getLibraries()) {
       if (object.isBuildStatic()) {
-        final String libraryTarget = CMakeListsConventions.staticLibraryTarget(
-            object.getName(), object.getToolchain(), object.getBuildConfig());
+        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(), object.getToolchain(),
+            CMakeLinkType.STATIC, object.getBuildConfig());
         write("add_library( %s::%s STATIC IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
             object, libraryTarget, OperatingSystem.current().getStaticLibrarySuffix(), project);
       }
       if (object.isBuildShared()) {
-        final String libraryTarget = CMakeListsConventions.sharedLibraryTarget(
-            object.getName(), object.getToolchain(), object.getBuildConfig());
+        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(), object.getToolchain(),
+            CMakeLinkType.SHARED, object.getBuildConfig());
         write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
             object, libraryTarget, OperatingSystem.current().getSharedLibrarySuffix(), project);
@@ -102,7 +102,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
       }
       for (final CMakeResolvedProjectModuleDependency projectModuleDependency : library
           .getPublicProjectModuleDependencies()) {
-        write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", projectModuleDependency.getIdentifier());
+        write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", projectModuleDependency.getBuildTarget());
       }
       for (final String linkOption : library.getPublicLinkOptions()) {
         write(1, "INTERFACE_LINK_LIBRARIES \"%s;\"", linkOption);

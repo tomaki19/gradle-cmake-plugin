@@ -6,44 +6,30 @@
 package ch.tomaki.gradle.cmake.model;
 
 import org.gradle.api.Project;
-import org.gradle.api.file.Directory;
-
-import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
-import ch.tomaki.gradle.cmake.tasks.CMakeTasksConventions;
 
 public class CMakeResolvedProjectModule {
 
-  private final String name;
-  private final Directory installDirectory;
+  private final Project project;
   private final CMakeResolvedToolchain toolchain;
 
   CMakeResolvedProjectModule(final Project project, final CMakeResolvedToolchain toolchain) {
-    this.name = project.getName();
-    this.installDirectory = project.getLayout().getBuildDirectory().dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get();
+    this.project = project;
     this.toolchain = toolchain;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public Directory getInstallDirectory() {
-    return installDirectory;
+  public Project getProject() {
+    return project;
   }
 
   public CMakeResolvedToolchain getToolchain() {
     return toolchain;
   }
 
-  public String getAssembleConfigTaskName() {
-    return ":%s:%s".formatted(name, CMakeTasksConventions.assembleConfigTaskName());
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((project == null) ? 0 : project.hashCode());
     result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
     return result;
   }
@@ -57,10 +43,10 @@ public class CMakeResolvedProjectModule {
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectModule other = (CMakeResolvedProjectModule) obj;
-    if (name == null) {
-      if (other.name != null)
+    if (project == null) {
+      if (other.project != null)
         return false;
-    } else if (!name.equals(other.name))
+    } else if (!project.equals(other.project))
       return false;
     if (toolchain == null) {
       if (other.toolchain != null)

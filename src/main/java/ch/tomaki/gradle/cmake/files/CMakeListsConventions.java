@@ -12,17 +12,19 @@ public class CMakeListsConventions {
   public static String CMAKE_BUILD_PATH = "cmake/build";
   public static String CMAKE_INSTALL_PATH = "cmake/install";
 
-  public static String staticLibraryTarget(final String name, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) {
-    return "library-%s-%s-static-%s".formatted(name, toolchain.getName(), buildConfig);
+  public static String libraryTarget(final String name, final CMakeResolvedToolchain toolchain,
+      final CMakeLinkType type, final String buildConfig) {
+    switch (type) {
+      case STATIC:
+        return "library-%s-%s-static-%s".formatted(name, toolchain.getName(), buildConfig);
+      case SHARED:
+        return "library-%s-%s-shared-%s".formatted(name, toolchain.getName(), buildConfig);
+      default:
+        return libraryInterfaceTarget(name);
+    }
   }
 
-  public static String sharedLibraryTarget(final String name, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) {
-    return "library-%s-%s-shared-%s".formatted(name, toolchain.getName(), buildConfig);
-  }
-
-  public static String interfaceLibraryTarget(final String name) {
+  public static String libraryInterfaceTarget(final String name) {
     return "library-%s-interface".formatted(name);
   }
 

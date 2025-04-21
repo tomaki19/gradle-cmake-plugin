@@ -17,6 +17,7 @@ import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
+import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModule;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 
@@ -70,7 +71,7 @@ public class CMakeTaskRegistry {
       final Collection<CMakeResolvedProjectModule> projectModules) {
     taskContainer.named(taskName).configure((task) -> {
       projectModules.stream()
-          .map(dependency -> dependency.getAssembleConfigTaskName())
+          .map(dependency -> CMakeTasksConventions.assembleConfigTaskName(dependency.getProject()))
           .forEach(assembleConfigTaskName -> task.dependsOn(assembleConfigTaskName));
     });
   }
@@ -79,9 +80,10 @@ public class CMakeTaskRegistry {
       final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
-          .filter(dependency -> !Objects.equals(dependency.getProjectName(), task.getProject().getName()))
-          .filter(dependency -> dependency.isBuildable())
-          .map(dependency -> dependency.getConfigTaskName())
+          .filter(dependency -> !Objects.equals(dependency.getProject(), task.getProject()))
+          .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
+          .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject(),
+              dependency.getToolchain()))
           .forEach(configTaskName -> task.mustRunAfter(configTaskName));
     });
   }
@@ -90,8 +92,9 @@ public class CMakeTaskRegistry {
       final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
-          .filter(dependency -> dependency.isBuildable())
-          .map(dependency -> dependency.getBuildTaskName())
+          .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
+          .map(dependency -> CMakeTasksConventions.buildTaskName(dependency.getProject(),
+              dependency.getBuildTarget()))
           .forEach(buildTaskName -> task.dependsOn(buildTaskName));
     });
   }

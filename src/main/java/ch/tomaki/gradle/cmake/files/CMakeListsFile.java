@@ -92,9 +92,9 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     for (final CMakeResolvedProjectModule object : projects) {
       writeLine();
       write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
-      write("set( %s_DIR \"%s\" )", object.getName(),
-          object.getInstallDirectory().getAsFile().toURI().getPath());
-      write("find_package( %s REQUIRED )", object.getName());
+      write("set( %s_DIR \"%s\" )", object.getProject().getName(), object.getProject().getLayout().getBuildDirectory()
+          .dir(CMakeListsConventions.CMAKE_INSTALL_PATH).get().getAsFile().toURI().getPath());
+      write("find_package( %s REQUIRED )", object.getProject().getName());
       write("endif()");
     }
   }
@@ -146,7 +146,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
 
   private void writeInterfaceLibrary(final CMakeResolvedInterface object, final Project project)
       throws IOException {
-    final String target = CMakeListsConventions.interfaceLibraryTarget(object.getName());
+    final String target = CMakeListsConventions.libraryInterfaceTarget(object.getName());
     write("add_library( %s INTERFACE )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetIncludeDirectories(target, "INTERFACE", object.getIncludes(), project);
@@ -154,8 +154,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
 
   private void writeStaticLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
-    final String target = CMakeListsConventions.staticLibraryTarget(
-        object.getName(), object.getToolchain(), object.getBuildConfig());
+    final String target = CMakeListsConventions.libraryTarget(
+        object.getName(), object.getToolchain(), CMakeLinkType.STATIC, object.getBuildConfig());
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_library( %s STATIC )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
@@ -174,8 +174,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
 
   private void writeSharedLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
-    final String target = CMakeListsConventions.sharedLibraryTarget(object.getName(), object.getToolchain(),
-        object.getBuildConfig());
+    final String target = CMakeListsConventions.libraryTarget(object.getName(), object.getToolchain(),
+        CMakeLinkType.SHARED, object.getBuildConfig());
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_library( %s SHARED )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
@@ -282,9 +282,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     if (!binary.getPrivateFindPackageDependencies().isEmpty()
         || !binary.getPrivateProjectModuleDependencies().isEmpty()
         || !binary.getPrivateLinkOptions().isEmpty()) {
-      writeTargetLinkLibraries(
-          target,
-          "PRIVATE",
+      writeTargetLinkLibraries(target, "PRIVATE",
           binary.getPrivateProjectModuleDependencies(),
           binary.getPrivateFindPackageDependencies(),
           binary.getPrivateLinkOptions());
@@ -296,9 +294,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     if (!library.getPublicFindPackageDependencies().isEmpty()
         || !library.getPublicProjectModuleDependencies().isEmpty()
         || !library.getPublicLinkOptions().isEmpty()) {
-      writeTargetLinkLibraries(
-          target,
-          "PUBLIC",
+      writeTargetLinkLibraries(target, "PUBLIC",
           library.getPublicProjectModuleDependencies(),
           library.getPublicFindPackageDependencies(),
           library.getPublicLinkOptions());
@@ -311,7 +307,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       final Set<String> options) throws IOException {
     write("target_link_libraries( %s %s", target, type);
     for (final CMakeResolvedProjectModuleDependency projectModule : projectModules) {
-      write(1, projectModule.getIdentifier());
+      write(1, "%s::%s", projectModule.getProject().getName(), projectModule.getBuildTarget());
     }
     for (final CMakeResolvedFindPackageDependency findPackage : findPackages) {
       write(1, findPackage.getIdentifier());
