@@ -19,8 +19,9 @@ The `findPackages` configuration block lets you specify exernal libraries that c
 ```groovy
 findPackages {
   <name> {
-    components = //optional, String
-    properties = //optional, Map<String,String>
+    components = //optional: String
+    properties = //optional: Map<String,String>
+  }
 }
 ```
 
@@ -29,21 +30,21 @@ findPackages {
 ```groovy
 toolchains {
   '<name>' {
-    operatingSystem = //mandatory: type org.gradle.internal.os.OperatingSystem
-    compiler = //mandatory: String
-    architecture = //mandatory: String
-    generator = //mandatory: String
-    buildConfigs = //mandatory: List<String>
+    operatingSystem = //required: org.gradle.internal.os.OperatingSystem
+    compiler = //required: String
+    architecture = //required: String
+    generator = //required: String
+    buildConfigs = //optional: List<String>, default: ['debug','release']
     environment = //optional, Map<String,String>
     environmentFile = //optional, File
     toolchainFile = //optional, File
     privateLibraryLinkDependencies= //optional: List<String>
     privateTestLinkDependencies = //optional: List<String>
     privateTestLinkDependencies = //optional: List<String>
-    buildStatic = //optional, boolean, default: false
-    buildShared = //optional, boolean, default: true
-    stripDebug = //optional, boolean, default: false
-    packageBuildOutputs = //optional, boolean, default: false
+    buildStatic = //optional: boolean, default: false
+    buildShared = //optional: boolean, default: true
+    stripDebug = //optional: boolean, default: false
+    packageBuildOutputs = //optional: boolean, default: false
   }
 }
 ```
@@ -53,8 +54,8 @@ toolchains {
 ```groovy
 libraries {
   '<name>' {
-    buildToolchains = //mandatory: List<String>
-    includes = //mandatory: List<String>
+    toolchains = //optional: List<String>, (header only library, if not present)
+    includes = //required: List<String>
     sources = //optional: List<String>
     privateCompileOptions = //optional: List<String>
     publicCompileOptions = //optional: List<String>
@@ -62,10 +63,10 @@ libraries {
     publicCompileDefinitions = //optional: List<String>
     privateLinkDependencies = //optional: List<String>
     publicLinkDependencies = //optional: List<String>
-    buildStatic = //optional, boolean, default: false
-    buildShared = //optional, boolean, default: true
-    stripDebug = //optional, boolean, default: false
-    packageBuildOutputs = //optional, boolean, default: false
+    buildStatic = //optional: boolean, default: false
+    buildShared = //optional: boolean, default: true
+    stripDebug = //optional: boolean, default: false
+    packageBuildOutputs = //optional: boolean, default: false
   }
 }
 ```
@@ -75,16 +76,16 @@ libraries {
 ```groovy
 applications {
   '<name>' {
-    buildToolchains = //mandatory: List<String>
-    includes = //mandatory: List<String>
-    sources = //optional: List<String>
+    toolchains = //required: List<String>
+    includes = //optional: List<String>
+    sources = //required: List<String>
     privateCompileOptions = //optional: List<String>
     privateCompileDefinitions = //optional: List<String>
     privateLinkDependencies = //optional: List<String>
-    buildStatic = //optional, boolean, default: false
-    buildShared = //optional, boolean, default: true
-    stripDebug = //optional, boolean, default: false
-    packageBuildOutputs = //optional, boolean, default: false
+    buildStatic = //optional: boolean, default: false
+    buildShared = //optional: boolean, default: true
+    stripDebug = //optional: boolean, default: false
+    packageBuildOutputs = //optional: boolean, default: false
   }
 }
 ```
@@ -94,16 +95,16 @@ applications {
 ```groovy
 tests {
   '<name>' {
-    buildToolchains = //mandatory: List<String>
-    includes = //mandatory: List<String>
-    sources = //optional: List<String>
+    toolchains = //required: List<String>
+    includes = //optional: List<String>
+    sources = //required: List<String>
     privateCompileOptions = //optional: List<String>
     privateCompileDefinitions = //optional: List<String>
     privateLinkDependencies = //optional: List<String>
-    buildStatic = //optional, boolean, default: false
-    buildShared = //optional, boolean, default: true
-    stripDebug = //optional, boolean, default: false
-    packageBuildOutputs = //optional, boolean, default: false
+    buildStatic = //optional: boolean, default: false
+    buildShared = //optional: boolean, default: true
+    stripDebug = //optional: boolean, default: false
+    packageBuildOutputs = //optional: boolean, default: false
   }
 }
 ```

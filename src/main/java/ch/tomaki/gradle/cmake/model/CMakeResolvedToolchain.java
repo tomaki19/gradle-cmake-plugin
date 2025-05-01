@@ -6,6 +6,8 @@
 package ch.tomaki.gradle.cmake.model;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -26,13 +28,6 @@ public final class CMakeResolvedToolchain {
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<RegularFile> toolchainFile;
-  // private final Set<String> privateLibraryLinkDependencies;
-  // private final Set<String> privateApplicationLinkDependencies;
-  // private final Set<String> privateTestLinkDependencies;
-  // private final boolean buildStatic;
-  // private final boolean buildShared;
-  // private final boolean stripDebug;
-  // private final boolean packageBuildOutputs;
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     this.name = toolchain.getName();
@@ -40,20 +35,10 @@ public final class CMakeResolvedToolchain {
     this.architecture = toolchain.getArchitecture().getOrElse("").toLowerCase();
     this.compiler = toolchain.getCompiler().getOrElse("").toLowerCase();
     this.generator = toolchain.getGenerator().getOrElse("");
-    this.buildConfigs = toolchain.getBuildConfigs().get();
+    this.buildConfigs = toolchain.getBuildConfigs().getOrElse(new HashSet<>(Arrays.asList("debug", "release")));
     this.environment = toolchain.getEnvironment().get();
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
-    // this.privateLibraryLinkDependencies =
-    // toolchain.getLibraryLinkDependencies().get();
-    // this.privateApplicationLinkDependencies =
-    // toolchain.getApplicationLinkDependencies().get();
-    // this.privateTestLinkDependencies = toolchain.getTestLinkDependencies().get();
-    // this.buildStatic = toolchain.getBuildStatic().getOrElse(Boolean.FALSE);
-    // this.buildShared = toolchain.getBuildShared().getOrElse(Boolean.TRUE);
-    // this.stripDebug = toolchain.getStripDebug().getOrElse(Boolean.FALSE);
-    // this.packageBuildOutputs =
-    // toolchain.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
   }
 
   public String getName() {
@@ -91,34 +76,6 @@ public final class CMakeResolvedToolchain {
   public Optional<RegularFile> getToolchainFile() {
     return toolchainFile;
   }
-
-  // public Set<String> getPrivateLibraryLinkDependencies() {
-  // return privateLibraryLinkDependencies;
-  // }
-
-  // public Set<String> getPrivateApplicationLinkDependencies() {
-  // return privateApplicationLinkDependencies;
-  // }
-
-  // public Set<String> getPrivateTestLinkDependencies() {
-  // return privateTestLinkDependencies;
-  // }
-
-  // public boolean isBuildStatic() {
-  // return buildStatic;
-  // }
-
-  // public boolean isBuildShared() {
-  // return buildShared;
-  // }
-
-  // public boolean isStripDebug() {
-  // return stripDebug;
-  // }
-
-  // public boolean isPackageBuildOutputs() {
-  // return packageBuildOutputs;
-  // }
 
   @Override
   public int hashCode() {

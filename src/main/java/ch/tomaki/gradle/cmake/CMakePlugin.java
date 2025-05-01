@@ -12,9 +12,9 @@ import java.util.Objects;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.BasePlugin;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
+import ch.tomaki.gradle.cmake.extension.CMakeValidator;
 import ch.tomaki.gradle.cmake.files.CMakeConfigFile;
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
@@ -44,17 +44,21 @@ public class CMakePlugin implements Plugin<Project> {
   }
 
   private void allProjects(final Project project) {
-    project.getPluginManager().apply(BasePlugin.class);
     project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
   }
 
   private void afterEvaluate(final Project project) {
-    project.getLogger().debug("%s: Evaluating Project...".formatted(project.getName()));
     try {
       final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
       if (Objects.nonNull(extension)) {
 
         final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild();
+
+        final CMakeValidator cmakeValidator = new CMakeValidator();
+        cmakeValidator.validateToolchains(extension.getToolchains());
+        cmakeValidator.validateLibraries(extension.getLibraries());
+        cmakeValidator.validateApplications(extension.getApplications());
+        cmakeValidator.validateTests(extension.getTests());
 
         final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages().getAsMap());
         cmakeResolver.process(resolvedBuild, extension.getToolchains().stream(),
