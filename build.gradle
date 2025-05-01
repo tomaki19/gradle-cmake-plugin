@@ -20,6 +20,7 @@ java {
 spotless {
   java {
     licenseHeaderFile file('gradle/license-header.txt')
+    removeUnusedImports()
   }
 }
 

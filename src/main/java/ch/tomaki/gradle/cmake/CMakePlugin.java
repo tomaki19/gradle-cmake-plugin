@@ -15,7 +15,6 @@ import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import ch.tomaki.gradle.cmake.files.CMakeConfigFile;
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
@@ -57,8 +56,8 @@ public class CMakePlugin implements Plugin<Project> {
 
         final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild();
 
-        final CMakeResolver cmakeResolver = new CMakeResolver(resolvedBuild, project,
-            extension.getFindPackages().getAsMap(), extension.getToolchains().stream(),
+        final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages().getAsMap());
+        cmakeResolver.process(resolvedBuild, extension.getToolchains().stream(),
             extension.getLibraries().stream(), extension.getApplications().stream(),
             extension.getTests().stream());
 

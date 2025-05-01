@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 
 public class CMakeResolvedBuild {
 

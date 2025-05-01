@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.gradle.api.Project;
@@ -28,12 +27,14 @@ public final class CMakeResolver {
   private final Map<String, CMakeToolchain> availabletoolchains = new HashMap<>();
   private final Map<String, CMakeFindPackage> availableFindPackages;
 
-  public CMakeResolver(final CMakeResolvedBuild build, final Project project,
-      final Map<String, CMakeFindPackage> findPackages, final Stream<CMakeToolchain> toolchains,
-      final Stream<CMakeLibrary> libraries, final Stream<CMakeApplication> applications,
-      final Stream<CMakeTest> tests) {
+  public CMakeResolver(final Project project, final Map<String, CMakeFindPackage> findPackages) {
     this.project = project;
     this.availableFindPackages = findPackages;
+  }
+
+  public void process(final CMakeResolvedBuild build, final Stream<CMakeToolchain> toolchains,
+      final Stream<CMakeLibrary> libraries, final Stream<CMakeApplication> applications,
+      final Stream<CMakeTest> tests) {
     processToolchains(toolchains, build);
     processLibraries(libraries, build);
     processApplications(applications, build);
