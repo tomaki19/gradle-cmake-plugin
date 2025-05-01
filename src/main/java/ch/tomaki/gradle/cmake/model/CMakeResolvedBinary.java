@@ -51,8 +51,8 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
         object.getPrivateLinkDependencies().get());
     this.privateProjectModules = new HashSet<>();
     this.privateProjectModuleDependencies = new HashSet<>();
-    resolveProjectModuleDependencies(privateProjectModules, privateProjectModuleDependencies, project,
-        resolvedToolchain, buildConfig, object.getPrivateLinkDependencies().get());
+    resolveProjectModuleDependencies(privateProjectModules, privateProjectModuleDependencies, resolvedToolchain,
+        object.getPrivateLinkDependencies().get(), buildConfig, project);
     this.buildStatic = object.getBuildStatic().getOrElse(Boolean.FALSE)
         || toolchain.getBuildStatic().getOrElse(Boolean.FALSE);
     this.buildShared = object.getBuildShared().getOrElse(Boolean.FALSE)
@@ -117,8 +117,8 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
     resolveLinkOptions(privateLinkOptions, dependencies);
     resolveFindPackageDependencies(privateFindPackages, privateFindPackageDependencies, getResolvedToolchain(),
         findPackages, dependencies);
-    resolveProjectModuleDependencies(privateProjectModules, privateProjectModuleDependencies, project,
-        getResolvedToolchain(), buildConfig, dependencies);
+    resolveProjectModuleDependencies(privateProjectModules, privateProjectModuleDependencies,
+        getResolvedToolchain(), dependencies, buildConfig, project);
   }
 
   protected static void resolveLinkOptions(final Set<String> linkOptions, final Set<String> dependencies)
@@ -157,8 +157,8 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedObject {
   }
 
   protected static void resolveProjectModuleDependencies(final Set<CMakeResolvedProjectModule> projectModules,
-      final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies, final Project project,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final Set<String> dependencies)
+      final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies, final CMakeResolvedToolchain toolchain,
+      final Set<String> dependencies, final String buildConfig, final Project project)
       throws IllegalArgumentException {
     for (final String dependency : dependencies) {
       if (!dependency.startsWith("-")) {
