@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
-
 public class CMakeResolvedFindPackage {
 
   private final String name;

@@ -11,11 +11,13 @@ import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.CMakeTest;
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 
 public final class CMakeResolvedTest extends CMakeResolvedBinary {
 
-  CMakeResolvedTest(final CMakeTest test, final CMakeResolvedToolchain toolchain, final String buildConfig,
+  CMakeResolvedTest(final CMakeTest test, final CMakeToolchain toolchain, final String buildConfig,
       final Map<String, CMakeFindPackage> findPackages, final Project project) {
     super(test, toolchain, buildConfig, findPackages, project);
+    addPrivateLinkDependencies(toolchain.getTestLinkDependencies().get(), findPackages, project);
   }
 }

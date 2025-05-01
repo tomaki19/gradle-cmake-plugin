@@ -5,10 +5,6 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import org.gradle.api.Project;
-
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
-
 public final class CMakeTasksConventions {
 
   public static final String GROUP_BUILD = "cmake build";
@@ -19,28 +15,28 @@ public final class CMakeTasksConventions {
     return "assemble-cmake-config";
   }
 
-  public static String assembleConfigTaskName(final Project project) {
-    return ":%s:assemble-cmake-config".formatted(project.getName());
+  public static String assembleConfigTaskName(final String projectName) {
+    return ":%s:assemble-cmake-config".formatted(projectName);
   }
 
   public static String assembleListsTaskName() {
     return "assemble-cmake-lists";
   }
 
-  public static String customTaskName(final String name, final CMakeResolvedToolchain toolchain) {
-    return "custom-%s-%s".formatted(name, toolchain.getName());
+  public static String customTaskName(final String targetName, final String toolchainName) {
+    return "custom-%s-%s".formatted(targetName, toolchainName);
   }
 
-  public static String configureTaskName(final CMakeResolvedToolchain toolchain) {
-    return "configure-%s".formatted(toolchain.getName());
+  public static String configureTaskName(final String toolchainName) {
+    return "configure-%s".formatted(toolchainName);
   }
 
-  public static String configureTaskName(final Project project, final CMakeResolvedToolchain toolchain) {
-    return ":%s:configure-%s".formatted(project.getName(), toolchain.getName());
+  public static String configureTaskName(final String projectName, final String toolchainName) {
+    return ":%s:configure-%s".formatted(projectName, toolchainName);
   }
 
-  public static String buildTaskName(final Project project, final String buildTarget) {
-    return ":%s:build-%s".formatted(project.getName(), buildTarget);
+  public static String buildTaskName(final String projectName, final String buildTarget) {
+    return ":%s:build-%s".formatted(projectName, buildTarget);
   }
 
   public static String buildTaskName(final String buildTarget) {

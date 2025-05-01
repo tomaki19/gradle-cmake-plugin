@@ -15,7 +15,7 @@ public abstract class CMakeTestExec extends CMakeExec {
 
   @Inject
   public CMakeTestExec(final String buildTarget, final CMakeResolvedTest test) {
-    super(test.getToolchain());
+    super(test.getResolvedToolchain());
     this.buildTarget = buildTarget;
     setGroup(CMakeTasksConventions.GROUP_CHECK);
     setWorkingDir(getProject().getProjectDir());
@@ -24,7 +24,7 @@ public abstract class CMakeTestExec extends CMakeExec {
     getBaseCommandLine().add(buildTarget);
     getBaseCommandLine().add("--test-dir");
     getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, test.getToolchain().getName()))
+        .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, test.getResolvedToolchain().getName()))
         .get().getAsFile().getAbsolutePath());
     getBaseCommandLine().add("--build-config");
     getBaseCommandLine().add(test.getBuildConfig());

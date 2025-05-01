@@ -6,12 +6,17 @@
 package ch.tomaki.gradle.cmake.model;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 
 public class CMakeResolvedBuild {
 
-  private final Set<CMakeResolvedToolchain> toolchains = new HashSet<>();
+  private final Map<String, CMakeResolvedToolchain> toolchains = new HashMap<>();
   private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
   private final Set<CMakeResolvedProjectModule> projectModules = new HashSet<>();
   private final Set<CMakeResolvedInterface> interfaces = new HashSet<>();
@@ -20,11 +25,19 @@ public class CMakeResolvedBuild {
   private final Set<CMakeResolvedTest> tests = new HashSet<>();
 
   void add(final CMakeResolvedToolchain toolchain) {
-    this.toolchains.add(toolchain);
+    this.toolchains.put(toolchain.getName(), toolchain);
   }
 
-  public Set<CMakeResolvedToolchain> getToolchains() {
-    return toolchains;
+  public boolean hasToolchain(final String name) {
+    return toolchains.containsKey(name);
+  }
+
+  public CMakeResolvedToolchain getToolchain(final String name) {
+    return toolchains.get(name);
+  }
+
+  public void forToolchains(final Consumer<CMakeResolvedToolchain> action) {
+    toolchains.forEach((name, toolchain) -> action.accept(toolchain));
   }
 
   public void addFindPackage(final CMakeResolvedFindPackage findPackage) {

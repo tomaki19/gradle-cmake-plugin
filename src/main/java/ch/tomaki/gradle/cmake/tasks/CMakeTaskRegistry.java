@@ -71,7 +71,7 @@ public class CMakeTaskRegistry {
       final Collection<CMakeResolvedProjectModule> projectModules) {
     taskContainer.named(taskName).configure((task) -> {
       projectModules.stream()
-          .map(dependency -> CMakeTasksConventions.assembleConfigTaskName(dependency.getProject()))
+          .map(dependency -> CMakeTasksConventions.assembleConfigTaskName(dependency.getProject().getName()))
           .forEach(assembleConfigTaskName -> task.dependsOn(assembleConfigTaskName));
     });
   }
@@ -82,8 +82,8 @@ public class CMakeTaskRegistry {
       projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getProject(), task.getProject()))
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject(),
-              dependency.getToolchain()))
+          .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject().getName(),
+              dependency.getToolchain().getName()))
           .forEach(configTaskName -> task.mustRunAfter(configTaskName));
     });
   }
@@ -93,7 +93,7 @@ public class CMakeTaskRegistry {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .map(dependency -> CMakeTasksConventions.buildTaskName(dependency.getProject(),
+          .map(dependency -> CMakeTasksConventions.buildTaskName(dependency.getProject().getName(),
               dependency.getBuildTarget()))
           .forEach(buildTaskName -> task.dependsOn(buildTaskName));
     });

@@ -25,7 +25,7 @@ import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 public final class CMakeResolver {
 
   private final Project project;
-  private final Map<String, CMakeResolvedToolchain> availabletoolchains = new HashMap<>();
+  private final Map<String, CMakeToolchain> availabletoolchains = new HashMap<>();
   private final Map<String, CMakeFindPackage> availableFindPackages;
 
   public CMakeResolver(final CMakeResolvedBuild build, final Project project,
@@ -40,78 +40,63 @@ public final class CMakeResolver {
     processTests(tests, build);
   }
 
-  public void forAvailableToolchain(final String name, final Consumer<CMakeResolvedToolchain> action) {
-    Optional.ofNullable(availabletoolchains.get(name)).ifPresent(action);
-  }
-
   private void processToolchains(final Stream<CMakeToolchain> toolchains, final CMakeResolvedBuild resolvedBuild) {
     toolchains.filter((toolchain) -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
-        .forEach((toolchain) -> {
-          final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-          availabletoolchains.put(resolvedToolchain.getName(), resolvedToolchain);
-        });
+        .forEach((toolchain) -> availabletoolchains.put(toolchain.getName(), toolchain));
   }
 
   private void processLibraries(final Stream<CMakeLibrary> libraries, final CMakeResolvedBuild build) {
     process(libraries, build,
-        (CMakeLibrary library, CMakeResolvedToolchain resolvedToolchain, String buildConfig) -> {
-          return new CMakeResolvedLibrary(library, resolvedToolchain, buildConfig, availableFindPackages, project);
+        (CMakeLibrary library, CMakeToolchain toolchain, String buildConfig) -> {
+          return new CMakeResolvedLibrary(library, toolchain, buildConfig, availableFindPackages, project);
         },
-        (CMakeResolvedLibrary library, CMakeResolvedToolchain toolchain) -> {
-          library.addPrivateLinkDependencies(toolchain.getPrivateLibraryLinkDependencies(), availableFindPackages,
-              project);
+        (CMakeResolvedLibrary library) -> {
           build.addFindPackages(library.getPrivateFindPackages());
           build.addFindPackages(library.getPublicFindPackages());
           build.addProjectModules(library.getPrivateProjectModules());
           build.addProjectModules(library.getPublicProjectModules());
           build.add(library);
-          build.add(toolchain);
+          build.add(library.getResolvedToolchain());
         });
   }
 
   private void processApplications(final Stream<CMakeApplication> applications, final CMakeResolvedBuild build) {
     process(applications, build,
-        (CMakeApplication application, CMakeResolvedToolchain toolchain, String buildConfig) -> {
+        (CMakeApplication application, CMakeToolchain toolchain, String buildConfig) -> {
           return new CMakeResolvedApplication(application, toolchain, buildConfig, availableFindPackages, project);
         },
-        (CMakeResolvedApplication application, CMakeResolvedToolchain toolchain) -> {
-          application.addPrivateLinkDependencies(toolchain.getPrivateApplicationLinkDependencies(),
-              availableFindPackages,
-              project);
+        (CMakeResolvedApplication application) -> {
           build.addFindPackages(application.getPrivateFindPackages());
           build.addProjectModules(application.getPrivateProjectModules());
           build.add(application);
-          build.add(toolchain);
+          build.add(application.getResolvedToolchain());
         });
   }
 
   private void processTests(final Stream<CMakeTest> tests, final CMakeResolvedBuild build) {
     process(tests, build,
-        (CMakeTest test, CMakeResolvedToolchain toolchain, String buildConfig) -> {
+        (CMakeTest test, CMakeToolchain toolchain, String buildConfig) -> {
           return new CMakeResolvedTest(test, toolchain, buildConfig, availableFindPackages, project);
         },
-        (CMakeResolvedTest test, CMakeResolvedToolchain toolchain) -> {
-          test.addPrivateLinkDependencies(toolchain.getPrivateTestLinkDependencies(), availableFindPackages,
-              project);
+        (CMakeResolvedTest test) -> {
           build.addFindPackages(test.getPrivateFindPackages());
           build.addProjectModules(test.getPrivateProjectModules());
           build.add(test);
-          build.add(toolchain);
+          build.add(test.getResolvedToolchain());
         });
   }
 
   private <O extends CMakeObject, R extends CMakeResolvedBinary> void process(final Stream<O> cmakeObjects,
-      final CMakeResolvedBuild resolvedBuild, final ResolverWithToolchain<O, R> resolverWithToolchain,
-      final AcceptorWithToolchain<R> acceptorWithToolchain) {
+      final CMakeResolvedBuild resolvedBuild, final Resolver<O, R> resolver, final Acceptor<R> acceptor) {
     cmakeObjects.forEach((cmakeObject) -> {
-      if (cmakeObject.getBuildToolchains().get().isEmpty()) {
+      if (cmakeObject.getToolchains().get().isEmpty()) {
         resolvedBuild.add(new CMakeResolvedInterface(cmakeObject));
       } else {
-        cmakeObject.getBuildToolchains().get().forEach((toolchainName) -> {
+        cmakeObject.getToolchains().get().forEach((toolchainName) -> {
           Optional.ofNullable(availabletoolchains.get(toolchainName)).ifPresent((toolchain) -> {
-            toolchain.getBuildConfigs().forEach((buildConfig) -> {
-              final R resolvedBinary = resolverWithToolchain.resolve(cmakeObject, toolchain, buildConfig);
-              acceptorWithToolchain.accept(resolvedBinary, toolchain);
+            toolchain.getBuildConfigs().get().forEach((buildConfig) -> {
+              final R resolvedBinary = resolver.resolve(cmakeObject, toolchain, buildConfig);
+              acceptor.accept(resolvedBinary);
             });
           });
         });
@@ -119,12 +104,12 @@ public final class CMakeResolver {
     });
   }
 
-  private interface ResolverWithToolchain<O extends CMakeObject, R extends CMakeResolvedBinary> {
-    R resolve(final O cmakeObject, final CMakeResolvedToolchain resolvedToolchain, final String buildConfig);
+  private interface Resolver<O extends CMakeObject, R extends CMakeResolvedBinary> {
+    R resolve(final O object, final CMakeToolchain toolchain, final String buildConfig);
   }
 
-  private interface AcceptorWithToolchain<R extends CMakeResolvedBinary> {
-    void accept(final R cmakeResolvedObject, final CMakeResolvedToolchain resolvedToolchain);
+  private interface Acceptor<R extends CMakeResolvedBinary> {
+    void accept(final R resolvedObject);
   }
 
 }

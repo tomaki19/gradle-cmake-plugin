@@ -10,7 +10,7 @@ import org.gradle.api.provider.SetProperty;
 
 public interface CMakeObject extends CMakeNamedObject {
 
-  SetProperty<String> getBuildToolchains();
+  SetProperty<String> getToolchains();
 
   SetProperty<String> getIncludes();
 

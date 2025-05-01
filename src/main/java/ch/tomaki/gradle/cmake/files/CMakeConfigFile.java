@@ -34,14 +34,16 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
     }
     for (final CMakeResolvedLibrary object : build.getLibraries()) {
       if (object.isBuildStatic()) {
-        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(), object.getToolchain(),
+        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(),
+            object.getResolvedToolchain(),
             CMakeLinkType.STATIC, object.getBuildConfig());
         write("add_library( %s::%s STATIC IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
             object, libraryTarget, OperatingSystem.current().getStaticLibrarySuffix(), project);
       }
       if (object.isBuildShared()) {
-        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(), object.getToolchain(),
+        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(),
+            object.getResolvedToolchain(),
             CMakeLinkType.SHARED, object.getBuildConfig());
         write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
@@ -68,14 +70,14 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
       final String librarySuffix, final Project project) throws IOException {
     write("set_target_properties( %s::%s PROPERTIES", project.getName(), libraryTarget);
     final File installDir = project.getLayout().getBuildDirectory().get()
-        .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_INSTALL_PATH, library.getToolchain().getName()))
+        .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_INSTALL_PATH, library.getResolvedToolchain().getName()))
         .getAsFile();
-    for (final String buildConfig : library.getToolchain().getBuildConfigs()) {
+    for (final String buildConfig : library.getResolvedToolchain().getBuildConfigs()) {
       write(1, "IMPORTED_LOCATION_%s %s/%s%s",
           buildConfig.toUpperCase(), installDir.toURI().getPath(), libraryTarget, librarySuffix);
     }
     write(1, "IMPORTED_LOCATION %s/%s%s", installDir.toURI().getPath(), libraryTarget, librarySuffix);
-    for (final String buildConfig : library.getToolchain().getBuildConfigs()) {
+    for (final String buildConfig : library.getResolvedToolchain().getBuildConfigs()) {
       write(1, "IMPORTED_CONFIGURATIONS \"%s;\"", buildConfig);
     }
     write(1, "INTERFACE_INCLUDE_DIRECTORIES");

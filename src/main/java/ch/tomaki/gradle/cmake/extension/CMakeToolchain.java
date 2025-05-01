@@ -35,11 +35,11 @@ public interface CMakeToolchain extends CMakeNamedObject {
 
   RegularFileProperty getToolchainFile();
 
-  SetProperty<String> getPrivateLibraryLinkDependencies();
+  SetProperty<String> getLibraryLinkDependencies();
 
-  SetProperty<String> getPrivateApplicationLinkDependencies();
+  SetProperty<String> getApplicationLinkDependencies();
 
-  SetProperty<String> getPrivateTestLinkDependencies();
+  SetProperty<String> getTestLinkDependencies();
 
   Property<Boolean> getBuildStatic();
 

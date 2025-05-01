@@ -26,15 +26,15 @@ public final class CMakeResolvedToolchain {
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<RegularFile> toolchainFile;
-  private final Set<String> privateLibraryLinkDependencies;
-  private final Set<String> privateApplicationLinkDependencies;
-  private final Set<String> privateTestLinkDependencies;
-  private final boolean buildStatic;
-  private final boolean buildShared;
-  private final boolean stripDebug;
-  private final boolean packageBuildOutputs;
+  // private final Set<String> privateLibraryLinkDependencies;
+  // private final Set<String> privateApplicationLinkDependencies;
+  // private final Set<String> privateTestLinkDependencies;
+  // private final boolean buildStatic;
+  // private final boolean buildShared;
+  // private final boolean stripDebug;
+  // private final boolean packageBuildOutputs;
 
-  CMakeResolvedToolchain(final CMakeToolchain toolchain) {
+  public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     this.name = toolchain.getName();
     this.operatingSystem = toolchain.getOperatingSystem().getOrNull();
     this.architecture = toolchain.getArchitecture().getOrElse("").toLowerCase();
@@ -44,14 +44,16 @@ public final class CMakeResolvedToolchain {
     this.environment = toolchain.getEnvironment().get();
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
-    this.privateLibraryLinkDependencies = toolchain.getPrivateLibraryLinkDependencies().get();
-    this.privateApplicationLinkDependencies =
-        toolchain.getPrivateApplicationLinkDependencies().get();
-    this.privateTestLinkDependencies = toolchain.getPrivateTestLinkDependencies().get();
-    this.buildStatic = toolchain.getBuildStatic().getOrElse(Boolean.FALSE);
-    this.buildShared = toolchain.getBuildShared().getOrElse(Boolean.TRUE);
-    this.stripDebug = toolchain.getStripDebug().getOrElse(Boolean.FALSE);
-    this.packageBuildOutputs = toolchain.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
+    // this.privateLibraryLinkDependencies =
+    // toolchain.getLibraryLinkDependencies().get();
+    // this.privateApplicationLinkDependencies =
+    // toolchain.getApplicationLinkDependencies().get();
+    // this.privateTestLinkDependencies = toolchain.getTestLinkDependencies().get();
+    // this.buildStatic = toolchain.getBuildStatic().getOrElse(Boolean.FALSE);
+    // this.buildShared = toolchain.getBuildShared().getOrElse(Boolean.TRUE);
+    // this.stripDebug = toolchain.getStripDebug().getOrElse(Boolean.FALSE);
+    // this.packageBuildOutputs =
+    // toolchain.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
   }
 
   public String getName() {
@@ -90,33 +92,33 @@ public final class CMakeResolvedToolchain {
     return toolchainFile;
   }
 
-  public Set<String> getPrivateLibraryLinkDependencies() {
-    return privateLibraryLinkDependencies;
-  }
+  // public Set<String> getPrivateLibraryLinkDependencies() {
+  // return privateLibraryLinkDependencies;
+  // }
 
-  public Set<String> getPrivateApplicationLinkDependencies() {
-    return privateApplicationLinkDependencies;
-  }
+  // public Set<String> getPrivateApplicationLinkDependencies() {
+  // return privateApplicationLinkDependencies;
+  // }
 
-  public Set<String> getPrivateTestLinkDependencies() {
-    return privateTestLinkDependencies;
-  }
+  // public Set<String> getPrivateTestLinkDependencies() {
+  // return privateTestLinkDependencies;
+  // }
 
-  public boolean isBuildStatic() {
-    return buildStatic;
-  }
+  // public boolean isBuildStatic() {
+  // return buildStatic;
+  // }
 
-  public boolean isBuildShared() {
-    return buildShared;
-  }
+  // public boolean isBuildShared() {
+  // return buildShared;
+  // }
 
-  public boolean isStripDebug() {
-    return stripDebug;
-  }
+  // public boolean isStripDebug() {
+  // return stripDebug;
+  // }
 
-  public boolean isPackageBuildOutputs() {
-    return packageBuildOutputs;
-  }
+  // public boolean isPackageBuildOutputs() {
+  // return packageBuildOutputs;
+  // }
 
   @Override
   public int hashCode() {
@@ -128,13 +130,18 @@ public final class CMakeResolvedToolchain {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     CMakeResolvedToolchain other = (CMakeResolvedToolchain) obj;
     if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
     return true;
   }
 }

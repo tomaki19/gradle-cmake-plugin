@@ -13,6 +13,7 @@ import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 
 public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
 
@@ -24,20 +25,23 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
   private final Set<CMakeResolvedProjectModule> publicProjectModules;
   private final Set<CMakeResolvedProjectModuleDependency> publicProjectModuleDependencies;
 
-  CMakeResolvedLibrary(final CMakeLibrary object, final CMakeResolvedToolchain toolchain,
+  CMakeResolvedLibrary(final CMakeLibrary object, final CMakeToolchain toolchain,
       final String buildConfig, final Map<String, CMakeFindPackage> findPackages, final Project project) {
     super(object, toolchain, buildConfig, findPackages, project);
     this.publicCompileOptions = new HashSet<>(object.getPublicCompileOptions().get());
     this.publicCompileDefinitions = new HashSet<>(object.getPublicCompileDefinitions().get());
-    this.publicLinkOptions = resolveLinkOptions(object.getPublicLinkDependencies().get());
+    this.publicLinkOptions = new HashSet<>();
+    resolveLinkOptions(publicLinkOptions, object.getPublicLinkDependencies().get());
     this.publicFindPackages = new HashSet<>();
     this.publicFindPackageDependencies = new HashSet<>();
-    resolveFindPackageDependencies(publicFindPackages, publicFindPackageDependencies, toolchain, findPackages,
-        object.getPrivateLinkDependencies().get());
+    resolveFindPackageDependencies(publicFindPackages, publicFindPackageDependencies, getResolvedToolchain(),
+        findPackages, object.getPrivateLinkDependencies().get());
     this.publicProjectModules = new HashSet<>();
     this.publicProjectModuleDependencies = new HashSet<>();
-    resolveProjectModuleDependencies(publicProjectModules, publicProjectModuleDependencies, project, toolchain,
-        buildConfig, object.getPublicLinkDependencies().get());
+    resolveProjectModuleDependencies(publicProjectModules, publicProjectModuleDependencies, project,
+        getResolvedToolchain(), buildConfig, object.getPublicLinkDependencies().get());
+    addPrivateLinkDependencies(toolchain.getLibraryLinkDependencies().get(), findPackages, project);
+
   }
 
   public final Set<String> getPublicCompileOptions() {
