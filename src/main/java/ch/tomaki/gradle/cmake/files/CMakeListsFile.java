@@ -8,6 +8,7 @@ package ch.tomaki.gradle.cmake.files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,12 +40,12 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
-    writeFindPackages(build.getFindPackages());
-    writeProjectDependencies(build.getProjectModules(), project);
-    writeInterfaces(build.getInterfaces(), project);
-    writeLibraries(build.getLibraries(), project);
-    writeApplications(build.getApplications(), project);
-    writeTests(build.getTests(), project);
+    writeFindPackages(build.getResolvedFindPackages());
+    writeProjectDependencies(build.getResolvedProjectModules(), project);
+    writeInterfaces(build.getResolvedInterfaces(), project);
+    writeLibraries(build.getResolvedLibraries(), project);
+    writeApplications(build.getResolvedApplications(), project);
+    writeTests(build.getResolvedTests(), project);
   }
 
   private void writeHeader(final Project project) throws IOException {
@@ -64,7 +65,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
         """);
   }
 
-  private void writeFindPackages(final Set<CMakeResolvedFindPackage> findPackages) throws IOException {
+  private void writeFindPackages(final Collection<CMakeResolvedFindPackage> findPackages) throws IOException {
     for (final CMakeResolvedFindPackage object : findPackages) {
       writeLine();
       write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
@@ -87,7 +88,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeProjectDependencies(final Set<CMakeResolvedProjectModule> projects, final Project project)
+  private void writeProjectDependencies(final Collection<CMakeResolvedProjectModule> projects, final Project project)
       throws IOException {
     for (final CMakeResolvedProjectModule object : projects) {
       writeLine();
@@ -99,14 +100,15 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeInterfaces(final Set<CMakeResolvedInterface> interfaces, final Project project) throws IOException {
+  private void writeInterfaces(final Collection<CMakeResolvedInterface> interfaces, final Project project)
+      throws IOException {
     for (final CMakeResolvedInterface object : interfaces) {
       writeLine();
       writeInterfaceLibrary(object, project);
     }
   }
 
-  private void writeLibraries(final Set<CMakeResolvedLibrary> libraries, final Project project)
+  private void writeLibraries(final Collection<CMakeResolvedLibrary> libraries, final Project project)
       throws IOException {
     for (final CMakeResolvedLibrary object : libraries) {
       writeLine();
@@ -119,7 +121,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeApplications(final Set<CMakeResolvedApplication> applications, final Project project)
+  private void writeApplications(final Collection<CMakeResolvedApplication> applications, final Project project)
       throws IOException {
     for (final CMakeResolvedApplication object : applications) {
       final String target = CMakeListsConventions.applicationTarget(object.getName(), object.getResolvedToolchain(),
@@ -129,7 +131,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeTests(final Set<CMakeResolvedTest> tests, final Project project)
+  private void writeTests(final Collection<CMakeResolvedTest> tests, final Project project)
       throws IOException {
     if (!tests.isEmpty()) {
       writeLine();

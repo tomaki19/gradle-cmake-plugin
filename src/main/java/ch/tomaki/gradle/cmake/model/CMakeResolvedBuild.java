@@ -9,90 +9,86 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-
 public class CMakeResolvedBuild {
 
-  private final Map<String, CMakeResolvedToolchain> toolchains = new HashMap<>();
-  private final Set<CMakeResolvedFindPackage> findPackages = new HashSet<>();
-  private final Set<CMakeResolvedProjectModule> projectModules = new HashSet<>();
-  private final Set<CMakeResolvedInterface> interfaces = new HashSet<>();
-  private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
-  private final Set<CMakeResolvedApplication> applications = new HashSet<>();
-  private final Set<CMakeResolvedTest> tests = new HashSet<>();
+  private final Map<String, CMakeResolvedToolchain> resolvedToolchains = new HashMap<>();
+  private final Set<CMakeResolvedFindPackage> resolvedFindPackages = new HashSet<>();
+  private final Set<CMakeResolvedProjectModule> resolvedProjectModules = new HashSet<>();
+  private final Set<CMakeResolvedInterface> resolvedInterfaces = new HashSet<>();
+  private final Set<CMakeResolvedLibrary> resolvedLibraries = new HashSet<>();
+  private final Set<CMakeResolvedApplication> resolvedApplications = new HashSet<>();
+  private final Set<CMakeResolvedTest> resolvedTests = new HashSet<>();
 
-  void add(final CMakeResolvedToolchain toolchain) {
-    this.toolchains.put(toolchain.getName(), toolchain);
+  void addToolchain(final CMakeResolvedToolchain toolchain) {
+    this.resolvedToolchains.put(toolchain.getName(), toolchain);
   }
 
-  public boolean hasToolchain(final String name) {
-    return toolchains.containsKey(name);
-  }
-
-  public CMakeResolvedToolchain getToolchain(final String name) {
-    return toolchains.get(name);
+  public void forToolchain(final String name, final Consumer<CMakeResolvedToolchain> action) {
+    Optional.ofNullable(resolvedToolchains.get(name)).ifPresent(action);
   }
 
   public void forToolchains(final Consumer<CMakeResolvedToolchain> action) {
-    toolchains.forEach((name, toolchain) -> action.accept(toolchain));
+    resolvedToolchains.forEach((name, toolchain) -> action.accept(toolchain));
   }
 
   public void addFindPackage(final CMakeResolvedFindPackage findPackage) {
-    this.findPackages.add(findPackage);
+    resolvedFindPackages.add(findPackage);
   }
 
   public void addFindPackages(final Collection<CMakeResolvedFindPackage> findPackages) {
-    this.findPackages.addAll(findPackages);
+    resolvedFindPackages.addAll(findPackages);
   }
 
-  public Set<CMakeResolvedFindPackage> getFindPackages() {
-    return findPackages;
+  public Collection<CMakeResolvedFindPackage> getResolvedFindPackages() {
+    return resolvedFindPackages;
   }
 
   public void addProjectModule(final CMakeResolvedProjectModule projectModule) {
-    this.projectModules.add(projectModule);
+    resolvedProjectModules.add(projectModule);
   }
 
   public void addProjectModules(final Collection<CMakeResolvedProjectModule> projectModules) {
-    this.projectModules.addAll(projectModules);
+    resolvedProjectModules.addAll(projectModules);
   }
 
-  public Set<CMakeResolvedProjectModule> getProjectModules() {
-    return projectModules;
+  public Collection<CMakeResolvedProjectModule> getResolvedProjectModules() {
+    return resolvedProjectModules;
   }
 
   public void add(final CMakeResolvedInterface object) {
-    this.interfaces.add(object);
+    resolvedInterfaces.add(object);
   }
 
-  public Set<CMakeResolvedInterface> getInterfaces() {
-    return interfaces;
+  public Collection<CMakeResolvedInterface> getResolvedInterfaces() {
+    return resolvedInterfaces;
   }
 
   public void add(final CMakeResolvedLibrary object) {
-    this.libraries.add(object);
+    resolvedLibraries.add(object);
   }
 
-  public Set<CMakeResolvedLibrary> getLibraries() {
-    return libraries;
+  public Collection<CMakeResolvedLibrary> getResolvedLibraries() {
+    return resolvedLibraries;
   }
 
   public void add(final CMakeResolvedApplication object) {
-    this.applications.add(object);
+    resolvedApplications.add(object);
   }
 
-  public Set<CMakeResolvedApplication> getApplications() {
-    return applications;
+  public Collection<CMakeResolvedApplication> getResolvedApplications() {
+    return resolvedApplications;
   }
 
   public void add(final CMakeResolvedTest object) {
-    this.tests.add(object);
+    resolvedTests.add(object);
   }
 
-  public Set<CMakeResolvedTest> getTests() {
-    return tests;
+  public Collection<CMakeResolvedTest> getResolvedTests() {
+    return resolvedTests;
   }
 
 }

@@ -27,12 +27,12 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
 
   @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
-    for (final CMakeResolvedInterface object : build.getInterfaces()) {
+    for (final CMakeResolvedInterface object : build.getResolvedInterfaces()) {
       final String libraryTarget = CMakeListsConventions.libraryInterfaceTarget(object.getName());
       write("add_library( %s::%s INTERFACE IMPORTED )", project.getName(), libraryTarget);
       setTargetProperties(object, libraryTarget, project);
     }
-    for (final CMakeResolvedLibrary object : build.getLibraries()) {
+    for (final CMakeResolvedLibrary object : build.getResolvedLibraries()) {
       if (object.isBuildStatic()) {
         final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(),
             object.getResolvedToolchain(),

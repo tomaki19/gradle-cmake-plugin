@@ -12,7 +12,7 @@ import org.gradle.api.provider.SetProperty;
 
 public final class CMakeValidator {
 
-  public void validateToolchains(final Set<CMakeToolchain> toolchains) {
+  public static void validateToolchains(final Set<CMakeToolchain> toolchains) {
     toolchains.forEach((toolchain) -> {
       validatePresent(toolchain.getOperatingSystem(),
           "toolchains -> %s -> operatingSystem".formatted(toolchain.getName()));
@@ -25,7 +25,7 @@ public final class CMakeValidator {
     });
   }
 
-  public void validateLibraries(final Set<CMakeLibrary> libraries) {
+  public static void validateLibraries(final Set<CMakeLibrary> libraries) {
     libraries.forEach((library) -> {
       if (!library.getToolchains().get().isEmpty()) {
         validateNotEmpty(library.getToolchains(), "libraries -> %s -> toolchains".formatted(library.getName()));
@@ -34,14 +34,14 @@ public final class CMakeValidator {
     });
   }
 
-  public void validateApplications(final Set<CMakeApplication> applications) {
+  public static void validateApplications(final Set<CMakeApplication> applications) {
     applications.forEach((application) -> {
       validateNotEmpty(application.getToolchains(), "application -> %s -> toolchains".formatted(application.getName()));
       validateNotEmpty(application.getSources(), "application -> %s -> sources".formatted(application.getName()));
     });
   }
 
-  public void validateTests(final Set<CMakeTest> tests) {
+  public static void validateTests(final Set<CMakeTest> tests) {
     tests.forEach((test) -> {
       validateNotEmpty(test.getToolchains(), "test -> %s -> toolchains".formatted(test.getName()));
       validateNotEmpty(test.getSources(), "test -> %s -> sources".formatted(test.getName()));
@@ -66,4 +66,6 @@ public final class CMakeValidator {
     }
   }
 
+  private CMakeValidator() {
+  }
 }

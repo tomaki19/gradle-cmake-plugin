@@ -52,18 +52,15 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
       if (Objects.nonNull(extension)) {
 
-        final CMakeResolvedBuild resolvedBuild = new CMakeResolvedBuild();
+        CMakeValidator.validateToolchains(extension.getToolchains());
+        CMakeValidator.validateLibraries(extension.getLibraries());
+        CMakeValidator.validateApplications(extension.getApplications());
+        CMakeValidator.validateTests(extension.getTests());
 
-        final CMakeValidator cmakeValidator = new CMakeValidator();
-        cmakeValidator.validateToolchains(extension.getToolchains());
-        cmakeValidator.validateLibraries(extension.getLibraries());
-        cmakeValidator.validateApplications(extension.getApplications());
-        cmakeValidator.validateTests(extension.getTests());
-
-        final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages().getAsMap());
-        cmakeResolver.process(resolvedBuild, extension.getToolchains().stream(),
-            extension.getLibraries().stream(), extension.getApplications().stream(),
-            extension.getTests().stream());
+        final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages(),
+            extension.getToolchains());
+        final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
+            extension.getApplications(), extension.getTests());
 
         final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry(project);
 
@@ -73,14 +70,14 @@ public class CMakePlugin implements Plugin<Project> {
         taskRegistry.register(assembleListsTaskName, CMakeAssemble.class, new CMakeListsFile(project), resolvedBuild)
             .configure((task) -> task.dependsOn(assembleConfigTaskName));
         taskRegistry.configureAssembleConfigTaskProjectModuleDependencies(assembleListsTaskName,
-            resolvedBuild.getProjectModules());
+            resolvedBuild.getResolvedProjectModules());
         taskRegistry.getGradleAssembleTask().configure((task) -> task.dependsOn(assembleListsTaskName));
 
         resolvedBuild.forToolchains((toolchain) -> {
           configureTasks(taskRegistry, toolchain);
         });
 
-        resolvedBuild.getLibraries().forEach((library) -> {
+        resolvedBuild.getResolvedLibraries().forEach((library) -> {
           if (library.isBuildStatic()) {
             final String buildTarget = CMakeListsConventions.libraryTarget(library.getName(),
                 library.getResolvedToolchain(), CMakeLinkType.STATIC, library.getBuildConfig());
@@ -93,13 +90,13 @@ public class CMakePlugin implements Plugin<Project> {
           }
         });
 
-        resolvedBuild.getApplications().forEach((application) -> {
+        resolvedBuild.getResolvedApplications().forEach((application) -> {
           final String buildTarget = CMakeListsConventions.applicationTarget(application.getName(),
               application.getResolvedToolchain(), application.getBuildConfig());
           configureTasks(taskRegistry, application, buildTarget);
         });
 
-        resolvedBuild.getTests().forEach((test) -> {
+        resolvedBuild.getResolvedTests().forEach((test) -> {
           final String buildTarget = CMakeListsConventions.testTarget(test.getName(), test.getResolvedToolchain(),
               test.getBuildConfig());
           configureTasks(taskRegistry, test, buildTarget);
@@ -107,9 +104,9 @@ public class CMakePlugin implements Plugin<Project> {
 
         extension.getCustomTasks().forEach((taskName, toolchainNames) -> {
           toolchainNames.stream().forEach((toolchainName) -> {
-            if (resolvedBuild.hasToolchain(toolchainName)) {
-              configureTask(taskRegistry, taskName, resolvedBuild.getToolchain(toolchainName));
-            }
+            resolvedBuild.forToolchain(toolchainName, (toolchain) -> {
+              configureTask(taskRegistry, taskName, toolchain);
+            });
           });
         });
       }
