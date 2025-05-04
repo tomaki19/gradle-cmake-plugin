@@ -10,12 +10,12 @@ import java.util.Set;
 
 import ch.tomaki.gradle.cmake.extension.CMakeObject;
 
-public abstract class CMakeResolvedObject {
+abstract class CMakeResolvedInterfaceObject {
 
   private final String name;
   private final Set<String> includes;
 
-  CMakeResolvedObject(final CMakeObject object) throws IllegalArgumentException {
+  CMakeResolvedInterfaceObject(final CMakeObject object) throws IllegalArgumentException {
     this.name = object.getName();
     this.includes = new HashSet<>(object.getIncludes().get());
   }
@@ -44,7 +44,7 @@ public abstract class CMakeResolvedObject {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeResolvedObject other = (CMakeResolvedObject) obj;
+    CMakeResolvedInterfaceObject other = (CMakeResolvedInterfaceObject) obj;
     if (name == null) {
       if (other.name != null)
         return false;

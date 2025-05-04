@@ -7,7 +7,7 @@ package ch.tomaki.gradle.cmake.model;
 
 import ch.tomaki.gradle.cmake.extension.CMakeObject;
 
-public final class CMakeResolvedInterface extends CMakeResolvedObject {
+public final class CMakeResolvedInterface extends CMakeResolvedInterfaceObject {
 
   CMakeResolvedInterface(final CMakeObject object) throws IllegalArgumentException {
     super(object);

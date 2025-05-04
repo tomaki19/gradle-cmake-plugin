@@ -124,7 +124,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   private void writeApplications(final Collection<CMakeResolvedApplication> applications, final Project project)
       throws IOException {
     for (final CMakeResolvedApplication object : applications) {
-      final String target = CMakeListsConventions.applicationTarget(object.getName(), object.getResolvedToolchain(),
+      final String target = CMakeListsConventions.applicationTarget(object.getName(), object.getToolchain(),
           object.getBuildConfig());
       writeLine();
       writeExecutable(target, object, project);
@@ -137,7 +137,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       writeLine();
       write("enable_testing()");
       for (final CMakeResolvedTest object : tests) {
-        final String target = CMakeListsConventions.testTarget(object.getName(), object.getResolvedToolchain(),
+        final String target = CMakeListsConventions.testTarget(object.getName(), object.getToolchain(),
             object.getBuildConfig());
         writeLine();
         writeExecutable(target, object, project);
@@ -157,8 +157,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   private void writeStaticLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
     final String target = CMakeListsConventions.libraryTarget(
-        object.getName(), object.getResolvedToolchain(), CMakeLinkType.STATIC, object.getBuildConfig());
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getResolvedToolchain().getName());
+        object.getName(), object.getToolchain(), CMakeLinkType.STATIC, object.getBuildConfig());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_library( %s STATIC )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetSources(target, "PUBLIC", object.getSources(), project);
@@ -167,18 +167,18 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     writePublicCompiling(target, object);
     writePrivateLinking(target, object);
     writePublicLinking(target, object);
-    writeOutputTargetProperties(target, object.getResolvedToolchain(), project);
+    writeOutputTargetProperties(target, object.getToolchain(), project);
     if (object.isStripDebug()) {
-      writeStripDebugCommand(target, object.getResolvedToolchain(), project);
+      writeStripDebugCommand(target, object.getToolchain(), project);
     }
     write("endif()");
   }
 
   private void writeSharedLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
-    final String target = CMakeListsConventions.libraryTarget(object.getName(), object.getResolvedToolchain(),
+    final String target = CMakeListsConventions.libraryTarget(object.getName(), object.getToolchain(),
         CMakeLinkType.SHARED, object.getBuildConfig());
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getResolvedToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_library( %s SHARED )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
@@ -187,30 +187,30 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     writePublicCompiling(target, object);
     writePrivateLinking(target, object);
     writePublicLinking(target, object);
-    writeOutputTargetProperties(target, object.getResolvedToolchain(), project);
+    writeOutputTargetProperties(target, object.getToolchain(), project);
     if (object.isStripDebug()) {
-      writeStripDebugCommand(target, object.getResolvedToolchain(), project);
+      writeStripDebugCommand(target, object.getToolchain(), project);
     }
     write("endif()");
   }
 
   private void writeExecutable(final String target, final CMakeResolvedBinary object, final Project project)
       throws IOException {
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getResolvedToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_executable( %s )", target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getIncludes(), project);
     writeTargetSources(target, "PRIVATE", object.getSources(), project);
     writePrivateCompiling(target, object);
     writePrivateLinking(target, object);
-    writeOutputTargetProperties(target, object.getResolvedToolchain(), project);
+    writeOutputTargetProperties(target, object.getToolchain(), project);
     if (object.isStripDebug()) {
-      writeStripDebugCommand(target, object.getResolvedToolchain(), project);
+      writeStripDebugCommand(target, object.getToolchain(), project);
     }
     write("endif()");
   }
 
   private void writeAddTest(final String target, final CMakeResolvedBinary object) throws IOException {
-    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getResolvedToolchain().getName());
+    write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_test(");
     write(1, "NAME %s", target);
     write(1, "COMMAND $<TARGET_FILE:%s>", target);

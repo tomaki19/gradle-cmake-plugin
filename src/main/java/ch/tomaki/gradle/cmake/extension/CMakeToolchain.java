@@ -6,6 +6,8 @@
 package ch.tomaki.gradle.cmake.extension;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
@@ -19,15 +21,17 @@ public interface CMakeToolchain extends CMakeNamedObject {
   static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
   static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
+  static final Collection<String> BuildConfigDefaults = Arrays.asList("release", "debug");
+
   Property<OperatingSystem> getOperatingSystem();
 
   Property<String> getCompiler();
 
   Property<String> getArchitecture();
 
-  Property<String> getGenerator(); // Ninja Multi Config
+  Property<String> getGenerator();
 
-  SetProperty<String> getBuildConfigs(); // Debug, Release, MinSizeRel, RelWithDebInfo
+  SetProperty<String> getBuildConfigs();
 
   MapProperty<String, String> getEnvironment();
 

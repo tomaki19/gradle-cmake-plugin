@@ -5,9 +5,10 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
+import javax.inject.Inject;
+
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
-import javax.inject.Inject;
 
 public abstract class CMakeTestExec extends CMakeExec {
 
@@ -15,7 +16,7 @@ public abstract class CMakeTestExec extends CMakeExec {
 
   @Inject
   public CMakeTestExec(final String buildTarget, final CMakeResolvedTest test) {
-    super(test.getResolvedToolchain());
+    super(test.getToolchain().getName(), test.getToolchain().getEnvironmentFile());
     this.buildTarget = buildTarget;
     setGroup(CMakeTasksConventions.GROUP_CHECK);
     setWorkingDir(getProject().getProjectDir());
@@ -24,7 +25,7 @@ public abstract class CMakeTestExec extends CMakeExec {
     getBaseCommandLine().add(buildTarget);
     getBaseCommandLine().add("--test-dir");
     getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, test.getResolvedToolchain().getName()))
+        .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, toolchainName))
         .get().getAsFile().getAbsolutePath());
     getBaseCommandLine().add("--build-config");
     getBaseCommandLine().add(test.getBuildConfig());

@@ -5,11 +5,13 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 import javax.inject.Inject;
+
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Input;
+
+import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 
 public abstract class CMakeBuildExec extends CMakeExec {
 
@@ -20,7 +22,7 @@ public abstract class CMakeBuildExec extends CMakeExec {
 
   @Inject
   public CMakeBuildExec(final String buildTarget, final CMakeResolvedBinary binary) {
-    super(binary.getResolvedToolchain());
+    super(binary.getToolchain().getName(), binary.getToolchain().getEnvironmentFile());
     this.buildTarget = buildTarget;
     setGroup(CMakeTasksConventions.GROUP_BUILD);
     setWorkingDir(getProject().getProjectDir());
@@ -28,7 +30,7 @@ public abstract class CMakeBuildExec extends CMakeExec {
       getBaseCommandLine().add("cmake");
       getBaseCommandLine().add("--build");
       getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
-          .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, binary.getResolvedToolchain().getName()))
+          .dir("%s/%s".formatted(CMakeListsConventions.CMAKE_BUILD_PATH, toolchainName))
           .get().getAsFile().getAbsolutePath());
       getBaseCommandLine().add("--target");
       getBaseCommandLine().add(buildTarget);

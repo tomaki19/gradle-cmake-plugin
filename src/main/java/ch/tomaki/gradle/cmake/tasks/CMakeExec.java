@@ -5,43 +5,44 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.Optional;
 import org.gradle.internal.os.OperatingSystem;
-
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
   protected final String toolchainName;
 
   @Inject
-  public CMakeExec(final CMakeResolvedToolchain toolchain) {
+  public CMakeExec(final String toolchainName, final Optional<File> environmentFile) {
     super(CMakeExec.class);
-    this.toolchainName = toolchain.getName();
-    toolchain.getEnvironmentFile().ifPresent((file) -> {
-      getEnvironmentFile().set(file);
+    this.toolchainName = toolchainName;
+    environmentFile.ifPresent((file) -> {
+      if (file.exists()) {
+        getEnvironmentFile().set(file);
+      } else {
+        throw new IllegalArgumentException("Environment file missing!");
+      }
     });
   }
 
-  @Input
+  @org.gradle.api.tasks.Input
   public abstract SetProperty<String> getBaseCommandLine();
 
-  @Optional
-  @Input
+  @org.gradle.api.tasks.Optional
+  @org.gradle.api.tasks.Input
   public abstract SetProperty<String> getAdditionalArguments();
 
-  @Optional
-  @InputFile
+  @org.gradle.api.tasks.Optional
+  @org.gradle.api.tasks.InputFile
   public abstract RegularFileProperty getEnvironmentFile();
 
   @Override
