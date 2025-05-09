@@ -54,7 +54,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write("project( %s LANGUAGES C CXX )", project.getName());
     writeLine();
     write("""
-        set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE )
+        set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "" )
+        set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON CACHE INTERNAL "" )
         set( CMAKE_CONFIGURATION_TYPES $ENV{CMAKE_CONFIGURATION_TYPES} )
         set( CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE} )
         set( CMAKE_BUILD_TYPE $ENV{CMAKE_BUILD_TYPE} )
