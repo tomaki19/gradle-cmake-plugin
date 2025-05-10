@@ -12,15 +12,15 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.helper.TestCMakeApplication;
 import ch.tomaki.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import ch.tomaki.gradle.cmake.helper.TestCMakeFindPackage;
 import ch.tomaki.gradle.cmake.helper.TestCMakeInterfaceLibrary;
+import ch.tomaki.gradle.cmake.helper.TestCMakeTest;
 import ch.tomaki.gradle.cmake.helper.TestCMakeToolchain;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolver;
 
-public class CMakeApplicationResolverTest {
+public class CMakeTestResolverTest {
 
   @Test
   void resolveNoToolchainTest() {
@@ -34,7 +34,7 @@ public class CMakeApplicationResolverTest {
         "FindPackage0", "-loption",
         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
         "%s::BinaryLibrary0::shared".formatted(project.getName()));
-    TestCMakeApplication.register("Application0", extension);
+    TestCMakeTest.register("Test0", extension);
 
     final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages(),
         extension.getToolchains());
@@ -44,7 +44,7 @@ public class CMakeApplicationResolverTest {
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(0, resolvedBuild.getResolvedApplications().size());
+    assertEquals(0, resolvedBuild.getResolvedTests().size());
   }
 
   @Test
@@ -55,8 +55,8 @@ public class CMakeApplicationResolverTest {
     TestCMakeFindPackage.register("FindPackage0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
-    TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension);
-    TestCMakeApplication.register("Application0", extension, "Toolchain0");
+    TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension);
+    TestCMakeTest.register("Test0", extension, "Toolchain0");
 
     final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages(),
         extension.getToolchains());
@@ -66,11 +66,11 @@ public class CMakeApplicationResolverTest {
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(2, resolvedBuild.getResolvedApplications().size());
-    resolvedBuild.getResolvedApplications().forEach((application) -> {
-      assertEquals(0, application.getPrivateFindPackageDependencies().size());
-      assertEquals(0, application.getPrivateProjectModuleDependencies().size());
-      assertEquals(0, application.getPrivateLinkOptions().size());
+    assertEquals(2, resolvedBuild.getResolvedTests().size());
+    resolvedBuild.getResolvedTests().forEach((test) -> {
+      assertEquals(0, test.getPrivateFindPackageDependencies().size());
+      assertEquals(0, test.getPrivateProjectModuleDependencies().size());
+      assertEquals(0, test.getPrivateLinkOptions().size());
     });
   }
 
@@ -82,11 +82,11 @@ public class CMakeApplicationResolverTest {
     TestCMakeFindPackage.register("FindPackage0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
-    TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
+    TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
         "FindPackage0", "-loption",
         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
         "%s::BinaryLibrary0::shared".formatted(project.getName()));
-    TestCMakeApplication.register("Application0", extension, "Toolchain0");
+    TestCMakeTest.register("Test0", extension, "Toolchain0");
 
     final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages(),
         extension.getToolchains());
@@ -96,11 +96,11 @@ public class CMakeApplicationResolverTest {
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(2, resolvedBuild.getResolvedApplications().size());
-    resolvedBuild.getResolvedApplications().forEach((application) -> {
-      assertEquals(1, application.getPrivateFindPackageDependencies().size());
-      assertEquals(2, application.getPrivateProjectModuleDependencies().size());
-      assertEquals(1, application.getPrivateLinkOptions().size());
+    assertEquals(2, resolvedBuild.getResolvedTests().size());
+    resolvedBuild.getResolvedTests().forEach((test) -> {
+      assertEquals(1, test.getPrivateFindPackageDependencies().size());
+      assertEquals(2, test.getPrivateProjectModuleDependencies().size());
+      assertEquals(1, test.getPrivateLinkOptions().size());
     });
   }
 
@@ -113,7 +113,7 @@ public class CMakeApplicationResolverTest {
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
     TestCMakeToolchain.register("Toolchain0", extension);
-    TestCMakeApplication.registerWithPrivateDependencies("Application0", extension, "Toolchain0",
+    TestCMakeTest.registerWithPrivateDependencies("Test0", extension, "Toolchain0",
         "FindPackage0", "-loption",
         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
         "%s::BinaryLibrary0::shared".formatted(project.getName()));
@@ -126,11 +126,11 @@ public class CMakeApplicationResolverTest {
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(2, resolvedBuild.getResolvedApplications().size());
-    resolvedBuild.getResolvedApplications().forEach((application) -> {
-      assertEquals(1, application.getPrivateFindPackageDependencies().size());
-      assertEquals(2, application.getPrivateProjectModuleDependencies().size());
-      assertEquals(1, application.getPrivateLinkOptions().size());
+    assertEquals(2, resolvedBuild.getResolvedTests().size());
+    resolvedBuild.getResolvedTests().forEach((test) -> {
+      assertEquals(1, test.getPrivateFindPackageDependencies().size());
+      assertEquals(2, test.getPrivateProjectModuleDependencies().size());
+      assertEquals(1, test.getPrivateLinkOptions().size());
     });
   }
 }

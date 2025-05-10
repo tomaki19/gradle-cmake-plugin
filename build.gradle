@@ -14,7 +14,7 @@ dependencies {
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_17 // minimal java version supported by Gradle 9
 }
 
 spotless {

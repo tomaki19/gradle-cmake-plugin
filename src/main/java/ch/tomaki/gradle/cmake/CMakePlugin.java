@@ -47,7 +47,11 @@ public class CMakePlugin implements Plugin<Project> {
   }
 
   private void allProjects(final Project project) {
-    project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    try {
+      project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    } catch (Exception e) {
+      throw new GradleException(e.getMessage(), e.getCause());
+    }
   }
 
   private void afterEvaluate(final Project project) {

@@ -28,8 +28,11 @@ public class CMakeBinaryLibraryResolverTest {
 
     TestCMakeFindPackage.register("FindPackage0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
-    TestCMakeToolchain.register("Toolchain0", extension);
+    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
+    TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
+        "FindPackage0", "-loption",
+        "%s::InterfaceLibrary0::interface".formatted(project.getName()),
+        "%s::BinaryLibrary0::shared".formatted(project.getName()));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension);
 
     final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages(),
@@ -38,8 +41,8 @@ public class CMakeBinaryLibraryResolverTest {
         extension.getApplications(), extension.getTests());
 
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(2, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(3, resolvedBuild.getResolvedInterfaces().size());
+    assertEquals(0, resolvedBuild.getResolvedLibraries().size());
   }
 
   @Test
@@ -61,6 +64,14 @@ public class CMakeBinaryLibraryResolverTest {
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    resolvedBuild.getResolvedLibraries().forEach((library) -> {
+      assertEquals(0, library.getPrivateFindPackageDependencies().size());
+      assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+      assertEquals(0, library.getPrivateLinkOptions().size());
+      assertEquals(0, library.getPublicFindPackageDependencies().size());
+      assertEquals(0, library.getPublicProjectModuleDependencies().size());
+      assertEquals(0, library.getPublicLinkOptions().size());
+    });
   }
 
   @Test
@@ -72,7 +83,7 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-        "FindPackage0",
+        "FindPackage0", "-loption",
         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
         "%s::BinaryLibrary0::shared".formatted(project.getName()));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension, "Toolchain0");
@@ -85,6 +96,14 @@ public class CMakeBinaryLibraryResolverTest {
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    resolvedBuild.getResolvedLibraries().forEach((library) -> {
+      assertEquals(1, library.getPrivateFindPackageDependencies().size());
+      assertEquals(2, library.getPrivateProjectModuleDependencies().size());
+      assertEquals(1, library.getPrivateLinkOptions().size());
+      assertEquals(0, library.getPublicFindPackageDependencies().size());
+      assertEquals(0, library.getPublicProjectModuleDependencies().size());
+      assertEquals(0, library.getPublicLinkOptions().size());
+    });
   }
 
   @Test
@@ -97,7 +116,7 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeBinaryLibrary.registerWithPrivateDependencies("BinaryLibrary1", extension, "Toolchain0",
-        "FindPackage0",
+        "FindPackage0", "-loption",
         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
         "%s::BinaryLibrary0::shared".formatted(project.getName()));
 
@@ -109,6 +128,23 @@ public class CMakeBinaryLibraryResolverTest {
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    resolvedBuild.getResolvedLibraries().forEach((library) -> {
+      if ("BinaryLibrary0".equals(library.getName())) {
+        assertEquals(0, library.getPrivateFindPackageDependencies().size());
+        assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(0, library.getPrivateLinkOptions().size());
+        assertEquals(0, library.getPublicFindPackageDependencies().size());
+        assertEquals(0, library.getPublicProjectModuleDependencies().size());
+        assertEquals(0, library.getPublicLinkOptions().size());
+      } else {
+        assertEquals(1, library.getPrivateFindPackageDependencies().size());
+        assertEquals(2, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(1, library.getPrivateLinkOptions().size());
+        assertEquals(0, library.getPublicFindPackageDependencies().size());
+        assertEquals(0, library.getPublicProjectModuleDependencies().size());
+        assertEquals(0, library.getPublicLinkOptions().size());
+      }
+    });
   }
 
   @Test
@@ -121,7 +157,7 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeBinaryLibrary.registerWithPublicDependencies("BinaryLibrary1", extension, "Toolchain0",
-        "FindPackage0",
+        "FindPackage0", "-loption",
         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
         "%s::BinaryLibrary0::shared".formatted(project.getName()));
 
@@ -133,6 +169,23 @@ public class CMakeBinaryLibraryResolverTest {
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    resolvedBuild.getResolvedLibraries().forEach((library) -> {
+      if ("BinaryLibrary0".equals(library.getName())) {
+        assertEquals(0, library.getPrivateFindPackageDependencies().size());
+        assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(0, library.getPrivateLinkOptions().size());
+        assertEquals(0, library.getPublicFindPackages().size());
+        assertEquals(0, library.getPublicProjectModuleDependencies().size());
+        assertEquals(0, library.getPublicLinkOptions().size());
+      } else {
+        assertEquals(0, library.getPrivateFindPackageDependencies().size());
+        assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(0, library.getPrivateLinkOptions().size());
+        assertEquals(1, library.getPublicFindPackageDependencies().size());
+        assertEquals(2, library.getPublicProjectModuleDependencies().size());
+        assertEquals(1, library.getPublicLinkOptions().size());
+      }
+    });
   }
 
 }

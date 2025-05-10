@@ -15,7 +15,6 @@ import ch.tomaki.gradle.cmake.extension.CMakeExtension;
 import ch.tomaki.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import ch.tomaki.gradle.cmake.helper.TestCMakeFindPackage;
 import ch.tomaki.gradle.cmake.helper.TestCMakeInterfaceLibrary;
-import ch.tomaki.gradle.cmake.helper.TestCMakeToolchain;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolver;
 
@@ -29,7 +28,6 @@ public class CMakeInterfaceLibraryResolverTest {
     TestCMakeFindPackage.register("FindPackage0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, "Toolchain0");
-    TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary1", extension);
 
     final CMakeResolver cmakeResolver = new CMakeResolver(project, extension.getFindPackages(),
