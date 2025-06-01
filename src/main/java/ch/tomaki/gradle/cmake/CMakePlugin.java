@@ -16,15 +16,15 @@ import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import ch.tomaki.gradle.cmake.extension.CMakeValidator;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 import ch.tomaki.gradle.cmake.files.CMakeConfigFile;
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.files.CMakeListsFile;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBinaryLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
 import ch.tomaki.gradle.cmake.model.CMakeResolver;
@@ -83,13 +83,13 @@ public class CMakePlugin implements Plugin<Project> {
 
         resolvedBuild.getResolvedLibraries().forEach((library) -> {
           if (library.isBuildStatic()) {
-            final String buildTarget = CMakeListsConventions.libraryTarget(library.getName(),
-                library.getToolchain(), CMakeLinkType.STATIC, library.getBuildConfig());
+            final String buildTarget = CMakeListsConventions.libraryTarget(library.getName(), CMakeLinkType.STATIC,
+                Optional.of(library.getToolchain()), Optional.of(library.getBuildConfig()));
             configureTasks(taskRegistry, library, buildTarget);
           }
           if (library.isBuildShared()) {
-            final String buildTarget = CMakeListsConventions.libraryTarget(library.getName(),
-                library.getToolchain(), CMakeLinkType.SHARED, library.getBuildConfig());
+            final String buildTarget = CMakeListsConventions.libraryTarget(library.getName(), CMakeLinkType.SHARED,
+                Optional.of(library.getToolchain()), Optional.of(library.getBuildConfig()));
             configureTasks(taskRegistry, library, buildTarget);
           }
         });
@@ -144,7 +144,7 @@ public class CMakePlugin implements Plugin<Project> {
         .configure((task) -> task.setGroup(CMakeTasksConventions.GROUP_CHECK));
   }
 
-  private void configureTasks(final CMakeTaskRegistry taskRegistry, final CMakeResolvedLibrary library,
+  private void configureTasks(final CMakeTaskRegistry taskRegistry, final CMakeResolvedBinaryLibrary library,
       final String buildTarget) {
     final List<CMakeResolvedProjectModuleDependency> projectModuleDependencies = new ArrayList<>();
     projectModuleDependencies.addAll(library.getPrivateProjectModuleDependencies());

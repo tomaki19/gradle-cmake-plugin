@@ -3,11 +3,11 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extension;
+package ch.tomaki.gradle.cmake.extension.api;
 
 import org.gradle.api.provider.Property;
 
-public interface CMakeTest extends CMakeObject {
+public interface CMakeTests extends CMakeBinaries {
 
   Property<Boolean> getTestResultsXmlOutput();
 

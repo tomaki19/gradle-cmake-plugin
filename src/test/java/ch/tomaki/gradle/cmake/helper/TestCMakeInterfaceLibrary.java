@@ -10,14 +10,14 @@ import java.util.Arrays;
 import org.gradle.api.NamedDomainObjectProvider;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 
 public final class TestCMakeInterfaceLibrary {
 
   public static NamedDomainObjectProvider<CMakeLibrary> register(final String name, final CMakeExtension extension) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = extension.getLibraries().register(name);
     provider.configure((object) -> {
-      object.getIncludes().set(Arrays.asList("inlude0"));
+      object.getHeaders().set(Arrays.asList("header0"));
     });
     return provider;
   }

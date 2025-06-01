@@ -5,6 +5,8 @@
  */
 package ch.tomaki.gradle.cmake.files;
 
+import java.util.Optional;
+
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeListsConventions {
@@ -12,13 +14,13 @@ public class CMakeListsConventions {
   public static String CMAKE_BUILD_PATH = "cmake/build";
   public static String CMAKE_INSTALL_PATH = "cmake/install";
 
-  public static String libraryTarget(final String name, final CMakeResolvedToolchain toolchain,
-      final CMakeLinkType type, final String buildConfig) {
+  public static String libraryTarget(final String name, final CMakeLinkType type,
+      final Optional<CMakeResolvedToolchain> toolchain, final Optional<String> buildConfig) {
     switch (type) {
       case STATIC:
-        return "library-%s-%s-static-%s".formatted(name, toolchain.getName(), buildConfig);
+        return "library-%s-%s-static-%s".formatted(name, toolchain.get().getName(), buildConfig.get());
       case SHARED:
-        return "library-%s-%s-shared-%s".formatted(name, toolchain.getName(), buildConfig);
+        return "library-%s-%s-shared-%s".formatted(name, toolchain.get().getName(), buildConfig.get());
       default:
         return libraryInterfaceTarget(name);
     }

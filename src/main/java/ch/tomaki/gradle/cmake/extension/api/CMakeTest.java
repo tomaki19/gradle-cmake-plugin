@@ -3,10 +3,8 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extension;
+package ch.tomaki.gradle.cmake.extension.api;
 
-interface CMakeNamedObject {
-
-  String getName();
+public interface CMakeTest extends CMakeBinary, CMakeTests {
 
 }

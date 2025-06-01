@@ -11,7 +11,7 @@ import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
 public final class TestCMakeToolchain {
 
@@ -27,7 +27,7 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final String... dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraryLinkDependencies().set(Arrays.asList(dependencies));
+      object.getLibraries().getPrivateLinkDependencies().set(Arrays.asList(dependencies));
     });
     return provider;
   }
@@ -36,7 +36,7 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final String... dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getApplicationLinkDependencies().set(Arrays.asList(dependencies));
+      object.getApplications().getPrivateLinkDependencies().set(Arrays.asList(dependencies));
     });
     return provider;
   }
@@ -45,7 +45,7 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final String... dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getTestLinkDependencies().set(Arrays.asList(dependencies));
+      object.getTests().getPrivateLinkDependencies().set(Arrays.asList(dependencies));
     });
     return provider;
   }

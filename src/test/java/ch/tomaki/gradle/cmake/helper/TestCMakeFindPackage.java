@@ -8,7 +8,7 @@ package ch.tomaki.gradle.cmake.helper;
 import org.gradle.api.NamedDomainObjectProvider;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 
 public final class TestCMakeFindPackage {
 

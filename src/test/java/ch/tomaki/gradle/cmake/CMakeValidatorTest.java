@@ -19,12 +19,12 @@ import org.gradle.internal.os.OperatingSystem;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
-import ch.tomaki.gradle.cmake.extension.CMakeApplication;
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeLibrary;
-import ch.tomaki.gradle.cmake.extension.CMakeTest;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
 import ch.tomaki.gradle.cmake.extension.CMakeValidator;
+import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
+import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
 public class CMakeValidatorTest {
 
@@ -77,10 +77,10 @@ public class CMakeValidatorTest {
 
     final Set<String> includes = new HashSet<>(Arrays.asList("i0", "i1"));
     provider.configure((library) -> {
-      library.getIncludes().set(includes);
+      library.getHeaders().set(includes);
     });
     assertEquals(name, provider.get().getName());
-    assertIterableEquals(includes, provider.get().getIncludes().get());
+    assertIterableEquals(includes, provider.get().getHeaders().get());
   }
 
   @Test
@@ -101,11 +101,11 @@ public class CMakeValidatorTest {
 
     final Set<String> includes = new HashSet<>(Arrays.asList("i0", "i1"));
     provider.configure((library) -> {
-      library.getIncludes().set(includes);
+      library.getHeaders().set(includes);
     });
     assertEquals(name, provider.get().getName());
     assertIterableEquals(toolchains, provider.get().getToolchains().get());
-    assertIterableEquals(includes, provider.get().getIncludes().get());
+    assertIterableEquals(includes, provider.get().getHeaders().get());
   }
 
   @Test

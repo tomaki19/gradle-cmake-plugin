@@ -9,8 +9,8 @@ import java.util.Arrays;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
-import ch.tomaki.gradle.cmake.extension.CMakeApplication;
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
+import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
 
 public final class TestCMakeApplication {
 
@@ -18,7 +18,7 @@ public final class TestCMakeApplication {
       final CMakeExtension extension) {
     final NamedDomainObjectProvider<CMakeApplication> provider = extension.getApplications().register(name);
     provider.configure((object) -> {
-      object.getIncludes().set(Arrays.asList("inlude0"));
+      object.getHeaders().set(Arrays.asList("header0"));
       object.getSources().set(Arrays.asList("source0"));
     });
     return provider;

@@ -5,14 +5,21 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
 import org.gradle.api.Project;
+
+import ch.tomaki.gradle.cmake.files.CMakeLinkType;
+import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 
 public class CMakeResolvedProjectModule {
 
   private final Project project;
-  private final CMakeResolvedToolchain toolchain;
+  private final Optional<CMakeResolvedToolchain> toolchain;
 
-  CMakeResolvedProjectModule(final Project project, final CMakeResolvedToolchain toolchain) {
+  CMakeResolvedProjectModule(final Project project, final Optional<CMakeResolvedToolchain> toolchain) {
     this.project = project;
     this.toolchain = toolchain;
   }
@@ -21,8 +28,42 @@ public class CMakeResolvedProjectModule {
     return project;
   }
 
-  public CMakeResolvedToolchain getToolchain() {
+  public Optional<CMakeResolvedToolchain> getToolchain() {
     return toolchain;
+  }
+
+  static void resolveProjectModuleDependencies(final Set<CMakeResolvedProjectModule> projectModules,
+      final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies,
+      final Optional<CMakeResolvedToolchain> toolchain, final Optional<String> buildConfig,
+      final Set<String> dependencies, final Project project)
+      throws IllegalArgumentException {
+    for (final String dependency : dependencies) {
+      if (!dependency.startsWith("-")) {
+        final String[] dependencyTokens = dependency.split("::");
+        if (dependencyTokens.length == 3) {
+          final Project dependencyProject = Objects.equals(dependencyTokens[0], project.getName()) ? project
+              : project.findProject(":%s".formatted(dependencyTokens[0]));
+          if (Objects.nonNull(dependencyProject)) {
+            final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
+            final String buildTarget = CMakeListsConventions.libraryTarget(dependencyTokens[1], type, toolchain,
+                buildConfig);
+            final CMakeResolvedProjectModuleDependency resolvedProjectModule = new CMakeResolvedProjectModuleDependency(
+                dependencyProject, toolchain, type, buildTarget);
+            projectModuleDependencies.add(resolvedProjectModule);
+            if (!Objects.equals(project, dependencyProject)) {
+              projectModules.add(new CMakeResolvedProjectModule(dependencyProject,
+                  toolchain));
+            }
+          } else {
+            throw new IllegalArgumentException(
+                "Missing local project '%s'!".formatted(dependencyTokens[0]));
+          }
+        } else if (dependencyTokens.length > 3) {
+          throw new IllegalArgumentException(
+              "Invalid dependency '%s'!".formatted(dependency));
+        }
+      }
+    }
   }
 
   @Override

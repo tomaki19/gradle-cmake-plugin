@@ -3,11 +3,11 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extension;
+package ch.tomaki.gradle.cmake.extension.api;
 
 import org.gradle.api.provider.SetProperty;
 
-public interface CMakeLibrary extends CMakeObject {
+public interface CMakeLibrary extends CMakeBinary, CMakeLibraries {
 
   SetProperty<String> getPublicCompileOptions();
 

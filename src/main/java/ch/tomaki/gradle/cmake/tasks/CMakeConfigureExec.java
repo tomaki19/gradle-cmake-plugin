@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import org.gradle.api.file.Directory;
 
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 
 public abstract class CMakeConfigureExec extends CMakeExec {
@@ -31,7 +31,7 @@ public abstract class CMakeConfigureExec extends CMakeExec {
     getBaseCommandLine().add("-G \"%s\"".formatted(toolchain.getGenerator().get()));
     if (toolchain.getToolchainFile().isPresent()) {
       getBaseCommandLine().add("--toolchain");
-      getBaseCommandLine().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAsFile().getAbsolutePath()));
+      getBaseCommandLine().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
     }
     getBaseCommandLine().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchainName));
     if (!toolchain.getBuildConfigs().get().isEmpty()) {

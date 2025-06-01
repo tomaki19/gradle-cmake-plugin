@@ -8,14 +8,15 @@ package ch.tomaki.gradle.cmake.files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBinaryLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedInterface;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedInterfaceLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 
 public class CMakeConfigFile extends CMakeFileOutputStream {
@@ -27,24 +28,22 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
 
   @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
-    for (final CMakeResolvedInterface object : build.getResolvedInterfaces()) {
+    for (final CMakeResolvedInterfaceLibrary object : build.getResolvedInterfaces()) {
       final String libraryTarget = CMakeListsConventions.libraryInterfaceTarget(object.getName());
       write("add_library( %s::%s INTERFACE IMPORTED )", project.getName(), libraryTarget);
       setTargetProperties(object, libraryTarget, project);
     }
-    for (final CMakeResolvedLibrary object : build.getResolvedLibraries()) {
+    for (final CMakeResolvedBinaryLibrary object : build.getResolvedLibraries()) {
       if (object.isBuildStatic()) {
-        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(),
-            object.getToolchain(),
-            CMakeLinkType.STATIC, object.getBuildConfig());
+        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(), CMakeLinkType.STATIC,
+            Optional.of(object.getToolchain()), Optional.of(object.getBuildConfig()));
         write("add_library( %s::%s STATIC IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
             object, libraryTarget, OperatingSystem.current().getStaticLibrarySuffix(), project);
       }
       if (object.isBuildShared()) {
-        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(),
-            object.getToolchain(),
-            CMakeLinkType.SHARED, object.getBuildConfig());
+        final String libraryTarget = CMakeListsConventions.libraryTarget(object.getName(), CMakeLinkType.SHARED,
+            Optional.of(object.getToolchain()), Optional.of(object.getBuildConfig()));
         write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);
         setTargetProperties(
             object, libraryTarget, OperatingSystem.current().getSharedLibrarySuffix(), project);
@@ -53,20 +52,20 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
   }
 
   private void setTargetProperties(
-      final CMakeResolvedInterface object,
+      final CMakeResolvedInterfaceLibrary object,
       final String objectTarget,
       final Project project)
       throws IOException {
     write("set_target_properties( %s::%s PROPERTIES", project.getName(), objectTarget);
     write(1, "INTERFACE_INCLUDE_DIRECTORIES");
-    for (final String include : object.getIncludes()) {
+    for (final String include : object.getHeaders()) {
       final File includeDir = project.getLayout().getProjectDirectory().dir(include).getAsFile();
       write(2, "%s", includeDir.toURI().getPath());
     }
     write(")");
   }
 
-  private void setTargetProperties(final CMakeResolvedLibrary library, final String libraryTarget,
+  private void setTargetProperties(final CMakeResolvedBinaryLibrary library, final String libraryTarget,
       final String librarySuffix, final Project project) throws IOException {
     write("set_target_properties( %s::%s PROPERTIES", project.getName(), libraryTarget);
     final File installDir = project.getLayout().getBuildDirectory().get()
@@ -81,7 +80,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
       write(1, "IMPORTED_CONFIGURATIONS \"%s;\"", buildConfig);
     }
     write(1, "INTERFACE_INCLUDE_DIRECTORIES");
-    for (final String include : library.getIncludes()) {
+    for (final String include : library.getHeaders()) {
       final File includeDir = project.getLayout().getProjectDirectory().dir(include).getAsFile();
       write(2, "%s", includeDir.toURI().getPath());
     }

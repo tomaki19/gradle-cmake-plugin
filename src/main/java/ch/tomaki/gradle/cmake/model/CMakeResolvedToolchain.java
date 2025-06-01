@@ -12,12 +12,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.gradle.api.file.RegularFile;
 import org.gradle.internal.os.OperatingSystem;
 
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedToolchain {
+public final class CMakeResolvedToolchain implements CMakeResolvedNamedObject {
 
   private final String name;
   private final OperatingSystem operatingSystem;
@@ -27,7 +26,7 @@ public final class CMakeResolvedToolchain {
   private final Set<String> buildConfigs;
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
-  private final Optional<RegularFile> toolchainFile;
+  private final Optional<File> toolchainFile;
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     this.name = toolchain.getName();
@@ -41,6 +40,7 @@ public final class CMakeResolvedToolchain {
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -73,7 +73,7 @@ public final class CMakeResolvedToolchain {
     return environmentFile;
   }
 
-  public Optional<RegularFile> getToolchainFile() {
+  public Optional<File> getToolchainFile() {
     return toolchainFile;
   }
 

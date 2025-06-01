@@ -5,6 +5,8 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import java.util.Optional;
+
 import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
@@ -12,11 +14,11 @@ import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 public class CMakeResolvedProjectModuleDependency {
 
   private final Project project;
-  private final CMakeResolvedToolchain toolchain;
+  private final Optional<CMakeResolvedToolchain> toolchain;
   private final CMakeLinkType type;
   private final String buildTarget;
 
-  CMakeResolvedProjectModuleDependency(final Project project, final CMakeResolvedToolchain toolchain,
+  CMakeResolvedProjectModuleDependency(final Project project, final Optional<CMakeResolvedToolchain> toolchain,
       final CMakeLinkType type, final String buildTarget) {
     this.project = project;
     this.toolchain = toolchain;
@@ -28,7 +30,7 @@ public class CMakeResolvedProjectModuleDependency {
     return project;
   }
 
-  public CMakeResolvedToolchain getToolchain() {
+  public Optional<CMakeResolvedToolchain> getToolchain() {
     return toolchain;
   }
 

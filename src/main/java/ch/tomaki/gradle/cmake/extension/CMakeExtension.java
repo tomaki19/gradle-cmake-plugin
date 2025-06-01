@@ -11,6 +11,12 @@ import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectContainer;
 
+import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
+import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
+
 public abstract class CMakeExtension {
 
   public static final String NAME = "cmake";

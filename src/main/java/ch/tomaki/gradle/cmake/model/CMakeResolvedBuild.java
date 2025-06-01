@@ -18,8 +18,8 @@ public class CMakeResolvedBuild {
   private final Map<String, CMakeResolvedToolchain> resolvedToolchains = new HashMap<>();
   private final Set<CMakeResolvedFindPackage> resolvedFindPackages = new HashSet<>();
   private final Set<CMakeResolvedProjectModule> resolvedProjectModules = new HashSet<>();
-  private final Set<CMakeResolvedInterface> resolvedInterfaces = new HashSet<>();
-  private final Set<CMakeResolvedLibrary> resolvedLibraries = new HashSet<>();
+  private final Set<CMakeResolvedInterfaceLibrary> resolvedInterfaces = new HashSet<>();
+  private final Set<CMakeResolvedBinaryLibrary> resolvedLibraries = new HashSet<>();
   private final Set<CMakeResolvedApplication> resolvedApplications = new HashSet<>();
   private final Set<CMakeResolvedTest> resolvedTests = new HashSet<>();
 
@@ -59,19 +59,19 @@ public class CMakeResolvedBuild {
     return resolvedProjectModules;
   }
 
-  public void add(final CMakeResolvedInterface object) {
+  public void add(final CMakeResolvedInterfaceLibrary object) {
     resolvedInterfaces.add(object);
   }
 
-  public Collection<CMakeResolvedInterface> getResolvedInterfaces() {
+  public Collection<CMakeResolvedInterfaceLibrary> getResolvedInterfaces() {
     return resolvedInterfaces;
   }
 
-  public void add(final CMakeResolvedLibrary object) {
+  public void add(final CMakeResolvedBinaryLibrary object) {
     resolvedLibraries.add(object);
   }
 
-  public Collection<CMakeResolvedLibrary> getResolvedLibraries() {
+  public Collection<CMakeResolvedBinaryLibrary> getResolvedLibraries() {
     return resolvedLibraries;
   }
 

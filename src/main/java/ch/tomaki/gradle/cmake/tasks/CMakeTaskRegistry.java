@@ -83,7 +83,7 @@ public class CMakeTaskRegistry {
           .filter(dependency -> !Objects.equals(dependency.getProject(), task.getProject()))
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
           .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject().getName(),
-              dependency.getToolchain().getName()))
+              dependency.getToolchain().get().getName()))
           .forEach(configTaskName -> task.mustRunAfter(configTaskName));
     });
   }

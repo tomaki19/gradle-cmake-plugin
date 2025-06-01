@@ -38,13 +38,35 @@ toolchains {
     environment = //optional, Map<String,String>
     environmentFile = //optional, File
     toolchainFile = //optional, File
-    privateLibraryLinkDependencies= //optional: List<String>
-    privateTestLinkDependencies = //optional: List<String>
-    privateTestLinkDependencies = //optional: List<String>
-    buildStatic = //optional: boolean, default: false
-    buildShared = //optional: boolean, default: true
-    stripDebug = //optional: boolean, default: false
-    packageBuildOutputs = //optional: boolean, default: false
+    binaries {
+      privateLinkDependencies = //optional: List<String>
+      buildStatic = //optional: boolean, default: false
+      buildShared = //optional: boolean, default: true
+      stripDebug = //optional: boolean, default: false
+      packageBuildOutputs = //optional: boolean, default: false
+    }
+    libraries {
+      privateLinkDependencies = //optional: List<String>
+      buildStatic = //optional: boolean, default: false
+      buildShared = //optional: boolean, default: true
+      stripDebug = //optional: boolean, default: false
+      packageBuildOutputs = //optional: boolean, default: false
+    }
+    applications {
+      privateLinkDependencies = //optional: List<String>
+      buildStatic = //optional: boolean, default: false
+      buildShared = //optional: boolean, default: true
+      stripDebug = //optional: boolean, default: false
+      packageBuildOutputs = //optional: boolean, default: false
+    }
+    tests {
+      privateLinkDependencies = //optional: List<String>
+      buildStatic = //optional: boolean, default: false
+      buildShared = //optional: boolean, default: true
+      stripDebug = //optional: boolean, default: false
+      packageBuildOutputs = //optional: boolean, default: false
+      testResultsXmlOutput = //optional: boolean, default: false
+    }
   }
 }
 ```
@@ -105,6 +127,7 @@ tests {
     buildShared = //optional: boolean, default: true
     stripDebug = //optional: boolean, default: false
     packageBuildOutputs = //optional: boolean, default: false
+    testResultsXmlOutput = //optional: boolean, default: false
   }
 }
 ```

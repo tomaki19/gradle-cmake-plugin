@@ -10,6 +10,11 @@ import java.util.Set;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 
+import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
+import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
+
 public final class CMakeValidator {
 
   public static void validateToolchains(final Set<CMakeToolchain> toolchains) {
@@ -30,7 +35,7 @@ public final class CMakeValidator {
       if (!library.getToolchains().get().isEmpty()) {
         validateNotEmpty(library.getToolchains(), "libraries -> %s -> toolchains".formatted(library.getName()));
       }
-      validateNotEmpty(library.getIncludes(), "library -> %s -> includes".formatted(library.getName()));
+      validateNotEmpty(library.getHeaders(), "library -> %s -> headers".formatted(library.getName()));
     });
   }
 

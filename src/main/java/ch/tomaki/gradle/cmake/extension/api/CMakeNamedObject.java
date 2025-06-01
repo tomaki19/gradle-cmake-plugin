@@ -3,7 +3,10 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extension;
+package ch.tomaki.gradle.cmake.extension.api;
 
-public interface CMakeApplication extends CMakeObject {
+public interface CMakeNamedObject {
+
+  String getName();
+
 }

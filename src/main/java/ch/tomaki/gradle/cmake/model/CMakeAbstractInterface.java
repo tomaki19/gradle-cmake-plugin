@@ -8,24 +8,25 @@ package ch.tomaki.gradle.cmake.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import ch.tomaki.gradle.cmake.extension.CMakeObject;
+import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
 
-abstract class CMakeResolvedInterfaceObject {
+abstract class CMakeAbstractInterface implements CMakeResolvedNamedObject {
 
   private final String name;
-  private final Set<String> includes;
+  private final Set<String> headers;
 
-  CMakeResolvedInterfaceObject(final CMakeObject object) throws IllegalArgumentException {
+  CMakeAbstractInterface(final CMakeBinary object) throws IllegalArgumentException {
     this.name = object.getName();
-    this.includes = new HashSet<>(object.getIncludes().get());
+    this.headers = new HashSet<>(object.getHeaders().get());
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
-  public Set<String> getIncludes() {
-    return includes;
+  public Set<String> getHeaders() {
+    return headers;
   }
 
   @Override
@@ -44,7 +45,7 @@ abstract class CMakeResolvedInterfaceObject {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeResolvedInterfaceObject other = (CMakeResolvedInterfaceObject) obj;
+    CMakeAbstractInterface other = (CMakeAbstractInterface) obj;
     if (name == null) {
       if (other.name != null)
         return false;

@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
-import ch.tomaki.gradle.cmake.extension.CMakeApplication;
-import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
-import ch.tomaki.gradle.cmake.extension.CMakeLibrary;
-import ch.tomaki.gradle.cmake.extension.CMakeObject;
-import ch.tomaki.gradle.cmake.extension.CMakeTest;
-import ch.tomaki.gradle.cmake.extension.CMakeToolchain;
+import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
+import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
+import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
 public final class CMakeResolver {
 
@@ -60,13 +60,13 @@ public final class CMakeResolver {
   private void processLibraries(final CMakeResolvedBuild build, final Set<CMakeLibrary> libraries) {
     libraries.forEach((object) -> {
       if (object.getToolchains().get().isEmpty()) {
-        build.add(new CMakeResolvedInterface(object));
+        build.add(new CMakeResolvedInterfaceLibrary(object, availableFindPackages, project));
       } else {
         processObjects(object,
             (CMakeLibrary library, CMakeToolchain toolchain, String buildConfig) -> {
-              return new CMakeResolvedLibrary(library, toolchain, buildConfig, availableFindPackages, project);
+              return new CMakeResolvedBinaryLibrary(library, toolchain, buildConfig, availableFindPackages, project);
             },
-            (CMakeResolvedLibrary library) -> {
+            (CMakeResolvedBinaryLibrary library) -> {
               build.addFindPackages(library.getPrivateFindPackages());
               build.addFindPackages(library.getPublicFindPackages());
               build.addProjectModules(library.getPrivateProjectModules());
@@ -101,33 +101,33 @@ public final class CMakeResolver {
         }));
   }
 
-  private <O extends CMakeObject, R extends CMakeResolvedBinary> void processObjects(final O object,
-      final Resolver<O, R> resolver, final Acceptor<R> acceptor) {
-    object.getToolchains().get().forEach((toolchainName) -> {
+  private <U extends CMakeBinary, R extends CMakeAbstractBinary> void processObjects(final U binary,
+      final Resolver<U, R> resolver, final Acceptor<R> acceptor) {
+    binary.getToolchains().get().forEach((toolchainName) -> {
       Optional.ofNullable(availableToolchains.get(toolchainName)).ifPresent((toolchain) -> {
         if (toolchain.getBuildConfigs().get().isEmpty()) {
-          processBuildConfigs(CMakeToolchain.BuildConfigDefaults, object, toolchain, resolver, acceptor);
+          processBuildConfigs(CMakeToolchain.BuildConfigDefaults, toolchain, binary, resolver, acceptor);
         } else {
-          processBuildConfigs(toolchain.getBuildConfigs().get(), object, toolchain, resolver, acceptor);
+          processBuildConfigs(toolchain.getBuildConfigs().get(), toolchain, binary, resolver, acceptor);
         }
       });
     });
   }
 
-  private <O extends CMakeObject, R extends CMakeResolvedBinary> void processBuildConfigs(
-      final Collection<String> buildConfigs, final O object, final CMakeToolchain toolchain,
-      final Resolver<O, R> resolver, final Acceptor<R> acceptor) {
+  private <U extends CMakeBinary, R extends CMakeAbstractBinary> void processBuildConfigs(
+      final Collection<String> buildConfigs, final CMakeToolchain toolchain, final U binary,
+      final Resolver<U, R> resolver, final Acceptor<R> acceptor) {
     buildConfigs.forEach((buildConfig) -> {
-      final R resolvedBinary = resolver.resolve(object, toolchain, buildConfig);
+      final R resolvedBinary = resolver.resolve(binary, toolchain, buildConfig);
       acceptor.accept(resolvedBinary);
     });
   }
 
-  private interface Resolver<O extends CMakeObject, R extends CMakeResolvedBinary> {
-    R resolve(final O object, final CMakeToolchain toolchain, final String buildConfig);
+  private interface Resolver<U extends CMakeBinary, R extends CMakeAbstractBinary> {
+    R resolve(final U binary, final CMakeToolchain toolchain, final String buildConfig);
   }
 
-  private interface Acceptor<R extends CMakeResolvedBinary> {
+  private interface Acceptor<R extends CMakeAbstractBinary> {
     void accept(final R resolvedObject);
   }
 

@@ -7,23 +7,26 @@ package ch.tomaki.gradle.cmake.model;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import ch.tomaki.gradle.cmake.extension.CMakeFindPackage;
-public class CMakeResolvedFindPackage {
+import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
+
+public final class CMakeResolvedFindPackage implements CMakeResolvedNamedObject {
 
   private final String name;
   private final Set<String> components;
   private final Map<String, String> properties;
-  private final CMakeResolvedToolchain toolchain;
+  private final Optional<CMakeResolvedToolchain> toolchain;
 
-  CMakeResolvedFindPackage(final CMakeFindPackage findPackage, final CMakeResolvedToolchain toolchain) {
+  CMakeResolvedFindPackage(final CMakeFindPackage findPackage, final Optional<CMakeResolvedToolchain> toolchain) {
     this.name = findPackage.getName();
     this.components = new HashSet<>(findPackage.getComponents().get());
     this.properties = findPackage.getProperties().get();
     this.toolchain = toolchain;
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -36,8 +39,29 @@ public class CMakeResolvedFindPackage {
     return properties;
   }
 
-  public CMakeResolvedToolchain getToolchain() {
+  public Optional<CMakeResolvedToolchain> getToolchain() {
     return toolchain;
+  }
+
+  static void resolveFindPackageDependencies(final Set<CMakeResolvedFindPackage> findPackages,
+      final Set<CMakeResolvedFindPackageDependency> findPackageDependencies,
+      final Optional<CMakeResolvedToolchain> toolchain, final Map<String, CMakeFindPackage> availableFindPackages,
+      final Set<String> dependencies)
+      throws IllegalArgumentException {
+    for (final String dependency : dependencies) {
+      if (!dependency.startsWith("-")) {
+        final String[] dependencyTokens = dependency.split("::");
+        if (dependencyTokens.length <= 2) {
+          if (availableFindPackages.containsKey(dependencyTokens[0])) {
+            final CMakeFindPackage findPackage = availableFindPackages.get(dependencyTokens[0]);
+            findPackages.add(new CMakeResolvedFindPackage(findPackage, toolchain));
+            findPackageDependencies.add(new CMakeResolvedFindPackageDependency(dependency));
+          } else {
+            throw new IllegalArgumentException("Missing find package '%s'!".formatted(dependency));
+          }
+        }
+      }
+    }
   }
 
   @Override
