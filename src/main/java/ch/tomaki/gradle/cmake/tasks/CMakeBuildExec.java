@@ -11,7 +11,7 @@ import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Input;
 
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
-import ch.tomaki.gradle.cmake.model.CMakeAbstractBinary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 
 public abstract class CMakeBuildExec extends CMakeExec {
 
@@ -21,7 +21,7 @@ public abstract class CMakeBuildExec extends CMakeExec {
   public abstract SetProperty<String> getAdditionalArguments();
 
   @Inject
-  public CMakeBuildExec(final String buildTarget, final CMakeAbstractBinary binary) {
+  public CMakeBuildExec(final String buildTarget, final CMakeResolvedBinary binary) {
     super(binary.getToolchain().getName(), binary.getToolchain().getEnvironmentFile());
     this.buildTarget = buildTarget;
     setGroup(CMakeTasksConventions.GROUP_BUILD);

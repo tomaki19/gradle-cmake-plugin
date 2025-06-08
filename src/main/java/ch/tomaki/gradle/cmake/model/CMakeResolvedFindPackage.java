@@ -12,7 +12,7 @@ import java.util.Set;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 
-public final class CMakeResolvedFindPackage implements CMakeResolvedNamedObject {
+public final class CMakeResolvedFindPackage {
 
   private final String name;
   private final Set<String> components;
@@ -26,7 +26,6 @@ public final class CMakeResolvedFindPackage implements CMakeResolvedNamedObject 
     this.toolchain = toolchain;
   }
 
-  @Override
   public String getName() {
     return name;
   }

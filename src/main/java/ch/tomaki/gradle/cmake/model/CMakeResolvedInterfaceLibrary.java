@@ -15,8 +15,13 @@ import org.gradle.api.Project;
 import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 
-public final class CMakeResolvedInterfaceLibrary extends CMakeAbstractInterface implements CMakeLibraryInterface {
+public final class CMakeResolvedInterfaceLibrary implements CMakeResolvedLibrary {
 
+  private final String name;
+  private final Set<String> headers;
+  private final Set<String> publicCompileOptions;
+  private final Set<String> publicCompileDefinitions;
+  private final Set<String> publicLinkOptions;
   private final Set<CMakeResolvedFindPackage> publicFindPackages;
   private final Set<CMakeResolvedFindPackageDependency> publicFindPackageDependencies;
   private final Set<CMakeResolvedProjectModule> publicProjectModules;
@@ -24,7 +29,12 @@ public final class CMakeResolvedInterfaceLibrary extends CMakeAbstractInterface 
 
   CMakeResolvedInterfaceLibrary(final CMakeLibrary library, final Map<String, CMakeFindPackage> findPackages,
       final Project project) throws IllegalArgumentException {
-    super(library);
+    this.name = library.getName();
+    this.headers = new HashSet<>(library.getHeaders().get());
+    this.publicCompileOptions = new HashSet<>(library.getPublicCompileOptions().get());
+    this.publicCompileDefinitions = new HashSet<>(library.getPublicCompileDefinitions().get());
+    this.publicLinkOptions = new HashSet<>();
+    CMakeResolvedBinary.resolveLinkOptions(publicLinkOptions, library.getPublicLinkDependencies().get());
     this.publicFindPackages = new HashSet<>();
     this.publicFindPackageDependencies = new HashSet<>();
     CMakeResolvedFindPackage.resolveFindPackageDependencies(publicFindPackages, publicFindPackageDependencies,
@@ -35,8 +45,24 @@ public final class CMakeResolvedInterfaceLibrary extends CMakeAbstractInterface 
         Optional.empty(), Optional.empty(), library.getPublicLinkDependencies().get(), project);
   }
 
-  public final Set<String> getPublicLinkOptions() {
-    return new HashSet<>();
+  public String getName() {
+    return name;
+  }
+
+  public Set<String> getHeaders() {
+    return headers;
+  }
+
+  public Set<String> getPublicCompileOptions() {
+    return publicCompileOptions;
+  }
+
+  public Set<String> getPublicCompileDefinitions() {
+    return publicCompileDefinitions;
+  }
+
+  public Set<String> getPublicLinkOptions() {
+    return publicLinkOptions;
   }
 
   public Set<CMakeResolvedFindPackage> getPublicFindPackages() {

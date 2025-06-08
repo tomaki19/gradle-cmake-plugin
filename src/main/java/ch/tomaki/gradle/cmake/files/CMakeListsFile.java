@@ -16,14 +16,14 @@ import java.util.Set;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
-import ch.tomaki.gradle.cmake.model.CMakeAbstractBinary;
-import ch.tomaki.gradle.cmake.model.CMakeLibraryInterface;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinaryLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackage;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedFindPackageDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedInterfaceLibrary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModule;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
@@ -44,8 +44,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     writeHeader(project);
     writeFindPackages(build.getResolvedFindPackages());
     writeProjectDependencies(build.getResolvedProjectModules(), project);
-    writeInterfaces(build.getResolvedInterfaces(), project);
-    writeLibraries(build.getResolvedLibraries(), project);
+    writeInterfaceLibraries(build.getResolvedInterfaces(), project);
+    writeBinaryLibraries(build.getResolvedLibraries(), project);
     writeApplications(build.getResolvedApplications(), project);
     writeTests(build.getResolvedTests(), project);
   }
@@ -111,7 +111,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeInterfaces(final Collection<CMakeResolvedInterfaceLibrary> interfaces, final Project project)
+  private void writeInterfaceLibraries(final Collection<CMakeResolvedInterfaceLibrary> interfaces, final Project project)
       throws IOException {
     for (final CMakeResolvedInterfaceLibrary object : interfaces) {
       writeLine();
@@ -119,7 +119,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeLibraries(final Collection<CMakeResolvedBinaryLibrary> libraries, final Project project)
+  private void writeBinaryLibraries(final Collection<CMakeResolvedBinaryLibrary> libraries, final Project project)
       throws IOException {
     for (final CMakeResolvedBinaryLibrary object : libraries) {
       writeLine();
@@ -163,6 +163,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write("add_library( %s INTERFACE )", target);
     write("add_library( %s::%s ALIAS %s)", project.getName(), target, target);
     writeTargetIncludeDirectories(target, "INTERFACE", object.getHeaders(), project);
+    writePublicCompiling(target, object);
     writePublicLinking(target, object);
   }
 
@@ -206,7 +207,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write("endif()");
   }
 
-  private void writeExecutable(final String target, final CMakeAbstractBinary object, final Project project)
+  private void writeExecutable(final String target, final CMakeResolvedBinary object, final Project project)
       throws IOException {
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_executable( %s )", target);
@@ -221,7 +222,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write("endif()");
   }
 
-  private void writeAddTest(final String target, final CMakeAbstractBinary object) throws IOException {
+  private void writeAddTest(final String target, final CMakeResolvedBinary object) throws IOException {
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
     write("add_test(");
     write(1, "NAME %s", target);
@@ -271,7 +272,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write(")");
   }
 
-  private void writePrivateCompiling(final String target, final CMakeAbstractBinary binary)
+  private void writePrivateCompiling(final String target, final CMakeResolvedBinary binary)
       throws IOException {
     if (!binary.getPrivateCompileOptions().isEmpty()) {
       writeTargetCompileOptions(target, "PRIVATE", binary.getPrivateCompileOptions());
@@ -281,7 +282,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writePublicCompiling(final String target, final CMakeResolvedBinaryLibrary library)
+  private void writePublicCompiling(final String target, final CMakeResolvedLibrary library)
       throws IOException {
     if (!library.getPublicCompileOptions().isEmpty()) {
       writeTargetCompileOptions(target, "PUBLIC", library.getPublicCompileOptions());
@@ -291,7 +292,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writePrivateLinking(final String target, final CMakeAbstractBinary binary)
+  private void writePrivateLinking(final String target, final CMakeResolvedBinary binary)
       throws IOException {
     if (!binary.getPrivateFindPackageDependencies().isEmpty()
         || !binary.getPrivateProjectModuleDependencies().isEmpty()
@@ -303,7 +304,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writePublicLinking(final String target, final CMakeLibraryInterface library)
+  private void writePublicLinking(final String target, final CMakeResolvedLibrary library)
       throws IOException {
     if (!library.getPublicFindPackageDependencies().isEmpty()
         || !library.getPublicProjectModuleDependencies().isEmpty()

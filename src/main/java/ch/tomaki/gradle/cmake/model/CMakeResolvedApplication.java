@@ -14,7 +14,7 @@ import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
 import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedApplication extends CMakeAbstractBinary {
+public final class CMakeResolvedApplication extends CMakeResolvedBinary {
 
   private final boolean buildStatic;
   private final boolean buildShared;
@@ -24,7 +24,7 @@ public final class CMakeResolvedApplication extends CMakeAbstractBinary {
   CMakeResolvedApplication(final CMakeApplication application, final CMakeToolchain toolchain,
       final String buildConfig, final Map<String, CMakeFindPackage> findPackages, final Project project) {
     super(application, toolchain, buildConfig, findPackages, project);
-    resolveLinkOptions(getPrivateLinkOptions(), application.getPrivateLinkDependencies().get());
+    CMakeResolvedBinary.resolveLinkOptions(getPrivateLinkOptions(), application.getPrivateLinkDependencies().get());
     CMakeResolvedFindPackage.resolveFindPackageDependencies(getPrivateFindPackages(),
         getPrivateFindPackageDependencies(), Optional.of(getToolchain()), findPackages,
         application.getPrivateLinkDependencies().get());

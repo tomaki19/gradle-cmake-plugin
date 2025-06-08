@@ -16,7 +16,7 @@ import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedBinaryLibrary extends CMakeAbstractBinary implements CMakeLibraryInterface {
+public final class CMakeResolvedBinaryLibrary extends CMakeResolvedBinary implements CMakeResolvedLibrary {
 
   private final Set<String> publicCompileOptions;
   private final Set<String> publicCompileDefinitions;
@@ -36,8 +36,8 @@ public final class CMakeResolvedBinaryLibrary extends CMakeAbstractBinary implem
     this.publicCompileOptions = new HashSet<>(library.getPublicCompileOptions().get());
     this.publicCompileDefinitions = new HashSet<>(library.getPublicCompileDefinitions().get());
     this.publicLinkOptions = new HashSet<>();
-    resolveLinkOptions(getPrivateLinkOptions(), library.getPrivateLinkDependencies().get());
-    resolveLinkOptions(publicLinkOptions, library.getPublicLinkDependencies().get());
+    CMakeResolvedBinary.resolveLinkOptions(getPrivateLinkOptions(), library.getPrivateLinkDependencies().get());
+    CMakeResolvedBinary.resolveLinkOptions(publicLinkOptions, library.getPublicLinkDependencies().get());
     this.publicFindPackages = new HashSet<>();
     this.publicFindPackageDependencies = new HashSet<>();
     CMakeResolvedFindPackage.resolveFindPackageDependencies(getPrivateFindPackages(),
@@ -68,15 +68,18 @@ public final class CMakeResolvedBinaryLibrary extends CMakeAbstractBinary implem
         project);
   }
 
-  public final Set<String> getPublicCompileOptions() {
+  @Override
+  public Set<String> getPublicCompileOptions() {
     return publicCompileOptions;
   }
 
+  @Override
   public Set<String> getPublicCompileDefinitions() {
     return publicCompileDefinitions;
   }
 
-  public final Set<String> getPublicLinkOptions() {
+  @Override
+  public Set<String> getPublicLinkOptions() {
     return publicLinkOptions;
   }
 
@@ -84,6 +87,7 @@ public final class CMakeResolvedBinaryLibrary extends CMakeAbstractBinary implem
     return publicFindPackages;
   }
 
+  @Override
   public Set<CMakeResolvedFindPackageDependency> getPublicFindPackageDependencies() {
     return publicFindPackageDependencies;
   }
@@ -92,6 +96,7 @@ public final class CMakeResolvedBinaryLibrary extends CMakeAbstractBinary implem
     return publicProjectModules;
   }
 
+  @Override
   public Set<CMakeResolvedProjectModuleDependency> getPublicProjectModuleDependencies() {
     return publicProjectModuleDependencies;
   }

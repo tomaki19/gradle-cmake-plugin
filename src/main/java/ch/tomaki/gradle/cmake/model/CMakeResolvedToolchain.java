@@ -16,7 +16,7 @@ import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedToolchain implements CMakeResolvedNamedObject {
+public final class CMakeResolvedToolchain {
 
   private final String name;
   private final OperatingSystem operatingSystem;
@@ -40,7 +40,6 @@ public final class CMakeResolvedToolchain implements CMakeResolvedNamedObject {
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
   }
 
-  @Override
   public String getName() {
     return name;
   }

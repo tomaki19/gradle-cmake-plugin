@@ -16,12 +16,13 @@ import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public abstract class CMakeAbstractBinary extends CMakeAbstractInterface
-    implements CMakeResolvedPrivatePackageDependencies,
+public abstract class CMakeResolvedBinary implements CMakeResolvedPrivatePackageDependencies,
     CMakeResolvedPrivateProjectDependencies {
 
   private final CMakeResolvedToolchain toolchain;
   private final String buildConfig;
+  private final String name;
+  private final Set<String> headers;
   private final Set<String> sources;
   private final Set<String> privateCompileOptions;
   private final Set<String> privateCompileDefinitions;
@@ -31,14 +32,15 @@ public abstract class CMakeAbstractBinary extends CMakeAbstractInterface
   private final Set<CMakeResolvedProjectModule> privateProjectModules;
   private final Set<CMakeResolvedProjectModuleDependency> privateProjectModuleDependencies;
 
-  CMakeAbstractBinary(final CMakeBinary object, final CMakeToolchain toolchain, final String buildConfig,
+  CMakeResolvedBinary(final CMakeBinary binary, final CMakeToolchain toolchain, final String buildConfig,
       final Map<String, CMakeFindPackage> findPackages, final Project project) throws IllegalArgumentException {
-    super(object);
     this.toolchain = new CMakeResolvedToolchain(toolchain);
     this.buildConfig = buildConfig;
-    this.sources = new HashSet<>(object.getSources().get());
-    this.privateCompileOptions = new HashSet<>(object.getPrivateCompileOptions().get());
-    this.privateCompileDefinitions = new HashSet<>(object.getPrivateCompileDefinitions().get());
+    this.name = binary.getName();
+    this.headers = new HashSet<>(binary.getHeaders().get());
+    this.sources = new HashSet<>(binary.getSources().get());
+    this.privateCompileOptions = new HashSet<>(binary.getPrivateCompileOptions().get());
+    this.privateCompileDefinitions = new HashSet<>(binary.getPrivateCompileDefinitions().get());
     this.privateLinkOptions = new HashSet<>();
     this.privateFindPackages = new HashSet<>();
     this.privateFindPackageDependencies = new HashSet<>();
@@ -54,6 +56,14 @@ public abstract class CMakeAbstractBinary extends CMakeAbstractInterface
 
   public String getBuildConfig() {
     return buildConfig;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Set<String> getHeaders() {
+    return headers;
   }
 
   public Set<String> getSources() {
@@ -105,7 +115,7 @@ public abstract class CMakeAbstractBinary extends CMakeAbstractInterface
         Optional.of(getToolchain()), Optional.of(buildConfig), dependencies, project);
   }
 
-  protected static void resolveLinkOptions(final Set<String> linkOptions, final Set<String> dependencies)
+  public static void resolveLinkOptions(final Set<String> linkOptions, final Set<String> dependencies)
       throws IllegalArgumentException {
     for (final String dependency : dependencies) {
       if (dependency.startsWith("-")) {
@@ -124,7 +134,7 @@ public abstract class CMakeAbstractBinary extends CMakeAbstractInterface
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((buildConfig == null) ? 0 : buildConfig.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
     return result;
   }
 
@@ -136,11 +146,11 @@ public abstract class CMakeAbstractBinary extends CMakeAbstractInterface
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeAbstractBinary other = (CMakeAbstractBinary) obj;
-    if (buildConfig == null) {
-      if (other.buildConfig != null)
+    CMakeResolvedBinary other = (CMakeResolvedBinary) obj;
+    if (name == null) {
+      if (other.name != null)
         return false;
-    } else if (!buildConfig.equals(other.buildConfig))
+    } else if (!name.equals(other.name))
       return false;
     return true;
   }

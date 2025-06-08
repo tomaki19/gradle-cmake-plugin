@@ -101,7 +101,7 @@ public final class CMakeResolver {
         }));
   }
 
-  private <U extends CMakeBinary, R extends CMakeAbstractBinary> void processObjects(final U binary,
+  private <U extends CMakeBinary, R extends CMakeResolvedBinary> void processObjects(final U binary,
       final Resolver<U, R> resolver, final Acceptor<R> acceptor) {
     binary.getToolchains().get().forEach((toolchainName) -> {
       Optional.ofNullable(availableToolchains.get(toolchainName)).ifPresent((toolchain) -> {
@@ -114,7 +114,7 @@ public final class CMakeResolver {
     });
   }
 
-  private <U extends CMakeBinary, R extends CMakeAbstractBinary> void processBuildConfigs(
+  private <U extends CMakeBinary, R extends CMakeResolvedBinary> void processBuildConfigs(
       final Collection<String> buildConfigs, final CMakeToolchain toolchain, final U binary,
       final Resolver<U, R> resolver, final Acceptor<R> acceptor) {
     buildConfigs.forEach((buildConfig) -> {
@@ -123,11 +123,11 @@ public final class CMakeResolver {
     });
   }
 
-  private interface Resolver<U extends CMakeBinary, R extends CMakeAbstractBinary> {
+  private interface Resolver<U extends CMakeBinary, R extends CMakeResolvedBinary> {
     R resolve(final U binary, final CMakeToolchain toolchain, final String buildConfig);
   }
 
-  private interface Acceptor<R extends CMakeAbstractBinary> {
+  private interface Acceptor<R extends CMakeResolvedBinary> {
     void accept(final R resolvedObject);
   }
 

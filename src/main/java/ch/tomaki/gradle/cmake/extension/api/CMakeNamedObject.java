@@ -5,7 +5,7 @@
  */
 package ch.tomaki.gradle.cmake.extension.api;
 
-public interface CMakeNamedObject {
+interface CMakeNamedObject {
 
   String getName();
 

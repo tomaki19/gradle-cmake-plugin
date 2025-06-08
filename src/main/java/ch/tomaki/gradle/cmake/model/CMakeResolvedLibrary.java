@@ -7,7 +7,15 @@ package ch.tomaki.gradle.cmake.model;
 
 import java.util.Set;
 
-public interface CMakeLibraryInterface {
+public interface CMakeResolvedLibrary {
+
+  String getName();
+
+  Set<String> getHeaders();
+
+  Set<String> getPublicCompileOptions();
+
+  Set<String> getPublicCompileDefinitions();
 
   Set<String> getPublicLinkOptions();
 
