@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake;
@@ -41,7 +40,7 @@ public class CMakeBinaryLibraryResolverTest {
         extension.getApplications(), extension.getTests());
 
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(3, resolvedBuild.getResolvedInterfaces().size());
+    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
     assertEquals(0, resolvedBuild.getResolvedLibraries().size());
   }
 
@@ -63,13 +62,13 @@ public class CMakeBinaryLibraryResolverTest {
 
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
-      assertEquals(0, library.getPrivateFindPackageDependencies().size());
-      assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+      assertEquals(0, library.getPrivatePackageDependencies().size());
+      assertEquals(0, library.getPrivateProjectDependencies().size());
       assertEquals(0, library.getPrivateLinkOptions().size());
-      assertEquals(0, library.getPublicFindPackageDependencies().size());
-      assertEquals(0, library.getPublicProjectModuleDependencies().size());
+      assertEquals(0, library.getPublicPackageDependencies().size());
+      assertEquals(0, library.getPublicProjectDependencies().size());
       assertEquals(0, library.getPublicLinkOptions().size());
     });
   }
@@ -95,13 +94,13 @@ public class CMakeBinaryLibraryResolverTest {
 
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
-      assertEquals(1, library.getPrivateFindPackageDependencies().size());
-      assertEquals(2, library.getPrivateProjectModuleDependencies().size());
+      assertEquals(1, library.getPrivatePackageDependencies().size());
+      assertEquals(4, library.getPrivateProjectDependencies().size());
       assertEquals(1, library.getPrivateLinkOptions().size());
-      assertEquals(0, library.getPublicFindPackageDependencies().size());
-      assertEquals(0, library.getPublicProjectModuleDependencies().size());
+      assertEquals(0, library.getPublicPackageDependencies().size());
+      assertEquals(0, library.getPublicProjectDependencies().size());
       assertEquals(0, library.getPublicLinkOptions().size());
     });
   }
@@ -127,21 +126,21 @@ public class CMakeBinaryLibraryResolverTest {
 
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
       if ("BinaryLibrary0".equals(library.getName())) {
-        assertEquals(0, library.getPrivateFindPackageDependencies().size());
-        assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(0, library.getPrivatePackageDependencies().size());
+        assertEquals(0, library.getPrivateProjectDependencies().size());
         assertEquals(0, library.getPrivateLinkOptions().size());
-        assertEquals(0, library.getPublicFindPackageDependencies().size());
-        assertEquals(0, library.getPublicProjectModuleDependencies().size());
+        assertEquals(0, library.getPublicPackageDependencies().size());
+        assertEquals(0, library.getPublicProjectDependencies().size());
         assertEquals(0, library.getPublicLinkOptions().size());
       } else {
-        assertEquals(1, library.getPrivateFindPackageDependencies().size());
-        assertEquals(2, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(1, library.getPrivatePackageDependencies().size());
+        assertEquals(4, library.getPrivateProjectDependencies().size());
         assertEquals(1, library.getPrivateLinkOptions().size());
-        assertEquals(0, library.getPublicFindPackageDependencies().size());
-        assertEquals(0, library.getPublicProjectModuleDependencies().size());
+        assertEquals(0, library.getPublicPackageDependencies().size());
+        assertEquals(0, library.getPublicProjectDependencies().size());
         assertEquals(0, library.getPublicLinkOptions().size());
       }
     });
@@ -168,21 +167,21 @@ public class CMakeBinaryLibraryResolverTest {
 
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(4, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
       if ("BinaryLibrary0".equals(library.getName())) {
-        assertEquals(0, library.getPrivateFindPackageDependencies().size());
-        assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(0, library.getPrivatePackageDependencies().size());
+        assertEquals(0, library.getPrivateProjectDependencies().size());
         assertEquals(0, library.getPrivateLinkOptions().size());
-        assertEquals(0, library.getPublicFindPackages().size());
-        assertEquals(0, library.getPublicProjectModuleDependencies().size());
+        assertEquals(0, library.getPublicPackages().size());
+        assertEquals(0, library.getPublicProjectDependencies().size());
         assertEquals(0, library.getPublicLinkOptions().size());
       } else {
-        assertEquals(0, library.getPrivateFindPackageDependencies().size());
-        assertEquals(0, library.getPrivateProjectModuleDependencies().size());
+        assertEquals(0, library.getPrivatePackageDependencies().size());
+        assertEquals(0, library.getPrivateProjectDependencies().size());
         assertEquals(0, library.getPrivateLinkOptions().size());
-        assertEquals(1, library.getPublicFindPackageDependencies().size());
-        assertEquals(2, library.getPublicProjectModuleDependencies().size());
+        assertEquals(1, library.getPublicPackageDependencies().size());
+        assertEquals(4, library.getPublicProjectDependencies().size());
         assertEquals(1, library.getPublicLinkOptions().size());
       }
     });

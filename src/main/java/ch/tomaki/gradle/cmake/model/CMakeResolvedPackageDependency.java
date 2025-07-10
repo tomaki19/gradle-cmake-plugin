@@ -1,15 +1,14 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.model;
 
-public final class CMakeResolvedFindPackageDependency {
+public final class CMakeResolvedPackageDependency {
 
   private final String identifier;
 
-  CMakeResolvedFindPackageDependency(final String identifier) {
+  CMakeResolvedPackageDependency(final String identifier) {
     this.identifier = identifier;
   }
 
@@ -33,7 +32,7 @@ public final class CMakeResolvedFindPackageDependency {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeResolvedFindPackageDependency other = (CMakeResolvedFindPackageDependency) obj;
+    CMakeResolvedPackageDependency other = (CMakeResolvedPackageDependency) obj;
     if (identifier == null) {
       if (other.identifier != null)
         return false;

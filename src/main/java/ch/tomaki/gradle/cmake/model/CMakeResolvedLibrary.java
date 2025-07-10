@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.model;
@@ -19,7 +18,8 @@ public interface CMakeResolvedLibrary {
 
   Set<String> getPublicLinkOptions();
 
-  Set<CMakeResolvedFindPackageDependency> getPublicFindPackageDependencies();
+  Set<CMakeResolvedPackageDependency> getPublicPackageDependencies();
 
-  Set<CMakeResolvedProjectModuleDependency> getPublicProjectModuleDependencies();
+  Set<CMakeResolvedProjectDependency> getPublicProjectDependencies();
+
 }

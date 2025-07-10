@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.helper;
@@ -19,6 +18,8 @@ public final class TestCMakeToolchain {
     final NamedDomainObjectProvider<CMakeToolchain> provider = extension.getToolchains().register(name);
     provider.configure((object) -> {
       object.getOperatingSystem().set(OperatingSystem.current());
+      object.getBuildConfigs().set(Arrays.asList("release", "debug"));
+
     });
     return provider;
   }

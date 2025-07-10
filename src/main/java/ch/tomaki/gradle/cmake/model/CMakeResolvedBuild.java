@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.model;
@@ -16,8 +15,8 @@ import java.util.function.Consumer;
 public class CMakeResolvedBuild {
 
   private final Map<String, CMakeResolvedToolchain> resolvedToolchains = new HashMap<>();
-  private final Set<CMakeResolvedFindPackage> resolvedFindPackages = new HashSet<>();
-  private final Set<CMakeResolvedProjectModule> resolvedProjectModules = new HashSet<>();
+  private final Set<CMakeResolvedPackage> resolvedFindPackages = new HashSet<>();
+  private final Set<CMakeResolvedProject> resolvedProjectModules = new HashSet<>();
   private final Set<CMakeResolvedInterfaceLibrary> resolvedInterfaces = new HashSet<>();
   private final Set<CMakeResolvedBinaryLibrary> resolvedLibraries = new HashSet<>();
   private final Set<CMakeResolvedApplication> resolvedApplications = new HashSet<>();
@@ -35,27 +34,27 @@ public class CMakeResolvedBuild {
     resolvedToolchains.forEach((name, toolchain) -> action.accept(toolchain));
   }
 
-  public void addFindPackage(final CMakeResolvedFindPackage findPackage) {
+  public void addFindPackage(final CMakeResolvedPackage findPackage) {
     resolvedFindPackages.add(findPackage);
   }
 
-  public void addFindPackages(final Collection<CMakeResolvedFindPackage> findPackages) {
+  public void addFindPackages(final Collection<CMakeResolvedPackage> findPackages) {
     resolvedFindPackages.addAll(findPackages);
   }
 
-  public Collection<CMakeResolvedFindPackage> getResolvedFindPackages() {
+  public Collection<CMakeResolvedPackage> getResolvedFindPackages() {
     return resolvedFindPackages;
   }
 
-  public void addProjectModule(final CMakeResolvedProjectModule projectModule) {
+  public void addProjectModule(final CMakeResolvedProject projectModule) {
     resolvedProjectModules.add(projectModule);
   }
 
-  public void addProjectModules(final Collection<CMakeResolvedProjectModule> projectModules) {
+  public void addProjectModules(final Collection<CMakeResolvedProject> projectModules) {
     resolvedProjectModules.addAll(projectModules);
   }
 
-  public Collection<CMakeResolvedProjectModule> getResolvedProjectModules() {
+  public Collection<CMakeResolvedProject> getResolvedProjectModules() {
     return resolvedProjectModules;
   }
 

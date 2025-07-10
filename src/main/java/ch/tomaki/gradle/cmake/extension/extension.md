@@ -31,10 +31,10 @@ findPackages {
 toolchains {
   '<name>' {
     operatingSystem = //required: org.gradle.internal.os.OperatingSystem
+    buildConfigs = //optional: List<String>, default: ['debug','release']
     compiler = //required: String
     architecture = //required: String
     generator = //required: String
-    buildConfigs = //optional: List<String>, default: ['debug','release']
     environment = //optional, Map<String,String>
     environmentFile = //optional, File
     toolchainFile = //optional, File

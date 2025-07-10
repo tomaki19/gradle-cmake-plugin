@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.tasks;
@@ -33,10 +32,8 @@ public abstract class CMakeConfigureExec extends CMakeExec {
       getBaseCommandLine().add("--toolchain");
       getBaseCommandLine().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
     }
-    getBaseCommandLine().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchainName));
-    if (!toolchain.getBuildConfigs().get().isEmpty()) {
-      getBaseCommandLine().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\""
-          .formatted(String.join(";", toolchain.getBuildConfigs().get())));
-    }
+    getBaseCommandLine().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
+    getBaseCommandLine().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\""
+        .formatted(String.join(";", toolchain.getBuildConfigs().get())));
   }
 }

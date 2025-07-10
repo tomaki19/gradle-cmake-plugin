@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.tasks;
@@ -18,8 +17,8 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModule;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectModuleDependency;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedProject;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectDependency;
 
 public class CMakeTaskRegistry {
 
@@ -68,7 +67,7 @@ public class CMakeTaskRegistry {
   }
 
   public void configureAssembleConfigTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProjectModule> projectModules) {
+      final Collection<CMakeResolvedProject> projectModules) {
     taskContainer.named(taskName).configure((task) -> {
       projectModules.stream()
           .map(dependency -> CMakeTasksConventions.assembleConfigTaskName(dependency.getProject().getName()))
@@ -77,24 +76,24 @@ public class CMakeTaskRegistry {
   }
 
   public void configureConfigureTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
+      final Collection<CMakeResolvedProjectDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getProject(), task.getProject()))
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject().getName(),
-              dependency.getToolchain().get().getName()))
+          .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject(),
+              dependency.getToolchain().getName()))
           .forEach(configTaskName -> task.mustRunAfter(configTaskName));
     });
   }
 
   public void configureBuildTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProjectModuleDependency> projectModuleDependencies) {
+      final Collection<CMakeResolvedProjectDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .map(dependency -> CMakeTasksConventions.buildTaskName(dependency.getProject().getName(),
-              dependency.getBuildTarget()))
+          .map(dependency -> CMakeTasksConventions.buildTaskName(dependency.getProject(), dependency.getName(),
+              dependency.getToolchain().getName(), dependency.getType(), dependency.getBuildConfig()))
           .forEach(buildTaskName -> task.dependsOn(buildTaskName));
     });
   }

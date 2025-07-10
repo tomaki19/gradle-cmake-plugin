@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake;
@@ -36,7 +35,8 @@ public class CMakeInterfaceLibraryResolverTest {
         extension.getApplications(), extension.getTests());
 
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(2, resolvedBuild.getResolvedInterfaces().size());
+    assertEquals(0, resolvedBuild.getResolvedInterfaces().size());
+    assertEquals(0, resolvedBuild.getResolvedLibraries().size());
   }
 
 }

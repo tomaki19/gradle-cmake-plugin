@@ -1,10 +1,10 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.extension;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.gradle.api.provider.Property;
@@ -27,6 +27,9 @@ public final class CMakeValidator {
       validateNotEmpty(toolchain.getArchitecture(), "toolchains -> %s -> architecture".formatted(toolchain.getName()));
       validatePresent(toolchain.getGenerator(), "toolchains -> %s -> generator".formatted(toolchain.getName()));
       validateNotEmpty(toolchain.getGenerator(), "toolchains -> %s -> generator".formatted(toolchain.getName()));
+      if (toolchain.getBuildConfigs().get().isEmpty()) {
+        toolchain.getBuildConfigs().set(Arrays.asList("debug", "release"));
+      }
     });
   }
 

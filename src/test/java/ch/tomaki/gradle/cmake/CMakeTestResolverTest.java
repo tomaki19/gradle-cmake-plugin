@@ -1,6 +1,5 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake;
@@ -43,7 +42,7 @@ public class CMakeTestResolverTest {
 
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
     assertEquals(0, resolvedBuild.getResolvedTests().size());
   }
 
@@ -65,11 +64,11 @@ public class CMakeTestResolverTest {
 
     assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(2, resolvedBuild.getResolvedTests().size());
+    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedTests().size());
     resolvedBuild.getResolvedTests().forEach((test) -> {
-      assertEquals(0, test.getPrivateFindPackageDependencies().size());
-      assertEquals(0, test.getPrivateProjectModuleDependencies().size());
+      assertEquals(0, test.getPrivatePackageDependencies().size());
+      assertEquals(0, test.getPrivateProjectDependencies().size());
       assertEquals(0, test.getPrivateLinkOptions().size());
     });
   }
@@ -95,11 +94,11 @@ public class CMakeTestResolverTest {
 
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(2, resolvedBuild.getResolvedTests().size());
+    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedTests().size());
     resolvedBuild.getResolvedTests().forEach((test) -> {
-      assertEquals(1, test.getPrivateFindPackageDependencies().size());
-      assertEquals(2, test.getPrivateProjectModuleDependencies().size());
+      assertEquals(1, test.getPrivatePackageDependencies().size());
+      assertEquals(4, test.getPrivateProjectDependencies().size());
       assertEquals(1, test.getPrivateLinkOptions().size());
     });
   }
@@ -125,11 +124,11 @@ public class CMakeTestResolverTest {
 
     assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
     assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
-    assertEquals(2, resolvedBuild.getResolvedTests().size());
+    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedTests().size());
     resolvedBuild.getResolvedTests().forEach((test) -> {
-      assertEquals(1, test.getPrivateFindPackageDependencies().size());
-      assertEquals(2, test.getPrivateProjectModuleDependencies().size());
+      assertEquals(1, test.getPrivatePackageDependencies().size());
+      assertEquals(4, test.getPrivateProjectDependencies().size());
       assertEquals(1, test.getPrivateLinkOptions().size());
     });
   }

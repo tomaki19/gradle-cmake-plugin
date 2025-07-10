@@ -1,13 +1,10 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.extension.api;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.gradle.api.Action;
 import org.gradle.api.provider.MapProperty;
@@ -22,17 +19,15 @@ public abstract class CMakeToolchain implements CMakeNamedObject {
   public static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
   public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
-  public static final Collection<String> BuildConfigDefaults = Arrays.asList("release", "debug");
-
   public abstract Property<OperatingSystem> getOperatingSystem();
+
+  public abstract SetProperty<String> getBuildConfigs();
 
   public abstract Property<String> getCompiler();
 
   public abstract Property<String> getArchitecture();
 
   public abstract Property<String> getGenerator();
-
-  public abstract SetProperty<String> getBuildConfigs();
 
   public abstract MapProperty<String, String> getEnvironment();
 

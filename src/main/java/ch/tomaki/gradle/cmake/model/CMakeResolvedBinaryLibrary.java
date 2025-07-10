@@ -1,13 +1,11 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.model;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.gradle.api.Project;
@@ -20,38 +18,26 @@ public final class CMakeResolvedBinaryLibrary extends CMakeResolvedBinary implem
 
   private final Set<String> publicCompileOptions;
   private final Set<String> publicCompileDefinitions;
-  private final Set<String> publicLinkOptions;
-  private final Set<CMakeResolvedFindPackage> publicFindPackages;
-  private final Set<CMakeResolvedFindPackageDependency> publicFindPackageDependencies;
-  private final Set<CMakeResolvedProjectModule> publicProjectModules;
-  private final Set<CMakeResolvedProjectModuleDependency> publicProjectModuleDependencies;
+  private final Set<String> publicLinkOptions = new HashSet<>();
+  private final Set<CMakeResolvedPackage> publicPackages = new HashSet<>();
+  private final Set<CMakeResolvedPackageDependency> publicPackageDependencies = new HashSet<>();
+  private final Set<CMakeResolvedProject> publicProjects = new HashSet<>();
+  private final Set<CMakeResolvedProjectDependency> publicProjectDependencies = new HashSet<>();
   private final boolean buildStatic;
   private final boolean buildShared;
   private final boolean stripDebug;
   private final boolean packageBuildOutputs;
 
   CMakeResolvedBinaryLibrary(final CMakeLibrary library, final CMakeToolchain toolchain,
-      final String buildConfig, final Map<String, CMakeFindPackage> findPackages, final Project project) {
-    super(library, toolchain, buildConfig, findPackages, project);
-    this.publicCompileOptions = new HashSet<>(library.getPublicCompileOptions().get());
-    this.publicCompileDefinitions = new HashSet<>(library.getPublicCompileDefinitions().get());
-    this.publicLinkOptions = new HashSet<>();
-    CMakeResolvedBinary.resolveLinkOptions(getPrivateLinkOptions(), library.getPrivateLinkDependencies().get());
-    CMakeResolvedBinary.resolveLinkOptions(publicLinkOptions, library.getPublicLinkDependencies().get());
-    this.publicFindPackages = new HashSet<>();
-    this.publicFindPackageDependencies = new HashSet<>();
-    CMakeResolvedFindPackage.resolveFindPackageDependencies(getPrivateFindPackages(),
-        getPrivateFindPackageDependencies(), Optional.of(getToolchain()), findPackages,
-        library.getPrivateLinkDependencies().get());
-    CMakeResolvedFindPackage.resolveFindPackageDependencies(publicFindPackages, publicFindPackageDependencies,
-        Optional.of(getToolchain()), findPackages, library.getPublicLinkDependencies().get());
-    this.publicProjectModules = new HashSet<>();
-    this.publicProjectModuleDependencies = new HashSet<>();
-    CMakeResolvedProjectModule.resolveProjectModuleDependencies(getPrivateProjectModules(),
-        getPrivateProjectModuleDependencies(), Optional.of(getToolchain()), Optional.of(buildConfig),
-        library.getPrivateLinkDependencies().get(), project);
-    CMakeResolvedProjectModule.resolveProjectModuleDependencies(publicProjectModules, publicProjectModuleDependencies,
-        Optional.of(getToolchain()), Optional.of(buildConfig), library.getPublicLinkDependencies().get(), project);
+      final Map<String, CMakeFindPackage> findPackages, final Project project) {
+    super(library, toolchain, findPackages, project);
+    this.publicCompileOptions = library.getPublicCompileOptions().get();
+    this.publicCompileDefinitions = library.getPublicCompileDefinitions().get();
+    CMakeResolvedBinary.resolveLinkOptions(library.getPublicLinkDependencies().get(), publicLinkOptions);
+    CMakeResolvedPackage.resolvePackageDependencies(library.getPublicLinkDependencies().get(), publicPackages,
+        publicPackageDependencies, getToolchain(), findPackages);
+    CMakeResolvedProject.resolveProjectDependencies(library.getPublicLinkDependencies().get(), publicProjects,
+        publicProjectDependencies, getToolchain(), project);
     this.buildStatic = library.getBuildStatic().getOrElse(Boolean.FALSE)
         || toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
         || toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE);
@@ -83,22 +69,22 @@ public final class CMakeResolvedBinaryLibrary extends CMakeResolvedBinary implem
     return publicLinkOptions;
   }
 
-  public Set<CMakeResolvedFindPackage> getPublicFindPackages() {
-    return publicFindPackages;
+  public Set<CMakeResolvedPackage> getPublicPackages() {
+    return publicPackages;
   }
 
   @Override
-  public Set<CMakeResolvedFindPackageDependency> getPublicFindPackageDependencies() {
-    return publicFindPackageDependencies;
+  public Set<CMakeResolvedPackageDependency> getPublicPackageDependencies() {
+    return publicPackageDependencies;
   }
 
-  public Set<CMakeResolvedProjectModule> getPublicProjectModules() {
-    return publicProjectModules;
+  public Set<CMakeResolvedProject> getPublicProjects() {
+    return publicProjects;
   }
 
   @Override
-  public Set<CMakeResolvedProjectModuleDependency> getPublicProjectModuleDependencies() {
-    return publicProjectModuleDependencies;
+  public Set<CMakeResolvedProjectDependency> getPublicProjectDependencies() {
+    return publicProjectDependencies;
   }
 
   @Override

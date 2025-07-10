@@ -1,25 +1,22 @@
 /*
  * SPDX-FileCopyrightText: 2025 Thomas Killer <tkone@gmx.ch>
- *
  * SPDX-License-Identifier: MIT
  */
 package ch.tomaki.gradle.cmake.model;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
-import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 
-public class CMakeResolvedProjectModule {
+public class CMakeResolvedProject {
 
   private final Project project;
-  private final Optional<CMakeResolvedToolchain> toolchain;
+  private final CMakeResolvedToolchain toolchain;
 
-  CMakeResolvedProjectModule(final Project project, final Optional<CMakeResolvedToolchain> toolchain) {
+  CMakeResolvedProject(final Project project, final CMakeResolvedToolchain toolchain) {
     this.project = project;
     this.toolchain = toolchain;
   }
@@ -28,15 +25,13 @@ public class CMakeResolvedProjectModule {
     return project;
   }
 
-  public Optional<CMakeResolvedToolchain> getToolchain() {
+  public CMakeResolvedToolchain getToolchain() {
     return toolchain;
   }
 
-  static void resolveProjectModuleDependencies(final Set<CMakeResolvedProjectModule> projectModules,
-      final Set<CMakeResolvedProjectModuleDependency> projectModuleDependencies,
-      final Optional<CMakeResolvedToolchain> toolchain, final Optional<String> buildConfig,
-      final Set<String> dependencies, final Project project)
-      throws IllegalArgumentException {
+  static void resolveProjectDependencies(final Set<String> dependencies, final Set<CMakeResolvedProject> projects,
+      final Set<CMakeResolvedProjectDependency> projectDependencies, final CMakeResolvedToolchain toolchain,
+      final Project project) throws IllegalArgumentException {
     for (final String dependency : dependencies) {
       if (!dependency.startsWith("-")) {
         final String[] dependencyTokens = dependency.split("::");
@@ -45,14 +40,24 @@ public class CMakeResolvedProjectModule {
               : project.findProject(":%s".formatted(dependencyTokens[0]));
           if (Objects.nonNull(dependencyProject)) {
             final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
-            final String buildTarget = CMakeListsConventions.libraryTarget(dependencyTokens[1], type, toolchain,
-                buildConfig);
-            final CMakeResolvedProjectModuleDependency resolvedProjectModule = new CMakeResolvedProjectModuleDependency(
-                dependencyProject, toolchain, type, buildTarget);
-            projectModuleDependencies.add(resolvedProjectModule);
+            for (final String buildConfig : toolchain.getBuildConfigs()) {
+              switch (type) {
+                case INTERFACE: {
+                  final CMakeResolvedProjectDependency resolvedProjectModule = new CMakeResolvedProjectDependency(
+                      dependencyProject, dependencyTokens[1], toolchain, type, buildConfig);
+                  projectDependencies.add(resolvedProjectModule);
+                  break;
+                }
+                default: {
+                  final CMakeResolvedProjectDependency resolvedProjectModule = new CMakeResolvedProjectDependency(
+                      dependencyProject, dependencyTokens[1], toolchain, type, buildConfig);
+                  projectDependencies.add(resolvedProjectModule);
+                  break;
+                }
+              }
+            }
             if (!Objects.equals(project, dependencyProject)) {
-              projectModules.add(new CMakeResolvedProjectModule(dependencyProject,
-                  toolchain));
+              projects.add(new CMakeResolvedProject(dependencyProject, toolchain));
             }
           } else {
             throw new IllegalArgumentException(
@@ -83,7 +88,7 @@ public class CMakeResolvedProjectModule {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeResolvedProjectModule other = (CMakeResolvedProjectModule) obj;
+    CMakeResolvedProject other = (CMakeResolvedProject) obj;
     if (project == null) {
       if (other.project != null)
         return false;
