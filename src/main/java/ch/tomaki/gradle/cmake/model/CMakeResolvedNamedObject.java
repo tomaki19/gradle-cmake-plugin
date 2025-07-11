@@ -4,11 +4,11 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-abstract class CMakeResolvedObject {
-    
+abstract class CMakeResolvedNamedObject {
+
     private final String name;
 
-    CMakeResolvedObject(final String name) {
+    CMakeResolvedNamedObject(final String name) {
         this.name = name;
     }
 
@@ -32,7 +32,7 @@ abstract class CMakeResolvedObject {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        CMakeResolvedObject other = (CMakeResolvedObject) obj;
+        CMakeResolvedNamedObject other = (CMakeResolvedNamedObject) obj;
         if (name == null) {
             if (other.name != null)
                 return false;

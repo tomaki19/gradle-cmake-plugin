@@ -13,7 +13,7 @@ import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedToolchain extends CMakeResolvedObject {
+public final class CMakeResolvedToolchain extends CMakeResolvedNamedObject {
 
   private final OperatingSystem operatingSystem;
   private final String architecture;

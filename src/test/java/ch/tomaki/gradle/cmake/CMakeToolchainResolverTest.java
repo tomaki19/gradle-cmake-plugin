@@ -36,9 +36,8 @@ public class CMakeToolchainResolverTest {
                 final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-                assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-                assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+                assertEquals(0, resolvedBuild.getResolvedPackages().size());
+                assertEquals(2, resolvedBuild.getResolvedLibraries().size());
         }
 
         @Test
@@ -60,9 +59,8 @@ public class CMakeToolchainResolverTest {
                 final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
-                assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-                assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+                assertEquals(1, resolvedBuild.getResolvedPackages().size());
+                assertEquals(2, resolvedBuild.getResolvedLibraries().size());
         }
 
         @Test
@@ -84,9 +82,8 @@ public class CMakeToolchainResolverTest {
                 final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-                assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-                assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+                assertEquals(0, resolvedBuild.getResolvedPackages().size());
+                assertEquals(2, resolvedBuild.getResolvedLibraries().size());
         }
 
         @Test
@@ -108,8 +105,7 @@ public class CMakeToolchainResolverTest {
                 final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-                assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-                assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+                assertEquals(0, resolvedBuild.getResolvedPackages().size());
+                assertEquals(2, resolvedBuild.getResolvedLibraries().size());
         }
 }

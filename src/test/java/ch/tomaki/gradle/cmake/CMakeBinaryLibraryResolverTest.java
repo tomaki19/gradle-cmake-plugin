@@ -39,9 +39,8 @@ public class CMakeBinaryLibraryResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(0, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedPackages().size());
+    assertEquals(3, resolvedBuild.getResolvedLibraries().size());
   }
 
   @Test
@@ -60,9 +59,8 @@ public class CMakeBinaryLibraryResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(0, resolvedBuild.getResolvedPackages().size());
+    assertEquals(3, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
       assertEquals(0, library.getPrivatePackageDependencies().size());
       assertEquals(0, library.getPrivateProjectDependencies().size());
@@ -92,9 +90,8 @@ public class CMakeBinaryLibraryResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedPackages().size());
+    assertEquals(3, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
       assertEquals(1, library.getPrivatePackageDependencies().size());
       assertEquals(4, library.getPrivateProjectDependencies().size());
@@ -124,9 +121,8 @@ public class CMakeBinaryLibraryResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedPackages().size());
+    assertEquals(3, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
       if ("BinaryLibrary0".equals(library.getName())) {
         assertEquals(0, library.getPrivatePackageDependencies().size());
@@ -135,7 +131,8 @@ public class CMakeBinaryLibraryResolverTest {
         assertEquals(0, library.getPublicPackageDependencies().size());
         assertEquals(0, library.getPublicProjectDependencies().size());
         assertEquals(0, library.getPublicLinkOptions().size());
-      } else {
+      }
+      if ("BinaryLibrary1".equals(library.getName())) {
         assertEquals(1, library.getPrivatePackageDependencies().size());
         assertEquals(4, library.getPrivateProjectDependencies().size());
         assertEquals(1, library.getPrivateLinkOptions().size());
@@ -165,9 +162,8 @@ public class CMakeBinaryLibraryResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedPackages().size());
+    assertEquals(3, resolvedBuild.getResolvedLibraries().size());
     resolvedBuild.getResolvedLibraries().forEach((library) -> {
       if ("BinaryLibrary0".equals(library.getName())) {
         assertEquals(0, library.getPrivatePackageDependencies().size());
@@ -176,7 +172,8 @@ public class CMakeBinaryLibraryResolverTest {
         assertEquals(0, library.getPublicPackages().size());
         assertEquals(0, library.getPublicProjectDependencies().size());
         assertEquals(0, library.getPublicLinkOptions().size());
-      } else {
+      }
+      if ("BinaryLibrary1".equals(library.getName())) {
         assertEquals(0, library.getPrivatePackageDependencies().size());
         assertEquals(0, library.getPrivateProjectDependencies().size());
         assertEquals(0, library.getPrivateLinkOptions().size());

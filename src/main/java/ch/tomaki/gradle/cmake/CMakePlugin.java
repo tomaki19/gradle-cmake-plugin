@@ -22,7 +22,7 @@ import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.files.CMakeListsConventions;
 import ch.tomaki.gradle.cmake.files.CMakeListsFile;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBinaryLibrary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
@@ -81,11 +81,13 @@ public class CMakePlugin implements Plugin<Project> {
         cmakeResolver.forToolchains((toolchain) -> configureTasks(taskRegistry, toolchain));
 
         resolvedBuild.getResolvedLibraries().forEach((library) -> {
-          if (library.isBuildStatic()) {
-            configureTasks(taskRegistry, library, CMakeLinkType.STATIC);
-          }
-          if (library.isBuildShared()) {
-            configureTasks(taskRegistry, library, CMakeLinkType.SHARED);
+          if (!library.getSources().isEmpty()) {
+            if (library.isBuildStatic()) {
+              configureTasks(taskRegistry, library, CMakeLinkType.STATIC);
+            }
+            if (library.isBuildShared()) {
+              configureTasks(taskRegistry, library, CMakeLinkType.SHARED);
+            }
           }
         });
 
@@ -134,7 +136,7 @@ public class CMakePlugin implements Plugin<Project> {
         .configure((task) -> task.setGroup(CMakeTasksConventions.GROUP_CHECK));
   }
 
-  private void configureTasks(final CMakeTaskRegistry taskRegistry, final CMakeResolvedBinaryLibrary library,
+  private void configureTasks(final CMakeTaskRegistry taskRegistry, final CMakeResolvedLibrary library,
       final CMakeLinkType linkType) {
     final String buildTarget = CMakeListsConventions.libraryBinaryTarget(library.getName(), linkType);
 

@@ -40,9 +40,8 @@ public class CMakeApplicationResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(0, resolvedBuild.getResolvedPackages().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     assertEquals(0, resolvedBuild.getResolvedApplications().size());
   }
 
@@ -62,9 +61,8 @@ public class CMakeApplicationResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(0, resolvedBuild.getResolvedPackages().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     assertEquals(1, resolvedBuild.getResolvedApplications().size());
     resolvedBuild.getResolvedApplications().forEach((application) -> {
       assertEquals(0, application.getPrivatePackageDependencies().size());
@@ -92,9 +90,8 @@ public class CMakeApplicationResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedPackages().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     assertEquals(1, resolvedBuild.getResolvedApplications().size());
     resolvedBuild.getResolvedApplications().forEach((application) -> {
       assertEquals(1, application.getPrivatePackageDependencies().size());
@@ -122,9 +119,8 @@ public class CMakeApplicationResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(1, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(1, resolvedBuild.getResolvedInterfaces().size());
-    assertEquals(1, resolvedBuild.getResolvedLibraries().size());
+    assertEquals(1, resolvedBuild.getResolvedPackages().size());
+    assertEquals(2, resolvedBuild.getResolvedLibraries().size());
     assertEquals(1, resolvedBuild.getResolvedApplications().size());
     resolvedBuild.getResolvedApplications().forEach((application) -> {
       assertEquals(1, application.getPrivatePackageDependencies().size());

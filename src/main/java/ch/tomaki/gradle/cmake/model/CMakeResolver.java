@@ -26,13 +26,13 @@ import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 public final class CMakeResolver {
 
   private final Project project;
-  private final Map<String, CMakeFindPackage> availableFindPackages;
+  private final Map<String, CMakeFindPackage> availablePackages;
   private final Map<String, CMakeToolchain> availableToolchains;
 
   public CMakeResolver(final Project project, final NamedDomainObjectContainer<CMakeFindPackage> findPackages,
       final NamedDomainObjectContainer<CMakeToolchain> toolchains) {
     this.project = project;
-    this.availableFindPackages = findPackages.parallelStream()
+    this.availablePackages = findPackages.parallelStream()
         .collect(Collectors.toMap(CMakeFindPackage::getName, Function.identity()));
     this.availableToolchains = toolchains.parallelStream()
         .filter((toolchain) -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
@@ -58,36 +58,28 @@ public final class CMakeResolver {
 
   private void processLibraries(final CMakeResolvedBuild build, final Set<CMakeLibrary> libraries) {
     libraries.forEach((object) -> {
-      if (!object.getSources().isPresent() || object.getSources().get().isEmpty()) {
-        availableToolchains.forEach((toolchainName, toolchain) -> {
-          final CMakeResolvedInterfaceLibrary library = new CMakeResolvedInterfaceLibrary(object, toolchain,
-              availableFindPackages, project);
-          build.add(library);
-        });
-      } else {
-        processObjects(object,
-            (CMakeLibrary library, CMakeToolchain toolchain) -> {
-              return new CMakeResolvedBinaryLibrary(library, toolchain, availableFindPackages, project);
-            },
-            (CMakeResolvedBinaryLibrary library) -> {
-              build.addFindPackages(library.getPrivatePackages());
-              build.addFindPackages(library.getPublicPackages());
-              build.addProjectModules(library.getPrivateProjects());
-              build.addProjectModules(library.getPublicProjects());
-              build.add(library);
-            });
-      }
+      processObjects(object,
+          (CMakeLibrary library, CMakeToolchain toolchain) -> {
+            return new CMakeResolvedLibrary(library, toolchain, availablePackages, project);
+          },
+          (CMakeResolvedLibrary library) -> {
+            build.addPackages(library.getPrivatePackages());
+            build.addPackages(library.getPublicPackages());
+            build.addProjects(library.getPrivateProjects());
+            build.addProjects(library.getPublicProjects());
+            build.add(library);
+          });
     });
   }
 
   private void processApplications(final CMakeResolvedBuild build, final Set<CMakeApplication> applications) {
     applications.forEach((object) -> processObjects(object,
         (CMakeApplication application, CMakeToolchain toolchain) -> {
-          return new CMakeResolvedApplication(application, toolchain, availableFindPackages, project);
+          return new CMakeResolvedApplication(application, toolchain, availablePackages, project);
         },
         (CMakeResolvedApplication application) -> {
-          build.addFindPackages(application.getPrivatePackages());
-          build.addProjectModules(application.getPrivateProjects());
+          build.addPackages(application.getPrivatePackages());
+          build.addProjects(application.getPrivateProjects());
           build.add(application);
         }));
   }
@@ -95,31 +87,32 @@ public final class CMakeResolver {
   private void processTests(final CMakeResolvedBuild build, final Set<CMakeTest> tests) {
     tests.forEach((object) -> processObjects(object,
         (CMakeTest test, CMakeToolchain toolchain) -> {
-          return new CMakeResolvedTest(test, toolchain, availableFindPackages, project);
+          return new CMakeResolvedTest(test, toolchain, availablePackages, project);
         },
         (CMakeResolvedTest test) -> {
-          build.addFindPackages(test.getPrivatePackages());
-          build.addProjectModules(test.getPrivateProjects());
+          build.addPackages(test.getPrivatePackages());
+          build.addProjects(test.getPrivateProjects());
           build.add(test);
         }));
   }
 
-  private <U extends CMakeBinary, R extends CMakeResolvedBinary> void processObjects(final U binary,
-      final Resolver<U, R> resolver, final Acceptor<R> acceptor) {
-    binary.getToolchains().get().forEach((toolchainName) -> {
-      Optional.ofNullable(availableToolchains.get(toolchainName)).ifPresent((toolchain) -> {
-        final R resolvedBinary = resolver.resolve(binary, toolchain);
-        acceptor.accept(resolvedBinary);
-      });
+  private <I extends CMakeBinary, O extends CMakeResolvedBinary> void processObjects(final I object,
+      final Resolver<I, O> resolver, final Acceptor<O> acceptor) {
+    availableToolchains.forEach((toolchainName, toolchain) -> {
+      if (object.getToolchains().get().contains(toolchainName)
+          || (object instanceof CMakeLibrary && object.getToolchains().get().isEmpty())) {
+        final O resolvedObject = resolver.resolve(object, toolchain);
+        acceptor.accept(resolvedObject);
+      }
     });
   }
 
-  private interface Resolver<U extends CMakeBinary, R extends CMakeResolvedBinary> {
-    R resolve(U binary, CMakeToolchain toolchain);
+  private interface Resolver<I extends CMakeBinary, O extends CMakeResolvedBinary> {
+    O resolve(I binary, CMakeToolchain toolchain);
   }
 
-  private interface Acceptor<R extends CMakeResolvedBinary> {
-    void accept(R resolvedObject);
+  private interface Acceptor<I extends CMakeResolvedBinary> {
+    void accept(I resolvedObject);
   }
 
 }

@@ -16,10 +16,8 @@ import org.gradle.api.file.Directory;
 
 import ch.tomaki.gradle.cmake.model.CMakeResolvedApplication;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBinaryLibrary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedInterfaceLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedPackage;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedPackageDependency;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProject;
@@ -40,9 +38,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   @Override
   public void write(final CMakeResolvedBuild build, final Project project) throws IOException {
     writeHeader(project);
-    writePackageDependencies(build.getResolvedFindPackages());
+    writePackageDependencies(build.getResolvedPackages());
     writeProjectDependencies(build.getResolvedProjectModules(), project);
-    writeInterfaceLibraries(build.getResolvedInterfaces(), project);
     writeBinaryLibraries(build.getResolvedLibraries(), project);
     writeApplications(build.getResolvedApplications(), project);
     writeTests(build.getResolvedTests(), project);
@@ -102,24 +99,19 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeInterfaceLibraries(final Collection<CMakeResolvedInterfaceLibrary> interfaces,
-      final Project project)
+  private void writeBinaryLibraries(final Collection<CMakeResolvedLibrary> libraries, final Project project)
       throws IOException {
-    for (final CMakeResolvedInterfaceLibrary object : interfaces) {
+    for (final CMakeResolvedLibrary object : libraries) {
       writeLine();
-      writeInterfaceLibrary(object, project);
-    }
-  }
-
-  private void writeBinaryLibraries(final Collection<CMakeResolvedBinaryLibrary> libraries, final Project project)
-      throws IOException {
-    for (final CMakeResolvedBinaryLibrary object : libraries) {
-      writeLine();
-      if (object.isBuildStatic()) {
-        writeStaticLibrary(object, project);
-      }
-      if (object.isBuildShared()) {
-        writeSharedLibrary(object, project);
+      if (object.getSources().isEmpty()) {
+        writeInterfaceLibrary(object, project);
+      } else {
+        if (object.isBuildStatic()) {
+          writeStaticLibrary(object, project);
+        }
+        if (object.isBuildShared()) {
+          writeSharedLibrary(object, project);
+        }
       }
     }
   }
@@ -147,7 +139,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeInterfaceLibrary(final CMakeResolvedInterfaceLibrary object, final Project project)
+  private void writeInterfaceLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
     final String target = CMakeListsConventions.libraryInterfaceTarget(object.getName());
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
@@ -159,7 +151,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write("endif()");
   }
 
-  private void writeStaticLibrary(final CMakeResolvedBinaryLibrary object, final Project project)
+  private void writeStaticLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
     final String target = CMakeListsConventions.libraryBinaryTarget(object.getName(), CMakeLinkType.STATIC);
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
@@ -178,7 +170,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write("endif()");
   }
 
-  private void writeSharedLibrary(final CMakeResolvedBinaryLibrary object, final Project project)
+  private void writeSharedLibrary(final CMakeResolvedLibrary object, final Project project)
       throws IOException {
     final String target = CMakeListsConventions.libraryBinaryTarget(object.getName(), CMakeLinkType.SHARED);
     write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", object.getToolchain().getName());
@@ -324,7 +316,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write(")");
   }
 
-  private void writeOutputTargetProperties(final String target, final CMakeResolvedBinary binary, final Project project)
+  private void writeOutputTargetProperties(final String target, final CMakeResolvedBinary binary,
+      final Project project)
       throws IOException {
     write("set_target_properties( %s PROPERTIES", target);
     write(1, "PREFIX \"\"");

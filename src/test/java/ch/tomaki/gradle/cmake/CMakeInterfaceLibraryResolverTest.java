@@ -34,8 +34,7 @@ public class CMakeInterfaceLibraryResolverTest {
     final CMakeResolvedBuild resolvedBuild = cmakeResolver.process(extension.getLibraries(),
         extension.getApplications(), extension.getTests());
 
-    assertEquals(0, resolvedBuild.getResolvedFindPackages().size());
-    assertEquals(0, resolvedBuild.getResolvedInterfaces().size());
+    assertEquals(0, resolvedBuild.getResolvedPackages().size());
     assertEquals(0, resolvedBuild.getResolvedLibraries().size());
   }
 

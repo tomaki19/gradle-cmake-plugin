@@ -14,9 +14,11 @@ import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public abstract class CMakeResolvedBinary extends CMakeResolvedInterface
+public abstract class CMakeResolvedBinary extends CMakeResolvedNamedObject
     implements CMakeResolvedPrivatePackageDependencies, CMakeResolvedPrivateProjectDependencies {
 
+  private final CMakeResolvedToolchain toolchain;
+  private final Set<String> headers;
   private final Set<String> sources;
   private final Set<String> privateCompileOptions;
   private final Set<String> privateCompileDefinitions;
@@ -32,7 +34,9 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedInterface
 
   CMakeResolvedBinary(final CMakeBinary binary, final CMakeToolchain toolchain,
       final Map<String, CMakeFindPackage> findPackages, final Project project) throws IllegalArgumentException {
-    super(binary, toolchain);
+    super(binary.getName());
+    this.toolchain = new CMakeResolvedToolchain(toolchain);
+    this.headers = binary.getHeaders().get();
     this.sources = binary.getSources().get();
     this.privateCompileOptions = binary.getPrivateCompileOptions().get();
     this.privateCompileDefinitions = binary.getPrivateCompileDefinitions().get();
@@ -55,6 +59,14 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedInterface
         || toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE);
     addPrivateLinkDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), findPackages,
         project);
+  }
+
+  public CMakeResolvedToolchain getToolchain() {
+    return toolchain;
+  }
+
+  public Set<String> getHeaders() {
+    return headers;
   }
 
   public Set<String> getSources() {
@@ -127,6 +139,31 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedInterface
         }
       }
     }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    CMakeResolvedBinary other = (CMakeResolvedBinary) obj;
+    if (toolchain == null) {
+      if (other.toolchain != null)
+        return false;
+    } else if (!toolchain.equals(other.toolchain))
+      return false;
+    return true;
   }
 
 }

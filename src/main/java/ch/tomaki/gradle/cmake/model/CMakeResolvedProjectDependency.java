@@ -8,7 +8,7 @@ import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 
-public class CMakeResolvedProjectDependency extends CMakeResolvedObject {
+public class CMakeResolvedProjectDependency extends CMakeResolvedNamedObject {
 
   private final Project project;
   private final CMakeResolvedToolchain toolchain;
