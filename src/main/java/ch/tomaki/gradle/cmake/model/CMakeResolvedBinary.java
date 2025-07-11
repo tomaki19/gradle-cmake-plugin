@@ -40,10 +40,10 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedNamedObject
     this.sources = binary.getSources().get();
     this.privateCompileOptions = binary.getPrivateCompileOptions().get();
     this.privateCompileDefinitions = binary.getPrivateCompileDefinitions().get();
-    CMakeResolvedBinary.resolveLinkOptions(binary.getPrivateLinkDependencies().get(), privateLinkOptions);
-    CMakeResolvedPackage.resolvePackageDependencies(binary.getPrivateLinkDependencies().get(), privatePackages,
+    CMakeResolver.resolveLinkOptions(binary.getPrivateLinkDependencies().get(), privateLinkOptions);
+    CMakeResolver.resolvePackageDependencies(binary.getPrivateLinkDependencies().get(), privatePackages,
         privatePackageDependencies, getToolchain(), findPackages);
-    CMakeResolvedProject.resolveProjectDependencies(binary.getPrivateLinkDependencies().get(), privateProjects,
+    CMakeResolver.resolveProjectDependencies(binary.getPrivateLinkDependencies().get(), privateProjects,
         privateProjectDependencies, getToolchain(), project);
     this.buildStatic = binary.getBuildStatic().getOrElse(Boolean.FALSE)
         || toolchain.getApplications().getBuildStatic().getOrElse(Boolean.FALSE)
@@ -119,26 +119,11 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedNamedObject
 
   protected void addPrivateLinkDependencies(final Set<String> dependencies,
       final Map<String, CMakeFindPackage> findPackages, final Project project) throws IllegalArgumentException {
-    resolveLinkOptions(dependencies, privateLinkOptions);
-    CMakeResolvedPackage.resolvePackageDependencies(dependencies, privatePackages, privatePackageDependencies,
+    CMakeResolver.resolveLinkOptions(dependencies, privateLinkOptions);
+    CMakeResolver.resolvePackageDependencies(dependencies, privatePackages, privatePackageDependencies,
         getToolchain(), findPackages);
-    CMakeResolvedProject.resolveProjectDependencies(dependencies, privateProjects,
+    CMakeResolver.resolveProjectDependencies(dependencies, privateProjects,
         privateProjectDependencies, getToolchain(), project);
-  }
-
-  static void resolveLinkOptions(final Set<String> dependencies, final Set<String> linkOptions)
-      throws IllegalArgumentException {
-    for (final String dependency : dependencies) {
-      if (dependency.startsWith("-")) {
-        final String[] dependencyTokens = dependency.split("::");
-        if (dependencyTokens.length <= 2) {
-          linkOptions.add(dependency);
-        } else {
-          throw new IllegalArgumentException(
-              "Invalid link option declaration: '%s'!".formatted(dependency));
-        }
-      }
-    }
   }
 
   @Override

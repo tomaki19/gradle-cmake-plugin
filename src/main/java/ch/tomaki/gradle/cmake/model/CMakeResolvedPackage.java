@@ -39,26 +39,6 @@ public final class CMakeResolvedPackage {
     return toolchain;
   }
 
-  static void resolvePackageDependencies(final Set<String> dependencies, final Set<CMakeResolvedPackage> packages,
-      final Set<CMakeResolvedPackageDependency> packageDependencies, final CMakeResolvedToolchain toolchain,
-      final Map<String, CMakeFindPackage> availableFindPackages)
-      throws IllegalArgumentException {
-    for (final String dependency : dependencies) {
-      if (!dependency.startsWith("-")) {
-        final String[] dependencyTokens = dependency.split("::");
-        if (dependencyTokens.length <= 2) {
-          if (availableFindPackages.containsKey(dependencyTokens[0])) {
-            final CMakeFindPackage findPackage = availableFindPackages.get(dependencyTokens[0]);
-            packages.add(new CMakeResolvedPackage(findPackage, toolchain));
-            packageDependencies.add(new CMakeResolvedPackageDependency(dependency));
-          } else {
-            throw new IllegalArgumentException("Missing find package '%s'!".formatted(dependency));
-          }
-        }
-      }
-    }
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;

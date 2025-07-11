@@ -22,6 +22,7 @@ import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
+import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 
 public final class CMakeResolver {
 
@@ -113,6 +114,70 @@ public final class CMakeResolver {
 
   private interface Acceptor<I extends CMakeResolvedBinary> {
     void accept(I resolvedObject);
+  }
+
+  static void resolveLinkOptions(final Set<String> dependencies, final Set<String> linkOptions)
+      throws IllegalArgumentException {
+    for (final String dependency : dependencies) {
+      if (dependency.startsWith("-")) {
+        final String[] dependencyTokens = dependency.split("::");
+        if (dependencyTokens.length <= 2) {
+          linkOptions.add(dependency);
+        } else {
+          throw new IllegalArgumentException(
+              "Invalid link option declaration: '%s'!".formatted(dependency));
+        }
+      }
+    }
+  }
+
+  static void resolvePackageDependencies(final Set<String> dependencies, final Set<CMakeResolvedPackage> packages,
+      final Set<CMakeResolvedPackageDependency> packageDependencies, final CMakeResolvedToolchain toolchain,
+      final Map<String, CMakeFindPackage> availableFindPackages)
+      throws IllegalArgumentException {
+    for (final String dependency : dependencies) {
+      if (!dependency.startsWith("-")) {
+        final String[] dependencyTokens = dependency.split("::");
+        if (dependencyTokens.length <= 2) {
+          if (availableFindPackages.containsKey(dependencyTokens[0])) {
+            final CMakeFindPackage findPackage = availableFindPackages.get(dependencyTokens[0]);
+            packages.add(new CMakeResolvedPackage(findPackage, toolchain));
+            packageDependencies.add(new CMakeResolvedPackageDependency(dependency));
+          } else {
+            throw new IllegalArgumentException("Missing find package '%s'!".formatted(dependency));
+          }
+        }
+      }
+    }
+  }
+
+  static void resolveProjectDependencies(final Set<String> dependencies, final Set<CMakeResolvedProject> projects,
+      final Set<CMakeResolvedProjectDependency> projectDependencies, final CMakeResolvedToolchain toolchain,
+      final Project project) throws IllegalArgumentException {
+    for (final String dependency : dependencies) {
+      if (!dependency.startsWith("-")) {
+        final String[] dependencyTokens = dependency.split("::");
+        if (dependencyTokens.length == 3) {
+          final Project dependencyProject = Objects.equals(dependencyTokens[0], project.getName()) ? project
+              : project.findProject(":%s".formatted(dependencyTokens[0]));
+          if (Objects.nonNull(dependencyProject)) {
+            if (!Objects.equals(project, dependencyProject)) {
+              projects.add(new CMakeResolvedProject(dependencyProject, toolchain));
+            }
+            final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
+            for (final String buildConfig : toolchain.getBuildConfigs()) {
+              final CMakeResolvedProjectDependency resolvedProjectModule = new CMakeResolvedProjectDependency(
+                  dependencyProject, dependencyTokens[1], toolchain, type, buildConfig);
+              projectDependencies.add(resolvedProjectModule);
+            }
+          } else {
+            throw new IllegalArgumentException("Missing local project '%s'!".formatted(dependencyTokens[0]));
+          }
+        } else if (dependencyTokens.length > 3) {
+          throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(dependency));
+        }
+      }
+    }
   }
 
 }

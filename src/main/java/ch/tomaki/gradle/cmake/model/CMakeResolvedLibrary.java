@@ -33,10 +33,10 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
     super(library, toolchain, findPackages, project);
     this.publicCompileOptions = library.getPublicCompileOptions().get();
     this.publicCompileDefinitions = library.getPublicCompileDefinitions().get();
-    CMakeResolvedBinary.resolveLinkOptions(library.getPublicLinkDependencies().get(), publicLinkOptions);
-    CMakeResolvedPackage.resolvePackageDependencies(library.getPublicLinkDependencies().get(), publicPackages,
+    CMakeResolver.resolveLinkOptions(library.getPublicLinkDependencies().get(), publicLinkOptions);
+    CMakeResolver.resolvePackageDependencies(library.getPublicLinkDependencies().get(), publicPackages,
         publicPackageDependencies, getToolchain(), findPackages);
-    CMakeResolvedProject.resolveProjectDependencies(library.getPublicLinkDependencies().get(), publicProjects,
+    CMakeResolver.resolveProjectDependencies(library.getPublicLinkDependencies().get(), publicProjects,
         publicProjectDependencies, getToolchain(), project);
     this.buildStatic = library.getBuildStatic().getOrElse(Boolean.FALSE)
         || toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
