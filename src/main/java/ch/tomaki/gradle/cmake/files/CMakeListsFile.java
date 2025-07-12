@@ -129,6 +129,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
       throws IOException {
     if (!tests.isEmpty()) {
       writeLine();
+      write("include( CTest )");
       write("enable_testing()");
       for (final CMakeResolvedTest object : tests) {
         final String target = CMakeListsConventions.testTarget(object.getName());
