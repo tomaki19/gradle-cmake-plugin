@@ -45,20 +45,12 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedNamedObject
         privatePackageDependencies, getToolchain(), findPackages);
     CMakeResolver.resolveProjectDependencies(binary.getPrivateLinkDependencies().get(), privateProjects,
         privateProjectDependencies, getToolchain(), project);
-    this.buildStatic = binary.getBuildStatic().getOrElse(Boolean.FALSE)
-        || toolchain.getApplications().getBuildStatic().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE);
-    this.buildShared = binary.getBuildShared().getOrElse(Boolean.FALSE)
-        || toolchain.getApplications().getBuildShared().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE);
-    this.stripDebug = binary.getStripDebug().getOrElse(Boolean.FALSE)
-        || toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE);
-    this.packageBuildOutputs = binary.getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-        || toolchain.getApplications().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE);
     addPrivateLinkDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), findPackages,
         project);
+    this.buildStatic = initBuildStatic(binary, toolchain);
+    this.buildShared = initBuildShared(binary, toolchain);
+    this.stripDebug = initStripDebug(binary, toolchain);
+    this.packageBuildOutputs = initPackageBuildOutputs(binary, toolchain);
   }
 
   public CMakeResolvedToolchain getToolchain() {
@@ -101,17 +93,25 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedNamedObject
     return privateProjectDependencies;
   }
 
+  protected abstract boolean initBuildStatic(final CMakeBinary binary, final CMakeToolchain toolchain);
+
   public boolean isBuildStatic() {
     return buildStatic;
   }
+
+  protected abstract boolean initBuildShared(final CMakeBinary binary, final CMakeToolchain toolchain);
 
   public boolean isBuildShared() {
     return buildShared;
   }
 
+  protected abstract boolean initStripDebug(final CMakeBinary binary, final CMakeToolchain toolchain);
+
   public boolean isStripDebug() {
     return stripDebug;
   }
+
+  protected abstract boolean initPackageBuildOutputs(final CMakeBinary binary, final CMakeToolchain toolchain);
 
   public boolean isPackageBuildOutputs() {
     return packageBuildOutputs;

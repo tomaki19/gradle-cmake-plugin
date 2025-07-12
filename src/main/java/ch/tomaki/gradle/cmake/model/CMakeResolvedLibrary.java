@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.gradle.api.Project;
 
+import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
@@ -23,10 +24,6 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
   private final Set<CMakeResolvedPackageDependency> publicPackageDependencies = new HashSet<>();
   private final Set<CMakeResolvedProject> publicProjects = new HashSet<>();
   private final Set<CMakeResolvedProjectDependency> publicProjectDependencies = new HashSet<>();
-  private final boolean buildStatic;
-  private final boolean buildShared;
-  private final boolean stripDebug;
-  private final boolean packageBuildOutputs;
 
   CMakeResolvedLibrary(final CMakeLibrary library, final CMakeToolchain toolchain,
       final Map<String, CMakeFindPackage> findPackages, final Project project) {
@@ -38,18 +35,6 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
         publicPackageDependencies, getToolchain(), findPackages);
     CMakeResolver.resolveProjectDependencies(library.getPublicLinkDependencies().get(), publicProjects,
         publicProjectDependencies, getToolchain(), project);
-    this.buildStatic = library.getBuildStatic().getOrElse(Boolean.FALSE)
-        || toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE);
-    this.buildShared = library.getBuildShared().getOrElse(Boolean.FALSE)
-        || toolchain.getLibraries().getBuildShared().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE);
-    this.stripDebug = library.getStripDebug().getOrElse(Boolean.FALSE)
-        || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE);
-    this.packageBuildOutputs = library.getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-        || toolchain.getLibraries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-        || toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE);
     addPrivateLinkDependencies(toolchain.getLibraries().getPrivateLinkDependencies().get(), findPackages,
         project);
   }
@@ -83,23 +68,31 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
   }
 
   @Override
-  public boolean isBuildStatic() {
-    return buildStatic;
+  protected boolean initBuildStatic(CMakeBinary binary, CMakeToolchain toolchain) {
+    return binary.getBuildStatic().getOrElse(Boolean.FALSE)
+        || toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
+        || toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE);
   }
 
   @Override
-  public boolean isBuildShared() {
-    return buildShared;
+  protected boolean initBuildShared(CMakeBinary binary, CMakeToolchain toolchain) {
+    return binary.getBuildShared().getOrElse(Boolean.FALSE)
+        || toolchain.getLibraries().getBuildShared().getOrElse(Boolean.FALSE)
+        || toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE);
   }
 
   @Override
-  public boolean isStripDebug() {
-    return stripDebug;
+  protected boolean initStripDebug(CMakeBinary binary, CMakeToolchain toolchain) {
+    return binary.getStripDebug().getOrElse(Boolean.FALSE)
+        || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE)
+        || toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE);
   }
 
   @Override
-  public boolean isPackageBuildOutputs() {
-    return packageBuildOutputs;
+  protected boolean initPackageBuildOutputs(CMakeBinary binary, CMakeToolchain toolchain) {
+    return binary.getPackageBuildOutputs().getOrElse(Boolean.FALSE)
+        || toolchain.getLibraries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
+        || toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE);
   }
 
 }
