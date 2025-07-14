@@ -7,7 +7,7 @@ package ch.tomaki.gradle.cmake.extension.api;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.SetProperty;
 
-public interface CMakeFindPackage extends CMakeNamedObject {
+public interface CMakeSystemPackage extends CMakeNamedObject {
 
   SetProperty<String> getComponents();
 

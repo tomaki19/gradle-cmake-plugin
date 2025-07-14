@@ -17,8 +17,7 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedProject;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectDependency;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectPackageDependency;
 
 public class CMakeTaskRegistry {
 
@@ -27,17 +26,20 @@ public class CMakeTaskRegistry {
   private final Map<String, TaskProvider<? extends Task>> cmakeTaskMap = new HashMap<>();
 
   private enum GradleTasks {
-    ASSEMBLE("assemble"), BUILD("build"), CHECK("check");
-
-    private final String name;
-
-    private GradleTasks(final String name) {
-      this.name = name;
-    }
-
-    @Override
-    public String toString() {
-      return name;
+    ASSEMBLE {
+      public String toString() {
+        return "assemble";
+      }
+    },
+    BUILD {
+      public String toString() {
+        return "build";
+      }
+    },
+    CHECK {
+      public String toString() {
+        return "check";
+      }
     }
   }
 
@@ -45,56 +47,36 @@ public class CMakeTaskRegistry {
     this.taskContainer = project.getTasks();
   }
 
-  public <T extends Task> TaskProvider<T> register(String name, Class<T> type, Object... constructorArgs)
-      throws InvalidUserDataException {
-    final TaskProvider<T> task = taskContainer.register(name, type, constructorArgs);
-    cmakeTaskMap.put(name, task);
+  public <T extends Task> TaskProvider<T> register(final String taskName, final Class<T> type,
+      final Object... constructorArgs) throws InvalidUserDataException {
+    final TaskProvider<T> task = taskContainer.register(taskName, type, constructorArgs);
+    cmakeTaskMap.put(taskName, task);
     return task;
   }
 
-  public TaskProvider<Task> register(String name) throws InvalidUserDataException {
-    final TaskProvider<Task> task = taskContainer.register(name);
-    cmakeTaskMap.put(name, task);
+  public TaskProvider<Task> register(final String taskName)
+      throws InvalidUserDataException {
+    final TaskProvider<Task> task = taskContainer.register(taskName);
+    cmakeTaskMap.put(taskName, task);
     return task;
   }
 
   @SuppressWarnings("unchecked")
-  public TaskProvider<Task> configure(final String name, final Action<? super Task> action) {
-    return (TaskProvider<Task>) cmakeTaskMap.computeIfPresent(name, (key, value) -> {
+  public TaskProvider<Task> configure(final String taskName, final Action<? super Task> action) {
+    return (TaskProvider<Task>) cmakeTaskMap.computeIfPresent(taskName, (key, value) -> {
       value.configure(action);
       return value;
     });
   }
 
-  public void configureAssembleConfigTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProject> projectModules) {
-    taskContainer.named(taskName).configure((task) -> {
-      projectModules.stream()
-          .map(dependency -> CMakeTasksConventions.assembleConfigTaskName(dependency.getProject().getName()))
-          .forEach(assembleConfigTaskName -> task.dependsOn(assembleConfigTaskName));
-    });
-  }
-
-  public void configureConfigureTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProjectDependency> projectModuleDependencies) {
-    taskContainer.named(taskName).configure((task) -> {
-      projectModuleDependencies.stream()
-          .filter(dependency -> !Objects.equals(dependency.getProject(), task.getProject()))
-          .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .map(dependency -> CMakeTasksConventions.configureTaskName(dependency.getProject(),
-              dependency.getToolchain().getName()))
-          .forEach(configTaskName -> task.mustRunAfter(configTaskName));
-    });
-  }
-
   public void configureBuildTaskProjectModuleDependencies(final String taskName,
-      final Collection<CMakeResolvedProjectDependency> projectModuleDependencies) {
+      final Collection<CMakeResolvedProjectPackageDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .map(dependency -> CMakeTasksConventions.buildTaskName(dependency.getProject(), dependency.getName(),
-              dependency.getToolchain().getName(), dependency.getType(), dependency.getBuildConfig()))
-          .forEach(buildTaskName -> task.dependsOn(buildTaskName));
+          .forEach(dependency -> dependency.getToolchain().getBuildConfigs()
+              .forEach((buildConfig) -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getProject(),
+                  dependency.getName(), dependency.getToolchain().getName(), dependency.getType(), buildConfig))));
     });
   }
 

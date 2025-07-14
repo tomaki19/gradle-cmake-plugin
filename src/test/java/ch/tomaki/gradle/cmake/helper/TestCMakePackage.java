@@ -7,16 +7,16 @@ package ch.tomaki.gradle.cmake.helper;
 import org.gradle.api.NamedDomainObjectProvider;
 
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
+import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
 
-public final class TestCMakeFindPackage {
+public final class TestCMakePackage {
 
-  public static NamedDomainObjectProvider<CMakeFindPackage> register(final String name,
+  public static NamedDomainObjectProvider<CMakeSystemPackage> register(final String name,
       final CMakeExtension extension) {
-    return extension.getFindPackages().register(name);
+    return extension.getPackages().register(name);
   }
 
-  private TestCMakeFindPackage() {
+  private TestCMakePackage() {
   }
 
 }

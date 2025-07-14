@@ -4,7 +4,7 @@ The `cmake` extension offers the following main configuration blocks:
 
 ```groovy
 cmake {
-  findPackages
+  packages
   toolchains
   libraries
   applications
@@ -12,12 +12,12 @@ cmake {
 }
 ```
 
-## FindPackages
+## Packages
 
-The `findPackages` configuration block lets you specify exernal libraries that can be referenced by your build. Each component has a mandatory, unique name and thw following optional configuration options:
+The `packages` configuration block lets you specify system libraries that can be referenced by your build as link dependencies. Each package has a mandatory, unique name and the following optional configuration options:
 
 ```groovy
-findPackages {
+packages {
   <name> {
     components = //optional: String
     properties = //optional: Map<String,String>

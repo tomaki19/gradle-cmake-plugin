@@ -14,16 +14,20 @@ public final class CMakeTasksConventions {
   public static final String GROUP_CHECK = "cmake test";
   public static final String GROUP_PACKAGE = "cmake package";
 
-  public static String assembleConfigTaskName() {
-    return "assemble-cmake-config";
-  }
-
-  public static String assembleConfigTaskName(final String projectName) {
-    return ":%s:assemble-cmake-config".formatted(projectName);
-  }
-
   public static String assembleListsTaskName() {
     return "assemble-cmake-lists";
+  }
+
+  public static String assembleListsTaskName(final Project project) {
+    return ":%s:assemble-cmake-lists".formatted(project.getName());
+  }
+
+  public static String assembleConfigTaskName(final String toolchainName) {
+    return "assemble-%s-config".formatted(toolchainName);
+  }
+
+  public static String assembleConfigTaskName(final Project project, final String toolchainName) {
+    return ":%s:assemble-%s-config".formatted(project.getName(), toolchainName);
   }
 
   public static String customTaskName(final String name, final String toolchainName) {

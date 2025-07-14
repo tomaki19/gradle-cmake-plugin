@@ -4,9 +4,10 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -18,165 +19,186 @@ import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
 import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
-import ch.tomaki.gradle.cmake.extension.api.CMakeFindPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
+import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 
 public final class CMakeResolver {
 
-  private final Project project;
-  private final Map<String, CMakeFindPackage> availablePackages;
   private final Map<String, CMakeToolchain> availableToolchains;
+  private final Map<String, CMakeSystemPackage> availableSystemPackges;
+  private final Project project;
 
-  public CMakeResolver(final Project project, final NamedDomainObjectContainer<CMakeFindPackage> findPackages,
-      final NamedDomainObjectContainer<CMakeToolchain> toolchains) {
-    this.project = project;
-    this.availablePackages = findPackages.parallelStream()
-        .collect(Collectors.toMap(CMakeFindPackage::getName, Function.identity()));
+  public CMakeResolver(final NamedDomainObjectContainer<CMakeToolchain> toolchains,
+      final NamedDomainObjectContainer<CMakeSystemPackage> systemPackages, final Project project) {
     this.availableToolchains = toolchains.parallelStream()
         .filter((toolchain) -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
         .collect(Collectors.toMap(CMakeToolchain::getName, Function.identity()));
+    this.availableSystemPackges = systemPackages.parallelStream()
+        .collect(Collectors.toMap(CMakeSystemPackage::getName, Function.identity()));
+    this.project = project;
   }
 
-  public void forToolchains(final Consumer<CMakeToolchain> action) {
-    availableToolchains.forEach((name, toolchain) -> action.accept(toolchain));
+  public Map<String, CMakeResolvedToolchain> process(final Set<CMakeLibrary> libraries,
+      final Set<CMakeApplication> applications, final Set<CMakeTest> tests) {
+    final Map<String, CMakeResolvedToolchain> resolvedToolchains = new HashMap<>();
+    resolveToolchains(availableToolchains.values(), resolvedToolchains);
+    resolveLibraries(libraries, resolvedToolchains);
+    resolveApplications(applications, resolvedToolchains);
+    resolveTests(tests, resolvedToolchains);
+    return resolvedToolchains;
   }
 
-  public void forToolchain(final String name, final Consumer<CMakeToolchain> action) {
-    Optional.ofNullable(availableToolchains.get(name)).ifPresent(action);
-  }
-
-  public CMakeResolvedBuild process(final Set<CMakeLibrary> libraries, final Set<CMakeApplication> applications,
-      final Set<CMakeTest> tests) {
-    final CMakeResolvedBuild build = new CMakeResolvedBuild();
-    processLibraries(build, libraries);
-    processApplications(build, applications);
-    processTests(build, tests);
-    return build;
-  }
-
-  private void processLibraries(final CMakeResolvedBuild build, final Set<CMakeLibrary> libraries) {
-    libraries.forEach((object) -> {
-      processObjects(object,
-          (CMakeLibrary library, CMakeToolchain toolchain) -> {
-            return new CMakeResolvedLibrary(library, toolchain, availablePackages, project);
-          },
-          (CMakeResolvedLibrary library) -> {
-            build.addPackages(library.getPrivatePackages());
-            build.addPackages(library.getPublicPackages());
-            build.addProjects(library.getPrivateProjects());
-            build.addProjects(library.getPublicProjects());
-            build.add(library);
-          });
+  private void resolveToolchains(final Collection<CMakeToolchain> toolchains,
+      Map<String, CMakeResolvedToolchain> resolvedToolchains) {
+    toolchains.forEach((toolchain) -> {
+      resolvedToolchains.put(toolchain.getName(), new CMakeResolvedToolchain(toolchain));
     });
   }
 
-  private void processApplications(final CMakeResolvedBuild build, final Set<CMakeApplication> applications) {
-    applications.forEach((object) -> processObjects(object,
-        (CMakeApplication application, CMakeToolchain toolchain) -> {
-          return new CMakeResolvedApplication(application, toolchain, availablePackages, project);
-        },
-        (CMakeResolvedApplication application) -> {
-          build.addPackages(application.getPrivatePackages());
-          build.addProjects(application.getPrivateProjects());
-          build.add(application);
-        }));
+  private void resolveLibraries(final Set<CMakeLibrary> libraries,
+      final Map<String, CMakeResolvedToolchain> resolvedToolchains) {
+    libraries.forEach((object) -> processObject(object, (CMakeLibrary library, CMakeToolchain toolchain) -> {
+      final CMakeResolvedToolchain resolvedToolchain = resolvedToolchains.get(toolchain.getName());
+      final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library,
+          toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
+              || toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE),
+          toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
+              && toolchain.getLibraries().getBuildShared().getOrElse(Boolean.TRUE),
+          toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
+              || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE),
+          toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
+              || toolchain.getLibraries().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
+      resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPrivateSystemPackageDependency,
+          resolvedLibrary::addPrivateProjectPackageDependency);
+      resolveDependencies(toolchain.getLibraries().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPrivateSystemPackageDependency,
+          resolvedLibrary::addPrivateProjectPackageDependency);
+      resolveDependencies(library.getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPrivateSystemPackageDependency,
+          resolvedLibrary::addPrivateProjectPackageDependency);
+      resolveDependencies(library.getPublicLinkDependencies().get(), resolvedToolchain,
+          resolvedLibrary::addPublicLinkOption, resolvedLibrary::addPublicSystemPackageDependency,
+          resolvedLibrary::addPublicProjectPackageDependency);
+      resolvedToolchain.addLibrary(resolvedLibrary);
+    }));
   }
 
-  private void processTests(final CMakeResolvedBuild build, final Set<CMakeTest> tests) {
-    tests.forEach((object) -> processObjects(object,
-        (CMakeTest test, CMakeToolchain toolchain) -> {
-          return new CMakeResolvedTest(test, toolchain, availablePackages, project);
-        },
-        (CMakeResolvedTest test) -> {
-          build.addPackages(test.getPrivatePackages());
-          build.addProjects(test.getPrivateProjects());
-          build.add(test);
-        }));
+  private void resolveApplications(final Set<CMakeApplication> applications,
+      final Map<String, CMakeResolvedToolchain> resolvedToolchains) {
+    applications.forEach((object) -> processObject(object, (CMakeApplication application, CMakeToolchain toolchain) -> {
+      final CMakeResolvedToolchain resolvedToolchain = resolvedToolchains.get(toolchain.getName());
+      final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(application,
+          toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
+              || toolchain.getApplications().getBuildStatic().getOrElse(Boolean.FALSE),
+          toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
+              && toolchain.getApplications().getBuildShared().getOrElse(Boolean.TRUE),
+          toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
+              || toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE),
+          toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
+              || toolchain.getApplications().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
+      resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedApplication::addPrivateLinkOption, resolvedApplication::addPrivateSystemPackageDependency,
+          resolvedApplication::addPrivateProjectPackageDependency);
+      resolveDependencies(toolchain.getApplications().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedApplication::addPrivateLinkOption, resolvedApplication::addPrivateSystemPackageDependency,
+          resolvedApplication::addPrivateProjectPackageDependency);
+      resolveDependencies(application.getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedApplication::addPrivateLinkOption, resolvedApplication::addPrivateSystemPackageDependency,
+          resolvedApplication::addPrivateProjectPackageDependency);
+      resolvedToolchain.addApplication(resolvedApplication);
+    }));
   }
 
-  private <I extends CMakeBinary, O extends CMakeResolvedBinary> void processObjects(final I object,
-      final Resolver<I, O> resolver, final Acceptor<O> acceptor) {
+  private void resolveTests(final Set<CMakeTest> tests, final Map<String, CMakeResolvedToolchain> resolvedToolchains) {
+    tests.forEach((object) -> processObject(object, (CMakeTest test, CMakeToolchain toolchain) -> {
+      final CMakeResolvedToolchain resolvedToolchain = resolvedToolchains.get(toolchain.getName());
+      final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(test,
+          toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
+              || toolchain.getTests().getBuildStatic().getOrElse(Boolean.FALSE),
+          toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
+              && toolchain.getTests().getBuildShared().getOrElse(Boolean.TRUE),
+          toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
+              || toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE),
+          toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
+              || toolchain.getTests().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
+      resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedTest::addPrivateLinkOption, resolvedTest::addPrivateSystemPackageDependency,
+          resolvedTest::addPrivateProjectPackageDependency);
+      resolveDependencies(toolchain.getTests().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedTest::addPrivateLinkOption, resolvedTest::addPrivateSystemPackageDependency,
+          resolvedTest::addPrivateProjectPackageDependency);
+      resolveDependencies(test.getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolvedTest::addPrivateLinkOption, resolvedTest::addPrivateSystemPackageDependency,
+          resolvedTest::addPrivateProjectPackageDependency);
+      resolvedToolchain.addTest(resolvedTest);
+    }));
+  }
+
+  private <B extends CMakeBinary> void processObject(final B binary, final Resolver<B> resolver) {
     availableToolchains.forEach((toolchainName, toolchain) -> {
-      if (object.getToolchains().get().contains(toolchainName)
-          || (object instanceof CMakeLibrary && object.getToolchains().get().isEmpty())) {
-        final O resolvedObject = resolver.resolve(object, toolchain);
-        acceptor.accept(resolvedObject);
+      if (binary.getToolchains().get().contains(toolchainName)
+          || ((binary instanceof CMakeLibrary) && binary.getToolchains().get().isEmpty()
+              && binary.getSources().get().isEmpty())) {
+        resolver.resolve(binary, toolchain);
       }
     });
   }
 
-  private interface Resolver<I extends CMakeBinary, O extends CMakeResolvedBinary> {
-    O resolve(I binary, CMakeToolchain toolchain);
+  private interface Resolver<B extends CMakeBinary> {
+    void resolve(B binary, CMakeToolchain toolchain);
   }
 
-  private interface Acceptor<I extends CMakeResolvedBinary> {
-    void accept(I resolvedObject);
-  }
-
-  static void resolveLinkOptions(final Set<String> dependencies, final Set<String> linkOptions)
-      throws IllegalArgumentException {
+  private void resolveDependencies(final Set<String> dependencies, final CMakeResolvedToolchain toolchain,
+      final Consumer<String> optionConsumer, final Consumer<String> packageDependencyConsumer,
+      final Consumer<CMakeResolvedProjectPackageDependency> moduleDependencyConsumer) {
     for (final String dependency : dependencies) {
+      final String[] dependencyTokens = dependency.split("::");
       if (dependency.startsWith("-")) {
-        final String[] dependencyTokens = dependency.split("::");
-        if (dependencyTokens.length <= 2) {
-          linkOptions.add(dependency);
+        if (dependencyTokens.length == 1) {
+          optionConsumer.accept(dependencyTokens[0]);
         } else {
-          throw new IllegalArgumentException(
-              "Invalid link option declaration: '%s'!".formatted(dependency));
+          throw new IllegalArgumentException("Invalid link option: '%s'!".formatted(dependencyTokens[0]));
         }
-      }
-    }
-  }
-
-  static void resolvePackageDependencies(final Set<String> dependencies, final Set<CMakeResolvedPackage> packages,
-      final Set<CMakeResolvedPackageDependency> packageDependencies, final CMakeResolvedToolchain toolchain,
-      final Map<String, CMakeFindPackage> availableFindPackages)
-      throws IllegalArgumentException {
-    for (final String dependency : dependencies) {
-      if (!dependency.startsWith("-")) {
-        final String[] dependencyTokens = dependency.split("::");
+      } else {
         if (dependencyTokens.length <= 2) {
-          if (availableFindPackages.containsKey(dependencyTokens[0])) {
-            final CMakeFindPackage findPackage = availableFindPackages.get(dependencyTokens[0]);
-            packages.add(new CMakeResolvedPackage(findPackage, toolchain));
-            packageDependencies.add(new CMakeResolvedPackageDependency(dependency));
-          } else {
-            throw new IllegalArgumentException("Missing find package '%s'!".formatted(dependency));
-          }
+          resolvePackage(dependencyTokens, dependency, packageDependencyConsumer, toolchain::addPackage);
+        } else if (dependencyTokens.length == 3) {
+          resolveModule(dependencyTokens, toolchain, moduleDependencyConsumer, toolchain::addModule);
+        } else {
+          throw new IllegalArgumentException("Missing dependency '%s'!".formatted(dependency));
         }
       }
     }
   }
 
-  static void resolveProjectDependencies(final Set<String> dependencies, final Set<CMakeResolvedProject> projects,
-      final Set<CMakeResolvedProjectDependency> projectDependencies, final CMakeResolvedToolchain toolchain,
-      final Project project) throws IllegalArgumentException {
-    for (final String dependency : dependencies) {
-      if (!dependency.startsWith("-")) {
-        final String[] dependencyTokens = dependency.split("::");
-        if (dependencyTokens.length == 3) {
-          final Project dependencyProject = Objects.equals(dependencyTokens[0], project.getName()) ? project
-              : project.findProject(":%s".formatted(dependencyTokens[0]));
-          if (Objects.nonNull(dependencyProject)) {
-            if (!Objects.equals(project, dependencyProject)) {
-              projects.add(new CMakeResolvedProject(dependencyProject, toolchain));
-            }
-            final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
-            for (final String buildConfig : toolchain.getBuildConfigs()) {
-              final CMakeResolvedProjectDependency resolvedProjectModule = new CMakeResolvedProjectDependency(
-                  dependencyProject, dependencyTokens[1], toolchain, type, buildConfig);
-              projectDependencies.add(resolvedProjectModule);
-            }
-          } else {
-            throw new IllegalArgumentException("Missing local project '%s'!".formatted(dependencyTokens[0]));
-          }
-        } else if (dependencyTokens.length > 3) {
-          throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(dependency));
-        }
-      }
+  private void resolvePackage(final String[] dependencyTokens, final String dependency,
+      final Consumer<String> binaryConsumer, final Consumer<CMakeResolvedSystemPackage> buildConsumer)
+      throws IllegalArgumentException {
+    final CMakeSystemPackage systemPackage = availableSystemPackges.get(dependencyTokens[0]);
+    if (Objects.nonNull(systemPackage)) {
+      binaryConsumer.accept(dependency);
+      buildConsumer.accept(new CMakeResolvedSystemPackage(systemPackage));
+    } else {
+      throw new IllegalArgumentException("Missing package '%s'!".formatted(dependencyTokens[0]));
+    }
+  }
+
+  private void resolveModule(final String[] dependencyTokens, final CMakeResolvedToolchain toolchain,
+      final Consumer<CMakeResolvedProjectPackageDependency> binaryConsumer,
+      final Consumer<CMakeResolvedProjectPackage> buildConsumer) throws IllegalArgumentException {
+    final Project dependencyProject = Objects.equals(dependencyTokens[0], project.getName()) ? project
+        : project.findProject(":%s".formatted(dependencyTokens[0]));
+    if (Objects.nonNull(dependencyProject)) {
+      final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
+      binaryConsumer
+          .accept(new CMakeResolvedProjectPackageDependency(dependencyTokens[1], toolchain, type, dependencyProject));
+      buildConsumer.accept(new CMakeResolvedProjectPackage(toolchain, dependencyProject));
+    } else {
+      throw new IllegalArgumentException("Missing module '%s'!".formatted(dependencyTokens[0]));
     }
   }
 

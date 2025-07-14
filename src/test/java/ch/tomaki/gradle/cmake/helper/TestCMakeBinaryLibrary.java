@@ -5,6 +5,7 @@
 package ch.tomaki.gradle.cmake.helper;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
@@ -23,30 +24,28 @@ public final class TestCMakeBinaryLibrary {
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> register(final String name, final CMakeExtension extension,
-      final String toolchainName) {
+      final Set<String> toolchains) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getToolchains().set(Arrays.asList(toolchainName));
+      object.getToolchains().set(toolchains);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateDependencies(final String name,
-      final CMakeExtension extension,
-      final String toolchainName, final String... dependencies) {
-    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchainName);
+      final CMakeExtension extension, final Set<String> toolchains, final Set<String> dependencies) {
+    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateLinkDependencies().set(Arrays.asList(dependencies));
+      object.getPrivateLinkDependencies().set(dependencies);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicDependencies(final String name,
-      final CMakeExtension extension,
-      final String toolchainName, final String... dependencies) {
-    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchainName);
+      final CMakeExtension extension, final Set<String> toolchains, final Set<String> dependencies) {
+    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPublicLinkDependencies().set(Arrays.asList(dependencies));
+      object.getPublicLinkDependencies().set(dependencies);
     });
     return provider;
   }

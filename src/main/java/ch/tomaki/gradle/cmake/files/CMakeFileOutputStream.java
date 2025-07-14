@@ -4,11 +4,10 @@
  */
 package ch.tomaki.gradle.cmake.files;
 
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBuild;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.gradle.api.Project;
+
 import org.gradle.api.file.RegularFile;
 
 public abstract class CMakeFileOutputStream implements AutoCloseable {
@@ -24,12 +23,11 @@ public abstract class CMakeFileOutputStream implements AutoCloseable {
     this.outputStream = new FileOutputStream(file.getAsFile());
   }
 
-  public abstract void write(final CMakeResolvedBuild build, final Project project)
-      throws IOException;
-
   public RegularFile getFile() {
     return file;
   }
+
+  public abstract void write() throws IOException;
 
   private void writeOutput(final String input) throws IOException {
     outputStream.write(input.getBytes());

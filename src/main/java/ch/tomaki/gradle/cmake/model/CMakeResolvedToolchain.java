@@ -5,6 +5,7 @@
 package ch.tomaki.gradle.cmake.model;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -13,7 +14,7 @@ import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedToolchain extends CMakeResolvedNamedObject {
+public final class CMakeResolvedToolchain extends CMakeResolvedName {
 
   private final OperatingSystem operatingSystem;
   private final String architecture;
@@ -23,6 +24,11 @@ public final class CMakeResolvedToolchain extends CMakeResolvedNamedObject {
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
+  private final Set<CMakeResolvedSystemPackage> systemPackages = new HashSet<>();
+  private final Set<CMakeResolvedProjectPackage> projectPackages = new HashSet<>();
+  private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
+  private final Set<CMakeResolvedApplication> applications = new HashSet<>();
+  private final Set<CMakeResolvedTest> tests = new HashSet<>();
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
@@ -66,6 +72,50 @@ public final class CMakeResolvedToolchain extends CMakeResolvedNamedObject {
 
   public Optional<File> getToolchainFile() {
     return toolchainFile;
+  }
+
+  void addPackage(final CMakeResolvedSystemPackage object) {
+    systemPackages.add(object);
+  }
+
+  public Set<CMakeResolvedSystemPackage> getSystemPackages() {
+    return systemPackages;
+  }
+
+  void addModule(final CMakeResolvedProjectPackage object) {
+    projectPackages.add(object);
+  }
+
+  public Set<CMakeResolvedProjectPackage> getProjectPackages() {
+    return projectPackages;
+  }
+
+  void addLibrary(final CMakeResolvedLibrary object) {
+    libraries.add(object);
+  }
+
+  public Set<CMakeResolvedLibrary> getLibraries() {
+    return libraries;
+  }
+
+  void addApplication(final CMakeResolvedApplication object) {
+    applications.add(object);
+  }
+
+  public Set<CMakeResolvedApplication> getApplications() {
+    return applications;
+  }
+
+  void addTest(final CMakeResolvedTest object) {
+    tests.add(object);
+  }
+
+  public Set<CMakeResolvedTest> getTests() {
+    return tests;
+  }
+
+  public boolean isUsed() {
+    return !libraries.isEmpty() || !applications.isEmpty() || !tests.isEmpty();
   }
 
 }
