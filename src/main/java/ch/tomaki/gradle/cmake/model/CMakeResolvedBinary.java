@@ -4,10 +4,20 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import java.util.Collection;
+import java.util.TreeSet;
+
 import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
 
-public abstract class CMakeResolvedBinary extends CMakeResolvedInterface {
+public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> extends CMakeResolvedName<T> {
 
+  private final Collection<String> headers;
+  private final Collection<String> sources;
+  private final Collection<String> privateCompileOptions;
+  private final Collection<String> privateCompileDefinitions;
+  private final Collection<String> privateLinkOptions = new TreeSet<>();
+  private final Collection<String> privateSystemPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectPackageDependency> privateProjectPackageDependencies = new TreeSet<>();
   private final boolean buildStatic;
   private final boolean buildShared;
   private final boolean stripDebug;
@@ -15,11 +25,55 @@ public abstract class CMakeResolvedBinary extends CMakeResolvedInterface {
 
   CMakeResolvedBinary(final CMakeBinary binary, final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) throws IllegalArgumentException {
-    super(binary);
+    super(binary.getName());
+    this.headers = new TreeSet<>(binary.getHeaders().get());
+    this.sources = new TreeSet<>(binary.getSources().get());
+    this.privateCompileOptions = new TreeSet<>(binary.getPrivateCompileOptions().get());
+    this.privateCompileDefinitions = new TreeSet<>(binary.getPrivateCompileDefinitions().get());
     this.buildStatic = buildStatic || binary.getBuildStatic().getOrElse(Boolean.FALSE);
     this.buildShared = buildShared && binary.getBuildShared().getOrElse(Boolean.TRUE);
     this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);
     this.packageBuildOutputs = packageBuildOutputs || binary.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
+  }
+
+  public Collection<String> getHeaders() {
+    return headers;
+  }
+
+  public Collection<String> getSources() {
+    return sources;
+  }
+
+  public Collection<String> getPrivateCompileOptions() {
+    return privateCompileOptions;
+  }
+
+  public Collection<String> getPrivateCompileDefinitions() {
+    return privateCompileDefinitions;
+  }
+
+  public Collection<String> getPrivateLinkOptions() {
+    return privateLinkOptions;
+  }
+
+  void addPrivateLinkOption(final String option) {
+    privateLinkOptions.add(option);
+  }
+
+  public Collection<String> getPrivateSystemPackageDependencies() {
+    return privateSystemPackageDependencies;
+  }
+
+  void addPrivateSystemPackageDependency(final String dependency) {
+    privateSystemPackageDependencies.add(dependency);
+  }
+
+  public Collection<CMakeResolvedProjectPackageDependency> getPrivateProjectPackageDependencies() {
+    return privateProjectPackageDependencies;
+  }
+
+  void addPrivateProjectPackageDependency(final CMakeResolvedProjectPackageDependency dependency) {
+    privateProjectPackageDependencies.add(dependency);
   }
 
   public boolean isBuildStatic() {

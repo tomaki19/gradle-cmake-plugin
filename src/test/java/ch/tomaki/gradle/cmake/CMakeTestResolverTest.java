@@ -5,11 +5,10 @@
 package ch.tomaki.gradle.cmake;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -21,6 +20,7 @@ import ch.tomaki.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import ch.tomaki.gradle.cmake.helper.TestCMakePackage;
 import ch.tomaki.gradle.cmake.helper.TestCMakeTest;
 import ch.tomaki.gradle.cmake.helper.TestCMakeToolchain;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 import ch.tomaki.gradle.cmake.model.CMakeResolver;
 
@@ -48,21 +48,19 @@ public class CMakeTestResolverTest {
                 assertEquals(0, extension.getApplications().size());
                 assertEquals(1, extension.getTests().size());
 
-                final CMakeResolver resolver = new CMakeResolver(extension.getToolchains(),
-                                extension.getPackages(),
-                                project);
-                final Map<String, CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(1, toolchains.size());
-                {
-                        final CMakeResolvedToolchain toolchain = toolchains.get("Toolchain0");
-                        assertEquals(0, toolchain.getSystemPackages().size());
-                        assertEquals(2, toolchain.getLibraries().size());
-                        assertEquals(0, toolchain.getApplications().size());
-                        assertEquals(0, toolchain.getTests().size());
-                        assertTrue(toolchain.isUsed());
-                }
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
+
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(0, toolchains[0].getSystemPackages().size());
+                assertEquals(2, toolchains[0].getLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(0, toolchains[0].getTests().size());
         }
 
         @Test
@@ -93,38 +91,38 @@ public class CMakeTestResolverTest {
                 assertEquals(0, extension.getApplications().size());
                 assertEquals(1, extension.getTests().size());
 
-                final CMakeResolver resolver = new CMakeResolver(extension.getToolchains(),
-                                extension.getPackages(),
-                                project);
-                final Map<String, CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(2, toolchains.size());
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(2, toolchains.length);
+
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(1, toolchains[0].getSystemPackages().size());
+                assertEquals(3, toolchains[0].getLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(1, toolchains[0].getTests().size());
                 {
-                        final CMakeResolvedToolchain toolchain = toolchains.get("Toolchain0");
-                        assertEquals(1, toolchain.getSystemPackages().size());
-                        assertEquals(3, toolchain.getLibraries().size());
-                        assertEquals(0, toolchain.getApplications().size());
-                        assertEquals(1, toolchain.getTests().size());
-                        toolchain.getTests().forEach((application) -> {
-                                assertEquals(1, application.getPrivateSystemPackageDependencies().size());
-                                assertEquals(2, application.getPrivateProjectPackageDependencies().size());
-                                assertEquals(1, application.getPrivateLinkOptions().size());
-                        });
-                        assertTrue(toolchain.isUsed());
+                        final CMakeResolvedTest[] tests = toolchains[0].getTests()
+                                        .toArray(new CMakeResolvedTest[toolchains[0].getTests().size()]);
+                        assertEquals(1, tests[0].getPrivateSystemPackageDependencies().size());
+                        assertEquals(2, tests[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(1, tests[0].getPrivateLinkOptions().size());
                 }
+
+                assertEquals("Toolchain1", toolchains[1].getName());
+                assertEquals(1, toolchains[1].getSystemPackages().size());
+                assertEquals(2, toolchains[1].getLibraries().size());
+                assertEquals(0, toolchains[1].getApplications().size());
+                assertEquals(1, toolchains[1].getTests().size());
                 {
-                        final CMakeResolvedToolchain toolchain = toolchains.get("Toolchain1");
-                        assertEquals(1, toolchain.getSystemPackages().size());
-                        assertEquals(2, toolchain.getLibraries().size());
-                        assertEquals(0, toolchain.getApplications().size());
-                        assertEquals(1, toolchain.getTests().size());
-                        toolchain.getTests().forEach((application) -> {
-                                assertEquals(1, application.getPrivateSystemPackageDependencies().size());
-                                assertEquals(1, application.getPrivateProjectPackageDependencies().size());
-                                assertEquals(1, application.getPrivateLinkOptions().size());
-                        });
-                        assertTrue(toolchain.isUsed());
+                        final CMakeResolvedTest[] tests = toolchains[1].getTests()
+                                        .toArray(new CMakeResolvedTest[toolchains[1].getTests().size()]);
+                        assertEquals(1, tests[0].getPrivateSystemPackageDependencies().size());
+                        assertEquals(1, tests[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(1, tests[0].getPrivateLinkOptions().size());
                 }
         }
 
@@ -149,21 +147,19 @@ public class CMakeTestResolverTest {
                 assertEquals(0, extension.getApplications().size());
                 assertEquals(1, extension.getTests().size());
 
-                final CMakeResolver resolver = new CMakeResolver(extension.getToolchains(),
-                                extension.getPackages(),
-                                project);
-                final Map<String, CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(1, toolchains.size());
-                {
-                        final CMakeResolvedToolchain toolchain = toolchains.get("Toolchain0");
-                        assertEquals(0, toolchain.getSystemPackages().size());
-                        assertEquals(2, toolchain.getLibraries().size());
-                        assertEquals(0, toolchain.getApplications().size());
-                        assertEquals(1, toolchain.getTests().size());
-                        assertTrue(toolchain.isUsed());
-                }
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
+
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(0, toolchains[0].getSystemPackages().size());
+                assertEquals(2, toolchains[0].getLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(1, toolchains[0].getTests().size());
         }
 
         @Test
@@ -189,21 +185,19 @@ public class CMakeTestResolverTest {
                 assertEquals(0, extension.getApplications().size());
                 assertEquals(1, extension.getTests().size());
 
-                final CMakeResolver resolver = new CMakeResolver(extension.getToolchains(),
-                                extension.getPackages(),
-                                project);
-                final Map<String, CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(1, toolchains.size());
-                {
-                        final CMakeResolvedToolchain toolchain = toolchains.get("Toolchain0");
-                        assertEquals(1, toolchain.getSystemPackages().size());
-                        assertEquals(2, toolchain.getLibraries().size());
-                        assertEquals(0, toolchain.getApplications().size());
-                        assertEquals(1, toolchain.getTests().size());
-                        assertTrue(toolchain.isUsed());
-                }
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
+
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(1, toolchains[0].getSystemPackages().size());
+                assertEquals(2, toolchains[0].getLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(1, toolchains[0].getTests().size());
         }
 
         @Test
@@ -229,20 +223,18 @@ public class CMakeTestResolverTest {
                 assertEquals(0, extension.getApplications().size());
                 assertEquals(1, extension.getTests().size());
 
-                final CMakeResolver resolver = new CMakeResolver(extension.getToolchains(),
-                                extension.getPackages(),
-                                project);
-                final Map<String, CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
                                 extension.getApplications(), extension.getTests());
 
-                assertEquals(1, toolchains.size());
-                {
-                        final CMakeResolvedToolchain toolchain = toolchains.get("Toolchain0");
-                        assertEquals(1, toolchain.getSystemPackages().size());
-                        assertEquals(2, toolchain.getLibraries().size());
-                        assertEquals(0, toolchain.getApplications().size());
-                        assertEquals(1, toolchain.getTests().size());
-                        assertTrue(toolchain.isUsed());
-                }
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
+
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(1, toolchains[0].getSystemPackages().size());
+                assertEquals(2, toolchains[0].getLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(1, toolchains[0].getTests().size());
         }
 }

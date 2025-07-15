@@ -6,11 +6,11 @@ package ch.tomaki.gradle.cmake.model;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
 
-public final class CMakeResolvedApplication extends CMakeResolvedBinary {
+public final class CMakeResolvedApplication extends CMakeResolvedBinary<CMakeResolvedApplication> {
 
-  CMakeResolvedApplication(final CMakeApplication application, final boolean buildStatic, final boolean buildShared,
+  CMakeResolvedApplication(final CMakeApplication application,  final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) {
-    super(application, buildStatic, buildShared, stripDebug, packageBuildOutputs);
+    super(application,  buildStatic, buildShared, stripDebug, packageBuildOutputs);
   }
 
 }

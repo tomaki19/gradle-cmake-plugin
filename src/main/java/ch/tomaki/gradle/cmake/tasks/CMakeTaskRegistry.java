@@ -18,6 +18,7 @@ import org.gradle.api.tasks.TaskProvider;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectPackageDependency;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeTaskRegistry {
 
@@ -69,14 +70,14 @@ public class CMakeTaskRegistry {
     });
   }
 
-  public void configureBuildTaskProjectModuleDependencies(final String taskName,
+  public void configureBuildTaskProjectModuleDependencies(final String taskName, final CMakeResolvedToolchain toolchain,
       final Collection<CMakeResolvedProjectPackageDependency> projectModuleDependencies) {
     taskContainer.named(taskName).configure((task) -> {
       projectModuleDependencies.stream()
           .filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-          .forEach(dependency -> dependency.getToolchain().getBuildConfigs()
+          .forEach(dependency -> toolchain.getBuildConfigs()
               .forEach((buildConfig) -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getProject(),
-                  dependency.getName(), dependency.getToolchain().getName(), dependency.getType(), buildConfig))));
+                  dependency.getName(), toolchain.getName(), dependency.getType(), buildConfig))));
     });
   }
 

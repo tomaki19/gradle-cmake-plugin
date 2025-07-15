@@ -4,23 +4,25 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
 
-public class CMakeResolvedSystemPackage extends CMakeResolvedName {
+public final class CMakeResolvedSystemPackage extends CMakeResolvedName<CMakeResolvedSystemPackage> {
 
-  private final Set<String> components;
+  private final Collection<String> components;
   private final Map<String, String> properties;
 
   CMakeResolvedSystemPackage(final CMakeSystemPackage object) {
     super(object.getName());
-    this.components = object.getComponents().get();
-    this.properties = object.getProperties().get();
+    this.components = new TreeSet<>(object.getComponents().get());
+    this.properties = new TreeMap<>(object.getProperties().get());
   }
 
-  public Set<String> getComponents() {
+  public Collection<String> getComponents() {
     return components;
   }
 

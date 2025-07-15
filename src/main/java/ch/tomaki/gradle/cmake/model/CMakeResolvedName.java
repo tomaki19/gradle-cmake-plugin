@@ -4,7 +4,7 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-public abstract class CMakeResolvedName {
+public abstract class CMakeResolvedName<T extends CMakeResolvedName<T>> implements Comparable<T> {
 
     private final String name;
 
@@ -32,13 +32,22 @@ public abstract class CMakeResolvedName {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        CMakeResolvedName other = (CMakeResolvedName) obj;
+        CMakeResolvedName<?> other = (CMakeResolvedName<?>) obj;
         if (name == null) {
             if (other.name != null)
                 return false;
         } else if (!name.equals(other.name))
             return false;
         return true;
+    }
+
+    @Override
+    public int compareTo(T other) {
+        int comparator = 0;
+        if ((comparator = getName().compareTo(other.getName())) != 0) {
+            return comparator;
+        }
+        return comparator;
     }
 
 }

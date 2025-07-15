@@ -5,30 +5,32 @@
 package ch.tomaki.gradle.cmake.model;
 
 import java.io.File;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
+import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
 
-public final class CMakeResolvedToolchain extends CMakeResolvedName {
+public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolvedToolchain> {
 
   private final OperatingSystem operatingSystem;
   private final String architecture;
   private final String compiler;
   private final String generator;
-  private final Set<String> buildConfigs;
+  private final Collection<String> buildConfigs;
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
-  private final Set<CMakeResolvedSystemPackage> systemPackages = new HashSet<>();
-  private final Set<CMakeResolvedProjectPackage> projectPackages = new HashSet<>();
-  private final Set<CMakeResolvedLibrary> libraries = new HashSet<>();
-  private final Set<CMakeResolvedApplication> applications = new HashSet<>();
-  private final Set<CMakeResolvedTest> tests = new HashSet<>();
+  private final Collection<CMakeResolvedSystemPackage> systemPackages = new TreeSet<>();
+  private final Collection<Project> projectPackages = new TreeSet<>();
+  private final Collection<CMakeResolvedLibrary> libraries = new TreeSet<>();
+  private final Collection<CMakeResolvedApplication> applications = new TreeSet<>();
+  private final Collection<CMakeResolvedTest> tests = new TreeSet<>();
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
@@ -36,8 +38,8 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName {
     this.architecture = toolchain.getArchitecture().getOrElse("").toLowerCase();
     this.compiler = toolchain.getCompiler().getOrElse("").toLowerCase();
     this.generator = toolchain.getGenerator().getOrElse("");
-    this.buildConfigs = toolchain.getBuildConfigs().get();
-    this.environment = toolchain.getEnvironment().getOrNull();
+    this.buildConfigs = new TreeSet<>(toolchain.getBuildConfigs().get());
+    this.environment = new TreeMap<>(toolchain.getEnvironment().get());
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
   }
@@ -58,7 +60,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName {
     return generator;
   }
 
-  public Set<String> getBuildConfigs() {
+  public Collection<String> getBuildConfigs() {
     return buildConfigs;
   }
 
@@ -78,15 +80,15 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName {
     systemPackages.add(object);
   }
 
-  public Set<CMakeResolvedSystemPackage> getSystemPackages() {
+  public Collection<CMakeResolvedSystemPackage> getSystemPackages() {
     return systemPackages;
   }
 
-  void addModule(final CMakeResolvedProjectPackage object) {
+  void addModule(final Project object) {
     projectPackages.add(object);
   }
 
-  public Set<CMakeResolvedProjectPackage> getProjectPackages() {
+  public Collection<Project> getProjectPackages() {
     return projectPackages;
   }
 
@@ -94,7 +96,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName {
     libraries.add(object);
   }
 
-  public Set<CMakeResolvedLibrary> getLibraries() {
+  public Collection<CMakeResolvedLibrary> getLibraries() {
     return libraries;
   }
 
@@ -102,7 +104,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName {
     applications.add(object);
   }
 
-  public Set<CMakeResolvedApplication> getApplications() {
+  public Collection<CMakeResolvedApplication> getApplications() {
     return applications;
   }
 
@@ -110,12 +112,8 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName {
     tests.add(object);
   }
 
-  public Set<CMakeResolvedTest> getTests() {
+  public Collection<CMakeResolvedTest> getTests() {
     return tests;
-  }
-
-  public boolean isUsed() {
-    return !libraries.isEmpty() || !applications.isEmpty() || !tests.isEmpty();
   }
 
 }

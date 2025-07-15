@@ -4,35 +4,35 @@
  */
 package ch.tomaki.gradle.cmake.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.TreeSet;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 
-public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
+public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolvedLibrary> {
 
-  private final Set<String> publicCompileOptions;
-  private final Set<String> publicCompileDefinitions;
-  private final Set<String> publicLinkOptions = new HashSet<>();
-  private final Set<String> publicSystemPackageDependencies = new HashSet<>();
-  private final Set<CMakeResolvedProjectPackageDependency> publicProjectPackageDependencies = new HashSet<>();
+  private final Collection<String> publicCompileOptions;
+  private final Collection<String> publicCompileDefinitions;
+  private final Collection<String> publicLinkOptions = new TreeSet<>();
+  private final Collection<String> publicSystemPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectPackageDependency> publicProjectPackageDependencies = new TreeSet<>();
 
   CMakeResolvedLibrary(final CMakeLibrary library, final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) {
     super(library, buildStatic, buildShared, stripDebug, packageBuildOutputs);
-    this.publicCompileOptions = library.getPublicCompileOptions().get();
-    this.publicCompileDefinitions = library.getPublicCompileDefinitions().get();
+    this.publicCompileOptions = new TreeSet<>(library.getPublicCompileOptions().get());
+    this.publicCompileDefinitions = new TreeSet<>(library.getPublicCompileDefinitions().get());
   }
 
-  public Set<String> getPublicCompileOptions() {
+  public Collection<String> getPublicCompileOptions() {
     return publicCompileOptions;
   }
 
-  public Set<String> getPublicCompileDefinitions() {
+  public Collection<String> getPublicCompileDefinitions() {
     return publicCompileDefinitions;
   }
 
-  public Set<String> getPublicLinkOptions() {
+  public Collection<String> getPublicLinkOptions() {
     return publicLinkOptions;
   }
 
@@ -40,7 +40,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
     publicLinkOptions.add(option);
   }
 
-  public Set<String> getPublicSystemPackageDependencies() {
+  public Collection<String> getPublicSystemPackageDependencies() {
     return publicSystemPackageDependencies;
   }
 
@@ -48,7 +48,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary {
     publicSystemPackageDependencies.add(dependency);
   }
 
-  public Set<CMakeResolvedProjectPackageDependency> getPublicProjectPackageDependencies() {
+  public Collection<CMakeResolvedProjectPackageDependency> getPublicProjectPackageDependencies() {
     return publicProjectPackageDependencies;
   }
 

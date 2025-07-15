@@ -8,32 +8,32 @@ import org.gradle.api.Project;
 
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
 
-public final class CMakeResolvedProjectPackageDependency extends CMakeResolvedProjectPackage {
+public final class CMakeResolvedProjectPackageDependency
+    extends CMakeResolvedName<CMakeResolvedProjectPackageDependency> {
 
+  private final Project project;
   private final CMakeLinkType type;
-  private final String name;
 
-  CMakeResolvedProjectPackageDependency(final String name, final CMakeResolvedToolchain toolchain,
-      final CMakeLinkType type, final Project project) {
-    super(toolchain, project);
+  CMakeResolvedProjectPackageDependency(final Project project, final String name, final CMakeLinkType type) {
+    super(name);
+    this.project = project;
     this.type = type;
-    this.name = name;
+  }
+
+  public Project getProject() {
+    return project;
   }
 
   public CMakeLinkType getType() {
     return type;
   }
 
-  public String getName() {
-    return name;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
+    result = prime * result + ((project == null) ? 0 : project.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
     return result;
   }
 
@@ -46,14 +46,29 @@ public final class CMakeResolvedProjectPackageDependency extends CMakeResolvedPr
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectPackageDependency other = (CMakeResolvedProjectPackageDependency) obj;
+    if (project == null) {
+      if (other.project != null)
+        return false;
+    } else if (!project.equals(other.project))
+      return false;
     if (type != other.type)
       return false;
-    if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
     return true;
+  }
+
+  @Override
+  public int compareTo(CMakeResolvedProjectPackageDependency other) {
+    int comparator = 0;
+    if ((comparator = getProject().compareTo(other.getProject())) != 0) {
+      return comparator;
+    }
+    if ((comparator = getName().compareTo(other.getName())) != 0) {
+      return comparator;
+    }
+    if ((comparator = getType().compareTo(other.getType())) != 0) {
+      return comparator;
+    }
+    return comparator;
   }
 
 }
