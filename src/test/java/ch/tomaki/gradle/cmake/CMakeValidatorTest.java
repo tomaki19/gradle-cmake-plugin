@@ -30,7 +30,8 @@ public class CMakeValidatorTest {
   @Test
   void validateToolchains() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     final String name = "Toolchain";
     final NamedDomainObjectProvider<CMakeToolchain> provider = extension.getToolchains()
@@ -68,7 +69,8 @@ public class CMakeValidatorTest {
   @Test
   void validateHeaderOnlyLibraries() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     final String name = "Library";
     final NamedDomainObjectProvider<CMakeLibrary> provider = extension.getLibraries().register(name);
@@ -85,7 +87,8 @@ public class CMakeValidatorTest {
   @Test
   void validateBinaryLibraries() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     final String name = "Library";
     final NamedDomainObjectProvider<CMakeLibrary> provider = extension.getLibraries()
@@ -110,7 +113,8 @@ public class CMakeValidatorTest {
   @Test
   void validateApplications() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     final String name = "Application";
     final NamedDomainObjectProvider<CMakeApplication> provider = extension.getApplications()
@@ -137,7 +141,8 @@ public class CMakeValidatorTest {
   @Test
   void validateTests() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     final String name = "Test";
     final NamedDomainObjectProvider<CMakeTest> provider = extension.getTests()

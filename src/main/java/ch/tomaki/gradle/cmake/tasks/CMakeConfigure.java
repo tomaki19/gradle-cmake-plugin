@@ -11,10 +11,10 @@ import org.gradle.api.file.Directory;
 import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
-public abstract class CMakeConfigureExec extends CMakeExec {
+public abstract class CMakeConfigure extends CMakeExec {
 
   @Inject
-  public CMakeConfigureExec(final CMakeResolvedToolchain toolchain) {
+  public CMakeConfigure(final CMakeResolvedToolchain toolchain) {
     super(toolchain.getName(), toolchain.getEnvironmentFile());
     final Directory outputDirectory = getProject().getLayout().getBuildDirectory()
         .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName())).get();

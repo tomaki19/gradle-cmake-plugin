@@ -29,8 +29,8 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Collection<CMakeResolvedSystemPackage> systemPackages = new TreeSet<>();
   private final Collection<Project> projectPackages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> libraries = new TreeSet<>();
-  private final Collection<CMakeResolvedApplication> applications = new TreeSet<>();
-  private final Collection<CMakeResolvedTest> tests = new TreeSet<>();
+  private final Collection<CMakeResolvedExecutable> applications = new TreeSet<>();
+  private final Collection<CMakeResolvedExecutable> tests = new TreeSet<>();
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
@@ -100,20 +100,36 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return libraries;
   }
 
-  void addApplication(final CMakeResolvedApplication object) {
+  public boolean hasLibraries() {
+    return !libraries.isEmpty();
+  }
+
+  void addApplication(final CMakeResolvedExecutable object) {
     applications.add(object);
   }
 
-  public Collection<CMakeResolvedApplication> getApplications() {
+  public Collection<CMakeResolvedExecutable> getApplications() {
     return applications;
   }
 
-  void addTest(final CMakeResolvedTest object) {
+  public boolean hasApplications() {
+    return !applications.isEmpty();
+  }
+
+  void addTest(final CMakeResolvedExecutable object) {
     tests.add(object);
   }
 
-  public Collection<CMakeResolvedTest> getTests() {
+  public Collection<CMakeResolvedExecutable> getTests() {
     return tests;
+  }
+
+  public boolean hasTests() {
+    return !tests.isEmpty();
+  }
+
+  public boolean hasBinaries() {
+    return hasLibraries() || hasApplications() || hasTests();
   }
 
 }

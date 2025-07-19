@@ -22,18 +22,13 @@ public class CMakeFileConventions {
     return "%s-%s".formatted(project.getName().toLowerCase(), toolchain.getName().toLowerCase());
   }
 
-  public static String libraryTarget(final String name, final CMakeResolvedToolchain toolchain,
-      final CMakeLinkType type, final String buildConfig) {
+  public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain, final CMakeLinkType type,
+      final String buildConfig) {
     return "%s-%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), type.name().toLowerCase(),
         buildConfig.toLowerCase());
   }
 
-  public static String applicationTarget(final String name, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) {
-    return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
-  }
-
-  public static String testTarget(final String name, final CMakeResolvedToolchain toolchain,
+  public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }

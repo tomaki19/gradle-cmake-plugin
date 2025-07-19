@@ -16,14 +16,13 @@ import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
 import org.gradle.internal.os.OperatingSystem;
 
-public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
+abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
   protected final String toolchainName;
 
   @Inject
   public CMakeExec(final String toolchainName, final Optional<File> environmentFile) {
     super(CMakeExec.class);
-    this.toolchainName = toolchainName;
     environmentFile.ifPresent((file) -> {
       if (file.exists()) {
         getEnvironmentFile().set(file);
@@ -31,6 +30,7 @@ public abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
         throw new IllegalArgumentException("Environment file missing!");
       }
     });
+    this.toolchainName = toolchainName;
   }
 
   @org.gradle.api.tasks.Input

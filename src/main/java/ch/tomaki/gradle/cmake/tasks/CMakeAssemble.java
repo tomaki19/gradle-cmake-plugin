@@ -26,4 +26,5 @@ public abstract class CMakeAssemble extends DefaultTask {
   protected void assemble() throws IOException {
     outputStream.write();
   }
+
 }

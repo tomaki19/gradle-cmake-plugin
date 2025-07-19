@@ -46,13 +46,7 @@ public class CMakeToolchainResolverTest {
                                 extension.getApplications(), extension.getTests());
 
                 final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
-                assertEquals(1, toolchains.length);
-
-                assertEquals("Toolchain0", toolchains[0].getName());
-                assertEquals(0, toolchains[0].getSystemPackages().size());
-                assertEquals(0, toolchains[0].getLibraries().size());
-                assertEquals(0, toolchains[0].getApplications().size());
-                assertEquals(0, toolchains[0].getTests().size());
+                assertEquals(0, toolchains.length);
         }
 
         @Test

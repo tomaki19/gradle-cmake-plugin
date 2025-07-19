@@ -20,7 +20,7 @@ import ch.tomaki.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import ch.tomaki.gradle.cmake.helper.TestCMakePackage;
 import ch.tomaki.gradle.cmake.helper.TestCMakeTest;
 import ch.tomaki.gradle.cmake.helper.TestCMakeToolchain;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedTest;
+import ch.tomaki.gradle.cmake.model.CMakeResolvedExecutable;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 import ch.tomaki.gradle.cmake.model.CMakeResolver;
 
@@ -83,7 +83,7 @@ public class CMakeTestResolverTest {
                                 new HashSet<>(Arrays.asList("Package1", "-loption",
                                                 "%s::InterfaceLibrary1::interface".formatted(project.getName()))));
                 TestCMakeTest.register("Test0", extension,
-                                new HashSet<>(Arrays.asList("Toolchain0", "Toolchain1")));
+                                new HashSet<>(Arrays.asList("Toolchain1", "Toolchain0")));
 
                 assertEquals(2, extension.getPackages().size());
                 assertEquals(2, extension.getToolchains().size());
@@ -105,8 +105,8 @@ public class CMakeTestResolverTest {
                 assertEquals(0, toolchains[0].getApplications().size());
                 assertEquals(1, toolchains[0].getTests().size());
                 {
-                        final CMakeResolvedTest[] tests = toolchains[0].getTests()
-                                        .toArray(new CMakeResolvedTest[toolchains[0].getTests().size()]);
+                        final CMakeResolvedExecutable[] tests = toolchains[0].getTests()
+                                        .toArray(new CMakeResolvedExecutable[toolchains[0].getTests().size()]);
                         assertEquals(1, tests[0].getPrivateSystemPackageDependencies().size());
                         assertEquals(2, tests[0].getPrivateProjectPackageDependencies().size());
                         assertEquals(1, tests[0].getPrivateLinkOptions().size());
@@ -118,8 +118,8 @@ public class CMakeTestResolverTest {
                 assertEquals(0, toolchains[1].getApplications().size());
                 assertEquals(1, toolchains[1].getTests().size());
                 {
-                        final CMakeResolvedTest[] tests = toolchains[1].getTests()
-                                        .toArray(new CMakeResolvedTest[toolchains[1].getTests().size()]);
+                        final CMakeResolvedExecutable[] tests = toolchains[1].getTests()
+                                        .toArray(new CMakeResolvedExecutable[toolchains[1].getTests().size()]);
                         assertEquals(1, tests[0].getPrivateSystemPackageDependencies().size());
                         assertEquals(1, tests[0].getPrivateProjectPackageDependencies().size());
                         assertEquals(1, tests[0].getPrivateLinkOptions().size());

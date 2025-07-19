@@ -27,7 +27,8 @@ public class CMakeInterfaceLibraryResolverTest {
   @Test
   void resolveNoDependenciesTest() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     TestCMakePackage.register("Package0", extension);
     TestCMakeToolchain.register("Toolchain0", extension);
@@ -58,7 +59,8 @@ public class CMakeInterfaceLibraryResolverTest {
   @Test
   void resolveInterfaceDependenciesTest() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class);
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
+        project.getTasks());
 
     TestCMakePackage.register("Package0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);

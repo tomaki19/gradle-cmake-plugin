@@ -4,30 +4,30 @@
  */
 package ch.tomaki.gradle.cmake.extension;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
+import javax.inject.Inject;
+
+import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.tasks.TaskContainer;
 
 import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
 import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
 import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
 import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
 import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
+import ch.tomaki.gradle.cmake.tasks.CMakeCustomExec;
 
 public abstract class CMakeExtension {
 
   public static final String NAME = "cmake";
 
-  private final Map<String, List<String>> customTasks = new HashMap<>();
+  private final TaskContainer taskContainer;
 
-  public void register(final String taskName, final List<String> toolChainNames) {
-    customTasks.put(taskName, toolChainNames);
-  }
-
-  public Map<String, List<String>> getCustomTasks() {
-    return customTasks;
+  @Inject
+  public CMakeExtension(final TaskContainer taskContainer) {
+    this.taskContainer = taskContainer;
   }
 
   public abstract NamedDomainObjectContainer<CMakeSystemPackage> getPackages();
@@ -40,4 +40,13 @@ public abstract class CMakeExtension {
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
 
+  public void register(final String taskName, final Collection<String> toolChainNames,
+      final Action<CMakeCustomExec> configurationAction) {
+    getToolchains().forEach((toolchain) -> {
+      if (toolChainNames.contains(toolchain.getName())) {
+        taskContainer.register(CMakeCustomExec.name(taskName, toolchain), CMakeCustomExec.class,
+            toolchain).configure(configurationAction);
+      }
+    });
+  }
 }

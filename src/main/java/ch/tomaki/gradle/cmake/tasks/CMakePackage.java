@@ -15,11 +15,12 @@ public abstract class CMakePackage extends Zip {
 
   @Inject
   public CMakePackage(final String buildTarget, final CMakeResolvedToolchain toolchain) {
-    setGroup(CMakeTasksConventions.GROUP_PACKAGE);
+    setGroup(CMakeTaskRegistry.GROUP_PACKAGE);
     getArchiveBaseName().set(buildTarget);
     getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().dir("install").get());
     final String toolchainPath = "%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName());
     from(getProject().getLayout().getBuildDirectory()
         .dir(toolchainPath).get().getAsFile().toURI().getPath()).include("%s.*".formatted(buildTarget));
   }
+
 }

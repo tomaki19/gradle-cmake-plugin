@@ -12,18 +12,17 @@ import org.gradle.api.tasks.Input;
 import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
-public abstract class CMakeBuildExec extends CMakeExec {
+public abstract class CMakeBuild extends CMakeExec {
 
-  protected final String buildName;
+  protected final String buildTarget;
 
   @Input
   public abstract SetProperty<String> getAdditionalArguments();
 
-  @Inject
-  public CMakeBuildExec(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+   @Inject
+ public CMakeBuild(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     super(toolchain.getName(), toolchain.getEnvironmentFile());
-    this.buildName = buildTarget;
-    setGroup(CMakeTasksConventions.GROUP_BUILD);
+    setGroup(CMakeTaskRegistry.GROUP_BUILD);
     setWorkingDir(getProject().getProjectDir());
     getBaseCommandLine().add("cmake");
     getBaseCommandLine().add("--build");
@@ -34,5 +33,7 @@ public abstract class CMakeBuildExec extends CMakeExec {
     getBaseCommandLine().add(buildTarget);
     getBaseCommandLine().add("--config");
     getBaseCommandLine().add(buildConfig);
+    this.buildTarget = buildTarget;
   }
+
 }

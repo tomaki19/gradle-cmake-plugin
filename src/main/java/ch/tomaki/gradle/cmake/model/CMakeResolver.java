@@ -36,7 +36,6 @@ public final class CMakeResolver {
         .collect(Collectors.toMap(CMakeSystemPackage::getName, Function.identity()));
     this.availableToolchains = toolchains.stream()
         .filter(toolchain -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
-        .sorted((o1, o2) ->  o2.getName().compareTo(o1.getName()))
         .collect(Collectors.toMap(Function.identity(), toolchain -> new CMakeResolvedToolchain(toolchain)));
   }
 
@@ -45,7 +44,8 @@ public final class CMakeResolver {
     resolveLibraries(libraries, availableToolchains);
     resolveApplications(applications, availableToolchains);
     resolveTests(tests, availableToolchains);
-    return availableToolchains.values();
+    return availableToolchains.values().stream().filter(toolchain -> toolchain.hasBinaries())
+        .sorted((first, second) -> first.getName().compareTo(second.getName())).toList();
   }
 
   private void resolveLibraries(final Set<CMakeLibrary> libraries,
@@ -81,7 +81,7 @@ public final class CMakeResolver {
       final Map<CMakeToolchain, CMakeResolvedToolchain> toolchains) {
     applications.forEach((object) -> processObject(object, toolchains,
         (CMakeApplication application, CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(application,
+          final CMakeResolvedExecutable resolvedApplication = new CMakeResolvedExecutable(application,
               toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
                   || toolchain.getApplications().getBuildStatic().getOrElse(Boolean.FALSE),
               toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
@@ -106,7 +106,7 @@ public final class CMakeResolver {
   private void resolveTests(final Set<CMakeTest> tests, final Map<CMakeToolchain, CMakeResolvedToolchain> toolchains) {
     tests.forEach((object) -> processObject(object, toolchains,
         (CMakeTest test, CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(test,
+          final CMakeResolvedExecutable resolvedTest = new CMakeResolvedExecutable(test,
               toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
                   || toolchain.getTests().getBuildStatic().getOrElse(Boolean.FALSE),
               toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
@@ -156,9 +156,9 @@ public final class CMakeResolver {
         }
       } else {
         if (dependencyTokens.length <= 2) {
-          resolvePackage(dependencyTokens, dependency, packageDependencyConsumer, toolchain::addPackage);
+          resolveSystemPackage(dependencyTokens, dependency, packageDependencyConsumer, toolchain::addPackage);
         } else if (dependencyTokens.length == 3) {
-          resolveModule(dependencyTokens, moduleDependencyConsumer, toolchain::addModule);
+          resolveProjectPackage(dependencyTokens, moduleDependencyConsumer, toolchain::addModule);
         } else {
           throw new IllegalArgumentException("Missing dependency '%s'!".formatted(dependency));
         }
@@ -166,7 +166,7 @@ public final class CMakeResolver {
     }
   }
 
-  private void resolvePackage(final String[] dependencyTokens, final String dependency,
+  private void resolveSystemPackage(final String[] dependencyTokens, final String dependency,
       final Consumer<String> binaryConsumer, final Consumer<CMakeResolvedSystemPackage> buildConsumer)
       throws IllegalArgumentException {
     final CMakeSystemPackage systemPackage = availableSystemPackages.get(dependencyTokens[0]);
@@ -174,11 +174,11 @@ public final class CMakeResolver {
       binaryConsumer.accept(dependency);
       buildConsumer.accept(new CMakeResolvedSystemPackage(systemPackage));
     } else {
-      throw new IllegalArgumentException("Missing package '%s'!".formatted(dependencyTokens[0]));
+      throw new IllegalArgumentException("Missing system package '%s'!".formatted(dependencyTokens[0]));
     }
   }
 
-  private void resolveModule(final String[] dependencyTokens,
+  private void resolveProjectPackage(final String[] dependencyTokens,
       final Consumer<CMakeResolvedProjectPackageDependency> binaryConsumer, final Consumer<Project> buildConsumer)
       throws IllegalArgumentException {
     final Project dependencyProject = Objects.equals(dependencyTokens[0], project.getName()) ? project
@@ -189,7 +189,7 @@ public final class CMakeResolver {
           dependencyTokens[1], type));
       buildConsumer.accept(dependencyProject);
     } else {
-      throw new IllegalArgumentException("Missing module '%s'!".formatted(dependencyTokens[0]));
+      throw new IllegalArgumentException("Missing project package '%s'!".formatted(dependencyTokens[0]));
     }
   }
 

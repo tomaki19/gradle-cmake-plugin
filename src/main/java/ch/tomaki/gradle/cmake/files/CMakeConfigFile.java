@@ -31,14 +31,14 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
     for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
       for (final String buildConfig : toolchain.getBuildConfigs()) {
         if (library.getSources().isEmpty()) {
-          final String libraryTarget = CMakeFileConventions.libraryTarget(library.getName(), toolchain,
+          final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
               CMakeLinkType.INTERFACE, buildConfig);
           writeLine();
           write("add_library( %s::%s INTERFACE IMPORTED )", project.getName(), libraryTarget);
           setTargetProperties(library, libraryTarget, project);
         } else {
           if (library.isBuildStatic()) {
-            final String libraryTarget = CMakeFileConventions.libraryTarget(library.getName(), toolchain,
+            final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
                 CMakeLinkType.STATIC, buildConfig);
             writeLine();
             write("add_library( %s::%s STATIC IMPORTED )", project.getName(), libraryTarget);
@@ -46,7 +46,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
                 project);
           }
           if (library.isBuildShared()) {
-            final String libraryTarget = CMakeFileConventions.libraryTarget(library.getName(), toolchain,
+            final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
                 CMakeLinkType.SHARED, buildConfig);
             writeLine();
             write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);

@@ -13,7 +13,7 @@ import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Nested;
 import org.gradle.internal.os.OperatingSystem;
 
-public abstract class CMakeToolchain implements CMakeNamedObject {
+public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMakeToolchain> {
 
   public static final OperatingSystem Linux = OperatingSystem.LINUX;
   public static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
@@ -62,4 +62,14 @@ public abstract class CMakeToolchain implements CMakeNamedObject {
   public void tests(Action<? super CMakeTests> action) {
     action.execute(getTests());
   }
+
+  @Override
+  public int compareTo(CMakeToolchain other) {
+    int comparator = 0;
+    if ((comparator = getName().compareTo(other.getName())) != 0) {
+      return comparator;
+    }
+    return comparator;
+  }
+
 }
