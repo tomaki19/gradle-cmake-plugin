@@ -4,8 +4,6 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import javax.inject.Inject;
-
 import org.gradle.api.file.Directory;
 
 import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
@@ -13,7 +11,7 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeConfigure extends CMakeExec {
 
-  @Inject
+  @javax.inject.Inject
   public CMakeConfigure(final CMakeResolvedToolchain toolchain) {
     super(toolchain.getName(), toolchain.getEnvironmentFile());
     final Directory outputDirectory = getProject().getLayout().getBuildDirectory()

@@ -6,8 +6,6 @@ package ch.tomaki.gradle.cmake.extension;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.tasks.TaskContainer;
@@ -25,7 +23,7 @@ public abstract class CMakeExtension {
 
   private final TaskContainer taskContainer;
 
-  @Inject
+  @javax.inject.Inject
   public CMakeExtension(final TaskContainer taskContainer) {
     this.taskContainer = taskContainer;
   }

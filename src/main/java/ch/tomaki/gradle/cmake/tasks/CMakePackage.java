@@ -4,17 +4,15 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import javax.inject.Inject;
-
 import org.gradle.api.tasks.bundling.Zip;
 
 import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
-public abstract class CMakePackage extends Zip {
+abstract class CMakePackage extends Zip {
 
-  @Inject
-  public CMakePackage(final String buildTarget, final CMakeResolvedToolchain toolchain) {
+  @javax.inject.Inject
+  CMakePackage(final String buildTarget, final CMakeResolvedToolchain toolchain) {
     setGroup(CMakeTaskRegistry.GROUP_PACKAGE);
     getArchiveBaseName().set(buildTarget);
     getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().dir("install").get());

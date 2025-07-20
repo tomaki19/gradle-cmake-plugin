@@ -4,7 +4,8 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import javax.inject.Inject;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Internal;
 
 import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
@@ -12,23 +13,27 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeCheck extends CMakeExec {
 
-  protected final String checkTarget;
+  @Internal
+  protected abstract Property<String> getCheckTarget();
 
-  @Inject
+  @javax.inject.Inject
   public CMakeCheck(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     super(toolchain.getName(), toolchain.getEnvironmentFile());
-    this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
-    setGroup(CMakeTaskRegistry.GROUP_CHECK);
-    setWorkingDir(getProject().getProjectDir());
+    final String checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
+    getCheckTarget().set(checkTarget);
     getBaseCommandLine().add("ctest");
+    getBaseCommandLine().add("-T");
+    getBaseCommandLine().add("Test");
     getBaseCommandLine().add("--test-dir");
     getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchainName))
+        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName()))
         .get().getAsFile().getAbsolutePath());
     getBaseCommandLine().add("--tests-regex");
     getBaseCommandLine().add(checkTarget);
     getBaseCommandLine().add("--build-config");
     getBaseCommandLine().add(buildConfig);
+    setWorkingDir(getProject().getProjectDir());
+    setGroup(CMakeTaskRegistry.GROUP_CHECK);
   }
 }
