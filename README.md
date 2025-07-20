@@ -10,6 +10,13 @@ plugins {
 }
 ```
 
+# Compatibility
+
+The plugin requires the following version:
+ - gradle >= 8
+ - Java >= 17
+ - cmake >= 3.14
+
 # Extension
 
 See the [extension documentation](<./src/main/java/ch/tomaki/gradle/cmake/extension/EXTENSION.md>).
