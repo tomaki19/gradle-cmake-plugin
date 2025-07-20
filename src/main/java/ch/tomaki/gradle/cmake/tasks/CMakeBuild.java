@@ -11,12 +11,12 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 abstract class CMakeBuild extends CMakeExec {
 
-  @org.gradle.api.tasks.Internal
   protected final String buildTarget;
 
   @javax.inject.Inject
   CMakeBuild(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     super(toolchain.getName(), toolchain.getEnvironmentFile());
+    this.buildTarget = buildTarget;
     getBaseCommandLine().add("cmake");
     getBaseCommandLine().add("--build");
     getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
@@ -28,7 +28,6 @@ abstract class CMakeBuild extends CMakeExec {
     getBaseCommandLine().add(buildConfig);
     setWorkingDir(getProject().getProjectDir());
     setGroup(CMakeTaskRegistry.GROUP_BUILD);
-    this.buildTarget = buildTarget;
   }
 
   @org.gradle.api.tasks.Input

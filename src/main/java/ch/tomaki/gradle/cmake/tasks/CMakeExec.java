@@ -15,17 +15,14 @@ import org.gradle.internal.os.OperatingSystem;
 
 abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
-  @org.gradle.api.tasks.Internal
   protected final String toolchainName;
-
-  @org.gradle.api.tasks.Internal
   protected final Optional<File> environmentFile;
 
   @javax.inject.Inject
   CMakeExec(final String toolchainName, final Optional<File> environmentFile) {
     super(CMakeExec.class);
-    this.environmentFile = environmentFile;
     this.toolchainName = toolchainName;
+    this.environmentFile = environmentFile;
   }
 
   @org.gradle.api.tasks.Input

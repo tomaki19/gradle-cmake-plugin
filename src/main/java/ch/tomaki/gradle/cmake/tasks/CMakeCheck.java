@@ -4,24 +4,19 @@
  */
 package ch.tomaki.gradle.cmake.tasks;
 
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Internal;
-
 import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeCheck extends CMakeExec {
 
-  @Internal
-  protected abstract Property<String> getCheckTarget();
+  protected final String checkTarget;
 
   @javax.inject.Inject
   public CMakeCheck(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     super(toolchain.getName(), toolchain.getEnvironmentFile());
-    final String checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
-    getCheckTarget().set(checkTarget);
+    this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
     getBaseCommandLine().add("ctest");
     getBaseCommandLine().add("-T");
     getBaseCommandLine().add("Test");
