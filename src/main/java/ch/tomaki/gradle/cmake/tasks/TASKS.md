@@ -10,7 +10,7 @@ The `assemble-<toolchain>-config` task creates `build/cmake/build/<project>-<too
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeConfigure`](./CMakeConfigure.java)
 
-The `configure-<toolchain>` tasks run the cmake configure step for each defined binary (see [extension](<./../extension/EXTENSION.md>) documentation).
+The `configure-<toolchain>` tasks run the cmake configure step for each defined binary (see [extension documentation](<./../extension/EXTENSION.md>)).
 
 The cmake configuration files for each toolchain are created in a `build/cmake/build/<toolchain>/` directory.
 
@@ -18,7 +18,7 @@ The cmake configuration files for each toolchain are created in a `build/cmake/b
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeBuild`](./CMakeBuild.java)
 
-The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension](<./../extension/EXTENSION.md>) documentation).
+The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 
 The compiled artifacts for each toolchain are deployed in a `build/cmake/install/<toolchain>/` directory.
 
@@ -32,7 +32,7 @@ For each toolchain a special `build-all-<toolchain>` task is created that runs a
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeCheck`](./CMakeCheck.java)
 
-These tasks run the cmake check step for each defined test (see the [extension](<./../extension/EXTENSION.md>) documentation).
+These tasks run the cmake check step for each defined test (see the [extension documentation](<./../extension/EXTENSION.md>)).
 
 ### Check All Tasks
 
@@ -80,7 +80,7 @@ tasks.withType(ch.tomaki.gradle.cmake.tasks.CMakePackage) {
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeCustomExec`](./CMakeCustomExec.java)
 
-These tasks execute a custom execution task in the context of a toolchain (see [extension](<./../extension/EXTENSION.md>) documentation).
+These tasks execute a custom execution task in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 
 The plugin provides a special register method for these tasks:
 
