@@ -15,6 +15,7 @@ import org.gradle.api.tasks.TaskProvider;
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
 import ch.tomaki.gradle.cmake.extension.CMakeValidator;
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
+import ch.tomaki.gradle.cmake.files.CMakeListsFile;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedExecutable;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
 import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
@@ -38,6 +39,9 @@ public class CMakePlugin implements Plugin<Project> {
   private void allProjects(final Project project) {
     try {
       project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
+      project.getTasks().named("clean", (task) -> task.doLast((action) -> {
+        project.delete(project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME));
+      }));
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }

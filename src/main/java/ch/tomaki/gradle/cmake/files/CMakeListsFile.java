@@ -23,7 +23,8 @@ import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeListsFile extends CMakeFileOutputStream {
 
-  private static final String CMAKE_LISTS_FILE = "CMakeLists.txt";
+  public static final String NAME = "CMakeLists.txt";
+
   private static final String CMAKE_MINIMUM_VERSION = "3.21";
 
   private final Collection<CMakeResolvedToolchain> toolchains;
@@ -31,7 +32,7 @@ public class CMakeListsFile extends CMakeFileOutputStream {
 
   public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final Project project)
       throws FileNotFoundException {
-    super(project.getLayout().getProjectDirectory().file(CMAKE_LISTS_FILE));
+    super(project.getLayout().getProjectDirectory().file(NAME));
     this.toolchains = toolchains;
     this.project = project;
   }
