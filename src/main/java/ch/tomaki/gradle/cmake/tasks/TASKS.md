@@ -16,7 +16,7 @@ The `configure-<toolchain>` tasks run the cmake configure step for each defined 
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeBuild`](./CMakeBuild.java)
 
-The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>) documentation).
+The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension](<./../extension/EXTENSION.md>) documentation).
 
 ### Build All Tasks
 
@@ -26,7 +26,7 @@ For each toolchain a special `build-all-<toolchain>` task is created that runs a
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeCheck`](./CMakeCheck.java)
 
-These tasks run the cmake check step for each defined test (see the [extension documenation](<./../extension/EXTENSION.md>) documentation).
+These tasks run the cmake check step for each defined test (see the [extension](<./../extension/EXTENSION.md>) documentation).
 
 ### Check All Tasks
 
