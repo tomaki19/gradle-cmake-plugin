@@ -4,17 +4,17 @@ The `cmake` extension offers the following main configuration blocks:
 
 ```groovy
 cmake {
-  packages
-  toolchains
-  libraries
-  applications
-  tests
+  packages {...}
+  toolchains {...}
+  libraries {...}
+  applications {...}
+  tests {...}
 }
 ```
 
 ## Packages
 
-The `packages` configuration block lets you specify system libraries that can be referenced by your build as link dependencies. Each package has a mandatory, unique name and the following optional configuration options:
+The `packages` configuration block lets you specify system libraries that can be referenced by your build items as link dependencies. Each package has a mandatory, unique name and the following optional configuration options:
 
 ```groovy
 packages {
@@ -26,6 +26,8 @@ packages {
 ```
 
 ## Toolchains
+
+The `toolchains` configuration block lets you specify build toolchains that can be referenced by your build items. Each toolchain has a mandatory, unique name and the following optional configuration options:
 
 ```groovy
 toolchains {
@@ -73,6 +75,8 @@ toolchains {
 
 ## Libraries
 
+The `libraries` configuration block lets you specify library build items that can be referenced by other build items as link dependencies. Each library has a mandatory, unique name and the following optional configuration options:
+
 ```groovy
 libraries {
   '<name>' {
@@ -95,6 +99,8 @@ libraries {
 
 ## Applications
 
+The `applications` configuration block lets you specify application build items. Each application has a mandatory, unique name and the following optional configuration options:
+
 ```groovy
 applications {
   '<name>' {
@@ -113,6 +119,8 @@ applications {
 ```
 
 ## Tests
+
+The `tests` configuration block lets you specify test build items. Each test has a mandatory, unique name and the following optional configuration options:
 
 ```groovy
 tests {

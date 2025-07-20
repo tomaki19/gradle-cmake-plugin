@@ -12,8 +12,8 @@ plugins {
 
 # Extension
 
-See the [extension documenation](<./src/main/java/ch/tomaki/gradle/cmake/extension/extension.md>).
+See the [extension documentation](<./src/main/java/ch/tomaki/gradle/cmake/extension/EXTENSION.md>).
 
 # Tasks
 
-See the [tasks documenation](<./src/main/java/ch/tomaki/gradle/cmake/tasks/tasks.md>).
+See the [tasks documentation](<./src/main/java/ch/tomaki/gradle/cmake/tasks/TASKS.md>).
