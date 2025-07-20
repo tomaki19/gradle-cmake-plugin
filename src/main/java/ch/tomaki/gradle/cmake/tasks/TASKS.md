@@ -12,11 +12,17 @@ The `assemble-<toolchain>-config` task creates `build/cmake/build/<project>-<too
 
 The `configure-<toolchain>` tasks run the cmake configure step for each defined binary (see [extension](<./../extension/EXTENSION.md>) documentation).
 
+The cmake configuration files for each toolchain are created in a `build/cmake/build/<toolchain>/` directory.
+
 ## Build Tasks
 
 [`ch.tomaki.gradle.cmake.tasks.CMakeBuild`](./CMakeBuild.java)
 
 The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension](<./../extension/EXTENSION.md>) documentation).
+
+The compiled artifacts for each toolchain are deployed in a `build/cmake/install/<toolchain>/` directory.
+
+The default file names of the artifacts are `<name>-<toolchain>-<link_type>-<build_config>`.
 
 ### Build All Tasks
 
