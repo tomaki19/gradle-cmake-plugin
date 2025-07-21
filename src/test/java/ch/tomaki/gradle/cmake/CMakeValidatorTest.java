@@ -76,12 +76,12 @@ public class CMakeValidatorTest {
     final NamedDomainObjectProvider<CMakeLibrary> provider = extension.getLibraries().register(name);
     assertThrows(IllegalArgumentException.class, () -> CMakeValidator.validateLibraries(extension.getLibraries()));
 
-    final Set<String> includes = new HashSet<>(Arrays.asList("i0", "i1"));
+    final Set<String> headers = new HashSet<>(Arrays.asList("i0", "i1"));
     provider.configure((library) -> {
-      library.getHeaders().set(includes);
+      library.getHeaders().set(headers);
     });
     assertEquals(name, provider.get().getName());
-    assertIterableEquals(includes, provider.get().getHeaders().get());
+    assertIterableEquals(headers, provider.get().getHeaders().get());
   }
 
   @Test
@@ -101,13 +101,13 @@ public class CMakeValidatorTest {
     });
     assertThrows(IllegalArgumentException.class, () -> CMakeValidator.validateLibraries(extension.getLibraries()));
 
-    final Set<String> includes = new HashSet<>(Arrays.asList("i0", "i1"));
+    final Set<String> headers = new HashSet<>(Arrays.asList("i0", "i1"));
     provider.configure((library) -> {
-      library.getHeaders().set(includes);
+      library.getHeaders().set(headers);
     });
     assertEquals(name, provider.get().getName());
     assertIterableEquals(toolchains, provider.get().getToolchains().get());
-    assertIterableEquals(includes, provider.get().getHeaders().get());
+    assertIterableEquals(headers, provider.get().getHeaders().get());
   }
 
   @Test

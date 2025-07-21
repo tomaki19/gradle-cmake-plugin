@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
   testImplementation libs.junit
+  testImplementation gradleTestKit()
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -25,7 +26,7 @@ spotless {
 }
 
 group = 'ch.tomaki'
-version = '1.0.0'
+version = '0.9.5'
 
 gradlePlugin {
   website = 'https://github.com/tomaki19/gradle-cmake-plugin'
@@ -41,8 +42,7 @@ gradlePlugin {
   }
 }
 
-tasks.test {
-  useJUnitPlatform()
+tasks.named('test', Test) {  useJUnitPlatform()
 }
 
 tasks.withType(Javadoc).configureEach {

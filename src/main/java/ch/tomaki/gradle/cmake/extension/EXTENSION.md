@@ -81,7 +81,7 @@ The `libraries` configuration block lets you specify library build items that ca
 libraries {
   '<name>' {
     toolchains = //optional: List<String>, (header only library, if not present)
-    includes = //required: List<String>
+    headers = //required: List<String>
     sources = //optional: List<String>
     privateCompileOptions = //optional: List<String>
     publicCompileOptions = //optional: List<String>
@@ -105,7 +105,7 @@ The `applications` configuration block lets you specify application build items.
 applications {
   '<name>' {
     toolchains = //required: List<String>
-    includes = //optional: List<String>
+    headers = //optional: List<String>
     sources = //required: List<String>
     privateCompileOptions = //optional: List<String>
     privateCompileDefinitions = //optional: List<String>
@@ -126,7 +126,7 @@ The `tests` configuration block lets you specify test build items. Each test has
 tests {
   '<name>' {
     toolchains = //required: List<String>
-    includes = //optional: List<String>
+    headers = //optional: List<String>
     sources = //required: List<String>
     privateCompileOptions = //optional: List<String>
     privateCompileDefinitions = //optional: List<String>
