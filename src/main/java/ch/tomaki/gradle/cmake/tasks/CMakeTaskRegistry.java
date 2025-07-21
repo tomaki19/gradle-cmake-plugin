@@ -116,7 +116,6 @@ public class CMakeTaskRegistry {
     toolchain.getProjectPackages().stream()
         .filter(dependency -> !Objects.equals(project, dependency.getProject()))
         .forEach(dependency -> {
-          project.evaluationDependsOn(dependency.getProject().getPath());
           task.mustRunAfter(CMakeTasksConventions.configureTaskName(dependency.getProject(), toolchain.getName()));
           task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getProject(), toolchain.getName()));
         });
