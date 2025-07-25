@@ -100,8 +100,14 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return libraries;
   }
 
-  public boolean hasLibraries() {
-    return !libraries.isEmpty();
+  public boolean hasInterfaceLibraries() {
+    return libraries.parallelStream()
+        .anyMatch((library) -> library.getSources().isEmpty() && !library.getHeaders().isEmpty());
+  }
+
+  public boolean hasBinaryLibraries() {
+    return libraries.parallelStream()
+        .anyMatch((library) -> !library.getSources().isEmpty() && !library.getHeaders().isEmpty());
   }
 
   void addApplication(final CMakeResolvedExecutable object) {
@@ -129,7 +135,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public boolean hasBinaries() {
-    return hasLibraries() || hasApplications() || hasTests();
+    return hasBinaryLibraries() || hasApplications() || hasTests();
   }
 
 }

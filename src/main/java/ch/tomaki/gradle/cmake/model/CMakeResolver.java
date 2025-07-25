@@ -44,7 +44,8 @@ public final class CMakeResolver {
     resolveLibraries(libraries, availableToolchains);
     resolveApplications(applications, availableToolchains);
     resolveTests(tests, availableToolchains);
-    return availableToolchains.values().stream().filter(toolchain -> toolchain.hasBinaries())
+    return availableToolchains.values().stream()
+        .filter(toolchain -> (toolchain.hasBinaries() || toolchain.hasInterfaceLibraries()))
         .sorted((first, second) -> first.getName().compareTo(second.getName())).toList();
   }
 

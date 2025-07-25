@@ -93,16 +93,16 @@ public class CMakePlugin implements Plugin<Project> {
       }));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
+        final TaskProvider<CMakeAssemble> assembleConfigTask = taskRegistry.assembleConfigTask(toolchain, project);
+        taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleConfigTask));
+
+        final TaskProvider<CMakeConfigure> configureTask = taskRegistry.configureTask(toolchain);
+        configureTask.configure((task) -> {
+          CMakeTaskRegistry.configureRemote(task, toolchain, project);
+          task.dependsOn(assembleListsTask);
+        });
+
         if (toolchain.hasBinaries()) {
-          final TaskProvider<CMakeAssemble> assembleConfigTask = taskRegistry.assembleConfigTask(toolchain, project);
-          taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleConfigTask));
-
-          final TaskProvider<CMakeConfigure> configureTask = taskRegistry.configureTask(toolchain);
-          configureTask.configure((task) -> {
-            CMakeTaskRegistry.configureRemote(task, toolchain, project);
-            task.dependsOn(assembleListsTask);
-          });
-
           final TaskProvider<?> buildAllToolchainTask = taskRegistry.buildAllToolchainTask(toolchain);
           buildAllToolchainTask.configure((task) -> {
             task.setGroup(CMakeTaskRegistry.GROUP_BUILD);
