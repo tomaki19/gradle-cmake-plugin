@@ -26,7 +26,6 @@ spotless {
 }
 
 group = 'ch.tomaki'
-version = '0.9.6'
 
 gradlePlugin {
   website = 'https://github.com/tomaki19/gradle-cmake-plugin'

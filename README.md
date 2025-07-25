@@ -6,7 +6,7 @@ A Gradle plugin that uses the CMake build framework for C/C++ builds.
 
 ```groovy
 plugins {
-  id('ch.tomaki.gradle-cmake-plugin') version '1.0.0'
+  id('ch.tomaki.gradle-cmake-plugin') version '...'
 }
 ```
 
