@@ -35,7 +35,7 @@ gradlePlugin {
       id = "${project.group}.${project.name}"
       displayName = 'CMake Build Plugin'
       description = 'A Gradle plugin that uses the CMake build framework for C/C++ builds.'
-      tags.set(['gradle', 'cmake', 'c', 'cpp', 'c++'])
+      tags.set(['cmake', 'build', 'native', 'c', 'cpp', 'c++'])
       implementationClass = 'ch.tomaki.gradle.cmake.CMakePlugin'
     }
   }
