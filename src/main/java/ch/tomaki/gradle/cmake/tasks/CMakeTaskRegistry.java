@@ -47,6 +47,10 @@ public class CMakeTaskRegistry {
     return taskContainer.named("check");
   }
 
+  public TaskProvider<Task> cleanTask() {
+    return taskContainer.named("clean");
+  }
+
   public TaskProvider<CMakeAssemble> assembleListsTask(final Collection<CMakeResolvedToolchain> toolchains,
       final Project project) throws FileNotFoundException {
     final String assembleListsTaskName = CMakeTasksConventions.assembleListsTaskName();

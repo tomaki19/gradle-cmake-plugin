@@ -9,9 +9,12 @@ import java.util.Collection;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.attributes.Category;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
+import ch.tomaki.gradle.cmake.extension.CMakeConfiguration;
 import ch.tomaki.gradle.cmake.extension.CMakeExtension;
 import ch.tomaki.gradle.cmake.extension.CMakeValidator;
 import ch.tomaki.gradle.cmake.files.CMakeLinkType;
@@ -39,9 +42,13 @@ public class CMakePlugin implements Plugin<Project> {
   private void allProjects(final Project project) {
     try {
       project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
-      project.getTasks().named("clean", (task) -> task.doLast((action) -> {
-        project.delete(project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME));
-      }));
+      project.getConfigurations().create(CMakeConfiguration.NAME, (configuration) -> {
+        configuration.setCanBeConsumed(false);
+        configuration.setCanBeDeclared(true);
+        configuration.setCanBeResolved(true);
+        configuration.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
+            project.getObjects().named(Category.class, Category.LIBRARY));
+      });
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
@@ -64,12 +71,26 @@ public class CMakePlugin implements Plugin<Project> {
       final Collection<CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
           extension.getApplications(), extension.getTests());
 
+      /* Configuration */
+
+      project.getConfigurations().named(CMakeConfiguration.NAME, (configuration) -> {
+        for (final CMakeResolvedToolchain toolchain : toolchains) {
+          for (final Project projectPackage : toolchain.getProjectPackages()) {
+            final Dependency projectDependency = project.getDependencies().create(projectPackage);
+            configuration.getDependencies().add(projectDependency);
+          }
+        }
+      });
+
       /* Tasks */
 
       final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry(project.getTasks());
 
       final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(toolchains, project);
       taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
+      taskRegistry.cleanTask().configure((task) -> task.doLast((action) -> {
+        project.delete(project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME));
+      }));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
         if (toolchain.hasBinaries()) {
@@ -85,8 +106,6 @@ public class CMakePlugin implements Plugin<Project> {
           final TaskProvider<?> buildAllToolchainTask = taskRegistry.buildAllToolchainTask(toolchain);
           buildAllToolchainTask.configure((task) -> {
             task.setGroup(CMakeTaskRegistry.GROUP_BUILD);
-            task.setEnabled(!toolchain.getLibraries().isEmpty() || !toolchain.getApplications().isEmpty()
-                || !toolchain.getTests().isEmpty());
           });
           taskRegistry.buildTask().configure((task) -> task.dependsOn(buildAllToolchainTask));
 
@@ -147,7 +166,6 @@ public class CMakePlugin implements Plugin<Project> {
             final TaskProvider<?> checkAllToolchainTask = taskRegistry.checkAllToolchainTask(toolchain);
             checkAllToolchainTask.configure((task) -> {
               task.setGroup(CMakeTaskRegistry.GROUP_CHECK);
-              task.setEnabled(!toolchain.getTests().isEmpty());
             });
             taskRegistry.checkTask().configure((task) -> task.dependsOn(checkAllToolchainTask));
 
