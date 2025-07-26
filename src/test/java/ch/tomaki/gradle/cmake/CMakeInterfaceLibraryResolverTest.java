@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake;
+package io.github.tomaki19.gradle.cmake;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,13 +14,13 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
-import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.helper.TestCMakeBinaryLibrary;
-import ch.tomaki.gradle.cmake.helper.TestCMakeInterfaceLibrary;
-import ch.tomaki.gradle.cmake.helper.TestCMakePackage;
-import ch.tomaki.gradle.cmake.helper.TestCMakeToolchain;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
-import ch.tomaki.gradle.cmake.model.CMakeResolver;
+import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
+import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
+import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
+import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
 
 public class CMakeInterfaceLibraryResolverTest {
 

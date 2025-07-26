@@ -2,14 +2,14 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.tasks;
+package io.github.tomaki19.gradle.cmake.tasks;
 
 import java.io.IOException;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
-import ch.tomaki.gradle.cmake.files.CMakeFileOutputStream;
+import io.github.tomaki19.gradle.cmake.files.CMakeFileOutputStream;
 
 public abstract class CMakeAssemble extends DefaultTask {
 

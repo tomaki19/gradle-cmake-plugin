@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.model;
+package io.github.tomaki19.gradle.cmake.model;
 
 import java.io.File;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
-import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 
 public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolvedToolchain> {
 

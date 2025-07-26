@@ -1,6 +1,6 @@
 # Assemble Tasks
 
-[`ch.tomaki.gradle.cmake.tasks.CMakeAssemble`](./CMakeAssemble.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble`](./CMakeAssemble.java)
 
 The `assemble-cmake-lists` task creates the `CMakeLists.txt` file for the project.
 
@@ -8,7 +8,7 @@ The `assemble-<toolchain>-config` task creates `build/cmake/build/<project>-<too
 
 ## Configure Tasks
 
-[`ch.tomaki.gradle.cmake.tasks.CMakeConfigure`](./CMakeConfigure.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure`](./CMakeConfigure.java)
 
 The `configure-<toolchain>` tasks run the cmake configure step for each defined binary (see [extension documentation](<./../extension/EXTENSION.md>)).
 
@@ -16,7 +16,7 @@ The cmake configuration files for each toolchain are created in a `build/cmake/b
 
 ## Build Tasks
 
-[`ch.tomaki.gradle.cmake.tasks.CMakeBuild`](./CMakeBuild.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeBuild`](./CMakeBuild.java)
 
 The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 
@@ -30,7 +30,7 @@ For each toolchain a special `build-all-<toolchain>` task is created that runs a
 
 ## Check Tasks
 
-[`ch.tomaki.gradle.cmake.tasks.CMakeCheck`](./CMakeCheck.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeCheck`](./CMakeCheck.java)
 
 These tasks run the cmake check step for each defined test (see the [extension documentation](<./../extension/EXTENSION.md>)).
 
@@ -43,7 +43,7 @@ For each toolchain a special `check-all-<toolchain>` task is created that runs a
 You may want to customize the test run tasks, e.g. by adding additional arguments to the internally used ctest command:
 
 ```groovy
-tasks.withType(ch.tomaki.gradle.cmake.tasks.CMakeCheck) {
+tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
     additionalArguments = [
         '--verbose',
         '--output-on-failure',
@@ -55,7 +55,7 @@ tasks.withType(ch.tomaki.gradle.cmake.tasks.CMakeCheck) {
 
 # Package Tasks
 
-[`ch.tomaki.gradle.cmake.tasks.CMakePackage`](./CMakePackage.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakePackage`](./CMakePackage.java)
 
 These tasks create zip packages containing the built binaries. The default package name is <buildTarget>-<version>.zip
 
@@ -64,7 +64,7 @@ These tasks create zip packages containing the built binaries. The default packa
 You may want to customize the package tasks, e.g. by adding additional files:
 
 ```groovy
-tasks.withType(ch.tomaki.gradle.cmake.tasks.CMakePackage) {
+tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakePackage) {
     doFirst {
         mkdir('build/tmp')
         file('build/tmp/description.txt').write("""
@@ -78,7 +78,7 @@ tasks.withType(ch.tomaki.gradle.cmake.tasks.CMakePackage) {
 
 # Custom Exec Tasks
 
-[`ch.tomaki.gradle.cmake.tasks.CMakeCustomExec`](./CMakeCustomExec.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec`](./CMakeCustomExec.java)
 
 These tasks execute a custom execution task in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 
@@ -99,7 +99,7 @@ As an example, to enable test coverage for a build you can add a custom exec tas
 
 ```groovy
 cmake.register('coverage', ['gcc-x86-64']) {
-    dependsOn(tasks.withType(ch.tomaki.gradle.cmake.tasks.CMakeCheck))
+    dependsOn(tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck))
     baseCommandLine = [
         'ctest',
         '-T',

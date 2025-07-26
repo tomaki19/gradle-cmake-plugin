@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.model;
+package io.github.tomaki19.gradle.cmake.model;
 
-import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
-import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 
 public final class CMakeResolvedExecutable extends CMakeResolvedBinary<CMakeResolvedExecutable> {
 

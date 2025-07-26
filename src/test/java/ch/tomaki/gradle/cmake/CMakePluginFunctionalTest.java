@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake;
+package io.github.tomaki19.gradle.cmake;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -245,7 +245,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -280,7 +280,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -299,7 +299,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -321,7 +321,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -351,7 +351,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -379,7 +379,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -407,7 +407,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {
@@ -442,7 +442,7 @@ class CMakePluginFunctionalTest {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
-            id 'ch.tomaki.gradle-cmake-plugin'
+            id 'io.github.tomaki19.gradle-cmake-plugin'
           }
 
           cmake {

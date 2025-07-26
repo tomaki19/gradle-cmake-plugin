@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake;
+package io.github.tomaki19.gradle.cmake;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -16,7 +16,7 @@ class CMakePluginTest {
   void load() {
     final Project project = ProjectBuilder.builder().build();
     project.getPluginManager().apply(CMakePlugin.class);
-    assertNotNull(project.getPlugins().findPlugin("ch.tomaki.gradle-cmake-plugin"));
+    assertNotNull(project.getPlugins().findPlugin("io.github.tomaki19.gradle-cmake-plugin"));
   }
 
   @Test

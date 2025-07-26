@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extension;
+package io.github.tomaki19.gradle.cmake.extension;
 
 import java.util.Collection;
 
@@ -10,12 +10,12 @@ import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.tasks.TaskContainer;
 
-import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
-import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
-import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
-import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
-import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
-import ch.tomaki.gradle.cmake.tasks.CMakeCustomExec;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeSystemPackage;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 
 public abstract class CMakeExtension {
 

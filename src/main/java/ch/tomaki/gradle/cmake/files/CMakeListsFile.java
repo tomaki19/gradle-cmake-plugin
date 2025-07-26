@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.files;
+package io.github.tomaki19.gradle.cmake.files;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,12 +14,12 @@ import java.util.Objects;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedExecutable;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedProjectPackageDependency;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedSystemPackage;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectPackageDependency;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedSystemPackage;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeListsFile extends CMakeFileOutputStream {
 

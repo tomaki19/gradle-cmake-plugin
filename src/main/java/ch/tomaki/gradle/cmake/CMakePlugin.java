@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake;
+package io.github.tomaki19.gradle.cmake;
 
 import java.util.Collection;
 
@@ -14,21 +14,21 @@ import org.gradle.api.attributes.Category;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
-import ch.tomaki.gradle.cmake.extension.CMakeConfiguration;
-import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.CMakeValidator;
-import ch.tomaki.gradle.cmake.files.CMakeLinkType;
-import ch.tomaki.gradle.cmake.files.CMakeListsFile;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedExecutable;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedLibrary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
-import ch.tomaki.gradle.cmake.model.CMakeResolver;
-import ch.tomaki.gradle.cmake.tasks.CMakeAssemble;
-import ch.tomaki.gradle.cmake.tasks.CMakeBuildExecutable;
-import ch.tomaki.gradle.cmake.tasks.CMakeBuildLibrary;
-import ch.tomaki.gradle.cmake.tasks.CMakeCheck;
-import ch.tomaki.gradle.cmake.tasks.CMakeConfigure;
-import ch.tomaki.gradle.cmake.tasks.CMakeTaskRegistry;
+import io.github.tomaki19.gradle.cmake.extension.CMakeConfiguration;
+import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.CMakeValidator;
+import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildExecutable;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
 
 public class CMakePlugin implements Plugin<Project> {
 

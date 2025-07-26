@@ -2,12 +2,12 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.model;
+package io.github.tomaki19.gradle.cmake.model;
 
 import java.util.Collection;
 import java.util.TreeSet;
 
-import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
 
 public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> extends CMakeResolvedName<T> {
 

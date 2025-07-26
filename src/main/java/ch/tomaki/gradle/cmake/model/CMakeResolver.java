@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.model;
+package io.github.tomaki19.gradle.cmake.model;
 
 import java.util.Collection;
 import java.util.Map;
@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
-import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
-import ch.tomaki.gradle.cmake.extension.api.CMakeBinary;
-import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
-import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
-import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
-import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
-import ch.tomaki.gradle.cmake.files.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeSystemPackage;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 
 public final class CMakeResolver {
 

@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.files;
+package io.github.tomaki19.gradle.cmake.files;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.gradle.api.Project;
 
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeFileConventions {
 

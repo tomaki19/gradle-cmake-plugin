@@ -2,12 +2,12 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.helper;
+package io.github.tomaki19.gradle.cmake.helper;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
-import ch.tomaki.gradle.cmake.extension.CMakeExtension;
-import ch.tomaki.gradle.cmake.extension.api.CMakeSystemPackage;
+import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeSystemPackage;
 
 public final class TestCMakePackage {
 

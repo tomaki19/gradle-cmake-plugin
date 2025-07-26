@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.extension;
+package io.github.tomaki19.gradle.cmake.extension;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -10,10 +10,10 @@ import java.util.Set;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 
-import ch.tomaki.gradle.cmake.extension.api.CMakeApplication;
-import ch.tomaki.gradle.cmake.extension.api.CMakeLibrary;
-import ch.tomaki.gradle.cmake.extension.api.CMakeTest;
-import ch.tomaki.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 
 public final class CMakeValidator {
 

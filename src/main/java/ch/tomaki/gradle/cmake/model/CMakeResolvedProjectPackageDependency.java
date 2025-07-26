@@ -2,11 +2,11 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.model;
+package io.github.tomaki19.gradle.cmake.model;
 
 import org.gradle.api.Project;
 
-import ch.tomaki.gradle.cmake.files.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 
 public final class CMakeResolvedProjectPackageDependency
     extends CMakeResolvedName<CMakeResolvedProjectPackageDependency> {

@@ -2,12 +2,12 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package ch.tomaki.gradle.cmake.tasks;
+package io.github.tomaki19.gradle.cmake.tasks;
 
-import ch.tomaki.gradle.cmake.files.CMakeFileConventions;
-import ch.tomaki.gradle.cmake.files.CMakeLinkType;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedBinary;
-import ch.tomaki.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
+import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakePackageLibrary extends CMakePackage {
 
