@@ -20,7 +20,6 @@ public final class TestCMakeToolchain {
     provider.configure((object) -> {
       object.getOperatingSystem().set(OperatingSystem.current());
       object.getBuildConfigs().set(Arrays.asList("release", "debug"));
-
     });
     return provider;
   }

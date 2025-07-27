@@ -14,7 +14,7 @@ public abstract class CMakePackageLibrary extends CMakePackage {
   @javax.inject.Inject
   public CMakePackageLibrary(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
       final CMakeLinkType linkType, final String buildConfig) {
-    super(CMakeFileConventions.buildTarget(binary.getName(), toolchain, linkType, buildConfig), toolchain);
+    super(CMakeFileConventions.buildTarget(binary.getName(), toolchain, linkType, buildConfig), toolchain, buildConfig);
   }
 
 }

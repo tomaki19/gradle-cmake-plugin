@@ -13,7 +13,7 @@ public abstract class CMakePackageExecutable extends CMakePackage {
   @javax.inject.Inject
   public CMakePackageExecutable(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    super(CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig), toolchain);
+    super(CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig), toolchain, buildConfig);
   }
 
 }
