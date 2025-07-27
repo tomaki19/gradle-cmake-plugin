@@ -80,6 +80,7 @@ The `libraries` configuration block lets you specify library build items that ca
 ```groovy
 libraries {
   '<name>' {
+    outputName = //optional: String, default: <name>
     toolchains = //optional: List<String>, (header only library, if not present)
     headers = //required: List<String>
     sources = //optional: List<String>
@@ -104,6 +105,7 @@ The `applications` configuration block lets you specify application build items.
 ```groovy
 applications {
   '<name>' {
+    outputName = //optional: String, default: <name>
     toolchains = //required: List<String>
     headers = //optional: List<String>
     sources = //required: List<String>
@@ -125,6 +127,7 @@ The `tests` configuration block lets you specify test build items. Each test has
 ```groovy
 tests {
   '<name>' {
+    outputName = //optional: String, default: <name>
     toolchains = //required: List<String>
     headers = //optional: List<String>
     sources = //required: List<String>

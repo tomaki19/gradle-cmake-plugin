@@ -82,7 +82,16 @@ tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakePackage) {
 
 These tasks execute a custom execution task in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 
-The plugin provides a special register method for these tasks:
+The plugin provides special register methods for these tasks:
+
+```groovy
+cmake.register(<name>) {
+    baseCommandLine = [...]
+    getAdditionalArguments = [...]
+}
+```
+
+Registers a custom exec task for all toolchains and build configs.
 
 ```groovy
 cmake.register(<name>, [<toolchains>]) {
@@ -91,7 +100,16 @@ cmake.register(<name>, [<toolchains>]) {
 }
 ```
 
-This may be useful for additional cmake features like test coverage.
+Registers a custom exec task for the specified toolchains and all build configs.
+
+```groovy
+cmake.register(<name>, [<toolchains>], [<buildConfigs>]) {
+    baseCommandLine = [...]
+    getAdditionalArguments = [...]
+}
+```
+
+Registers a custom exec task for the specified toolchains and build configs.
 
 ## Test Coverage
 

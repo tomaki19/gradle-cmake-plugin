@@ -41,18 +41,18 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
           if (library.isBuildStatic()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
                 CMakeLinkType.STATIC, buildConfig);
+            final String outputName = toolchain.getOperatingSystem().getStaticLibraryName(library.getOutputName());
             writeLine();
             write("add_library( %s::%s STATIC IMPORTED )", project.getName(), libraryTarget);
-            setTargetProperties(library, libraryTarget, toolchain.getOperatingSystem().getStaticLibrarySuffix(),
-                toolchain, buildConfig, project);
+            setTargetProperties(library, libraryTarget, outputName, toolchain, buildConfig, project);
           }
           if (library.isBuildShared()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
-                CMakeLinkType.SHARED, buildConfig);
+                CMakeLinkType.STATIC, buildConfig);
+            final String outputName = toolchain.getOperatingSystem().getSharedLibraryName(library.getOutputName());
             writeLine();
             write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);
-            setTargetProperties(library, libraryTarget, toolchain.getOperatingSystem().getSharedLibrarySuffix(),
-                toolchain, buildConfig, project);
+            setTargetProperties(library, libraryTarget, outputName, toolchain, buildConfig, project);
           }
         }
       }
@@ -71,15 +71,15 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
   }
 
   private void setTargetProperties(final CMakeResolvedLibrary library, final String libraryTarget,
-      final String librarySuffix, final CMakeResolvedToolchain toolchain, final String buildConfig,
-      final Project project) throws IOException {
+      final String outputName, final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project)
+      throws IOException {
     write("set_target_properties( %s::%s PROPERTIES", project.getName(), libraryTarget);
     final Directory installDir = project.getLayout().getBuildDirectory().get()
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName(), buildConfig));
-    write(1, "IMPORTED_LOCATION %s/%s%s", installDir.getAsFile().toURI().getPath(),
-        libraryTarget, librarySuffix);
-    write(1, "IMPORTED_LOCATION_%s %s/%s%s", buildConfig.toUpperCase(), installDir.getAsFile().toURI().getPath(),
-        libraryTarget, librarySuffix);
+    write(1, "IMPORTED_LOCATION %s/%s", installDir.getAsFile().toURI().getPath(),
+        outputName);
+    write(1, "IMPORTED_LOCATION_%s %s/%s", buildConfig.toUpperCase(), installDir.getAsFile().toURI().getPath(),
+        outputName);
     write(1, "IMPORTED_CONFIGURATIONS \"%s\"", buildConfig);
     write(1, "INTERFACE_INCLUDE_DIRECTORIES");
     for (final String include : library.getHeaders()) {
