@@ -63,9 +63,9 @@ public class CMakeTaskRegistry {
     return taskContainer.register(assembleConfigTaskName, CMakeAssemble.class, new CMakeConfigFile(project, toolchain));
   }
 
-  public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain) {
-    final String cmakeConfigureTaskName = CMakeTasksConventions.configureTaskName(toolchain.getName());
-    return taskContainer.register(cmakeConfigureTaskName, CMakeConfigure.class, toolchain);
+  public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String cmakeConfigureTaskName = CMakeTasksConventions.configureTaskName(toolchain.getName(), buildConfig);
+    return taskContainer.register(cmakeConfigureTaskName, CMakeConfigure.class, toolchain, buildConfig);
   }
 
   public TaskProvider<CMakeBuildLibrary> buildTask(final CMakeResolvedLibrary library,
@@ -116,12 +116,14 @@ public class CMakeTaskRegistry {
   }
 
   public static void configureRemote(final CMakeConfigure task, final CMakeResolvedToolchain toolchain,
-      final Project project) {
+      final String buildConfig, final Project project) {
     toolchain.getProjectPackages().stream()
         .filter(dependency -> !Objects.equals(project, dependency.getProject()))
         .forEach(dependency -> {
-          task.mustRunAfter(CMakeTasksConventions.configureTaskName(dependency.getProject(), toolchain.getName()));
-          task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getProject(), toolchain.getName()));
+          task.mustRunAfter(CMakeTasksConventions.configureTaskName(dependency.getProject(),
+              toolchain.getName(), buildConfig));
+          task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getProject(),
+              toolchain.getName()));
         });
   }
 

@@ -22,12 +22,12 @@ public final class CMakeTasksConventions {
     return ":%s:assemble-%s-config".formatted(project.getName(), toolchainName);
   }
 
-  static String configureTaskName(final Project project, final String toolchainName) {
-    return ":%s:configure-%s".formatted(project.getName(), toolchainName);
+  static String configureTaskName(final Project project, final String toolchainName, final String buildConfig) {
+    return ":%s:configure-%s-%s".formatted(project.getName(), toolchainName, buildConfig);
   }
 
-  static String configureTaskName(final String toolchainName) {
-    return "configure-%s".formatted(toolchainName);
+  static String configureTaskName(final String toolchainName, final String buildConfig) {
+    return "configure-%s-%s".formatted(toolchainName, buildConfig);
   }
 
   static String buildTaskName(final Project project, final String targetName,

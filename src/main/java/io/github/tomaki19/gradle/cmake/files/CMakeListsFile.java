@@ -348,7 +348,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     write(1, "PREFIX \"\"");
     write(1, "OUTPUT_NAME \"%s\"", target);
     final File installDir = project.getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName())).get().getAsFile();
+        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName())).get()
+        .getAsFile();
     write(1, "ARCHIVE_OUTPUT_DIRECTORY \"%s\"", installDir.toURI().getPath());
     for (final String buildConfig : toolchain.getBuildConfigs()) {
       write(1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"%s\"",

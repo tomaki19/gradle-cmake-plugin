@@ -15,12 +15,12 @@ abstract class CMakeBuild extends CMakeExec {
 
   @javax.inject.Inject
   CMakeBuild(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    super(toolchain.getName(), toolchain.getEnvironmentFile());
+    super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
     this.buildTarget = buildTarget;
     getBaseCommandLine().add("cmake");
     getBaseCommandLine().add("--build");
     getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName()))
+        .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig))
         .get().getAsFile().getAbsolutePath());
     getBaseCommandLine().add("--target");
     getBaseCommandLine().add(buildTarget);

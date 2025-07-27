@@ -38,13 +38,38 @@ public abstract class CMakeExtension {
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
 
+  public void register(final String taskName, final Action<CMakeCustomExec> configurationAction) {
+    for (final CMakeToolchain toolchain : getToolchains()) {
+      for (final String buildConfig : toolchain.getBuildConfigs().get()) {
+        taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
+            toolchain, buildConfig).configure(configurationAction);
+      }
+    }
+  }
+
   public void register(final String taskName, final Collection<String> toolChainNames,
       final Action<CMakeCustomExec> configurationAction) {
-    getToolchains().forEach((toolchain) -> {
+    for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
-        taskContainer.register(CMakeCustomExec.name(taskName, toolchain), CMakeCustomExec.class,
-            toolchain).configure(configurationAction);
+        for (final String buildConfig : toolchain.getBuildConfigs().get()) {
+          taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
+              toolchain, buildConfig).configure(configurationAction);
+        }
       }
-    });
+    }
+  }
+
+  public void register(final String taskName, final Collection<String> toolChainNames,
+      final Collection<String> buildConfigs, final Action<CMakeCustomExec> configurationAction) {
+    for (final CMakeToolchain toolchain : getToolchains()) {
+      if (toolChainNames.contains(toolchain.getName())) {
+        for (final String buildConfig : toolchain.getBuildConfigs().get()) {
+          if (buildConfigs.contains(buildConfig)) {
+            taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
+                toolchain, buildConfig).configure(configurationAction);
+          }
+        }
+      }
+    }
   }
 }

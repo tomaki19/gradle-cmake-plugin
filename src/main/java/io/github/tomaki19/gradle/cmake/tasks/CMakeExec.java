@@ -17,12 +17,14 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
   protected final String toolchainName;
   protected final Optional<File> environmentFile;
+  protected final String buildConfig;
 
   @javax.inject.Inject
-  CMakeExec(final String toolchainName, final Optional<File> environmentFile) {
+  CMakeExec(final String toolchainName, final Optional<File> environmentFile, final String buildConfig) {
     super(CMakeExec.class);
     this.toolchainName = toolchainName;
     this.environmentFile = environmentFile;
+    this.buildConfig = buildConfig;
   }
 
   @org.gradle.api.tasks.Input

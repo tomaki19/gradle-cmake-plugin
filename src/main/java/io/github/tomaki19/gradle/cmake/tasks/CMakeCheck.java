@@ -15,14 +15,14 @@ public abstract class CMakeCheck extends CMakeExec {
   @javax.inject.Inject
   public CMakeCheck(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    super(toolchain.getName(), toolchain.getEnvironmentFile());
+    super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
     this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
     getBaseCommandLine().add("ctest");
     getBaseCommandLine().add("-T");
     getBaseCommandLine().add("Test");
     getBaseCommandLine().add("--test-dir");
     getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName()))
+        .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig))
         .get().getAsFile().getAbsolutePath());
     getBaseCommandLine().add("--tests-regex");
     getBaseCommandLine().add(checkTarget);
