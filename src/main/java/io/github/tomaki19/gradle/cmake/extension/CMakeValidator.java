@@ -26,6 +26,9 @@ public final class CMakeValidator {
       validateNotEmpty(toolchain.getArchitecture(), "toolchains -> %s -> architecture".formatted(toolchain.getName()));
       validatePresent(toolchain.getGenerator(), "toolchains -> %s -> generator".formatted(toolchain.getName()));
       validateNotEmpty(toolchain.getGenerator(), "toolchains -> %s -> generator".formatted(toolchain.getName()));
+      if (toolchain.getBuildConfigs().get().isEmpty()) {
+        toolchain.getBuildConfigs().set(Set.of("debug", "release"));
+      }
     });
   }
 

@@ -29,8 +29,8 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
 
   @Override
   public void write() throws IOException {
-    for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
-      for (final String buildConfig : toolchain.getBuildConfigs()) {
+    for (final String buildConfig : toolchain.getBuildConfigs()) {
+      for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
         if (library.getSources().isEmpty()) {
           final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
               CMakeLinkType.INTERFACE, buildConfig);
@@ -48,7 +48,7 @@ public class CMakeConfigFile extends CMakeFileOutputStream {
           }
           if (library.isBuildShared()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
-                CMakeLinkType.STATIC, buildConfig);
+                CMakeLinkType.SHARED, buildConfig);
             final String outputName = toolchain.getOperatingSystem().getSharedLibraryName(library.getOutputName());
             writeLine();
             write("add_library( %s::%s SHARED IMPORTED )", project.getName(), libraryTarget);

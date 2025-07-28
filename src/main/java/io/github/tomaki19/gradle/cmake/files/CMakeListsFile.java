@@ -113,8 +113,8 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getLibraries().isEmpty()) {
         write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedLibrary object : toolchain.getLibraries()) {
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedLibrary object : toolchain.getLibraries()) {
             if (object.getSources().isEmpty()) {
               writeInterfaceLibrary(object, toolchain, buildConfig, project);
             } else {
@@ -137,9 +137,18 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getApplications().isEmpty()) {
         write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedExecutable object : toolchain.getApplications()) {
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
-            writeExecutable(object, toolchain, buildConfig, project);
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedExecutable object : toolchain.getApplications()) {
+            final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, buildConfig);
+            writeExecutable(target, object, toolchain, buildConfig, project);
+            final Directory installDir = project.getLayout().getBuildDirectory()
+                .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName(), buildConfig))
+                .get();
+            final String outputName = object.getOutputName();
+            writeOutputTargetProperties(target, installDir, outputName, toolchain, buildConfig);
+            if (object.isStripDebug()) {
+              writeStripDebugCommand(target);
+            }
           }
         }
         write("endif()");
@@ -155,10 +164,12 @@ public class CMakeListsFile extends CMakeFileOutputStream {
         write("enable_testing()");
         write("include( CTest )");
         write("if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedExecutable object : toolchain.getTests()) {
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
-            writeExecutable(object, toolchain, buildConfig, project);
-            writeAddTest(object, toolchain, buildConfig);
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedExecutable object : toolchain.getTests()) {
+            final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, buildConfig);
+            writeExecutable(target, object, toolchain, buildConfig, project);
+            final String outputName = object.getOutputName();
+            writeAddTest(target, outputName);
           }
         }
         write("endif()");
@@ -222,28 +233,21 @@ public class CMakeListsFile extends CMakeFileOutputStream {
     }
   }
 
-  private void writeExecutable(final CMakeResolvedBinary<?> object, final CMakeResolvedToolchain toolchain,
-      final String buildConfig, final Project project) throws IOException {
-    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, buildConfig);
-    final Directory installDir = project.getLayout().getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName(), buildConfig)).get();
-    final String outputName = object.getOutputName();
+  private void writeExecutable(final String target, final CMakeResolvedBinary<?> object,
+      final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project) throws IOException {
     writeLine();
     write("add_executable( %s )", target);
     writeTargetIncludeDirectories(target, "PUBLIC", object.getHeaders(), project);
     writeTargetSources(target, "PRIVATE", object.getSources(), project);
     writePrivateCompiling(target, object);
     writePrivateLinking(target, object, toolchain, buildConfig);
-    writeOutputTargetProperties(target, installDir, outputName, toolchain, buildConfig);
-    if (object.isStripDebug()) {
-      writeStripDebugCommand(target);
-    }
   }
 
-  private void writeAddTest(final CMakeResolvedBinary<?> object, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) throws IOException {
-    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, buildConfig);
+  private void writeAddTest(final String target, final String outputName) throws IOException {
     writeLine();
+    write("set_target_properties( %s PROPERTIES", target);
+    write(1, "OUTPUT_NAME \"%s\"", outputName);
+    write(")");
     write("add_test(");
     write(1, "NAME %s", target);
     write(1, "COMMAND $<TARGET_FILE:%s>", target);
@@ -355,7 +359,6 @@ public class CMakeListsFile extends CMakeFileOutputStream {
   private void writeOutputTargetProperties(final String target, final Directory installDir, final String outputName,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
     write("set_target_properties( %s PROPERTIES", target);
-    // write(1, "PREFIX \"\"");
     write(1, "OUTPUT_NAME \"%s\"", outputName);
     write(1, "ARCHIVE_OUTPUT_DIRECTORY \"%s\"", installDir.dir(buildConfig).getAsFile().toURI().getPath());
     for (final String config : toolchain.getBuildConfigs()) {
