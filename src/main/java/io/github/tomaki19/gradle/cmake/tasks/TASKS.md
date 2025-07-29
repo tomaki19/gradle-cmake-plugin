@@ -1,6 +1,6 @@
 # Assemble Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble`](./CMakeAssemble.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble`](CMakeAssemble.java)
 
 The `assemble-cmake-lists` task creates the `CMakeLists.txt` file for the project.
 
@@ -8,15 +8,15 @@ The `assemble-<toolchain>-config` task creates `build/cmake/build/<project>-<too
 
 ## Configure Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure`](./CMakeConfigure.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure`](CMakeConfigure.java)
 
-The `configure-<toolchain>` tasks run the cmake configure step for each defined binary (see [extension documentation](<./../extension/EXTENSION.md>)).
+The `configure-<toolchain>` tasks run the cmake configure step for each defined binary (see [extension documentation](<../extension/EXTENSION.md>)).
 
 The cmake configuration files for each toolchain are created in a `build/cmake/build/<toolchain>/` directory.
 
 ## Build Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakeBuild`](./CMakeBuild.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeBuild`](CMakeBuild.java)
 
 The `build-<binary>-<toolchain>` tasks run the cmake build step for each binary in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 
@@ -30,7 +30,7 @@ For each toolchain a special `build-all-<toolchain>` task is created that runs a
 
 ## Check Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakeCheck`](./CMakeCheck.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeCheck`](CMakeCheck.java)
 
 These tasks run the cmake check step for each defined test (see the [extension documentation](<./../extension/EXTENSION.md>)).
 
@@ -55,7 +55,7 @@ tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
 
 # Package Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakePackage`](./CMakePackage.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakePackage`](CMakePackage.java)
 
 These tasks create zip packages containing the built binaries. The default package name is <buildTarget>-<version>.zip
 
@@ -78,7 +78,7 @@ tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakePackage) {
 
 # Custom Exec Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec`](./CMakeCustomExec.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec`](CMakeCustomExec.java)
 
 These tasks execute a custom execution task in the context of a toolchain (see [extension documentation](<./../extension/EXTENSION.md>)).
 

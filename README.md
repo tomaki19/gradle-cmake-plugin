@@ -20,8 +20,8 @@ The plugin requires the following version:
 
 # Extension
 
-See the [extension documentation](<./src/main/java/ch/tomaki/gradle/cmake/extension/EXTENSION.md>).
+See the [extension documentation](<src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md>).
 
 # Tasks
 
-See the [tasks documentation](<./src/main/java/ch/tomaki/gradle/cmake/tasks/TASKS.md>).
+See the [tasks documentation](<src/main/java/io/github/tomaki19/gradle/cmake/tasks/TASKS.md>).
