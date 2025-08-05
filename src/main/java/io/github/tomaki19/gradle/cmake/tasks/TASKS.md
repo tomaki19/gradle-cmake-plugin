@@ -85,9 +85,13 @@ These tasks execute a custom execution task in the context of a toolchain (see [
 The plugin provides special register methods for these tasks:
 
 ```groovy
-cmake.register(<name>) {
-    baseCommandLine = [...]
-    getAdditionalArguments = [...]
+cmake.register('<name>') {
+    baseCommand = '<executable>'
+    baseArguments = ['<argument>', ...] // optional
+    additionalArguments = ['<argument>', ...] // optional
+    toolchainName // variable containing the toolchain name
+    buildConfig // variable containing the build config name
+    compileCommands // variable containing the path to the compile_commands.json file
 }
 ```
 
@@ -95,8 +99,8 @@ Registers a custom exec task for all toolchains and build configs.
 
 ```groovy
 cmake.register(<name>, [<toolchains>]) {
-    baseCommandLine = [...]
-    getAdditionalArguments = [...]
+    baseCommand = '<executable>'
+    ...
 }
 ```
 
@@ -104,8 +108,8 @@ Registers a custom exec task for the specified toolchains and all build configs.
 
 ```groovy
 cmake.register(<name>, [<toolchains>], [<buildConfigs>]) {
-    baseCommandLine = [...]
-    getAdditionalArguments = [...]
+    baseCommand = '<executable>'
+    ...
 }
 ```
 
@@ -118,7 +122,8 @@ As an example, to enable test coverage for a build you can add a custom exec tas
 ```groovy
 cmake.register('coverage', ['gcc-x86-64']) {
     dependsOn(tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck))
-    baseCommandLine = [
+    baseCommand = 'ctest'
+    baseArguments = [
         'ctest',
         '-T',
         'Coverage',

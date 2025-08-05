@@ -17,12 +17,13 @@ import org.gradle.internal.os.OperatingSystem;
 abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
   protected final String toolchainName;
-  protected final Optional<File> environmentFile;
   protected final String buildConfig;
-  protected final List<String> baseArguments = new ArrayList<>();
+
+  private final Optional<File> environmentFile;
 
   @javax.inject.Inject
-  CMakeExec(final String toolchainName, final Optional<File> environmentFile, final String buildConfig) {
+  CMakeExec(final String toolchainName, final Optional<File> environmentFile,
+      final String buildConfig) {
     super(CMakeExec.class);
     this.toolchainName = toolchainName;
     this.environmentFile = environmentFile;
@@ -31,6 +32,10 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
 
   @org.gradle.api.tasks.Input
   protected abstract Property<String> getBaseCommand();
+
+  @org.gradle.api.tasks.Optional
+  @org.gradle.api.tasks.Input
+  protected abstract SetProperty<String> getBaseArguments();
 
   @org.gradle.api.tasks.Optional
   @org.gradle.api.tasks.Input
@@ -45,7 +50,7 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
       commandLine.add("&&");
     });
     commandLine.add(getBaseCommand().get());
-    commandLine.addAll(baseArguments);
+    commandLine.addAll(getBaseArguments().get());
     commandLine.addAll(getAdditionalArguments().get());
     if (OperatingSystem.current().isUnix()) {
       setCommandLine("sh", "-c", String.join(" ", commandLine));

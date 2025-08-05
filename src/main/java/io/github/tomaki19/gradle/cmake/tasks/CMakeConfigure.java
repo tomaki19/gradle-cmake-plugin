@@ -21,15 +21,15 @@ public abstract class CMakeConfigure extends CMakeExec {
     getOutputs().dir(outputDirectory);
     setWorkingDir(getProject().getProjectDir());
     getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
-    baseArguments.add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
+    getBaseArguments().add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
-    baseArguments.add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
-    baseArguments.add("-G \"%s\"".formatted(toolchain.getGenerator()));
+    getBaseArguments().add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
+    getBaseArguments().add("-G \"%s\"".formatted(toolchain.getGenerator()));
     if (toolchain.getToolchainFile().isPresent()) {
-      baseArguments.add("--toolchain");
-      baseArguments.add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
+      getBaseArguments().add("--toolchain");
+      getBaseArguments().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
     }
-    baseArguments.add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
-    baseArguments.add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
+    getBaseArguments().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
+    getBaseArguments().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
   }
 }
