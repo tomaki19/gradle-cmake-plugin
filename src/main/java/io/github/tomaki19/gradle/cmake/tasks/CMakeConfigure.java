@@ -5,6 +5,7 @@
 package io.github.tomaki19.gradle.cmake.tasks;
 
 import org.gradle.api.file.Directory;
+import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -19,16 +20,16 @@ public abstract class CMakeConfigure extends CMakeExec {
     // tasks with same output directory are not run in parallel
     getOutputs().dir(outputDirectory);
     setWorkingDir(getProject().getProjectDir());
-    getBaseCommandLine().add("cmake");
-    getBaseCommandLine().add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
+    getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
+    baseArguments.add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
-    getBaseCommandLine().add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
-    getBaseCommandLine().add("-G \"%s\"".formatted(toolchain.getGenerator()));
+    baseArguments.add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
+    baseArguments.add("-G \"%s\"".formatted(toolchain.getGenerator()));
     if (toolchain.getToolchainFile().isPresent()) {
-      getBaseCommandLine().add("--toolchain");
-      getBaseCommandLine().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
+      baseArguments.add("--toolchain");
+      baseArguments.add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
     }
-    getBaseCommandLine().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
-    getBaseCommandLine().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
+    baseArguments.add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
+    baseArguments.add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
   }
 }

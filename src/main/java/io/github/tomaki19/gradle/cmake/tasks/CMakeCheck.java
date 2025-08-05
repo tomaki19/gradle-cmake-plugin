@@ -4,6 +4,8 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import org.gradle.internal.os.OperatingSystem;
+
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -17,17 +19,17 @@ public abstract class CMakeCheck extends CMakeExec {
       final String buildConfig) {
     super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
     this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
-    getBaseCommandLine().add("ctest");
-    getBaseCommandLine().add("-T");
-    getBaseCommandLine().add("Test");
-    getBaseCommandLine().add("--test-dir");
-    getBaseCommandLine().add(getProject().getLayout().getBuildDirectory()
+    getBaseCommand().set(OperatingSystem.current().getExecutableName("ctest"));
+    baseArguments.add("-T");
+    baseArguments.add("Test");
+    baseArguments.add("--test-dir");
+    baseArguments.add(getProject().getLayout().getBuildDirectory()
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig))
         .get().getAsFile().getAbsolutePath());
-    getBaseCommandLine().add("--tests-regex");
-    getBaseCommandLine().add(checkTarget);
-    getBaseCommandLine().add("--build-config");
-    getBaseCommandLine().add(buildConfig);
+    baseArguments.add("--tests-regex");
+    baseArguments.add(checkTarget);
+    baseArguments.add("--build-config");
+    baseArguments.add(buildConfig);
     setWorkingDir(getProject().getProjectDir());
     setGroup(CMakeTaskRegistry.GROUP_CHECK);
   }
