@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import org.gradle.api.Project;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 
@@ -18,21 +17,21 @@ public final class CMakeTasksConventions {
     return "assemble-%s-config".formatted(toolchainName);
   }
 
-  static String assembleConfigTaskName(final Project project, final String toolchainName) {
-    return ":%s:assemble-%s-config".formatted(project.getName(), toolchainName);
+  static String assembleConfigTaskName(final String projectName, final String toolchainName) {
+    return ":%s:assemble-%s-config".formatted(projectName, toolchainName);
   }
 
-  static String configureTaskName(final Project project, final String toolchainName, final String buildConfig) {
-    return ":%s:configure-%s-%s".formatted(project.getName(), toolchainName, buildConfig);
+  static String configureTaskName(final String projectName, final String toolchainName, final String buildConfig) {
+    return ":%s:configure-%s-%s".formatted(projectName, toolchainName, buildConfig);
   }
 
   static String configureTaskName(final String toolchainName, final String buildConfig) {
     return "configure-%s-%s".formatted(toolchainName, buildConfig);
   }
 
-  static String buildTaskName(final Project project, final String targetName,
+  static String buildTaskName(final String projectName, final String targetName,
       final String toolchainName, final CMakeLinkType targetType, final String buildConfig) {
-    return ":%s:build-%s-%s-%s-%s".formatted(project.getName(), targetName, toolchainName, targetType, buildConfig);
+    return ":%s:build-%s-%s-%s-%s".formatted(projectName, targetName, toolchainName, targetType, buildConfig);
   }
 
   static String buildTaskName(final String targetName, final String toolchainName,

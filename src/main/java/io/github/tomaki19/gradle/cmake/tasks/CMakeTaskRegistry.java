@@ -60,7 +60,7 @@ public class CMakeTaskRegistry {
   public TaskProvider<CMakeAssemble> assembleConfigTask(final CMakeResolvedToolchain toolchain, final Project project)
       throws FileNotFoundException {
     final String assembleConfigTaskName = CMakeTasksConventions.assembleConfigTaskName(toolchain.getName());
-    return taskContainer.register(assembleConfigTaskName, CMakeAssemble.class, new CMakeConfigFile(project, toolchain));
+    return taskContainer.register(assembleConfigTaskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project));
   }
 
   public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain, final String buildConfig) {
@@ -118,11 +118,11 @@ public class CMakeTaskRegistry {
   public static void configureRemote(final CMakeConfigure task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Project project) {
     toolchain.getProjectPackages().stream()
-        .filter(dependency -> !Objects.equals(project, dependency.getProject()))
+        .filter(dependency -> !Objects.equals(project.getName(), dependency.getName()))
         .forEach(dependency -> {
-          task.mustRunAfter(CMakeTasksConventions.configureTaskName(dependency.getProject(),
+          task.mustRunAfter(CMakeTasksConventions.configureTaskName(dependency.getName(),
               toolchain.getName(), buildConfig));
-          task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getProject(),
+          task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getName(),
               toolchain.getName()));
         });
   }
@@ -143,7 +143,7 @@ public class CMakeTaskRegistry {
   private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Collection<CMakeResolvedProjectPackageDependency> dependencies) {
     dependencies.stream().filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
-        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getProject(),
+        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getProject().getName(),
             dependency.getName(), toolchain.getName(), dependency.getType(), buildConfig)));
   }
 

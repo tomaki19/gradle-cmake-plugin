@@ -46,7 +46,7 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
     final List<String> commandLine = new ArrayList<>();
     environmentFile.ifPresent((file) -> {
       commandLine.add(".");
-      commandLine.add(environmentFile.get().getAbsolutePath());
+      commandLine.add(file.getAbsolutePath());
       commandLine.add("&&");
     });
     commandLine.add(getBaseCommand().get());

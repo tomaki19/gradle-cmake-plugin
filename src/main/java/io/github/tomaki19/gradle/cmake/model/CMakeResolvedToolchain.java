@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
@@ -27,7 +26,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
   private final Collection<CMakeResolvedSystemPackage> systemPackages = new TreeSet<>();
-  private final Collection<Project> projectPackages = new TreeSet<>();
+  private final Collection<CMakeResolvedProject> projectPackages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> libraries = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> applications = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> tests = new TreeSet<>();
@@ -84,11 +83,11 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return systemPackages;
   }
 
-  void addModule(final Project object) {
+  void addModule(final CMakeResolvedProject object) {
     projectPackages.add(object);
   }
 
-  public Collection<Project> getProjectPackages() {
+  public Collection<CMakeResolvedProject> getProjectPackages() {
     return projectPackages;
   }
 

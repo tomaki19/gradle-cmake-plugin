@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.gradle.api.Project;
-
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeFileConventions {
@@ -18,8 +16,8 @@ public class CMakeFileConventions {
   public static String CMAKE_INSTALL_PATH = "cmake/install";
   public static Set<String> DEFAULT_BUILD_CONFIGS = new HashSet<>(Arrays.asList("debug", "release"));
 
-  public static String cmakeConfigName(final Project project, final CMakeResolvedToolchain toolchain) {
-    return "%s-%s".formatted(project.getName().toLowerCase(), toolchain.getName().toLowerCase());
+  public static String cmakeConfigName(final String name, final CMakeResolvedToolchain toolchain) {
+    return "%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase());
   }
 
   public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain, final CMakeLinkType type,

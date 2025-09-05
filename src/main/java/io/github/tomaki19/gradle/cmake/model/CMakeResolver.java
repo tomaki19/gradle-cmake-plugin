@@ -180,15 +180,15 @@ public final class CMakeResolver {
   }
 
   private void resolveProjectPackage(final String[] dependencyTokens,
-      final Consumer<CMakeResolvedProjectPackageDependency> binaryConsumer, final Consumer<Project> buildConsumer)
-      throws IllegalArgumentException {
+      final Consumer<CMakeResolvedProjectPackageDependency> binaryConsumer,
+      final Consumer<CMakeResolvedProject> buildConsumer) throws IllegalArgumentException {
     final Project dependencyProject = Objects.equals(dependencyTokens[0], project.getName()) ? project
         : project.findProject(":%s".formatted(dependencyTokens[0]));
     if (Objects.nonNull(dependencyProject)) {
       final CMakeLinkType type = CMakeLinkType.valueOf(dependencyTokens[2].toUpperCase());
       binaryConsumer.accept(new CMakeResolvedProjectPackageDependency(dependencyProject,
           dependencyTokens[1], type));
-      buildConsumer.accept(dependencyProject);
+      buildConsumer.accept(new CMakeResolvedProject(dependencyProject));
     } else {
       throw new IllegalArgumentException("Missing project package '%s'!".formatted(dependencyTokens[0]));
     }

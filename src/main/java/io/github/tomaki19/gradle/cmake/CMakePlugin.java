@@ -10,18 +10,19 @@ import java.util.Optional;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.attributes.Category;
+import org.gradle.api.Task;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
-import io.github.tomaki19.gradle.cmake.extension.CMakeConfiguration;
+import io.github.tomaki19.gradle.cmake.extension.CMakeConfigurations;
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.CMakeValidator;
 import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble;
@@ -43,13 +44,15 @@ public class CMakePlugin implements Plugin<Project> {
   private void allProjects(final Project project) {
     try {
       project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
-      project.getConfigurations().create(CMakeConfiguration.NAME, (configuration) -> {
-        configuration.setCanBeConsumed(false);
-        configuration.setCanBeDeclared(true);
-        configuration.setCanBeResolved(true);
-        configuration.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
-            project.getObjects().named(Category.class, Category.LIBRARY));
-      });
+      project.getConfigurations().create(CMakeConfigurations.CMAKE_PROJECT.toString(),
+          (configuration) -> {
+            configuration.setDescription("CMake project configuration.");
+            configuration.setVisible(true);
+            configuration.setCanBeConsumed(false);
+            configuration.setCanBeDeclared(true);
+            configuration.setCanBeResolved(false);
+            // configuration.setCanBeResolved(true);
+          });
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
@@ -74,14 +77,15 @@ public class CMakePlugin implements Plugin<Project> {
 
       /* Configuration */
 
-      project.getConfigurations().named(CMakeConfiguration.NAME, (configuration) -> {
-        for (final CMakeResolvedToolchain toolchain : toolchains) {
-          for (final Project projectPackage : toolchain.getProjectPackages()) {
-            final Dependency projectDependency = project.getDependencies().create(projectPackage);
-            configuration.getDependencies().add(projectDependency);
-          }
+      for (final CMakeResolvedToolchain toolchain : toolchains) {
+        for (final CMakeResolvedProject projectPackage : toolchain.getProjectPackages()) {
+          project.getConfigurations().getByName(CMakeConfigurations.CMAKE_PROJECT.toString(), (configuration) -> {
+            configuration.defaultDependencies((defaultDependencies) -> {
+              defaultDependencies.add(project.getDependencies().create(projectPackage.getIdentifier()));
+            });
+          });
         }
-      });
+      }
 
       /* Tasks */
 
@@ -89,8 +93,11 @@ public class CMakePlugin implements Plugin<Project> {
 
       final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(toolchains, project);
       taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
-      taskRegistry.cleanTask().configure((task) -> task.doLast((action) -> {
-        project.delete(project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME));
+
+      final TaskProvider<Task> cleanTask = taskRegistry.cleanTask();
+      final RegularFile cmakeListsFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME);
+      cleanTask.configure((task) -> task.doLast((action) -> {
+        cmakeListsFile.getAsFile().delete();
       }));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
@@ -125,7 +132,7 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, project);
             task.dependsOn(assembleListsTask);
           });
-          
+
           for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
             if (!library.getSources().isEmpty()) {
               if (library.isBuildStatic()) {

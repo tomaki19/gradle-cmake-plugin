@@ -11,16 +11,16 @@ import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 public final class CMakeResolvedProjectPackageDependency
     extends CMakeResolvedName<CMakeResolvedProjectPackageDependency> {
 
-  private final Project project;
+  private final CMakeResolvedProject project;
   private final CMakeLinkType type;
 
   CMakeResolvedProjectPackageDependency(final Project project, final String name, final CMakeLinkType type) {
     super(name);
-    this.project = project;
+    this.project = new CMakeResolvedProject(project);
     this.type = type;
   }
 
-  public Project getProject() {
+  public CMakeResolvedProject getProject() {
     return project;
   }
 
