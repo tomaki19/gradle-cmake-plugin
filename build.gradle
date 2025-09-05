@@ -4,7 +4,7 @@ plugins {
   alias(libs.plugins.publish)
 }
 
-version = '0.9.6'
+version = '0.9.7'
 group = 'io.github.tomaki19'
 
 repositories {
@@ -42,11 +42,12 @@ gradlePlugin {
   }
 }
 
-tasks.named('test', Test) {  useJUnitPlatform()
+tasks.named('test', Test) {
+  useJUnitPlatform()
 }
 
 tasks.withType(Javadoc).configureEach {
-    options.addStringOption('Xdoclint:-missing', '-quiet')
+  options.addStringOption('Xdoclint:-missing', '-quiet')
 }
 
 tasks.withType(AbstractPublishToMaven) {
