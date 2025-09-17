@@ -19,7 +19,7 @@ The `packages` configuration block lets you specify system libraries that can be
 ```groovy
 packages {
   '<name>' {
-    components = //optional: String
+    components = //optional: List<String>
     properties = //optional: Map<String,String>
   }
 }

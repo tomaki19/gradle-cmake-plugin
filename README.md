@@ -3,11 +3,21 @@
 A Gradle plugin that uses the CMake build framework for C/C++ builds.
 
 # Setup
-
 ```groovy
 plugins {
-  id('io.github.tomaki19.gradle-cmake-plugin') version '...'
+  id('io.github.tomaki19.gradle-cmake-plugin') version '<version>'
 }
+```
+
+### Legacy
+```groovy
+buildscript {
+    dependencies {
+        classpath 'io.github.tomaki19:gradle-cmake-plugin:<version>'
+    }
+}
+
+apply plugin: 'io.github.tomaki19.gradle-cmake-plugin'
 ```
 
 # Compatibility
