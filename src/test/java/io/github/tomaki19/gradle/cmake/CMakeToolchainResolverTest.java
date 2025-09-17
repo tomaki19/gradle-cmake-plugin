@@ -92,7 +92,7 @@ public class CMakeToolchainResolverTest {
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                 new HashSet<>(Arrays.asList("Toolchain0")));
         TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-                new HashSet<>(Arrays.asList("Package0",
+                new HashSet<>(Arrays.asList("Package0::target",
                         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
 
@@ -128,7 +128,7 @@ public class CMakeToolchainResolverTest {
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                 new HashSet<>(Arrays.asList("Toolchain0")));
         TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-                new HashSet<>(Arrays.asList("Package0",
+                new HashSet<>(Arrays.asList("Package0::target",
                         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
 
@@ -164,7 +164,7 @@ public class CMakeToolchainResolverTest {
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                 new HashSet<>(Arrays.asList("Toolchain0")));
         TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
-                new HashSet<>(Arrays.asList("Package0",
+                new HashSet<>(Arrays.asList("Package0::target",
                         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
 

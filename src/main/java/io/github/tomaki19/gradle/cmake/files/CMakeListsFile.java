@@ -69,20 +69,10 @@ public class CMakeListsFile extends CMakeFileContent {
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final CMakeResolvedSystemPackage resolvedPackage : toolchain.getSystemPackages()) {
           writeLine(outputStream);
-          if (resolvedPackage.getComponents().isEmpty()) {
-            write(outputStream, "find_package( %s CONFIG REQUIRED )", resolvedPackage.getName());
-          } else {
-            write(outputStream, "find_package( %s CONFIG REQUIRED", resolvedPackage.getName());
-            for (final String component : resolvedPackage.getComponents()) {
-              write(outputStream, 1, "%s::%s", resolvedPackage.getName(), component);
-            }
-            write(outputStream, ")");
-          }
-          if (!resolvedPackage.getProperties().isEmpty()) {
-            for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-              write(outputStream, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
-                  property.getValue().toUpperCase());
-            }
+          write(outputStream, "find_package( %s CONFIG REQUIRED )", resolvedPackage.getName());
+          for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
+            write(outputStream, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
+                property.getValue().toUpperCase());
           }
         }
         write(outputStream, "endif()");

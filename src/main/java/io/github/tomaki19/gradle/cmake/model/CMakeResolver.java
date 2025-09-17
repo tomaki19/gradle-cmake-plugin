@@ -158,7 +158,6 @@ public final class CMakeResolver {
         }
       } else {
         switch (dependencyTokens.length) {
-          case 1:
           case 2:
             packageDependencyConsumer.accept(dependency);
             break;
@@ -166,7 +165,7 @@ public final class CMakeResolver {
             resolveProjectPackage(dependencyTokens, moduleDependencyConsumer, toolchain::addModule);
             break;
           default:
-            throw new IllegalArgumentException("Missing dependency '%s'!".formatted(dependency));
+            throw new IllegalArgumentException("Invalid link option '%s'!".formatted(dependency));
         }
       }
     }

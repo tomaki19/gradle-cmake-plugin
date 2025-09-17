@@ -37,7 +37,7 @@ public class CMakeTestResolverTest {
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                                 new HashSet<>(Arrays.asList("Toolchain0")));
                 TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-                                new HashSet<>(Arrays.asList("Package0", "-loption",
+                                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                                                 "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                                                 "%s::BinaryLibrary0::shared".formatted(project.getName()))));
                 TestCMakeTest.register("Test0", extension);
@@ -76,11 +76,11 @@ public class CMakeTestResolverTest {
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                                 new HashSet<>(Arrays.asList("Toolchain0")));
                 TestCMakeToolchain.registerWithBinaryDependencies("Toolchain0", extension,
-                                new HashSet<>(Arrays.asList("Package0", "-loption",
+                                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                                                 "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                                                 "%s::BinaryLibrary0::shared".formatted(project.getName()))));
                 TestCMakeToolchain.registerWithTestDependencies("Toolchain1", extension,
-                                new HashSet<>(Arrays.asList("Package1", "-loption",
+                                new HashSet<>(Arrays.asList("Package1::target", "-loption",
                                                 "%s::InterfaceLibrary1::interface".formatted(project.getName()))));
                 TestCMakeTest.register("Test0", extension,
                                 new HashSet<>(Arrays.asList("Toolchain1", "Toolchain0")));
@@ -173,7 +173,7 @@ public class CMakeTestResolverTest {
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                                 new HashSet<>(Arrays.asList("Toolchain0")));
                 TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
-                                new HashSet<>(Arrays.asList("Package0", "-loption",
+                                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                                                 "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                                                 "%s::BinaryLibrary0::shared".formatted(project.getName()))));
                 TestCMakeTest.register("Test0", extension,
@@ -213,7 +213,7 @@ public class CMakeTestResolverTest {
                 TestCMakeToolchain.register("Toolchain0", extension);
                 TestCMakeTest.registerWithPrivateDependencies("Test0", extension,
                                 new HashSet<>(Arrays.asList("Toolchain0")),
-                                new HashSet<>(Arrays.asList("Package0", "-loption",
+                                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                                                 "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                                                 "%s::BinaryLibrary0::shared".formatted(project.getName()))));
 

@@ -33,7 +33,7 @@ public class CMakeBinaryLibraryResolverTest {
         TestCMakePackage.register("Package0", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
         TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-                new HashSet<>(Arrays.asList("Package0", "-loption",
+                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
         TestCMakeBinaryLibrary.register("BinaryLibrary1", extension);
 
@@ -132,7 +132,7 @@ public class CMakeBinaryLibraryResolverTest {
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                 new HashSet<>(Arrays.asList("Toolchain0")));
         TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-                new HashSet<>(Arrays.asList("Package0", "-loption",
+                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
         TestCMakeBinaryLibrary.register("BinaryLibrary1", extension,
@@ -172,7 +172,7 @@ public class CMakeBinaryLibraryResolverTest {
         TestCMakeToolchain.register("Toolchain0", extension);
         TestCMakeBinaryLibrary.registerWithPrivateDependencies("BinaryLibrary1", extension,
                 new HashSet<>(Arrays.asList("Toolchain0")),
-                new HashSet<>(Arrays.asList("Package0", "-loption",
+                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
 
@@ -210,7 +210,7 @@ public class CMakeBinaryLibraryResolverTest {
         TestCMakeToolchain.register("Toolchain0", extension);
         TestCMakeBinaryLibrary.registerWithPublicDependencies("BinaryLibrary1", extension,
                 new HashSet<>(Arrays.asList("Toolchain0")),
-                new HashSet<>(Arrays.asList("Package0", "-loption",
+                new HashSet<>(Arrays.asList("Package0::target", "-loption",
                         "%s::InterfaceLibrary0::interface".formatted(project.getName()),
                         "%s::BinaryLibrary0::shared".formatted(project.getName()))));
 
