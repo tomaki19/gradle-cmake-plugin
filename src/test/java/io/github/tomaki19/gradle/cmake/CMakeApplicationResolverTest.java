@@ -57,7 +57,7 @@ public class CMakeApplicationResolverTest {
         assertEquals(1, toolchains.length);
 
         assertEquals("Toolchain0", toolchains[0].getName());
-        assertEquals(0, toolchains[0].getSystemPackages().size());
+        assertEquals(1, toolchains[0].getSystemPackages().size());
         assertEquals(2, toolchains[0].getLibraries().size());
         assertEquals(0, toolchains[0].getApplications().size());
         assertEquals(0, toolchains[0].getTests().size());
@@ -100,7 +100,7 @@ public class CMakeApplicationResolverTest {
         assertEquals(2, toolchains.length);
 
         assertEquals("Toolchain0", toolchains[0].getName());
-        assertEquals(1, toolchains[0].getSystemPackages().size());
+        assertEquals(2, toolchains[0].getSystemPackages().size());
         assertEquals(3, toolchains[0].getLibraries().size());
         assertEquals(1, toolchains[0].getApplications().size());
         {
@@ -113,7 +113,7 @@ public class CMakeApplicationResolverTest {
         assertEquals(0, toolchains[0].getTests().size());
 
         assertEquals("Toolchain1", toolchains[1].getName());
-        assertEquals(1, toolchains[1].getSystemPackages().size());
+        assertEquals(2, toolchains[1].getSystemPackages().size());
         assertEquals(2, toolchains[1].getLibraries().size());
         assertEquals(1, toolchains[1].getApplications().size());
         {
@@ -156,7 +156,7 @@ public class CMakeApplicationResolverTest {
         assertEquals(1, toolchains.length);
 
         assertEquals("Toolchain0", toolchains[0].getName());
-        assertEquals(0, toolchains[0].getSystemPackages().size());
+        assertEquals(1, toolchains[0].getSystemPackages().size());
         assertEquals(2, toolchains[0].getLibraries().size());
         assertEquals(1, toolchains[0].getApplications().size());
         {

@@ -26,17 +26,18 @@ import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 public final class CMakeResolver {
 
   private final Project project;
-  private final Map<String, CMakeSystemPackage> availableSystemPackages;
   private final Map<CMakeToolchain, CMakeResolvedToolchain> availableToolchains;
 
   public CMakeResolver(final Project project, final Set<CMakeSystemPackage> systemPackages,
       final Set<CMakeToolchain> toolchains) {
     this.project = project;
-    this.availableSystemPackages = systemPackages.stream()
-        .collect(Collectors.toMap(CMakeSystemPackage::getName, Function.identity()));
+    final Collection<CMakeResolvedSystemPackage> availableSystemPackages = systemPackages.stream()
+        .map(systemPackage -> new CMakeResolvedSystemPackage(systemPackage))
+        .toList();
     this.availableToolchains = toolchains.stream()
         .filter(toolchain -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
-        .collect(Collectors.toMap(Function.identity(), toolchain -> new CMakeResolvedToolchain(toolchain)));
+        .collect(Collectors.toMap(Function.identity(),
+            toolchain -> new CMakeResolvedToolchain(toolchain, availableSystemPackages)));
   }
 
   public Collection<CMakeResolvedToolchain> process(final Set<CMakeLibrary> libraries,
@@ -156,26 +157,18 @@ public final class CMakeResolver {
           throw new IllegalArgumentException("Invalid link option: '%s'!".formatted(dependencyTokens[0]));
         }
       } else {
-        if (dependencyTokens.length <= 2) {
-          resolveSystemPackage(dependencyTokens, dependency, packageDependencyConsumer, toolchain::addPackage);
-        } else if (dependencyTokens.length == 3) {
-          resolveProjectPackage(dependencyTokens, moduleDependencyConsumer, toolchain::addModule);
-        } else {
-          throw new IllegalArgumentException("Missing dependency '%s'!".formatted(dependency));
+        switch (dependencyTokens.length) {
+          case 1:
+          case 2:
+            packageDependencyConsumer.accept(dependency);
+            break;
+          case 3:
+            resolveProjectPackage(dependencyTokens, moduleDependencyConsumer, toolchain::addModule);
+            break;
+          default:
+            throw new IllegalArgumentException("Missing dependency '%s'!".formatted(dependency));
         }
       }
-    }
-  }
-
-  private void resolveSystemPackage(final String[] dependencyTokens, final String dependency,
-      final Consumer<String> binaryConsumer, final Consumer<CMakeResolvedSystemPackage> buildConsumer)
-      throws IllegalArgumentException {
-    final CMakeSystemPackage systemPackage = availableSystemPackages.get(dependencyTokens[0]);
-    if (Objects.nonNull(systemPackage)) {
-      binaryConsumer.accept(dependency);
-      buildConsumer.accept(new CMakeResolvedSystemPackage(systemPackage));
-    } else {
-      throw new IllegalArgumentException("Missing system package '%s'!".formatted(dependencyTokens[0]));
     }
   }
 
