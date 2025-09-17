@@ -10,7 +10,7 @@ import org.gradle.internal.os.OperatingSystem;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
-abstract class CMakeBuild extends CMakeExec {
+public abstract class CMakeBuild extends CMakeExec {
 
   protected final String buildTarget;
 

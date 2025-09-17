@@ -9,7 +9,7 @@ import org.gradle.api.tasks.bundling.Zip;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
-abstract class CMakePackage extends Zip {
+public abstract class CMakePackage extends Zip {
 
   @javax.inject.Inject
   CMakePackage(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
