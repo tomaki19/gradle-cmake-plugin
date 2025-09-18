@@ -7,6 +7,9 @@ package io.github.tomaki19.gradle.cmake;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.component.AdhocComponentWithVariants;
+import org.gradle.api.component.SoftwareComponentFactory;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -34,6 +37,13 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
 
 public class CMakePlugin implements Plugin<Project> {
 
+  private final SoftwareComponentFactory softwareComponentFactory;
+
+  @javax.inject.Inject
+  CMakePlugin(SoftwareComponentFactory softwareComponentFactory) {
+    this.softwareComponentFactory = softwareComponentFactory;
+  }
+
   @Override
   public void apply(Project project) {
     project.getPluginManager().apply(BasePlugin.class);
@@ -44,15 +54,64 @@ public class CMakePlugin implements Plugin<Project> {
   private void allProjects(final Project project) {
     try {
       project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
-      project.getConfigurations().create(CMakeConfigurations.CMAKE_PROJECT.toString(),
-          (configuration) -> {
-            configuration.setDescription("CMake project configuration.");
-            configuration.setVisible(true);
-            configuration.setCanBeConsumed(false);
-            configuration.setCanBeDeclared(true);
-            configuration.setCanBeResolved(false);
-            // configuration.setCanBeResolved(true);
-          });
+      final AdhocComponentWithVariants adhocComponent = softwareComponentFactory.adhoc("cmake");
+      {
+        final Configuration cmakeCompile = project.getConfigurations()
+            .create(CMakeConfigurations.CMAKE_COMPILE.toString(), (configuration) -> {
+              configuration.setDescription("CMake compile declarations.");
+              configuration.setCanBeDeclared(true);
+              configuration.setCanBeResolved(false);
+              configuration.setCanBeConsumed(false);
+            });
+        project.getConfigurations().create(CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.toString(), (configuration) -> {
+          configuration.setDescription("CMake compile classpath.");
+          configuration.setCanBeDeclared(false);
+          configuration.setCanBeResolved(true);
+          configuration.setCanBeConsumed(false);
+          configuration.extendsFrom(cmakeCompile);
+        });
+        final Configuration cmakeCompileElements = project.getConfigurations()
+            .create(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.toString(), (configuration) -> {
+              configuration.setDescription("CMake compile elements.");
+              configuration.setCanBeDeclared(false);
+              configuration.setCanBeResolved(false);
+              configuration.setCanBeConsumed(true);
+              configuration.extendsFrom(cmakeCompile);
+            });
+        adhocComponent.addVariantsFromConfiguration(cmakeCompileElements, (variant) -> {
+          variant.mapToMavenScope("compile");
+          variant.mapToOptional();
+        });
+      }
+      {
+        final Configuration cmakeRuntime = project.getConfigurations()
+            .create(CMakeConfigurations.CMAKE_RUNTIME.toString(), (configuration) -> {
+              configuration.setDescription("CMake runtime declarations.");
+              configuration.setCanBeDeclared(true);
+              configuration.setCanBeResolved(false);
+              configuration.setCanBeConsumed(false);
+            });
+        project.getConfigurations().create(CMakeConfigurations.CMAKE_RUNTIME_CLASSPATH.toString(), (configuration) -> {
+          configuration.setDescription("CMake runtime classpath.");
+          configuration.setCanBeDeclared(false);
+          configuration.setCanBeResolved(true);
+          configuration.setCanBeConsumed(false);
+          configuration.extendsFrom(cmakeRuntime);
+        });
+        final Configuration cmakeRuntimeElements = project.getConfigurations()
+            .create(CMakeConfigurations.CMAKE_RUNTIME_ELEMENTS.toString(), (configuration) -> {
+              configuration.setDescription("CMake runtime elements.");
+              configuration.setCanBeDeclared(false);
+              configuration.setCanBeResolved(false);
+              configuration.setCanBeConsumed(true);
+              configuration.extendsFrom(cmakeRuntime);
+            });
+        adhocComponent.addVariantsFromConfiguration(cmakeRuntimeElements, (variant) -> {
+          variant.mapToMavenScope("runtime");
+          variant.mapToOptional();
+        });
+        project.getComponents().add(adhocComponent);
+      }
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
@@ -79,7 +138,7 @@ public class CMakePlugin implements Plugin<Project> {
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
         for (final CMakeResolvedProject projectPackage : toolchain.getProjectPackages()) {
-          project.getConfigurations().getByName(CMakeConfigurations.CMAKE_PROJECT.toString(), (configuration) -> {
+          project.getConfigurations().getByName(CMakeConfigurations.CMAKE_COMPILE.toString(), (configuration) -> {
             configuration.defaultDependencies((defaultDependencies) -> {
               defaultDependencies.add(project.getDependencies().create(projectPackage.getIdentifier()));
             });
