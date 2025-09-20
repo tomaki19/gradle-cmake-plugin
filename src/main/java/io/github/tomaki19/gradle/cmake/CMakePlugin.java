@@ -55,63 +55,37 @@ public class CMakePlugin implements Plugin<Project> {
     try {
       project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
       final AdhocComponentWithVariants adhocComponent = softwareComponentFactory.adhoc("cmake");
-      {
-        final Configuration cmakeCompile = project.getConfigurations()
-            .create(CMakeConfigurations.CMAKE_COMPILE.toString(), (configuration) -> {
-              configuration.setDescription("CMake compile declarations.");
-              configuration.setCanBeDeclared(true);
-              configuration.setCanBeResolved(false);
-              configuration.setCanBeConsumed(false);
-            });
-        project.getConfigurations().create(CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.toString(), (configuration) -> {
-          configuration.setDescription("CMake compile classpath.");
-          configuration.setCanBeDeclared(false);
-          configuration.setCanBeResolved(true);
-          configuration.setCanBeConsumed(false);
-          configuration.extendsFrom(cmakeCompile);
-        });
-        final Configuration cmakeCompileElements = project.getConfigurations()
-            .create(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.toString(), (configuration) -> {
-              configuration.setDescription("CMake compile elements.");
-              configuration.setCanBeDeclared(false);
-              configuration.setCanBeResolved(false);
-              configuration.setCanBeConsumed(true);
-              configuration.extendsFrom(cmakeCompile);
-            });
-        adhocComponent.addVariantsFromConfiguration(cmakeCompileElements, (variant) -> {
-          variant.mapToMavenScope("compile");
-          variant.mapToOptional();
-        });
-      }
-      {
-        final Configuration cmakeRuntime = project.getConfigurations()
-            .create(CMakeConfigurations.CMAKE_RUNTIME.toString(), (configuration) -> {
-              configuration.setDescription("CMake runtime declarations.");
-              configuration.setCanBeDeclared(true);
-              configuration.setCanBeResolved(false);
-              configuration.setCanBeConsumed(false);
-            });
-        project.getConfigurations().create(CMakeConfigurations.CMAKE_RUNTIME_CLASSPATH.toString(), (configuration) -> {
-          configuration.setDescription("CMake runtime classpath.");
-          configuration.setCanBeDeclared(false);
-          configuration.setCanBeResolved(true);
-          configuration.setCanBeConsumed(false);
-          configuration.extendsFrom(cmakeRuntime);
-        });
-        final Configuration cmakeRuntimeElements = project.getConfigurations()
-            .create(CMakeConfigurations.CMAKE_RUNTIME_ELEMENTS.toString(), (configuration) -> {
-              configuration.setDescription("CMake runtime elements.");
-              configuration.setCanBeDeclared(false);
-              configuration.setCanBeResolved(false);
-              configuration.setCanBeConsumed(true);
-              configuration.extendsFrom(cmakeRuntime);
-            });
-        adhocComponent.addVariantsFromConfiguration(cmakeRuntimeElements, (variant) -> {
-          variant.mapToMavenScope("runtime");
-          variant.mapToOptional();
-        });
-        project.getComponents().add(adhocComponent);
-      }
+      final Configuration cmakeCompile = project.getConfigurations()
+          .create(CMakeConfigurations.CMAKE_COMPILE.toString(), CMakeConfigurations.CMAKE_COMPILE.configure());
+      final Configuration cmakeCompileClasspath = project.getConfigurations().create(
+          CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.toString(),
+          CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.configure());
+      cmakeCompileClasspath.extendsFrom(cmakeCompile);
+      final Configuration cmakeCompileElements = project.getConfigurations()
+          .create(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.toString(),
+              CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.configure());
+      cmakeCompileElements.extendsFrom(cmakeCompile);
+      adhocComponent.addVariantsFromConfiguration(cmakeCompileElements, (variant) -> {
+        variant.mapToMavenScope("compile");
+        variant.mapToOptional();
+      });
+      final Configuration cmakeRuntime = project.getConfigurations()
+          .create(CMakeConfigurations.CMAKE_RUNTIME.toString(), CMakeConfigurations.CMAKE_RUNTIME.configure());
+      final Configuration cmakeRuntimeClasspth = project.getConfigurations()
+          .create(CMakeConfigurations.CMAKE_RUNTIME_CLASSPATH.toString(),
+              CMakeConfigurations.CMAKE_RUNTIME_CLASSPATH.configure());
+      cmakeRuntimeClasspth.extendsFrom(cmakeCompile);
+      cmakeRuntimeClasspth.extendsFrom(cmakeRuntime);
+      final Configuration cmakeRuntimeElements = project.getConfigurations()
+          .create(CMakeConfigurations.CMAKE_RUNTIME_ELEMENTS.toString(),
+              CMakeConfigurations.CMAKE_RUNTIME_ELEMENTS.configure());
+      cmakeRuntimeElements.extendsFrom(cmakeCompile);
+      cmakeRuntimeElements.extendsFrom(cmakeRuntime);
+      adhocComponent.addVariantsFromConfiguration(cmakeRuntimeElements, (variant) -> {
+        variant.mapToMavenScope("runtime");
+        variant.mapToOptional();
+      });
+      project.getComponents().add(adhocComponent);
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
@@ -150,7 +124,8 @@ public class CMakePlugin implements Plugin<Project> {
 
       final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry(project.getTasks());
 
-      final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(toolchains, project);
+      final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(
+          resolver.getAvailableSystemPackages(), toolchains, project);
       taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
 
       final TaskProvider<Task> cleanTask = taskRegistry.cleanTask();

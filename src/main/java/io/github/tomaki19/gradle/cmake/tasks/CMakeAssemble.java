@@ -19,6 +19,7 @@ public abstract class CMakeAssemble extends DefaultTask {
   @javax.inject.Inject
   public CMakeAssemble(final CMakeFileContent content) {
     this.content = content;
+    setOnlyIf((action) -> true);
     getOutputs().file(content.getFile());
   }
 

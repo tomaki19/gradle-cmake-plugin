@@ -18,7 +18,6 @@ public abstract class CMakeConfigure extends CMakeExec {
     final Directory outputDirectory = getProject().getLayout().getBuildDirectory()
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig)).get();
     // tasks with same output directory are not run in parallel
-    getOutputs().dir(outputDirectory);
     setWorkingDir(getProject().getProjectDir());
     getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
     getBaseArguments().add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
