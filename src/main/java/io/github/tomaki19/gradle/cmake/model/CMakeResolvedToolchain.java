@@ -25,14 +25,12 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
-  private final Collection<CMakeResolvedSystemPackage> systemPackages;
   private final Collection<CMakeResolvedProject> projectPackages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> libraries = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> applications = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> tests = new TreeSet<>();
 
-  public CMakeResolvedToolchain(final CMakeToolchain toolchain,
-      final Collection<CMakeResolvedSystemPackage> systemPackages) {
+  public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
     this.operatingSystem = toolchain.getOperatingSystem().get();
     this.architecture = toolchain.getArchitecture().getOrElse("").toLowerCase();
@@ -42,7 +40,6 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     this.environment = new TreeMap<>(toolchain.getEnvironment().get());
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
     this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
-    this.systemPackages = new TreeSet<>(systemPackages);
   }
 
   public String getCompiler() {
@@ -75,10 +72,6 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public Optional<File> getToolchainFile() {
     return toolchainFile;
-  }
-
-  public Collection<CMakeResolvedSystemPackage> getSystemPackages() {
-    return systemPackages;
   }
 
   void addModule(final CMakeResolvedProject object) {

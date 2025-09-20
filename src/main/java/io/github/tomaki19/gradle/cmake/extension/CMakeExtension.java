@@ -28,7 +28,7 @@ public abstract class CMakeExtension {
     this.taskContainer = taskContainer;
   }
 
-  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getPackages();
+  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getSystemPackages();
 
   public abstract NamedDomainObjectContainer<CMakeToolchain> getToolchains();
 

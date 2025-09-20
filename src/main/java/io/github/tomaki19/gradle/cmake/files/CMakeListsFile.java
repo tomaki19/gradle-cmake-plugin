@@ -29,18 +29,21 @@ public class CMakeListsFile extends CMakeFileContent {
 
   private static final String CMAKE_MINIMUM_VERSION = "3.21";
 
+  private final Collection<CMakeResolvedSystemPackage> systemPackages;
   private final Collection<CMakeResolvedToolchain> toolchains;
 
-  public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final Project project)
+  public CMakeListsFile(final Collection<CMakeResolvedSystemPackage> systemPackages,
+      final Collection<CMakeResolvedToolchain> toolchains, final Project project)
       throws FileNotFoundException {
     super(project.getLayout().getProjectDirectory().file(NAME), project);
+    this.systemPackages = systemPackages;
     this.toolchains = toolchains;
   }
 
   @Override
   public void writeTo(final FileOutputStream outputStream) throws IOException {
     writeHeader(outputStream);
-    writeSystemPackages(outputStream, toolchains);
+    writeSystemPackages(outputStream, systemPackages);
     writeProjectPackages(outputStream, toolchains);
     writeLibraries(outputStream, toolchains);
     writeApplications(outputStream, toolchains);
@@ -63,19 +66,13 @@ public class CMakeListsFile extends CMakeFileContent {
   }
 
   private void writeSystemPackages(final FileOutputStream outputStream,
-      final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
-    for (final CMakeResolvedToolchain toolchain : toolchains) {
-      if (!toolchain.getSystemPackages().isEmpty()) {
-        write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedSystemPackage resolvedPackage : toolchain.getSystemPackages()) {
-          writeLine(outputStream);
-          write(outputStream, "find_package( %s CONFIG REQUIRED )", resolvedPackage.getName());
-          for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-            write(outputStream, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
-                property.getValue().toUpperCase());
-          }
-        }
-        write(outputStream, "endif()");
+      final Collection<CMakeResolvedSystemPackage> systemPackages) throws IOException {
+    for (final CMakeResolvedSystemPackage resolvedPackage : systemPackages) {
+      writeLine(outputStream);
+      write(outputStream, "find_package( %s CONFIG REQUIRED )", resolvedPackage.getName());
+      for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
+        write(outputStream, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
+            property.getValue().toUpperCase());
       }
     }
   }

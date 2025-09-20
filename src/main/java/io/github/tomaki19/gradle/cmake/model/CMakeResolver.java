@@ -26,18 +26,23 @@ import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 public final class CMakeResolver {
 
   private final Project project;
+  private final Collection<CMakeResolvedSystemPackage> availableSystemPackages;
   private final Map<CMakeToolchain, CMakeResolvedToolchain> availableToolchains;
 
   public CMakeResolver(final Project project, final Set<CMakeSystemPackage> systemPackages,
       final Set<CMakeToolchain> toolchains) {
     this.project = project;
-    final Collection<CMakeResolvedSystemPackage> availableSystemPackages = systemPackages.stream()
+    this.availableSystemPackages = systemPackages.stream()
         .map(systemPackage -> new CMakeResolvedSystemPackage(systemPackage))
         .toList();
     this.availableToolchains = toolchains.stream()
         .filter(toolchain -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
         .collect(Collectors.toMap(Function.identity(),
-            toolchain -> new CMakeResolvedToolchain(toolchain, availableSystemPackages)));
+            toolchain -> new CMakeResolvedToolchain(toolchain)));
+  }
+
+  public Collection<CMakeResolvedSystemPackage> getAvailableSystemPackages() {
+    return availableSystemPackages;
   }
 
   public Collection<CMakeResolvedToolchain> process(final Set<CMakeLibrary> libraries,

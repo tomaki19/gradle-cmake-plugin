@@ -21,6 +21,7 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectPackageDependency;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedSystemPackage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeTaskRegistry {
@@ -51,10 +52,11 @@ public class CMakeTaskRegistry {
     return taskContainer.named("clean");
   }
 
-  public TaskProvider<CMakeAssemble> assembleListsTask(final Collection<CMakeResolvedToolchain> toolchains,
-      final Project project) throws FileNotFoundException {
+  public TaskProvider<CMakeAssemble> assembleListsTask(final Collection<CMakeResolvedSystemPackage> systemPackages,
+      final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
     final String assembleListsTaskName = CMakeTasksConventions.assembleListsTaskName();
-    return taskContainer.register(assembleListsTaskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project));
+    return taskContainer.register(assembleListsTaskName, CMakeAssemble.class,
+        new CMakeListsFile(systemPackages, toolchains, project));
   }
 
   public TaskProvider<CMakeAssemble> assembleConfigTask(final CMakeResolvedToolchain toolchain, final Project project)
