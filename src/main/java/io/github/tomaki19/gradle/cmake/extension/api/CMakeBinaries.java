@@ -4,19 +4,57 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import org.gradle.api.provider.Property;
-import org.gradle.api.provider.SetProperty;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public interface CMakeBinaries {
+public abstract class CMakeBinaries {
 
-  SetProperty<String> getPrivateLinkDependencies();
+  private Collection<String> privateLinkDependencies = new HashSet<>();
+  private Optional<Boolean> buildStatic = Optional.empty();
+  private Optional<Boolean> buildShared = Optional.empty();
+  private Optional<Boolean> stripDebug = Optional.empty();
+  private Optional<Boolean> packageBuildOutputs = Optional.empty();
 
-  Property<Boolean> getBuildStatic();
+  public Collection<String> getPrivateLinkDependencies() {
+    return privateLinkDependencies;
+  }
 
-  Property<Boolean> getBuildShared();
+  public void setPrivateLinkDependencies(final Collection<CharSequence> values) {
+    this.privateLinkDependencies = values.parallelStream().map((value) -> value.toString())
+        .collect(Collectors.toUnmodifiableSet());
+  }
 
-  Property<Boolean> getStripDebug();
+  public Optional<Boolean> getBuildStatic() {
+    return buildStatic;
+  }
 
-  Property<Boolean> getPackageBuildOutputs();
+  public void setBuildStatic(final Boolean value) {
+    this.buildStatic = Optional.of(value);
+  }
 
+  public Optional<Boolean> getBuildShared() {
+    return buildShared;
+  }
+
+  public void setBuildShared(final Boolean value) {
+    this.buildShared = Optional.of(value);
+  }
+
+  public Optional<Boolean> getStripDebug() {
+    return stripDebug;
+  }
+
+  public void setStripDebug(final Boolean value) {
+    this.stripDebug = Optional.of(value);
+  }
+
+  public Optional<Boolean> getPackageBuildOutputs() {
+    return packageBuildOutputs;
+  }
+
+  public void setPackageBuildOutputs(final Boolean value) {
+    this.packageBuildOutputs = Optional.of(value);
+  }
 }

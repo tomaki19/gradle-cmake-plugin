@@ -4,8 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.helper;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.Collection;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
@@ -17,35 +16,37 @@ public final class TestCMakeBinaryLibrary {
   public static NamedDomainObjectProvider<CMakeLibrary> register(final String name, final CMakeExtension extension) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = extension.getLibraries().register(name);
     provider.configure((object) -> {
-      object.getHeaders().set(Arrays.asList("header0"));
-      object.getSources().set(Arrays.asList("source0"));
+      object.getHeaders().add("header0");
+      object.getSources().add("source0");
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> register(final String name, final CMakeExtension extension,
-      final Set<String> toolchains) {
+      final Collection<CharSequence> toolchains) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getToolchains().set(toolchains);
+      object.setToolchains(toolchains);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateDependencies(final String name,
-      final CMakeExtension extension, final Set<String> toolchains, final Set<String> dependencies) {
+      final CMakeExtension extension, final Collection<CharSequence> toolchains,
+      final Collection<CharSequence> dependencies) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateLinkDependencies().set(dependencies);
+      object.setPrivateLinkDependencies(dependencies);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicDependencies(final String name,
-      final CMakeExtension extension, final Set<String> toolchains, final Set<String> dependencies) {
+      final CMakeExtension extension, final Collection<CharSequence> toolchains,
+      final Collection<CharSequence> dependencies) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPublicLinkDependencies().set(dependencies);
+      object.setPublicLinkDependencies(dependencies);
     });
     return provider;
   }

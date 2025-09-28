@@ -4,10 +4,17 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import org.gradle.api.provider.Property;
+import java.util.Optional;
 
-public interface CMakeTests extends CMakeBinaries {
+public abstract class CMakeTests extends CMakeBinaries {
 
-  Property<Boolean> getTestResultsXmlOutput();
+  private Optional<Boolean> testResultsXmlOutput = Optional.empty();
 
+  public Optional<Boolean> getTestResultsXmlOutput() {
+    return testResultsXmlOutput;
+  }
+
+  public void setTestResultsXmlOutput(final Boolean value) {
+    this.testResultsXmlOutput = Optional.of(value);
+  }
 }

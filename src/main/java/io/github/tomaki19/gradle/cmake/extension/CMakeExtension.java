@@ -28,7 +28,7 @@ public abstract class CMakeExtension {
     this.taskContainer = taskContainer;
   }
 
-  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getSystemPackages();
+  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getPackages();
 
   public abstract NamedDomainObjectContainer<CMakeToolchain> getToolchains();
 
@@ -40,7 +40,7 @@ public abstract class CMakeExtension {
 
   public void register(final String taskName, final Action<CMakeCustomExec> configurationAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
-      for (final String buildConfig : toolchain.getBuildConfigs().get()) {
+      for (final CharSequence buildConfig : toolchain.getBuildConfigs()) {
         taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
             toolchain, buildConfig).configure(configurationAction);
       }
@@ -51,7 +51,7 @@ public abstract class CMakeExtension {
       final Action<CMakeCustomExec> configurationAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
-        for (final String buildConfig : toolchain.getBuildConfigs().get()) {
+        for (final CharSequence buildConfig : toolchain.getBuildConfigs()) {
           taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
               toolchain, buildConfig).configure(configurationAction);
         }
@@ -63,7 +63,7 @@ public abstract class CMakeExtension {
       final Collection<String> buildConfigs, final Action<CMakeCustomExec> configurationAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
-        for (final String buildConfig : toolchain.getBuildConfigs().get()) {
+        for (final CharSequence buildConfig : toolchain.getBuildConfigs()) {
           if (buildConfigs.contains(buildConfig)) {
             taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
                 toolchain, buildConfig).configure(configurationAction);

@@ -27,15 +27,15 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   CMakeResolvedBinary(final CMakeBinary binary, final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) throws IllegalArgumentException {
     super(binary.getName());
-    this.outputName = binary.getOutputName().getOrElse(binary.getName());
-    this.headers = new TreeSet<>(binary.getHeaders().get());
-    this.sources = new TreeSet<>(binary.getSources().get());
-    this.privateCompileOptions = new TreeSet<>(binary.getPrivateCompileOptions().get());
-    this.privateCompileDefinitions = new TreeSet<>(binary.getPrivateCompileDefinitions().get());
-    this.buildStatic = buildStatic || binary.getBuildStatic().getOrElse(Boolean.FALSE);
-    this.buildShared = buildShared && binary.getBuildShared().getOrElse(Boolean.TRUE);
-    this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);
-    this.packageBuildOutputs = packageBuildOutputs || binary.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
+    this.outputName = binary.getOutputName().orElse(binary.getName());
+    this.headers = new TreeSet<>(binary.getHeaders());
+    this.sources = new TreeSet<>(binary.getSources());
+    this.privateCompileOptions = new TreeSet<>(binary.getPrivateCompileOptions());
+    this.privateCompileDefinitions = new TreeSet<>(binary.getPrivateCompileDefinitions());
+    this.buildStatic = buildStatic || binary.getBuildStatic().orElse(Boolean.FALSE);
+    this.buildShared = buildShared && binary.getBuildShared().orElse(Boolean.TRUE);
+    this.stripDebug = stripDebug || binary.getStripDebug().orElse(Boolean.FALSE);
+    this.packageBuildOutputs = packageBuildOutputs || binary.getPackageBuildOutputs().orElse(Boolean.FALSE);
   }
 
   public String getOutputName() {

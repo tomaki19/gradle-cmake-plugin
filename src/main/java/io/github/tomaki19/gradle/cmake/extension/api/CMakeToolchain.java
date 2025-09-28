@@ -5,35 +5,90 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.gradle.api.Action;
-import org.gradle.api.provider.MapProperty;
-import org.gradle.api.provider.Property;
-import org.gradle.api.provider.SetProperty;
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.tasks.Nested;
 import org.gradle.internal.os.OperatingSystem;
 
 public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMakeToolchain> {
 
   public static final OperatingSystem Linux = OperatingSystem.LINUX;
-  public static final OperatingSystem MacOs = OperatingSystem.MAC_OS;
+  public static final OperatingSystem MacOS = OperatingSystem.MAC_OS;
   public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
-  public abstract Property<OperatingSystem> getOperatingSystem();
+  private static final OperatingSystem DEFAULT_OPERATINGSYSYTEM = OperatingSystem.current();
+  private static final Collection<String> DEFAULT_BUILDCONFIGS = Arrays.asList("debug", "release");
 
-  public abstract SetProperty<String> getBuildConfigs();
+  private Optional<OperatingSystem> operatingSystem = Optional.of(DEFAULT_OPERATINGSYSYTEM);
+  private Optional<String> generator = Optional.empty();
+  private Collection<String> buildConfigs = new HashSet<>(DEFAULT_BUILDCONFIGS);
+  private Map<String, String> environment = new HashMap<>();
+  private Optional<File> environmentFile = Optional.empty();
+  private Optional<File> toolchainFile = Optional.empty();
 
-  public abstract Property<String> getCompiler();
+  public Optional<OperatingSystem> getOperatingSystem() {
+    return operatingSystem;
+  }
 
-  public abstract Property<String> getArchitecture();
+  public void setOperatingSystem(final OperatingSystem value) {
+    this.operatingSystem = Optional.of(value);
+  }
 
-  public abstract Property<String> getGenerator();
+  public Optional<String> getGenerator() {
+    return generator;
+  }
 
-  public abstract MapProperty<String, String> getEnvironment();
+  public void setGenerator(final CharSequence value) {
+    this.generator = Optional.of(value.toString());
+  }
 
-  public abstract Property<File> getEnvironmentFile();
+  public Collection<String> getBuildConfigs() {
+    return buildConfigs;
+  }
 
-  public abstract Property<File> getToolchainFile();
+  public void setBuildConfigs(final Collection<CharSequence> values) {
+    this.buildConfigs = values.parallelStream().map((value) -> value.toString())
+        .collect(Collectors.toUnmodifiableSet());
+  }
+
+  public void buildConfigs(final CharSequence... values) {
+    setBuildConfigs(Arrays.asList(values));
+  }
+
+  public Map<String, String> getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(final Map<CharSequence, CharSequence> values) {
+    this.environment = values.entrySet().parallelStream().collect(
+        Collectors.toUnmodifiableMap((entry) -> entry.getKey().toString(), (entry) -> entry.getValue().toString()));
+  }
+
+  public Optional<File> getEnvironmentFile() {
+    return environmentFile;
+  }
+
+  public void getEnvironmentFile(final File value) {
+    this.environmentFile = Optional.of(value);
+  }
+
+  public Optional<File> getToolchainFile() {
+    return toolchainFile;
+  }
+
+  public void getToolchainFile(final File value) {
+    this.toolchainFile = Optional.of(value);
+  }
+
+  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getPackages();
 
   @Nested
   public abstract CMakeBinaries getBinaries();

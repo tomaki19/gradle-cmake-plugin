@@ -26,22 +26,23 @@ import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 public final class CMakeResolver {
 
   private final Project project;
-  private final Collection<CMakeResolvedSystemPackage> availableSystemPackages;
+  private final Collection<CMakeResolvedPackage> availableSystemPackages;
   private final Map<CMakeToolchain, CMakeResolvedToolchain> availableToolchains;
 
   public CMakeResolver(final Project project, final Set<CMakeSystemPackage> systemPackages,
       final Set<CMakeToolchain> toolchains) {
     this.project = project;
     this.availableSystemPackages = systemPackages.stream()
-        .map(systemPackage -> new CMakeResolvedSystemPackage(systemPackage))
+        .map(systemPackage -> new CMakeResolvedPackage(systemPackage))
         .toList();
     this.availableToolchains = toolchains.stream()
-        .filter(toolchain -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
-        .collect(Collectors.toMap(Function.identity(),
-            toolchain -> new CMakeResolvedToolchain(toolchain)));
+        .filter((toolchain) -> toolchain.getOperatingSystem().isPresent()
+            && Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
+        .collect(Collectors.toMap(Function.identity(), (toolchain) -> new CMakeResolvedToolchain(toolchain)));
+
   }
 
-  public Collection<CMakeResolvedSystemPackage> getAvailableSystemPackages() {
+  public Collection<CMakeResolvedPackage> getAvailableSystemPackages() {
     return availableSystemPackages;
   }
 
@@ -60,24 +61,24 @@ public final class CMakeResolver {
     libraries.forEach((object) -> processObject(object, build,
         (CMakeLibrary library, CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library,
-              toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
-                  || toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
-                  && toolchain.getLibraries().getBuildShared().getOrElse(Boolean.TRUE),
-              toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-                  || toolchain.getLibraries().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
-          resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), resolvedToolchain,
+              toolchain.getBinaries().getBuildStatic().orElse(Boolean.FALSE)
+                  || toolchain.getLibraries().getBuildStatic().orElse(Boolean.FALSE),
+              toolchain.getBinaries().getBuildShared().orElse(Boolean.TRUE)
+                  && toolchain.getLibraries().getBuildShared().orElse(Boolean.TRUE),
+              toolchain.getBinaries().getStripDebug().orElse(Boolean.FALSE)
+                  || toolchain.getLibraries().getStripDebug().orElse(Boolean.FALSE),
+              toolchain.getBinaries().getPackageBuildOutputs().orElse(Boolean.FALSE)
+                  || toolchain.getLibraries().getPackageBuildOutputs().orElse(Boolean.FALSE));
+          resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies(), resolvedToolchain,
               resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
-          resolveDependencies(toolchain.getLibraries().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(toolchain.getLibraries().getPrivateLinkDependencies(), resolvedToolchain,
               resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
-          resolveDependencies(library.getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(library.getPrivateLinkDependencies(), resolvedToolchain,
               resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
-          resolveDependencies(library.getPublicLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(library.getPublicLinkDependencies(), resolvedToolchain,
               resolvedLibrary::addPublicLinkOption, resolvedLibrary::addPublicSystemPackageDependency,
               resolvedLibrary::addPublicProjectPackageDependency);
           resolvedToolchain.addLibrary(resolvedLibrary);
@@ -89,21 +90,21 @@ public final class CMakeResolver {
     applications.forEach((object) -> processObject(object, toolchains,
         (CMakeApplication application, CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedExecutable resolvedApplication = new CMakeResolvedExecutable(application,
-              toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
-                  || toolchain.getApplications().getBuildStatic().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
-                  && toolchain.getApplications().getBuildShared().getOrElse(Boolean.TRUE),
-              toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-                  || toolchain.getApplications().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
-          resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), resolvedToolchain,
+              toolchain.getBinaries().getBuildStatic().orElse(Boolean.FALSE)
+                  || toolchain.getApplications().getBuildStatic().orElse(Boolean.FALSE),
+              toolchain.getBinaries().getBuildShared().orElse(Boolean.TRUE)
+                  && toolchain.getApplications().getBuildShared().orElse(Boolean.TRUE),
+              toolchain.getBinaries().getStripDebug().orElse(Boolean.FALSE)
+                  || toolchain.getApplications().getStripDebug().orElse(Boolean.FALSE),
+              toolchain.getBinaries().getPackageBuildOutputs().orElse(Boolean.FALSE)
+                  || toolchain.getApplications().getPackageBuildOutputs().orElse(Boolean.FALSE));
+          resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies(), resolvedToolchain,
               resolvedApplication::addPrivateLinkOption, resolvedApplication::addPrivateSystemPackageDependency,
               resolvedApplication::addPrivateProjectPackageDependency);
-          resolveDependencies(toolchain.getApplications().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(toolchain.getApplications().getPrivateLinkDependencies(), resolvedToolchain,
               resolvedApplication::addPrivateLinkOption, resolvedApplication::addPrivateSystemPackageDependency,
               resolvedApplication::addPrivateProjectPackageDependency);
-          resolveDependencies(application.getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(application.getPrivateLinkDependencies(), resolvedToolchain,
               resolvedApplication::addPrivateLinkOption, resolvedApplication::addPrivateSystemPackageDependency,
               resolvedApplication::addPrivateProjectPackageDependency);
           resolvedToolchain.addApplication(resolvedApplication);
@@ -114,21 +115,21 @@ public final class CMakeResolver {
     tests.forEach((object) -> processObject(object, toolchains,
         (CMakeTest test, CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedExecutable resolvedTest = new CMakeResolvedExecutable(test,
-              toolchain.getBinaries().getBuildStatic().getOrElse(Boolean.FALSE)
-                  || toolchain.getTests().getBuildStatic().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getBuildShared().getOrElse(Boolean.TRUE)
-                  && toolchain.getTests().getBuildShared().getOrElse(Boolean.TRUE),
-              toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-                  || toolchain.getTests().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
-          resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies().get(), resolvedToolchain,
+              toolchain.getBinaries().getBuildStatic().orElse(Boolean.FALSE)
+                  || toolchain.getTests().getBuildStatic().orElse(Boolean.FALSE),
+              toolchain.getBinaries().getBuildShared().orElse(Boolean.TRUE)
+                  && toolchain.getTests().getBuildShared().orElse(Boolean.TRUE),
+              toolchain.getBinaries().getStripDebug().orElse(Boolean.FALSE)
+                  || toolchain.getTests().getStripDebug().orElse(Boolean.FALSE),
+              toolchain.getBinaries().getPackageBuildOutputs().orElse(Boolean.FALSE)
+                  || toolchain.getTests().getPackageBuildOutputs().orElse(Boolean.FALSE));
+          resolveDependencies(toolchain.getBinaries().getPrivateLinkDependencies(), resolvedToolchain,
               resolvedTest::addPrivateLinkOption, resolvedTest::addPrivateSystemPackageDependency,
               resolvedTest::addPrivateProjectPackageDependency);
-          resolveDependencies(toolchain.getTests().getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(toolchain.getTests().getPrivateLinkDependencies(), resolvedToolchain,
               resolvedTest::addPrivateLinkOption, resolvedTest::addPrivateSystemPackageDependency,
               resolvedTest::addPrivateProjectPackageDependency);
-          resolveDependencies(test.getPrivateLinkDependencies().get(), resolvedToolchain,
+          resolveDependencies(test.getPrivateLinkDependencies(), resolvedToolchain,
               resolvedTest::addPrivateLinkOption, resolvedTest::addPrivateSystemPackageDependency,
               resolvedTest::addPrivateProjectPackageDependency);
           resolvedToolchain.addTest(resolvedTest);
@@ -138,9 +139,8 @@ public final class CMakeResolver {
   private <U extends CMakeBinary> void processObject(final U binary,
       final Map<CMakeToolchain, CMakeResolvedToolchain> toolchains, final Resolver<U> resolver) {
     toolchains.forEach((toolchain, resolvedToolchain) -> {
-      if (binary.getToolchains().get().contains(toolchain.getName())
-          || ((binary instanceof CMakeLibrary) && binary.getToolchains().get().isEmpty()
-              && binary.getSources().get().isEmpty())) {
+      if (binary.getToolchains().contains(toolchain.getName())
+          || ((binary instanceof CMakeLibrary) && binary.getToolchains().isEmpty() && binary.getSources().isEmpty())) {
         resolver.resolve(binary, toolchain, resolvedToolchain);
       }
     });
@@ -150,13 +150,13 @@ public final class CMakeResolver {
     void resolve(U binary, CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain);
   }
 
-  private void resolveDependencies(final Set<String> dependencies, final CMakeResolvedToolchain toolchain,
+  private void resolveDependencies(final Collection<String> dependencies, final CMakeResolvedToolchain toolchain,
       final Consumer<String> optionConsumer, final Consumer<String> packageDependencyConsumer,
       final Consumer<CMakeResolvedProjectPackageDependency> moduleDependencyConsumer) {
     for (final String dependency : dependencies) {
-      final String[] dependencyTokens = dependency.split("::");
-      if (dependency.startsWith("-")) {
-        if (dependencyTokens.length == 1) {
+      final String[] dependencyTokens = splitDependency(dependency);
+      if (dependencyTokens.length == 1) {
+        if (dependencyTokens[0].startsWith("-")) {
           optionConsumer.accept(dependencyTokens[0]);
         } else {
           throw new IllegalArgumentException("Invalid link option: '%s'!".formatted(dependencyTokens[0]));
@@ -174,6 +174,14 @@ public final class CMakeResolver {
         }
       }
     }
+  }
+
+  private String[] splitDependency(final String dependency) {
+    String cleanDependency = dependency;
+    if (cleanDependency.startsWith("::")) {
+      cleanDependency = project.getName() + dependency;
+    }
+    return cleanDependency.split("::");
   }
 
   private void resolveProjectPackage(final String[] dependencyTokens,

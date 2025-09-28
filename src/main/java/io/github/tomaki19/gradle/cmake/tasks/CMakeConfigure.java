@@ -23,11 +23,13 @@ public abstract class CMakeConfigure extends CMakeExec {
     getBaseArguments().add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
     getBaseArguments().add("-B %s".formatted(outputDirectory.getAsFile().getAbsolutePath()));
-    getBaseArguments().add("-G \"%s\"".formatted(toolchain.getGenerator()));
-    if (toolchain.getToolchainFile().isPresent()) {
+    toolchain.getGenerator().ifPresent((generator) -> {
+      getBaseArguments().add("-G \"%s\"".formatted(generator));
+    });
+    toolchain.getToolchainFile().ifPresent((toolchainFile) -> {
       getBaseArguments().add("--toolchain");
-      getBaseArguments().add(" \"%s\"".formatted(toolchain.getToolchainFile().get().getAbsolutePath()));
-    }
+      getBaseArguments().add(" \"%s\"".formatted(toolchainFile.getAbsolutePath()));
+    });
     getBaseArguments().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
     getBaseArguments().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
   }

@@ -20,8 +20,8 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   CMakeResolvedLibrary(final CMakeLibrary library, final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) {
     super(library, buildStatic, buildShared, stripDebug, packageBuildOutputs);
-    this.publicCompileOptions = new TreeSet<>(library.getPublicCompileOptions().get());
-    this.publicCompileDefinitions = new TreeSet<>(library.getPublicCompileDefinitions().get());
+    this.publicCompileOptions = new TreeSet<>(library.getPublicCompileOptions());
+    this.publicCompileDefinitions = new TreeSet<>(library.getPublicCompileDefinitions());
   }
 
   public Collection<String> getPublicCompileOptions() {

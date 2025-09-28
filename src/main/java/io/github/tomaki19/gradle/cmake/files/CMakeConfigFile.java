@@ -78,7 +78,7 @@ public class CMakeConfigFile extends CMakeFileContent {
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName(), buildConfig));
     write(outputStream, 1, "IMPORTED_LOCATION %s/%s", installDir.getAsFile().toURI().getPath(),
         outputName);
-    write(outputStream, 1, "IMPORTED_LOCATION_%s %s/%s", buildConfig.toUpperCase(),
+    write(outputStream, 1, "IMPORTED_LOCATION_%s %s/%s", buildConfig.toString().toUpperCase(),
         installDir.getAsFile().toURI().getPath(),
         outputName);
     write(outputStream, 1, "IMPORTED_CONFIGURATIONS \"%s\"", buildConfig);

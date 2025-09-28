@@ -23,12 +23,13 @@ public class CMakeFileConventions {
   public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain, final CMakeLinkType type,
       final String buildConfig) {
     return "%s-%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), type.name().toLowerCase(),
-        buildConfig.toLowerCase());
+        buildConfig.toString().toLowerCase());
   }
 
   public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+    return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(),
+        buildConfig.toString().toLowerCase());
   }
 
   private CMakeFileConventions() {

@@ -16,7 +16,7 @@ public final class TestCMakeInterfaceLibrary {
   public static NamedDomainObjectProvider<CMakeLibrary> register(final String name, final CMakeExtension extension) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = extension.getLibraries().register(name);
     provider.configure((object) -> {
-      object.getHeaders().set(Arrays.asList("header0"));
+      object.getHeaders().add("header0");
     });
     return provider;
   }
@@ -25,7 +25,7 @@ public final class TestCMakeInterfaceLibrary {
       final CMakeExtension extension, final String... dependencies) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getPrivateLinkDependencies().set(Arrays.asList(dependencies));
+      object.getPrivateLinkDependencies().addAll(Arrays.asList(dependencies));
     });
     return provider;
   }
@@ -34,7 +34,7 @@ public final class TestCMakeInterfaceLibrary {
       final CMakeExtension extension, final String... dependencies) {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getPublicLinkDependencies().set(Arrays.asList(dependencies));
+      object.getPublicLinkDependencies().addAll(Arrays.asList(dependencies));
     });
     return provider;
   }

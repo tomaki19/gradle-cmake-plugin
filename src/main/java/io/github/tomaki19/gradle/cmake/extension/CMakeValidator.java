@@ -4,10 +4,9 @@
  */
 package io.github.tomaki19.gradle.cmake.extension;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
-
-import org.gradle.api.provider.Property;
-import org.gradle.api.provider.SetProperty;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
@@ -18,25 +17,22 @@ public final class CMakeValidator {
 
   public static void validateToolchains(final Set<CMakeToolchain> toolchains) {
     toolchains.forEach((toolchain) -> {
-      validatePresent(toolchain.getOperatingSystem(),
-          "toolchains -> %s -> operatingSystem".formatted(toolchain.getName()));
-      validatePresent(toolchain.getCompiler(), "toolchains -> %s -> compiler".formatted(toolchain.getName()));
-      validateNotEmpty(toolchain.getCompiler(), "toolchains -> %s -> compiler".formatted(toolchain.getName()));
-      validatePresent(toolchain.getArchitecture(), "toolchains -> %s -> architecture".formatted(toolchain.getName()));
-      validateNotEmpty(toolchain.getArchitecture(), "toolchains -> %s -> architecture".formatted(toolchain.getName()));
-      validatePresent(toolchain.getGenerator(), "toolchains -> %s -> generator".formatted(toolchain.getName()));
-      validateNotEmpty(toolchain.getGenerator(), "toolchains -> %s -> generator".formatted(toolchain.getName()));
-      if (toolchain.getBuildConfigs().get().isEmpty()) {
-        toolchain.getBuildConfigs().set(Set.of("debug", "release"));
-      }
+
+
+      // validatePresent(toolchain.getOperatingSystem(),
+      // "toolchains -> %s -> operatingSystem".formatted(toolchain.getName()));
+      // validatePresent(toolchain.getGenerator(), "toolchains -> %s ->
+      // generator".formatted(toolchain.getName()));
+      // validateNotEmpty(toolchain.getGenerator(), "toolchains -> %s ->
+      // generator".formatted(toolchain.getName()));
+      // if (toolchain.getBuildConfigs().isEmpty()) {
+      // toolchain.getBuildConfigs().set(Set.of("debug", "release"));
+      // }
     });
   }
 
   public static void validateLibraries(final Set<CMakeLibrary> libraries) {
     libraries.forEach((library) -> {
-      if (!library.getToolchains().get().isEmpty()) {
-        validateNotEmpty(library.getToolchains(), "libraries -> %s -> toolchains".formatted(library.getName()));
-      }
       validateNotEmpty(library.getHeaders(), "library -> %s -> headers".formatted(library.getName()));
     });
   }
@@ -55,21 +51,15 @@ public final class CMakeValidator {
     });
   }
 
-  private static void validatePresent(final Property<?> property, final String message) {
-    if (!property.isPresent()) {
+  private static void validate(final Optional<?> property, final String message) {
+    if (property.isEmpty()) {
       throw new IllegalArgumentException("Required option is missing: %s!".formatted(message));
     }
   }
 
-  private static void validateNotEmpty(final Property<String> property, final String name) {
-    if (property.get().isBlank()) {
-      throw new IllegalArgumentException("Required option is empty: %s!".formatted(name));
-    }
-  }
-
-  private static void validateNotEmpty(final SetProperty<String> property, final String name) {
-    if (property.get().isEmpty()) {
-      throw new IllegalArgumentException("Required option is empty: %s!".formatted(name));
+  private static void validateNotEmpty(final Collection<?> property, final String name) {
+    if (property.isEmpty()) {
+      throw new IllegalArgumentException("Required option is missing: %s!".formatted(name));
     }
   }
 

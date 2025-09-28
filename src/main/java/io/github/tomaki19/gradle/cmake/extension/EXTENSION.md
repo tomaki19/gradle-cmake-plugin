@@ -31,37 +31,35 @@ The `toolchains` configuration block lets you specify build toolchains that can 
 ```groovy
 toolchains {
   '<name>' {
-    operatingSystem = //required: org.gradle.internal.os.OperatingSystem
+    operatingSystem = //optional: enum [Linux, Windows, MacOS], default: auto detect
+    generator = //optional: String, default: cmake defaults for operating system
     buildConfigs = //optional: List<String>, default: ['debug','release']
-    compiler = //required: String
-    architecture = //required: String
-    generator = //required: String
-    environment = //optional, Map<String,String>
-    environmentFile = //optional, File
-    toolchainFile = //optional, File
+    environment = //optional: Map<String,String>, default: none
+    environmentFile = //optional: File, default: none
+    toolchainFile = //optional: File, default: none
     binaries {
-      privateLinkDependencies = //optional: List<String>
+      privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
       packageBuildOutputs = //optional: boolean, default: false
     }
     libraries {
-      privateLinkDependencies = //optional: List<String>
+      privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
       packageBuildOutputs = //optional: boolean, default: false
     }
     applications {
-      privateLinkDependencies = //optional: List<String>
+      privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
       packageBuildOutputs = //optional: boolean, default: false
     }
     tests {
-      privateLinkDependencies = //optional: List<String>
+      privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false

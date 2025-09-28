@@ -5,6 +5,7 @@
 package io.github.tomaki19.gradle.cmake.model;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -18,10 +19,8 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolvedToolchain> {
 
   private final OperatingSystem operatingSystem;
-  private final String architecture;
-  private final String compiler;
-  private final String generator;
   private final Collection<String> buildConfigs;
+  private final Optional<String> generator;
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
@@ -32,34 +31,25 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
-    this.operatingSystem = toolchain.getOperatingSystem().get();
-    this.architecture = toolchain.getArchitecture().getOrElse("").toLowerCase();
-    this.compiler = toolchain.getCompiler().getOrElse("").toLowerCase();
-    this.generator = toolchain.getGenerator().getOrElse("");
-    this.buildConfigs = new TreeSet<>(toolchain.getBuildConfigs().get());
-    this.environment = new TreeMap<>(toolchain.getEnvironment().get());
-    this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
-    this.toolchainFile = Optional.ofNullable(toolchain.getToolchainFile().getOrNull());
-  }
-
-  public String getCompiler() {
-    return compiler;
+    this.operatingSystem = toolchain.getOperatingSystem().orElse(OperatingSystem.current());
+    this.buildConfigs = toolchain.getBuildConfigs().isEmpty() ? Arrays.asList("debug", "release")
+        : new TreeSet<>(toolchain.getBuildConfigs());
+    this.generator = toolchain.getGenerator();
+    this.environment = new TreeMap<>(toolchain.getEnvironment());
+    this.environmentFile = toolchain.getEnvironmentFile();
+    this.toolchainFile = toolchain.getToolchainFile();
   }
 
   public OperatingSystem getOperatingSystem() {
     return operatingSystem;
   }
 
-  public String getArchitecture() {
-    return architecture;
-  }
-
-  public String getGenerator() {
-    return generator;
-  }
-
   public Collection<String> getBuildConfigs() {
     return buildConfigs;
+  }
+
+  public Optional<String> getGenerator() {
+    return generator;
   }
 
   public Map<String, String> getEnvironment() {

@@ -20,7 +20,7 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectPackageDependency;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedSystemPackage;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeListsFile extends CMakeFileContent {
@@ -29,10 +29,10 @@ public class CMakeListsFile extends CMakeFileContent {
 
   private static final String CMAKE_MINIMUM_VERSION = "3.21";
 
-  private final Collection<CMakeResolvedSystemPackage> systemPackages;
+  private final Collection<CMakeResolvedPackage> systemPackages;
   private final Collection<CMakeResolvedToolchain> toolchains;
 
-  public CMakeListsFile(final Collection<CMakeResolvedSystemPackage> systemPackages,
+  public CMakeListsFile(final Collection<CMakeResolvedPackage> systemPackages,
       final Collection<CMakeResolvedToolchain> toolchains, final Project project)
       throws FileNotFoundException {
     super(project.getLayout().getProjectDirectory().file(NAME), project);
@@ -66,8 +66,8 @@ public class CMakeListsFile extends CMakeFileContent {
   }
 
   private void writeSystemPackages(final FileOutputStream outputStream,
-      final Collection<CMakeResolvedSystemPackage> systemPackages) throws IOException {
-    for (final CMakeResolvedSystemPackage resolvedPackage : systemPackages) {
+      final Collection<CMakeResolvedPackage> systemPackages) throws IOException {
+    for (final CMakeResolvedPackage resolvedPackage : systemPackages) {
       writeLine(outputStream);
       write(outputStream, "find_package( %s CONFIG REQUIRED )", resolvedPackage.getName());
       for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
@@ -82,6 +82,7 @@ public class CMakeListsFile extends CMakeFileContent {
       throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getProjectPackages().isEmpty()) {
+        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final CMakeResolvedProject resolvedPackage : toolchain.getProjectPackages()) {
           if (!Objects.equals(getProjectName(), resolvedPackage.getName())) {
@@ -92,6 +93,7 @@ public class CMakeListsFile extends CMakeFileContent {
             write(outputStream, "find_package( %s CONFIG REQUIRED )", target);
           }
         }
+        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
@@ -101,6 +103,7 @@ public class CMakeListsFile extends CMakeFileContent {
       throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getLibraries().isEmpty()) {
+        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           for (final CMakeResolvedLibrary object : toolchain.getLibraries()) {
@@ -116,6 +119,7 @@ public class CMakeListsFile extends CMakeFileContent {
             }
           }
         }
+        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
@@ -125,6 +129,7 @@ public class CMakeListsFile extends CMakeFileContent {
       final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getApplications().isEmpty()) {
+        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           for (final CMakeResolvedExecutable object : toolchain.getApplications()) {
@@ -139,6 +144,7 @@ public class CMakeListsFile extends CMakeFileContent {
             }
           }
         }
+        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
@@ -151,6 +157,7 @@ public class CMakeListsFile extends CMakeFileContent {
         writeLine(outputStream);
         write(outputStream, "enable_testing()");
         write(outputStream, "include( CTest )");
+        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           for (final CMakeResolvedExecutable object : toolchain.getTests()) {
@@ -163,6 +170,7 @@ public class CMakeListsFile extends CMakeFileContent {
             writeAddTest(outputStream, target, outputName);
           }
         }
+        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
@@ -353,22 +361,22 @@ public class CMakeListsFile extends CMakeFileContent {
     write(outputStream, "set_target_properties( %s PROPERTIES", target);
     write(outputStream, 1, "OUTPUT_NAME \"%s\"", outputName);
     write(outputStream, 1, "ARCHIVE_OUTPUT_DIRECTORY \"%s\"",
-        installDir.dir(buildConfig).getAsFile().toURI().getPath());
+        installDir.dir(buildConfig.toString()).getAsFile().toURI().getPath());
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"%s\"", config.toUpperCase(),
-          installDir.dir(buildConfig).getAsFile().toURI().getPath());
+      write(outputStream, 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"%s\"", config.toString().toUpperCase(),
+          installDir.dir(buildConfig.toString()).getAsFile().toURI().getPath());
     }
     write(outputStream, 1, "LIBRARY_OUTPUT_DIRECTORY \"%s\"",
-        installDir.dir(buildConfig).getAsFile().toURI().getPath());
+        installDir.dir(buildConfig.toString()).getAsFile().toURI().getPath());
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, 1, "LIBRARY_OUTPUT_DIRECTORY_%s \"%s\"", config.toUpperCase(),
-          installDir.dir(buildConfig).getAsFile().toURI().getPath());
+      write(outputStream, 1, "LIBRARY_OUTPUT_DIRECTORY_%s \"%s\"", config.toString().toUpperCase(),
+          installDir.dir(buildConfig.toString()).getAsFile().toURI().getPath());
     }
     write(outputStream, 1, "RUNTIME_OUTPUT_DIRECTORY \"%s\"",
-        installDir.dir(buildConfig).getAsFile().toURI().getPath());
+        installDir.dir(buildConfig.toString()).getAsFile().toURI().getPath());
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, 1, "RUNTIME_OUTPUT_DIRECTORY_%s \"%s\"", config.toUpperCase(),
-          installDir.dir(buildConfig).getAsFile().toURI().getPath());
+      write(outputStream, 1, "RUNTIME_OUTPUT_DIRECTORY_%s \"%s\"", config.toString().toUpperCase(),
+          installDir.dir(buildConfig.toString()).getAsFile().toURI().getPath());
     }
     write(outputStream, ")");
   }

@@ -4,14 +4,43 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import org.gradle.api.provider.SetProperty;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
-public interface CMakeLibrary extends CMakeBinary, CMakeLibraries {
+public abstract class CMakeLibrary extends CMakeBinary {
 
-  SetProperty<String> getPublicCompileOptions();
+  private Collection<String> publicCompileOptions = new HashSet<>();
 
-  SetProperty<String> getPublicCompileDefinitions();
+  private Collection<String> publicCompileDefinitions = new HashSet<>();
 
-  SetProperty<String> getPublicLinkDependencies();
+  private Collection<String> publicLinkDependencies = new HashSet<>();
+
+  public Collection<String> getPublicCompileOptions() {
+    return publicCompileOptions;
+  }
+
+  public void setPublicCompileOptions(final Collection<CharSequence> values) {
+    this.publicCompileOptions = values.parallelStream().map((value) -> value.toString())
+        .collect(Collectors.toUnmodifiableSet());
+  }
+
+  public Collection<String> getPublicCompileDefinitions() {
+    return publicCompileDefinitions;
+  }
+
+  public void setPublicCompileDefinitions(final Collection<CharSequence> values) {
+    this.publicCompileDefinitions = values.parallelStream().map((value) -> value.toString())
+        .collect(Collectors.toUnmodifiableSet());
+  }
+
+  public Collection<String> getPublicLinkDependencies() {
+    return publicLinkDependencies;
+  }
+
+  public void setPublicLinkDependencies(final Collection<CharSequence> values) {
+    this.publicLinkDependencies = values.parallelStream().map((value) -> value.toString())
+        .collect(Collectors.toUnmodifiableSet());
+  }
 
 }
