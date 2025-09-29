@@ -76,7 +76,7 @@ public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMa
     return environmentFile;
   }
 
-  public void getEnvironmentFile(final File value) {
+  public void setEnvironmentFile(final File value) {
     this.environmentFile = Optional.of(value);
   }
 
@@ -84,7 +84,7 @@ public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMa
     return toolchainFile;
   }
 
-  public void getToolchainFile(final File value) {
+  public void setToolchainFile(final File value) {
     this.toolchainFile = Optional.of(value);
   }
 
