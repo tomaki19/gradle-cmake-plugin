@@ -14,11 +14,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.gradle.api.Action;
-import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.Named;
 import org.gradle.api.tasks.Nested;
 import org.gradle.internal.os.OperatingSystem;
 
-public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMakeToolchain> {
+public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain> {
 
   public static final OperatingSystem Linux = OperatingSystem.LINUX;
   public static final OperatingSystem MacOS = OperatingSystem.MAC_OS;
@@ -55,8 +55,7 @@ public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMa
   }
 
   public void setBuildConfigs(final Collection<CharSequence> values) {
-    this.buildConfigs = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.buildConfigs = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
   public void buildConfigs(final CharSequence... values) {
@@ -68,7 +67,7 @@ public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMa
   }
 
   public void setEnvironment(final Map<CharSequence, CharSequence> values) {
-    this.environment = values.entrySet().parallelStream().collect(
+    this.environment = values.entrySet().stream().sorted().collect(
         Collectors.toUnmodifiableMap((entry) -> entry.getKey().toString(), (entry) -> entry.getValue().toString()));
   }
 
@@ -87,8 +86,6 @@ public abstract class CMakeToolchain implements CMakeNamedObject, Comparable<CMa
   public void setToolchainFile(final File value) {
     this.toolchainFile = Optional.of(value);
   }
-
-  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getPackages();
 
   @Nested
   public abstract CMakeBinaries getBinaries();

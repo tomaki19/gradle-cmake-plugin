@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 
@@ -18,10 +17,6 @@ public abstract class CMakeCustomExec extends CMakeExec {
     this.compileCommands = getProject().getLayout().getBuildDirectory().dir("%s/%s/%s/compile_commands.json"
         .formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig))
         .get().getAsFile().getAbsolutePath();
-  }
-
-  public static String name(final String baseName, final CMakeToolchain toolchain, final CharSequence buildConfig) {
-    return "%s-%s-%s".formatted(baseName, toolchain.getName(), buildConfig);
   }
 
 }

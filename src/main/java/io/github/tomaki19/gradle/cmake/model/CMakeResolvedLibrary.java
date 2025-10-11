@@ -14,8 +14,8 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   private final Collection<String> publicCompileOptions;
   private final Collection<String> publicCompileDefinitions;
   private final Collection<String> publicLinkOptions = new TreeSet<>();
-  private final Collection<String> publicSystemPackageDependencies = new TreeSet<>();
-  private final Collection<CMakeResolvedProjectPackageDependency> publicProjectPackageDependencies = new TreeSet<>();
+  private final Collection<String> publicPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
 
   CMakeResolvedLibrary(final CMakeLibrary library, final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) {
@@ -40,20 +40,20 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
     publicLinkOptions.add(option);
   }
 
-  public Collection<String> getPublicSystemPackageDependencies() {
-    return publicSystemPackageDependencies;
+  public Collection<String> getPublicPackageDependencies() {
+    return publicPackageDependencies;
   }
 
   public void addPublicSystemPackageDependency(final String dependency) {
-    publicSystemPackageDependencies.add(dependency);
+    publicPackageDependencies.add(dependency);
   }
 
-  public Collection<CMakeResolvedProjectPackageDependency> getPublicProjectPackageDependencies() {
-    return publicProjectPackageDependencies;
+  public Collection<CMakeResolvedProjectDependency> getPublicProjectDependencies() {
+    return publicProjectDependencies;
   }
 
-  public void addPublicProjectPackageDependency(final CMakeResolvedProjectPackageDependency dependency) {
-    publicProjectPackageDependencies.add(dependency);
+  public void addPublicProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {
+    publicProjectDependencies.add(dependency);
   }
 
 }

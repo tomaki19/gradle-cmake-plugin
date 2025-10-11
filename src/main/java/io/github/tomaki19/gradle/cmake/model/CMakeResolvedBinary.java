@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -12,13 +13,13 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
 public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> extends CMakeResolvedName<T> {
 
   private final String outputName;
-  private final Collection<String> headers;
-  private final Collection<String> sources;
+  private final Collection<File> headers;
+  private final Collection<File> sources;
   private final Collection<String> privateCompileOptions;
   private final Collection<String> privateCompileDefinitions;
   private final Collection<String> privateLinkOptions = new TreeSet<>();
   private final Collection<String> privateSystemPackageDependencies = new TreeSet<>();
-  private final Collection<CMakeResolvedProjectPackageDependency> privateProjectPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> privateProjectPackageDependencies = new TreeSet<>();
   private final boolean buildStatic;
   private final boolean buildShared;
   private final boolean stripDebug;
@@ -28,8 +29,8 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
       final boolean stripDebug, final boolean packageBuildOutputs) throws IllegalArgumentException {
     super(binary.getName());
     this.outputName = binary.getOutputName().orElse(binary.getName());
-    this.headers = new TreeSet<>(binary.getHeaders());
-    this.sources = new TreeSet<>(binary.getSources());
+    this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs());
+    this.sources = new TreeSet<>(binary.getSources().getFiles());
     this.privateCompileOptions = new TreeSet<>(binary.getPrivateCompileOptions());
     this.privateCompileDefinitions = new TreeSet<>(binary.getPrivateCompileDefinitions());
     this.buildStatic = buildStatic || binary.getBuildStatic().orElse(Boolean.FALSE);
@@ -42,11 +43,11 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
     return outputName;
   }
 
-  public Collection<String> getHeaders() {
+  public Collection<File> getHeaders() {
     return headers;
   }
 
-  public Collection<String> getSources() {
+  public Collection<File> getSources() {
     return sources;
   }
 
@@ -74,11 +75,11 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
     privateSystemPackageDependencies.add(dependency);
   }
 
-  public Collection<CMakeResolvedProjectPackageDependency> getPrivateProjectPackageDependencies() {
+  public Collection<CMakeResolvedProjectDependency> getPrivateProjectPackageDependencies() {
     return privateProjectPackageDependencies;
   }
 
-  void addPrivateProjectPackageDependency(final CMakeResolvedProjectPackageDependency dependency) {
+  void addPrivateProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {
     privateProjectPackageDependencies.add(dependency);
   }
 

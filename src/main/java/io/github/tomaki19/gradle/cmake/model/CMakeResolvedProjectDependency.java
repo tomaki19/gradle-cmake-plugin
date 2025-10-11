@@ -8,13 +8,13 @@ import org.gradle.api.Project;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 
-public final class CMakeResolvedProjectPackageDependency
-    extends CMakeResolvedName<CMakeResolvedProjectPackageDependency> {
+public final class CMakeResolvedProjectDependency
+    extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
   private final CMakeResolvedProject project;
   private final CMakeLinkType type;
 
-  CMakeResolvedProjectPackageDependency(final Project project, final String name, final CMakeLinkType type) {
+  CMakeResolvedProjectDependency(final Project project, final String name, final CMakeLinkType type) {
     super(name);
     this.project = new CMakeResolvedProject(project);
     this.type = type;
@@ -45,7 +45,7 @@ public final class CMakeResolvedProjectPackageDependency
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeResolvedProjectPackageDependency other = (CMakeResolvedProjectPackageDependency) obj;
+    CMakeResolvedProjectDependency other = (CMakeResolvedProjectDependency) obj;
     if (project == null) {
       if (other.project != null)
         return false;
@@ -57,7 +57,7 @@ public final class CMakeResolvedProjectPackageDependency
   }
 
   @Override
-  public int compareTo(CMakeResolvedProjectPackageDependency other) {
+  public int compareTo(CMakeResolvedProjectDependency other) {
     int comparator = 0;
     if ((comparator = getProject().compareTo(other.getProject())) != 0) {
       return comparator;

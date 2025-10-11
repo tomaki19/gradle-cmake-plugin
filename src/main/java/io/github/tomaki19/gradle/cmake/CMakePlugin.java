@@ -5,25 +5,24 @@
 package io.github.tomaki19.gradle.cmake;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.SoftwareComponentFactory;
+import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.attributes.Bundling;
-import org.gradle.api.attributes.Category;
-import org.gradle.api.attributes.LibraryElements;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
-import io.github.tomaki19.gradle.cmake.extension.CMakeConfigurations;
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
-import io.github.tomaki19.gradle.cmake.extension.CMakeValidator;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
@@ -35,11 +34,13 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildExecutable;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
 
 public class CMakePlugin implements Plugin<Project> {
 
   private final SoftwareComponentFactory softwareComponentFactory;
+  private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomExec>>> customTaskProtos = new HashMap<>();
 
   @javax.inject.Inject
   CMakePlugin(SoftwareComponentFactory softwareComponentFactory) {
@@ -55,37 +56,39 @@ public class CMakePlugin implements Plugin<Project> {
 
   private void allProjects(final Project project) {
     try {
-      project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
+      project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, customTaskProtos);
 
       final AdhocComponentWithVariants adhocComponent = softwareComponentFactory.adhoc("cmake");
       project.getComponents().add(adhocComponent);
 
-      final Configuration cmakeCompile = project.getConfigurations()
-          .create(CMakeConfigurations.CMAKE_COMPILE.toString(),
-              CMakeConfigurations.CMAKE_COMPILE.configure());
+      // final Configuration cmakeCompile = project.getConfigurations()
+      // .create(CMakeConfigurations.CMAKE_COMPILE.toString(),
+      // CMakeConfigurations.CMAKE_COMPILE.configure());
 
-      final Configuration cmakeCompileClasspath = project.getConfigurations().create(
-          CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.toString(),
-          CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.configure());
-      cmakeCompileClasspath.extendsFrom(cmakeCompile);
-      cmakeCompileClasspath.getAttributes().attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-          project.getObjects().named(LibraryElements.class, "cmake-compile"));
+      // final Configuration cmakeCompileClasspath =
+      // project.getConfigurations().create(
+      // CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.toString(),
+      // CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.configure());
+      // cmakeCompileClasspath.extendsFrom(cmakeCompile);
+      // cmakeCompileClasspath.getAttributes().attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+      // project.getObjects().named(LibraryElements.class, "cmake-compile"));
 
-      final Configuration cmakeCompileElements = project.getConfigurations()
-          .create(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.toString(),
-              CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.configure());
-      cmakeCompileElements.extendsFrom(cmakeCompile);
-      cmakeCompileElements.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
-          project.getObjects().named(Category.class, Category.LIBRARY));
-      cmakeCompileElements.getAttributes().attribute(Bundling.BUNDLING_ATTRIBUTE,
-          project.getObjects().named(Bundling.class, Bundling.EXTERNAL));
-      cmakeCompileElements.getAttributes().attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-          project.getObjects().named(LibraryElements.class, "cmake-compile"));
+      // final Configuration cmakeCompileElements = project.getConfigurations()
+      // .create(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.toString(),
+      // CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.configure());
+      // cmakeCompileElements.extendsFrom(cmakeCompile);
+      // cmakeCompileElements.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
+      // project.getObjects().named(Category.class, Category.LIBRARY));
+      // cmakeCompileElements.getAttributes().attribute(Bundling.BUNDLING_ATTRIBUTE,
+      // project.getObjects().named(Bundling.class, Bundling.EXTERNAL));
+      // cmakeCompileElements.getAttributes().attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+      // project.getObjects().named(LibraryElements.class, "cmake-compile"));
 
-      adhocComponent.addVariantsFromConfiguration(cmakeCompileElements, (variant) -> {
-        variant.mapToMavenScope("compile");
-        variant.mapToOptional();
-      });
+      // adhocComponent.addVariantsFromConfiguration(cmakeCompileElements, (variant)
+      // -> {
+      // variant.mapToMavenScope("compile");
+      // variant.mapToOptional();
+      // });
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
@@ -95,17 +98,9 @@ public class CMakePlugin implements Plugin<Project> {
     try {
       final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
 
-      /* Validation */
-
-      CMakeValidator.validateToolchains(extension.getToolchains());
-      CMakeValidator.validateLibraries(extension.getLibraries());
-      CMakeValidator.validateApplications(extension.getApplications());
-      CMakeValidator.validateTests(extension.getTests());
-
       /* Resolve */
 
-      final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
-          extension.getToolchains());
+      final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
       final Collection<CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
           extension.getApplications(), extension.getTests());
 
@@ -114,7 +109,7 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry(project.getTasks());
 
       final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(
-          resolver.getAvailableSystemPackages(), toolchains, project);
+          toolchains, project);
       taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
 
       final TaskProvider<Task> cleanTask = taskRegistry.cleanTask();
@@ -124,6 +119,7 @@ public class CMakePlugin implements Plugin<Project> {
       }));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
+
         final TaskProvider<CMakeAssemble> assembleConfigTask = taskRegistry.assembleConfigTask(toolchain, project);
         taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleConfigTask));
 
@@ -155,6 +151,14 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, project);
             task.dependsOn(assembleListsTask);
           });
+
+          if (customTaskProtos.containsKey(toolchain.getName())) {
+            customTaskProtos.get(toolchain.getName()).forEach((taskProto, taskAction) -> {
+              if (Objects.equals(buildConfig, taskProto.getBuildConfig())) {
+                taskRegistry.customExecTask(taskProto).configure(taskAction);
+              }
+            });
+          }
 
           for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
             if (!library.getSources().isEmpty()) {

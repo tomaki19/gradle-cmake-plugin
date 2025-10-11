@@ -24,7 +24,8 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
-  private final Collection<CMakeResolvedProject> projectPackages = new TreeSet<>();
+  private final Collection<CMakeResolvedProject> projects = new TreeSet<>();
+  private final Collection<CMakeResolvedPackage> packages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> libraries = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> applications = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> tests = new TreeSet<>();
@@ -64,12 +65,20 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return toolchainFile;
   }
 
-  void addModule(final CMakeResolvedProject object) {
-    projectPackages.add(object);
+  void addProject(final CMakeResolvedProject object) {
+    projects.add(object);
   }
 
-  public Collection<CMakeResolvedProject> getProjectPackages() {
-    return projectPackages;
+  public Collection<CMakeResolvedPackage> getPackages() {
+    return packages;
+  }
+
+  void addPackage(final CMakeResolvedPackage object) {
+    packages.add(object);
+  }
+
+  public Collection<CMakeResolvedProject> getProjects() {
+    return projects;
   }
 
   void addLibrary(final CMakeResolvedLibrary object) {
@@ -81,12 +90,12 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public boolean hasInterfaceLibraries() {
-    return libraries.parallelStream()
+    return libraries.stream()
         .anyMatch((library) -> library.getSources().isEmpty() && !library.getHeaders().isEmpty());
   }
 
   public boolean hasBinaryLibraries() {
-    return libraries.parallelStream()
+    return libraries.stream()
         .anyMatch((library) -> !library.getSources().isEmpty() && !library.getHeaders().isEmpty());
   }
 

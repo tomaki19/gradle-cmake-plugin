@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
@@ -23,15 +25,20 @@ class CMakePluginFunctionalTest {
   File testProjectDir;
 
   private File buildFile;
+  private File sourcesDir;
 
   @BeforeEach
   void setup() throws IOException {
     buildFile = new File(testProjectDir, "build.gradle");
+    sourcesDir = new File(testProjectDir, "src");
+    sourcesDir.mkdirs();
+    Files.createFile(Paths.get(sourcesDir.getAbsolutePath(), "test.hpp"));
+    Files.createFile(Paths.get(sourcesDir.getAbsolutePath(), "test.cpp"));
   }
 
   @Test
   void pluginCreatesExpectedTasks() throws IOException {
-    writeBuildFile();
+    writeValidBuildFile();
 
     BuildResult result = GradleRunner.create()
         .withProjectDir(testProjectDir)
@@ -53,40 +60,6 @@ class CMakePluginFunctionalTest {
     assertTrue(output.contains("configure-TestToolchain"), "Should contain configure task");
     assertTrue(output.contains("build-all-TestToolchain"), "Should contain build-all task");
   }
-
-  // @Test
-  // void pluginFailsWithMissingRequiredToolchainProperties() throws IOException {
-  // writeBuildFileWithMissingToolchainProperties();
-
-  // try {
-  // GradleRunner.create()
-  // .withProjectDir(testProjectDir)
-  // .withArguments("tasks")
-  // .withPluginClasspath()
-  // .buildAndFail();
-  // } catch (Exception e) {
-  // assertTrue(e.getMessage().contains("Required option is missing") ||
-  // e.getMessage().contains("BUILD FAILED"),
-  // "Should fail with validation error for missing toolchain properties");
-  // }
-  // }
-
-  // @Test
-  // void pluginFailsWithEmptyToolchainProperties() throws IOException {
-  // writeBuildFileWithEmptyToolchainProperties();
-
-  // try {
-  // GradleRunner.create()
-  // .withProjectDir(testProjectDir)
-  // .withArguments("tasks")
-  // .withPluginClasspath()
-  // .buildAndFail();
-  // } catch (Exception e) {
-  // assertTrue(e.getMessage().contains("Required option is empty") ||
-  // e.getMessage().contains("BUILD FAILED"),
-  // "Should fail with validation error for empty toolchain properties");
-  // }
-  // }
 
   @Test
   void pluginFailsWithMissingLibraryProperties() throws IOException {
@@ -170,7 +143,7 @@ class CMakePluginFunctionalTest {
 
   @Test
   void pluginHandlesFileSystemErrors() throws IOException {
-    writeBuildFile();
+    writeValidBuildFile();
 
     // Create a read-only directory to simulate file system errors
     File readOnlyDir = new File(testProjectDir, "readonly");
@@ -221,7 +194,7 @@ class CMakePluginFunctionalTest {
 
   @Test
   void pluginFailsWithMissingCMakeExecutable() throws IOException {
-    writeBuildFile();
+    writeValidBuildFile();
 
     // Try to run a CMake task that would require the cmake executable
     // This should fail if cmake is not installed or not in PATH
@@ -241,7 +214,7 @@ class CMakePluginFunctionalTest {
     }
   }
 
-  private void writeBuildFile() throws IOException {
+  private void writeValidBuildFile() throws IOException {
     try (FileWriter writer = new FileWriter(buildFile)) {
       writer.write("""
           plugins {
@@ -256,60 +229,25 @@ class CMakePluginFunctionalTest {
 
             toolchains {
               TestToolchain {
-                operatingSystem = org.gradle.internal.os.OperatingSystem.current()
                 buildConfigs = ['Debug']
-                generator = 'Unix Makefiles'
               }
             }
 
             libraries {
               TestLibrary {
                 toolchains = ['TestToolchain']
-                headers = ['src/headers/']
-                sources = ['src/cpp/']
+                headers {
+                  srcDir '%1$s'
+                  include '*.hpp'
+                }
+                sources {
+                  srcDir '%1$s'
+                  include '*.cpp'
+                }
               }
             }
           }
-          """);
-    }
-  }
-
-  private void writeBuildFileWithMissingToolchainProperties() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
-      writer.write("""
-          plugins {
-            id 'io.github.tomaki19.gradle-cmake-plugin'
-          }
-
-          cmake {
-            toolchains {
-              TestToolchain {
-                // Missing required properties: operatingSystem, generator
-                buildConfigs = ['Debug']
-              }
-            }
-          }
-          """);
-    }
-  }
-
-  private void writeBuildFileWithEmptyToolchainProperties() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
-      writer.write("""
-          plugins {
-            id 'io.github.tomaki19.gradle-cmake-plugin'
-          }
-
-          cmake {
-            toolchains {
-              TestToolchain {
-                operatingSystem = org.gradle.internal.os.OperatingSystem.current()
-                buildConfigs = ['Debug']
-                generator = ''  // Empty generator
-              }
-            }
-          }
-          """);
+          """.formatted(sourcesDir.getAbsolutePath()));
     }
   }
 
@@ -333,11 +271,14 @@ class CMakePluginFunctionalTest {
               TestLibrary {
                 toolchains = ['TestToolchain']
                 // Missing headers property
-                sources = ['src/cpp/']
+                sources {
+                  srcDir '%1$s'
+                  include '*.cpp'
+                }
               }
             }
           }
-          """);
+          """.formatted(sourcesDir.getAbsolutePath()));
     }
   }
 
@@ -359,7 +300,7 @@ class CMakePluginFunctionalTest {
 
             applications {
               TestApplication {
-                // Missing toolchains and sources properties
+                // Missing sources properties
               }
             }
           }
@@ -385,7 +326,7 @@ class CMakePluginFunctionalTest {
 
             tests {
               TestTest {
-                // Missing toolchains and sources properties
+                // Missing sources properties
               }
             }
           }
@@ -412,17 +353,29 @@ class CMakePluginFunctionalTest {
             libraries {
               ValidLibrary {
                 toolchains = ['TestToolchain']  // Valid toolchain reference
-                headers = ['src/headers/']
-                sources = ['src/cpp/']
+                headers {
+                  srcDir '%1$s'
+                  include '*.hpp'
+                }
+                sources {
+                  srcDir '%1$s'
+                  include '*.cpp'
+                }
               }
               InvalidLibrary {
                 toolchains = ['NonExistentToolchain']  // Invalid toolchain reference
-                headers = ['src/headers/']
-                sources = ['src/cpp/']
+                headers {
+                  srcDir '%1$s'
+                  include '*.hpp'
+                }
+                sources {
+                  srcDir '%1$s'
+                  include '*.cpp'
+                }
               }
             }
           }
-          """);
+          """.formatted(sourcesDir.getAbsolutePath()));
     }
   }
 

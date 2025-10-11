@@ -19,6 +19,8 @@ public abstract class CMakeConfigure extends CMakeExec {
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig)).get();
     // tasks with same output directory are not run in parallel
     setWorkingDir(getProject().getProjectDir());
+    // if gradle build file changes, configure needs to be run
+    getInputs().file(getProject().getBuildFile());
     getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
     getBaseArguments().add("-S %s".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));

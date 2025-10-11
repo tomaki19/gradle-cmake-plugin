@@ -78,9 +78,9 @@ The `libraries` configuration block lets you specify library build items that ca
 libraries {
   '<name>' {
     outputName = //optional: String, default: <name>
-    toolchains = //optional: List<String>, (header only library, if not present)
+    toolchains = //optional: List<String>
     headers = //required: List<String>
-    sources = //optional: List<String>
+    sources = //optional: List<String>, (header only library, if not present)
     privateCompileOptions = //optional: List<String>
     publicCompileOptions = //optional: List<String>
     privateCompileDefinitions = //optional: List<String>

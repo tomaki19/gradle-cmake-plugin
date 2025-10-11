@@ -5,32 +5,33 @@
 package io.github.tomaki19.gradle.cmake.extension;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
-import org.gradle.api.tasks.TaskContainer;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeSystemPackage;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 
 public abstract class CMakeExtension {
 
   public static final String NAME = "cmake";
 
-  private final TaskContainer taskContainer;
+  private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks;
 
   @javax.inject.Inject
-  public CMakeExtension(final TaskContainer taskContainer) {
-    this.taskContainer = taskContainer;
+  public CMakeExtension(final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
+    this.customTasks = customTasks;
   }
 
-  public abstract NamedDomainObjectContainer<CMakeSystemPackage> getPackages();
-
   public abstract NamedDomainObjectContainer<CMakeToolchain> getToolchains();
+
+  public abstract NamedDomainObjectContainer<CMakePackage> getPackages();
 
   public abstract NamedDomainObjectContainer<CMakeLibrary> getLibraries();
 
@@ -38,38 +39,42 @@ public abstract class CMakeExtension {
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
 
-  public void register(final String taskName, final Action<CMakeCustomExec> configurationAction) {
+  public void register(final String taskName, final Action<CMakeCustomTaskProto> taskAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
-      for (final CharSequence buildConfig : toolchain.getBuildConfigs()) {
-        taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
-            toolchain, buildConfig).configure(configurationAction);
+      for (final String buildConfig : toolchain.getBuildConfigs()) {
+        putCMakeCustomTaskProto(new CMakeCustomTaskProto(taskName, toolchain, buildConfig), taskAction);
       }
     }
   }
 
   public void register(final String taskName, final Collection<String> toolChainNames,
-      final Action<CMakeCustomExec> configurationAction) {
+      final Action<CMakeCustomTaskProto> taskAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
-        for (final CharSequence buildConfig : toolchain.getBuildConfigs()) {
-          taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
-              toolchain, buildConfig).configure(configurationAction);
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          putCMakeCustomTaskProto(new CMakeCustomTaskProto(taskName, toolchain, buildConfig), taskAction);
         }
       }
     }
   }
 
   public void register(final String taskName, final Collection<String> toolChainNames,
-      final Collection<String> buildConfigs, final Action<CMakeCustomExec> configurationAction) {
+      final Collection<String> buildConfigs, final Action<CMakeCustomTaskProto> taskAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
-        for (final CharSequence buildConfig : toolchain.getBuildConfigs()) {
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
           if (buildConfigs.contains(buildConfig)) {
-            taskContainer.register(CMakeCustomExec.name(taskName, toolchain, buildConfig), CMakeCustomExec.class,
-                toolchain, buildConfig).configure(configurationAction);
+            putCMakeCustomTaskProto(new CMakeCustomTaskProto(taskName, toolchain, buildConfig), taskAction);
           }
         }
       }
     }
+  }
+
+  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto, final Action<CMakeCustomTaskProto> action) {
+    if (!customTasks.containsKey(proto.getToolchain().getName())) {
+      customTasks.put(proto.getToolchain().getName(), new HashMap<>());
+    }
+    customTasks.get(proto.getToolchain().getName()).put(proto, action);
   }
 }

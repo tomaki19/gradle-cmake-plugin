@@ -4,7 +4,8 @@
  */
 package io.github.tomaki19.gradle.cmake.helper;
 
-import java.util.Set;
+import java.net.URISyntaxException;
+import java.util.Collection;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
@@ -13,29 +14,33 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 
 public final class TestCMakeTest {
 
-  public static NamedDomainObjectProvider<CMakeTest> register(final String name, final CMakeExtension extension) {
+  public static NamedDomainObjectProvider<CMakeTest> register(final String name, final CMakeExtension extension)
+      throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = extension.getTests().register(name);
+    final String headerPath = TestCMakeApplication.class.getResource("src/cpp").toURI().getPath();
+    final String sourcePath = TestCMakeApplication.class.getResource("src/hpp").toURI().getPath();
     provider.configure((object) -> {
-      object.getHeaders().add("header0");
-      object.getSources().add("source0");
+      object.getHeaders().srcDir(headerPath);
+      object.getSources().srcDir(sourcePath);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeTest> register(final String name, final CMakeExtension extension,
-      final Set<String> toolchains) {
+      final Collection<CharSequence> toolchains) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getToolchains().addAll(toolchains);
+      object.setToolchains(toolchains);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeTest> registerWithPrivateDependencies(final String name,
-      final CMakeExtension extension, final Set<String> toolchains, final Set<String> dependencies) {
+      final CMakeExtension extension, final Collection<CharSequence> toolchains,
+      final Collection<CharSequence> dependencies) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateLinkDependencies().addAll(dependencies);
+      object.setPrivateLinkDependencies(dependencies);
     });
     return provider;
   }

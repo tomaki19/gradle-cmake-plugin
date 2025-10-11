@@ -7,7 +7,6 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public abstract class CMakeBinaries {
 
@@ -22,8 +21,7 @@ public abstract class CMakeBinaries {
   }
 
   public void setPrivateLinkDependencies(final Collection<CharSequence> values) {
-    this.privateLinkDependencies = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.privateLinkDependencies = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
   public Optional<Boolean> getBuildStatic() {

@@ -7,16 +7,28 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public abstract class CMakeBinary extends CMakeBinaries implements CMakeNamedObject {
+import javax.inject.Inject;
+
+import org.gradle.api.Action;
+import org.gradle.api.Named;
+import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.model.ObjectFactory;
+
+public abstract class CMakeBinary extends CMakeBinaries implements Named {
 
   private Optional<String> outputName = Optional.empty();
+  private final SourceDirectorySet headers;
+  private final SourceDirectorySet sources;
   private Collection<String> toolchains = new HashSet<>();
-  private Collection<String> headers = new HashSet<>();
-  private Collection<String> sources = new HashSet<>();
   private Collection<String> privateCompileOptions = new HashSet<>();
   private Collection<String> privateCompileDefinitions = new HashSet<>();
+
+  @Inject
+  public CMakeBinary(ObjectFactory objectFactory) {
+    this.headers = objectFactory.sourceDirectorySet("headers", "CMake headers");
+    this.sources = objectFactory.sourceDirectorySet("sources", "CMake sources");
+  }
 
   public Optional<String> getOutputName() {
     return outputName;
@@ -31,26 +43,23 @@ public abstract class CMakeBinary extends CMakeBinaries implements CMakeNamedObj
   }
 
   public void setToolchains(final Collection<CharSequence> values) {
-    this.toolchains = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.toolchains = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
-  public Collection<String> getHeaders() {
+  public SourceDirectorySet getHeaders() {
     return headers;
   }
 
-  public void setHeaders(final Collection<CharSequence> values) {
-    this.headers = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+  public void headers(Action<? super SourceDirectorySet> action) {
+    action.execute(headers);
   }
 
-  public Collection<String> getSources() {
+  public SourceDirectorySet getSources() {
     return sources;
   }
 
-  public void setSources(final Collection<CharSequence> values) {
-    this.sources = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+  public void sources(Action<? super SourceDirectorySet> action) {
+    action.execute(sources);
   }
 
   public Collection<String> getPrivateCompileOptions() {
@@ -58,8 +67,7 @@ public abstract class CMakeBinary extends CMakeBinaries implements CMakeNamedObj
   }
 
   public void setPrivateCompileOptions(final Collection<CharSequence> values) {
-    this.privateCompileOptions = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.privateCompileOptions = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
   public Collection<String> getPrivateCompileDefinitions() {
@@ -67,8 +75,7 @@ public abstract class CMakeBinary extends CMakeBinaries implements CMakeNamedObj
   }
 
   public void setPrivateCompileDefinitions(final Collection<CharSequence> values) {
-    this.privateCompileDefinitions = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.privateCompileDefinitions = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
 }

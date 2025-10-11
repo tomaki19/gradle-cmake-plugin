@@ -6,23 +6,28 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
+import org.gradle.api.model.ObjectFactory;
 
 public abstract class CMakeLibrary extends CMakeBinary {
 
   private Collection<String> publicCompileOptions = new HashSet<>();
-
   private Collection<String> publicCompileDefinitions = new HashSet<>();
-
   private Collection<String> publicLinkDependencies = new HashSet<>();
+
+  @Inject
+  public CMakeLibrary(ObjectFactory objectFactory) {
+    super(objectFactory);
+  }
 
   public Collection<String> getPublicCompileOptions() {
     return publicCompileOptions;
   }
 
   public void setPublicCompileOptions(final Collection<CharSequence> values) {
-    this.publicCompileOptions = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.publicCompileOptions = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
   public Collection<String> getPublicCompileDefinitions() {
@@ -30,8 +35,7 @@ public abstract class CMakeLibrary extends CMakeBinary {
   }
 
   public void setPublicCompileDefinitions(final Collection<CharSequence> values) {
-    this.publicCompileDefinitions = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.publicCompileDefinitions = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
   public Collection<String> getPublicLinkDependencies() {
@@ -39,8 +43,7 @@ public abstract class CMakeLibrary extends CMakeBinary {
   }
 
   public void setPublicLinkDependencies(final Collection<CharSequence> values) {
-    this.publicLinkDependencies = values.parallelStream().map((value) -> value.toString())
-        .collect(Collectors.toUnmodifiableSet());
+    this.publicLinkDependencies = values.stream().map((value) -> value.toString()).sorted().toList();
   }
 
 }
