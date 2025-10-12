@@ -67,38 +67,10 @@ public class CMakeListsFile extends CMakeFileContent {
       if (!toolchain.getPackages().isEmpty() || !toolchain.getProjects().isEmpty()) {
         writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        writePackageDependencies(outputStream, toolchain.getPackages());
         writeProjectDependencies(outputStream, toolchain.getProjects(), toolchain);
+        writePackageDependencies(outputStream, toolchain.getPackages());
         writeLine(outputStream);
         write(outputStream, "endif()");
-      }
-    }
-  }
-
-  private void writePackageDependencies(final FileOutputStream outputStream,
-      final Collection<CMakeResolvedPackage> dependencies) throws IOException {
-    for (final CMakeResolvedPackage resolvedPackage : dependencies) {
-      writeLine(outputStream);
-      for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-        write(outputStream, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
-            property.getValue().toUpperCase());
-      }
-      if (resolvedPackage.getComponents().isEmpty()) {
-        if (resolvedPackage.isConfigMode()) {
-          write(outputStream, "find_package( %s REQUIRED CONFIG )", resolvedPackage.getName());
-        } else {
-          write(outputStream, "find_package( %s REQUIRED )", resolvedPackage.getName());
-        }
-      } else {
-        write(outputStream, "find_package( %s REQUIRED", resolvedPackage.getName());
-        write(outputStream, 1, "COMPONENTS");
-        for (final String component : resolvedPackage.getComponents()) {
-          write(outputStream, 2, component);
-        }
-        if (resolvedPackage.isConfigMode()) {
-          write(outputStream, 1, "CONFIG");
-        }
-        write(outputStream, ")");
       }
     }
   }
@@ -109,10 +81,42 @@ public class CMakeListsFile extends CMakeFileContent {
       if (!Objects.equals(getProjectName(), resolvedProject.getName())) {
         writeLine(outputStream);
         final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain);
-        write(outputStream, "set( %s_DIR \"%s\" )", target, resolvedProject.getBuildDirectory()
+        write(outputStream, "if( NOT TARGET %s )", target);
+        write(outputStream, 1, "set( %s_DIR \"%s\" )", target, resolvedProject.getBuildDirectory()
             .dir(CMakeFileConventions.CMAKE_INSTALL_PATH).getAsFile().toURI().getPath());
-        write(outputStream, "find_package( %s CONFIG REQUIRED )", target);
+        write(outputStream, 1, "find_package( %s CONFIG REQUIRED )", target);
+        write(outputStream, "endif()");
       }
+    }
+  }
+
+  private void writePackageDependencies(final FileOutputStream outputStream,
+      final Collection<CMakeResolvedPackage> dependencies) throws IOException {
+    for (final CMakeResolvedPackage resolvedPackage : dependencies) {
+      writeLine(outputStream);
+      write(outputStream, "if( NOT TARGET %s )", resolvedPackage.getName());
+      for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
+        write(outputStream, 1, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
+            property.getValue().toUpperCase());
+      }
+      if (resolvedPackage.getComponents().isEmpty()) {
+        if (resolvedPackage.isConfigMode()) {
+          write(outputStream, 1, "find_package( %s REQUIRED CONFIG )", resolvedPackage.getName());
+        } else {
+          write(outputStream, 1, "find_package( %s REQUIRED )", resolvedPackage.getName());
+        }
+      } else {
+        write(outputStream, 1, "find_package( %s REQUIRED", resolvedPackage.getName());
+        write(outputStream, 2, "COMPONENTS");
+        for (final String component : resolvedPackage.getComponents()) {
+          write(outputStream, 3, component);
+        }
+        if (resolvedPackage.isConfigMode()) {
+          write(outputStream, 2, "CONFIG");
+        }
+        write(outputStream, 1, ")");
+      }
+      write(outputStream, "endif()");
     }
   }
 
@@ -343,8 +347,8 @@ public class CMakeListsFile extends CMakeFileContent {
   private void writePublicLinking(final FileOutputStream outputStream, final String target,
       final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    if (!library.getPublicPackageDependencies().isEmpty()
-        || !library.getPublicProjectDependencies().isEmpty()
+    if (!library.getPublicProjectDependencies().isEmpty()
+        || !library.getPublicPackageDependencies().isEmpty()
         || !library.getPublicLinkOptions().isEmpty()) {
       writeTargetLinkLibraries(outputStream, target, "PUBLIC", toolchain, buildConfig,
           library.getPublicProjectDependencies(),

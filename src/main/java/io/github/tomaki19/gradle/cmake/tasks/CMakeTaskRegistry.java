@@ -129,10 +129,10 @@ public class CMakeTaskRegistry {
     toolchain.getProjects().stream()
         .filter(dependency -> !Objects.equals(project.getName(), dependency.getName()))
         .forEach(dependency -> {
-          task.mustRunAfter(CMakeTasksConventions.configureTaskName(dependency.getName(),
-              toolchain.getName(), buildConfig));
           task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getName(),
               toolchain.getName()));
+          task.dependsOn(CMakeTasksConventions.configureTaskName(dependency.getName(),
+              toolchain.getName(), buildConfig));
         });
   }
 

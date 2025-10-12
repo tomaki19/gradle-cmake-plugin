@@ -35,9 +35,7 @@ public class CMakeConfigFile extends CMakeFileContent {
   @Override
   public void writeTo(final FileOutputStream outputStream) throws IOException {
     write(outputStream, "include( CMakeFindDependencyMacro )");
-    writeLine(outputStream);
     writePackageDependencies(outputStream, toolchain.getPackages());
-    writeLine(outputStream);
     writeProjectDependencies(outputStream, toolchain.getProjects(), toolchain);
     for (final String buildConfig : toolchain.getBuildConfigs()) {
       for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
@@ -48,6 +46,7 @@ public class CMakeConfigFile extends CMakeFileContent {
           write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
           write(outputStream, 1, "add_library( %s::%s INTERFACE IMPORTED )", getProjectName(), libraryTarget);
           setTargetProperties(outputStream, library, libraryTarget);
+          write(outputStream, "endif()");
         } else {
           if (library.isBuildStatic()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
@@ -57,6 +56,7 @@ public class CMakeConfigFile extends CMakeFileContent {
             write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
             write(outputStream, 1, "add_library( %s::%s STATIC IMPORTED )", getProjectName(), libraryTarget);
             setTargetProperties(outputStream, library, libraryTarget, outputName, toolchain, buildConfig);
+            write(outputStream, "endif()");
           }
           if (library.isBuildShared()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
@@ -66,9 +66,9 @@ public class CMakeConfigFile extends CMakeFileContent {
             write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
             write(outputStream, 1, "add_library( %s::%s SHARED IMPORTED )", getProjectName(), libraryTarget);
             setTargetProperties(outputStream, library, libraryTarget, outputName, toolchain, buildConfig);
+            write(outputStream, "endif()");
           }
         }
-        write(outputStream, "endif()");
       }
     }
   }
@@ -148,27 +148,32 @@ public class CMakeConfigFile extends CMakeFileContent {
           workingDir.toPath().relativize(headerDir.toPath()));
     }
     if (!library.getPublicCompileOptions().isEmpty()) {
-      write(outputStream, 2, "INTERFACE_COMPILE_OPTIONS \"%s\"",
-          String.join(";", library.getPublicCompileOptions()));
-    }
-    if (!library.getPublicCompileDefinitions().isEmpty()) {
-      write(outputStream, 2, "INTERFACE_COMPILE_DEFINITIONS \"%s\"",
-          String.join(";", library.getPublicCompileDefinitions()));
-    }
-    if (!library.getPublicPackageDependencies().isEmpty()) {
-      write(outputStream, 2, "INTERFACE_LINK_LIBRARIES \"%s\"",
-          String.join(";", library.getPublicPackageDependencies()));
-    }
-    if (!library.getPublicProjectDependencies().isEmpty()) {
-      for (final CMakeResolvedProjectDependency projectDependency : library
-          .getPublicProjectDependencies()) {
-        write(outputStream, 2, "INTERFACE_LINK_LIBRARIES \"%s-%s;\"", projectDependency.getName(),
-            projectDependency.getType().name().toLowerCase());
+      write(outputStream, 2, "INTERFACE_COMPILE_OPTIONS");
+      for (final String value : library.getPublicCompileOptions()) {
+        write(outputStream, 3, value);
       }
     }
-    if (!library.getPublicLinkOptions().isEmpty()) {
-      write(outputStream, 2, "INTERFACE_LINK_LIBRARIES \"%s\"",
-          String.join(";", library.getPublicLinkOptions()));
+    if (!library.getPublicCompileDefinitions().isEmpty()) {
+      write(outputStream, 2, "INTERFACE_COMPILE_DEFINITIONS");
+      for (final String value : library.getPublicCompileDefinitions()) {
+        write(outputStream, 3, value);
+      }
+    }
+    if (!library.getPublicPackageDependencies().isEmpty()
+        || !library.getPublicProjectDependencies().isEmpty()
+        || !library.getPublicLinkOptions().isEmpty()) {
+      write(outputStream, 2, "INTERFACE_LINK_LIBRARIES");
+      for (final CMakeResolvedProjectDependency projectDependency : library.getPublicProjectDependencies()) {
+        write(outputStream, 3, "%s::%s", projectDependency.getProject().getName(),
+            CMakeFileConventions.buildTarget(projectDependency.getName(), toolchain, projectDependency.getType(),
+                buildConfig));
+      }
+      for (final String value : library.getPublicPackageDependencies()) {
+        write(outputStream, 3, value);
+      }
+      for (final String value : library.getPublicLinkOptions()) {
+        write(outputStream, 3, value);
+      }
     }
     write(outputStream, 1, ")");
   }
