@@ -67,61 +67,58 @@ public class CMakeListsFile extends CMakeFileContent {
       if (!toolchain.getPackages().isEmpty() || !toolchain.getProjects().isEmpty()) {
         writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        writeProjectDependencies(outputStream, toolchain.getProjects(), toolchain);
-        writePackageDependencies(outputStream, toolchain.getPackages());
-        writeLine(outputStream);
+        writeProjectDependencies(outputStream, 1, toolchain.getProjects(), toolchain);
+        writePackageDependencies(outputStream, 1, toolchain.getPackages());
         write(outputStream, "endif()");
       }
     }
   }
 
-  private void writeProjectDependencies(final FileOutputStream outputStream,
+  private void writeProjectDependencies(final FileOutputStream outputStream, final int indent,
       final Collection<CMakeResolvedProject> dependencies, final CMakeResolvedToolchain toolchain) throws IOException {
     for (final CMakeResolvedProject resolvedProject : dependencies) {
       if (!Objects.equals(getProjectName(), resolvedProject.getName())) {
-        writeLine(outputStream);
         final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain);
-        write(outputStream, "if( NOT TARGET %s )", target);
-        write(outputStream, 1, "set( %s_DIR \"%s\" )", target, resolvedProject.getBuildDirectory()
+        write(outputStream, indent, "if( NOT TARGET %s )", target);
+        write(outputStream, indent + 1, "set( %s_DIR \"%s\" )", target, resolvedProject.getBuildDirectory()
             .dir(CMakeFileConventions.CMAKE_INSTALL_PATH).getAsFile().toURI().getPath());
-        write(outputStream, 1, "find_package( %s CONFIG REQUIRED )", target);
-        write(outputStream, "endif()");
+        write(outputStream, indent + 1, "find_package( %s CONFIG REQUIRED )", target);
+        write(outputStream, indent, "endif()");
       }
     }
   }
 
-  private void writePackageDependencies(final FileOutputStream outputStream,
+  private void writePackageDependencies(final FileOutputStream outputStream, final int indent,
       final Collection<CMakeResolvedPackage> dependencies) throws IOException {
     for (final CMakeResolvedPackage resolvedPackage : dependencies) {
-      writeLine(outputStream);
-      write(outputStream, "if( NOT TARGET %s )", resolvedPackage.getName());
+      write(outputStream, indent, "if( NOT TARGET %s )", resolvedPackage.getName());
       for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-        write(outputStream, 1, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
+        write(outputStream, indent + 1, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
             property.getValue().toUpperCase());
       }
       if (resolvedPackage.getComponents().isEmpty()) {
         if (resolvedPackage.isConfigMode()) {
-          write(outputStream, 1, "find_package( %s REQUIRED CONFIG )", resolvedPackage.getName());
+          write(outputStream, indent + 1, "find_package( %s REQUIRED CONFIG )", resolvedPackage.getName());
         } else {
-          write(outputStream, 1, "find_package( %s REQUIRED )", resolvedPackage.getName());
+          write(outputStream, indent + 1, "find_package( %s REQUIRED )", resolvedPackage.getName());
         }
       } else {
-        write(outputStream, 1, "find_package( %s REQUIRED", resolvedPackage.getName());
-        write(outputStream, 2, "COMPONENTS");
+        write(outputStream, indent + 1, "find_package( %s REQUIRED", resolvedPackage.getName());
+        write(outputStream, indent + 2, "COMPONENTS");
         for (final String component : resolvedPackage.getComponents()) {
-          write(outputStream, 3, component);
+          write(outputStream, indent + 3, component);
         }
         if (resolvedPackage.isConfigMode()) {
-          write(outputStream, 2, "CONFIG");
+          write(outputStream, indent + 2, "CONFIG");
         }
-        write(outputStream, 1, ")");
+        write(outputStream, indent + 1, ")");
       }
-      write(outputStream, "endif()");
+      write(outputStream, indent, "endif()");
     }
   }
 
-  private void writeLibraries(final FileOutputStream outputStream, final Collection<CMakeResolvedToolchain> toolchains)
-      throws IOException {
+  private void writeLibraries(final FileOutputStream outputStream,
+      final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getLibraries().isEmpty()) {
         writeLine(outputStream);
@@ -129,18 +126,17 @@ public class CMakeListsFile extends CMakeFileContent {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           for (final CMakeResolvedLibrary object : toolchain.getLibraries()) {
             if (object.getSources().isEmpty()) {
-              writeInterfaceLibrary(outputStream, object, toolchain, buildConfig);
+              writeInterfaceLibrary(outputStream, 1, object, toolchain, buildConfig);
             } else {
               if (object.isBuildStatic()) {
-                writeStaticLibrary(outputStream, object, toolchain, buildConfig);
+                writeStaticLibrary(outputStream, 1, object, toolchain, buildConfig);
               }
               if (object.isBuildShared()) {
-                writeSharedLibrary(outputStream, object, toolchain, buildConfig);
+                writeSharedLibrary(outputStream, 1, object, toolchain, buildConfig);
               }
             }
           }
         }
-        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
@@ -155,24 +151,23 @@ public class CMakeListsFile extends CMakeFileContent {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           for (final CMakeResolvedExecutable object : toolchain.getApplications()) {
             final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, buildConfig);
-            writeExecutable(outputStream, target, object, toolchain, buildConfig);
+            writeExecutable(outputStream, 1, target, object, toolchain, buildConfig);
             final Directory installDir = getBuildDirectory()
                 .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName()));
             final String outputName = object.getOutputName();
-            writeOutputTargetProperties(outputStream, target, installDir, outputName, toolchain, buildConfig);
+            writeOutputTargetProperties(outputStream, 1, target, installDir, outputName, toolchain, buildConfig);
             if (object.isStripDebug()) {
-              writeStripDebugCommand(outputStream, target);
+              writeStripDebugCommand(outputStream, 1, target);
             }
           }
         }
-        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
   }
 
-  private void writeTests(final FileOutputStream outputStream, final Collection<CMakeResolvedToolchain> toolchains)
-      throws IOException {
+  private void writeTests(final FileOutputStream outputStream,
+      final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getTests().isEmpty()) {
         writeLine(outputStream);
@@ -183,233 +178,237 @@ public class CMakeListsFile extends CMakeFileContent {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           for (final CMakeResolvedExecutable object : toolchain.getTests()) {
             final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, buildConfig);
-            writeExecutable(outputStream, target, object, toolchain, buildConfig);
+            writeExecutable(outputStream, 1, target, object, toolchain, buildConfig);
             final Directory installDir = getBuildDirectory()
                 .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName()));
-            final String outputName = object.getOutputName();
-            writeOutputTargetProperties(outputStream, target, installDir, outputName, toolchain, buildConfig);
-            writeAddTest(outputStream, target, outputName);
+            writeOutputTargetProperties(outputStream, 1, target, installDir, object.getOutputName(), toolchain,
+                buildConfig);
+            writeAddTest(outputStream, 1, target, object.getOutputName());
           }
         }
-        writeLine(outputStream);
         write(outputStream, "endif()");
       }
     }
   }
 
-  private void writeInterfaceLibrary(final FileOutputStream outputStream, final CMakeResolvedLibrary object,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
+  private void writeInterfaceLibrary(final FileOutputStream outputStream, final int indent,
+      final CMakeResolvedLibrary object, final CMakeResolvedToolchain toolchain, final String buildConfig)
+      throws IOException {
     final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkType.INTERFACE,
         buildConfig);
-    writeLine(outputStream);
-    write(outputStream, "add_library( %s INTERFACE )", target);
-    write(outputStream, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
-    writeTargetIncludeDirectories(outputStream, target, "INTERFACE", object.getHeaders());
-    writePublicCompiling(outputStream, target, object);
-    writePublicLinking(outputStream, target, object, toolchain, buildConfig);
+    write(outputStream, indent, "add_library( %s INTERFACE )", target);
+    write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
+    writeTargetIncludeDirectories(outputStream, indent, target, "INTERFACE", object.getHeaders());
+    writePublicCompiling(outputStream, indent, target, object);
+    writePublicLinking(outputStream, indent, target, object, toolchain, buildConfig);
   }
 
-  private void writeStaticLibrary(final FileOutputStream outputStream, final CMakeResolvedLibrary object,
+  private void writeStaticLibrary(final FileOutputStream outputStream, final int indent,
+      final CMakeResolvedLibrary object,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
     final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkType.STATIC,
         buildConfig);
     final Directory installDir = getBuildDirectory()
         .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName()));
     final String outputName = object.getOutputName();
-    writeLine(outputStream);
-    write(outputStream, "add_library( %s STATIC )", target);
-    write(outputStream, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
-    writeTargetSources(outputStream, target, "PUBLIC", object.getSources());
-    writeTargetIncludeDirectories(outputStream, target, "PUBLIC", object.getHeaders());
-    writePrivateCompiling(outputStream, target, object);
-    writePublicCompiling(outputStream, target, object);
-    writePrivateLinking(outputStream, target, object, toolchain, buildConfig);
-    writePublicLinking(outputStream, target, object, toolchain, buildConfig);
-    writeOutputTargetProperties(outputStream, target, installDir, outputName, toolchain, buildConfig);
+    write(outputStream, indent, "add_library( %s STATIC )", target);
+    write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
+    writeTargetSources(outputStream, indent, target, "PUBLIC", object.getSources());
+    writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", object.getHeaders());
+    writePrivateCompiling(outputStream, indent, target, object);
+    writePublicCompiling(outputStream, indent, target, object);
+    writePrivateLinking(outputStream, indent, target, object, toolchain, buildConfig);
+    writePublicLinking(outputStream, indent, target, object, toolchain, buildConfig);
+    writeOutputTargetProperties(outputStream, indent, target, installDir, outputName, toolchain, buildConfig);
     if (object.isStripDebug()) {
-      writeStripDebugCommand(outputStream, target);
+      writeStripDebugCommand(outputStream, indent, target);
     }
   }
 
-  private void writeSharedLibrary(final FileOutputStream outputStream, final CMakeResolvedLibrary object,
+  private void writeSharedLibrary(final FileOutputStream outputStream, final int indent,
+      final CMakeResolvedLibrary object,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
     final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkType.SHARED,
         buildConfig);
     final Directory installDir = getBuildDirectory()
         .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName()));
-    final String outputName = object.getOutputName();
-    writeLine(outputStream);
-    write(outputStream, "add_library( %s SHARED )", target);
-    write(outputStream, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
-    writeTargetIncludeDirectories(outputStream, target, "PUBLIC", object.getHeaders());
-    writeTargetSources(outputStream, target, "PUBLIC", object.getSources());
-    writePrivateCompiling(outputStream, target, object);
-    writePublicCompiling(outputStream, target, object);
-    writePrivateLinking(outputStream, target, object, toolchain, buildConfig);
-    writePublicLinking(outputStream, target, object, toolchain, buildConfig);
-    writeOutputTargetProperties(outputStream, target, installDir, outputName, toolchain, buildConfig);
+    write(outputStream, indent, "add_library( %s SHARED )", target);
+    write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
+    writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", object.getHeaders());
+    writeTargetSources(outputStream, indent, target, "PUBLIC", object.getSources());
+    writePrivateCompiling(outputStream, indent, target, object);
+    writePublicCompiling(outputStream, indent, target, object);
+    writePrivateLinking(outputStream, indent, target, object, toolchain, buildConfig);
+    writePublicLinking(outputStream, indent, target, object, toolchain, buildConfig);
+    writeOutputTargetProperties(outputStream, indent, target, installDir, object.getOutputName(), toolchain,
+        buildConfig);
     if (object.isStripDebug()) {
-      writeStripDebugCommand(outputStream, target);
+      writeStripDebugCommand(outputStream, indent, target);
     }
   }
 
-  private void writeExecutable(final FileOutputStream outputStream, final String target,
+  private void writeExecutable(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> object, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    writeLine(outputStream);
-    write(outputStream, "add_executable( %s )", target);
-    writeTargetIncludeDirectories(outputStream, target, "PUBLIC", object.getHeaders());
-    writeTargetSources(outputStream, target, "PRIVATE", object.getSources());
-    writePrivateCompiling(outputStream, target, object);
-    writePrivateLinking(outputStream, target, object, toolchain, buildConfig);
+    write(outputStream, indent, "add_executable( %s )", target);
+    writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", object.getHeaders());
+    writeTargetSources(outputStream, indent, target, "PRIVATE", object.getSources());
+    writePrivateCompiling(outputStream, indent, target, object);
+    writePrivateLinking(outputStream, indent, target, object, toolchain, buildConfig);
   }
 
-  private void writeAddTest(final FileOutputStream outputStream, final String target, final String outputName)
+  private void writeAddTest(final FileOutputStream outputStream, final int indent, final String target,
+      final String outputName)
       throws IOException {
-    writeLine(outputStream);
-    write(outputStream, "add_test(");
-    write(outputStream, 1, "NAME %s", target);
-    write(outputStream, 1, "COMMAND $<TARGET_FILE:%s>", target);
-    write(outputStream, ")");
+    write(outputStream, indent, "add_test(");
+    write(outputStream, indent + 1, "NAME %s", target);
+    write(outputStream, indent + 1, "COMMAND $<TARGET_FILE:%s>", target);
+    write(outputStream, indent, ")");
   }
 
-  private void writeTargetIncludeDirectories(final FileOutputStream outputStream, final String target,
+  private void writeTargetIncludeDirectories(final FileOutputStream outputStream, final int indent, final String target,
       final String access, final Collection<File> headers) throws IOException {
-    write(outputStream, "target_include_directories( %s %s", target, access);
+    write(outputStream, indent, "target_include_directories( %s %s", target, access);
     final File workingDir = getProjectDirectory().getAsFile();
     for (final File headerDir : headers) {
-      write(outputStream, 1, "${CMAKE_CURRENT_SOURCE_DIR}/%s", workingDir.toPath().relativize(headerDir.toPath()));
+      write(outputStream, indent + 1, "${CMAKE_CURRENT_SOURCE_DIR}/%s",
+          workingDir.toPath().relativize(headerDir.toPath()));
     }
-    write(outputStream, ")");
+    write(outputStream, indent, ")");
   }
 
-  private void writeTargetSources(final FileOutputStream outputStream, final String target, final String access,
+  private void writeTargetSources(final FileOutputStream outputStream, final int indent, final String target,
+      final String access,
       final Collection<File> sources) throws IOException {
-    write(outputStream, "target_sources( %s %s", target, access);
+    write(outputStream, indent, "target_sources( %s %s", target, access);
     final File workingDir = getProjectDirectory().getAsFile();
     for (final File sourceFile : sources) {
-      write(outputStream, 1, "${CMAKE_CURRENT_SOURCE_DIR}/%s", workingDir.toPath().relativize(sourceFile.toPath()));
+      write(outputStream, indent + 1, "${CMAKE_CURRENT_SOURCE_DIR}/%s",
+          workingDir.toPath().relativize(sourceFile.toPath()));
     }
-    write(outputStream, ")");
+    write(outputStream, indent, ")");
   }
 
-  private void writeTargetCompileOptions(final FileOutputStream outputStream, final String target, final String access,
+  private void writeTargetCompileOptions(final FileOutputStream outputStream, final int indent, final String target,
+      final String access,
       final Collection<String> options) throws IOException {
-    write(outputStream, "target_compile_options( %s %s", target, access);
+    write(outputStream, indent, "target_compile_options( %s %s", target, access);
     for (final String option : options) {
-      write(outputStream, 1, option);
+      write(outputStream, indent + 1, option);
     }
-    write(outputStream, ")");
+    write(outputStream, indent, ")");
   }
 
-  private void writeTargetCompileDefinitions(final FileOutputStream outputStream, final String target,
+  private void writeTargetCompileDefinitions(final FileOutputStream outputStream, final int indent, final String target,
       final String type, final Collection<String> definitions) throws IOException {
-    write(outputStream, "target_compile_definitions( %s %s", target, type);
+    write(outputStream, indent, "target_compile_definitions( %s %s", target, type);
     for (final String definition : definitions) {
-      write(outputStream, 1, definition);
+      write(outputStream, indent + 1, definition);
     }
-    write(outputStream, ")");
+    write(outputStream, indent, ")");
   }
 
-  private void writePrivateCompiling(final FileOutputStream outputStream, final String target,
+  private void writePrivateCompiling(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> binary) throws IOException {
     if (!binary.getPrivateCompileOptions().isEmpty()) {
-      writeTargetCompileOptions(outputStream, target, "PRIVATE", binary.getPrivateCompileOptions());
+      writeTargetCompileOptions(outputStream, indent, target, "PRIVATE", binary.getPrivateCompileOptions());
     }
     if (!binary.getPrivateCompileDefinitions().isEmpty()) {
-      writeTargetCompileDefinitions(outputStream, target, "PRIVATE", binary.getPrivateCompileDefinitions());
+      writeTargetCompileDefinitions(outputStream, indent, target, "PRIVATE", binary.getPrivateCompileDefinitions());
     }
   }
 
-  private void writePublicCompiling(final FileOutputStream outputStream, final String target,
+  private void writePublicCompiling(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedLibrary library) throws IOException {
     if (!library.getPublicCompileOptions().isEmpty()) {
-      writeTargetCompileOptions(outputStream, target, "PUBLIC", library.getPublicCompileOptions());
+      writeTargetCompileOptions(outputStream, indent, target, "PUBLIC", library.getPublicCompileOptions());
     }
     if (!library.getPublicCompileDefinitions().isEmpty()) {
-      writeTargetCompileDefinitions(outputStream, target, "PUBLIC", library.getPublicCompileDefinitions());
+      writeTargetCompileDefinitions(outputStream, indent, target, "PUBLIC", library.getPublicCompileDefinitions());
     }
   }
 
-  private void writePrivateLinking(final FileOutputStream outputStream, final String target,
+  private void writePrivateLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
     if (!binary.getPrivateSystemPackageDependencies().isEmpty()
         || !binary.getPrivateProjectPackageDependencies().isEmpty()
         || !binary.getPrivateLinkOptions().isEmpty()) {
-      writeTargetLinkLibraries(outputStream, target, "PRIVATE", toolchain, buildConfig,
+      writeTargetLinkLibraries(outputStream, indent, target, "PRIVATE", toolchain, buildConfig,
           binary.getPrivateProjectPackageDependencies(),
           binary.getPrivateSystemPackageDependencies(),
           binary.getPrivateLinkOptions());
     }
   }
 
-  private void writePublicLinking(final FileOutputStream outputStream, final String target,
+  private void writePublicLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
     if (!library.getPublicProjectDependencies().isEmpty()
         || !library.getPublicPackageDependencies().isEmpty()
         || !library.getPublicLinkOptions().isEmpty()) {
-      writeTargetLinkLibraries(outputStream, target, "PUBLIC", toolchain, buildConfig,
+      writeTargetLinkLibraries(outputStream, indent, target, "PUBLIC", toolchain, buildConfig,
           library.getPublicProjectDependencies(),
           library.getPublicPackageDependencies(),
           library.getPublicLinkOptions());
     }
   }
 
-  private void writeTargetLinkLibraries(final FileOutputStream outputStream, final String target, final String type,
+  private void writeTargetLinkLibraries(final FileOutputStream outputStream, final int indent, final String target,
+      final String type,
       final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Collection<CMakeResolvedProjectDependency> projectPackageDependencies,
       final Collection<String> packageDependencies, final Collection<String> options) throws IOException {
-    write(outputStream, "target_link_libraries( %s %s", target, type);
+    write(outputStream, indent, "target_link_libraries( %s %s", target, type);
     for (final CMakeResolvedProjectDependency projectModule : projectPackageDependencies) {
-      write(outputStream, 1, "%s::%s", projectModule.getProject().getName(),
+      write(outputStream, indent + 1, "%s::%s", projectModule.getProject().getName(),
           CMakeFileConventions.buildTarget(projectModule.getName(), toolchain, projectModule.getType(), buildConfig));
     }
     for (final String packageDependency : packageDependencies) {
-      write(outputStream, 1, packageDependency);
+      write(outputStream, indent + 1, packageDependency);
     }
     for (final String option : options) {
-      write(outputStream, 1, option);
+      write(outputStream, indent + 1, option);
     }
-    write(outputStream, ")");
+    write(outputStream, indent, ")");
   }
 
-  private void writeOutputTargetProperties(final FileOutputStream outputStream, final String target,
+  private void writeOutputTargetProperties(final FileOutputStream outputStream, final int indent, final String target,
       final Directory installDir, final String outputName, final CMakeResolvedToolchain toolchain,
       final String buildConfig) throws IOException {
     final File projectDir = getProjectDirectory().getAsFile();
-    write(outputStream, "set_target_properties( %s PROPERTIES", target);
-    write(outputStream, 1, "OUTPUT_NAME \"%s\"", outputName);
-    write(outputStream, 1, "ARCHIVE_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
+    write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
+    write(outputStream, indent + 1, "OUTPUT_NAME \"%s\"", outputName);
+    write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
         projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
+      write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
           config.toString().toUpperCase(),
           projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
     }
-    write(outputStream, 1, "LIBRARY_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
+    write(outputStream, indent + 1, "LIBRARY_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
         projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, 1, "LIBRARY_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
+      write(outputStream, indent + 1, "LIBRARY_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
           config.toString().toUpperCase(),
           projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
     }
-    write(outputStream, 1, "RUNTIME_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
+    write(outputStream, indent + 1, "RUNTIME_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
         projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, 1, "RUNTIME_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
+      write(outputStream, indent + 1, "RUNTIME_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
           config.toString().toUpperCase(),
           projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
     }
-    write(outputStream, ")");
+    write(outputStream, indent, ")");
   }
 
-  private void writeStripDebugCommand(final FileOutputStream outputStream, final String target) throws IOException {
-    write(outputStream, "add_custom_command( TARGET %s POST_BUILD", target);
-    write(outputStream, 1, "COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:%s> $<TARGET_FILE:%s>.debug",
+  private void writeStripDebugCommand(final FileOutputStream outputStream, final int indent, final String target)
+      throws IOException {
+    write(outputStream, indent, "add_custom_command( TARGET %s POST_BUILD", target);
+    write(outputStream, indent + 1, "COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:%s> $<TARGET_FILE:%s>.debug",
         target, target);
-    write(outputStream, 1, "COMMAND ${CMAKE_STRIP} -g $<TARGET_FILE:%s>", target);
-    write(outputStream, ")");
+    write(outputStream, indent + 1, "COMMAND ${CMAKE_STRIP} -g $<TARGET_FILE:%s>", target);
+    write(outputStream, indent, ")");
   }
 }
