@@ -15,8 +15,8 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final String outputName;
   private final Collection<File> headers;
   private final Collection<File> sources;
-  private final Collection<String> privateCompileOptions;
-  private final Collection<String> privateCompileDefinitions;
+  private final Collection<String> privateCompileDefinitions = new TreeSet<>();
+  private final Collection<String> privateCompileOptions = new TreeSet<>();
   private final Collection<String> privateLinkOptions = new TreeSet<>();
   private final Collection<String> privateSystemPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> privateProjectPackageDependencies = new TreeSet<>();
@@ -31,8 +31,6 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
     this.outputName = binary.getOutputName().orElse(binary.getName());
     this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs());
     this.sources = new TreeSet<>(binary.getSources().getFiles());
-    this.privateCompileOptions = new TreeSet<>(binary.getPrivateCompileOptions());
-    this.privateCompileDefinitions = new TreeSet<>(binary.getPrivateCompileDefinitions());
     this.buildStatic = buildStatic || binary.getBuildStatic().orElse(Boolean.FALSE);
     this.buildShared = buildShared && binary.getBuildShared().orElse(Boolean.TRUE);
     this.stripDebug = stripDebug || binary.getStripDebug().orElse(Boolean.FALSE);
@@ -51,12 +49,20 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
     return sources;
   }
 
+  public Collection<String> getPrivateCompileDefinitions() {
+    return privateCompileDefinitions;
+  }
+
+  void addPrivateCompileDefinitions(final String definition) {
+    privateCompileDefinitions.add(definition);
+  }
+
   public Collection<String> getPrivateCompileOptions() {
     return privateCompileOptions;
   }
 
-  public Collection<String> getPrivateCompileDefinitions() {
-    return privateCompileDefinitions;
+  void addPrivateCompileOptions(final String option) {
+    privateCompileOptions.add(option);
   }
 
   public Collection<String> getPrivateLinkOptions() {

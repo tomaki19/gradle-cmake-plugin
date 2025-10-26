@@ -15,6 +15,7 @@ import java.util.Objects;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
@@ -41,7 +42,7 @@ public class CMakeConfigFile extends CMakeFileContent {
       for (final CMakeResolvedLibrary library : toolchain.getLibraries()) {
         if (library.getSources().isEmpty()) {
           final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
-              CMakeLinkType.INTERFACE, buildConfig);
+              CMakeLinkage.INTERFACE.toString(), buildConfig);
           writeLine(outputStream);
           write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
           write(outputStream, 1, "add_library( %s::%s INTERFACE IMPORTED )", getProjectName(), libraryTarget);
@@ -50,7 +51,7 @@ public class CMakeConfigFile extends CMakeFileContent {
         } else {
           if (library.isBuildStatic()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
-                CMakeLinkType.STATIC, buildConfig);
+                CMakeLinkage.STATIC.toString(), buildConfig);
             final String outputName = toolchain.getOperatingSystem().getStaticLibraryName(library.getOutputName());
             writeLine(outputStream);
             write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
@@ -60,7 +61,7 @@ public class CMakeConfigFile extends CMakeFileContent {
           }
           if (library.isBuildShared()) {
             final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
-                CMakeLinkType.SHARED, buildConfig);
+                CMakeLinkage.SHARED.toString(), buildConfig);
             final String outputName = toolchain.getOperatingSystem().getSharedLibraryName(library.getOutputName());
             writeLine(outputStream);
             write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
@@ -165,7 +166,7 @@ public class CMakeConfigFile extends CMakeFileContent {
       write(outputStream, 2, "INTERFACE_LINK_LIBRARIES");
       for (final CMakeResolvedProjectDependency projectDependency : library.getPublicProjectDependencies()) {
         write(outputStream, 3, "%s::%s", projectDependency.getProject().getName(),
-            CMakeFileConventions.buildTarget(projectDependency.getName(), toolchain, projectDependency.getType(),
+            CMakeFileConventions.buildTarget(projectDependency.getName(), toolchain, projectDependency.getLinkage(),
                 buildConfig));
       }
       for (final String value : library.getPublicPackageDependencies()) {

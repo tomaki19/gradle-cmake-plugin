@@ -16,8 +16,8 @@ import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeConfigFile;
-import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -78,10 +78,10 @@ public class CMakeTaskRegistry {
   }
 
   public TaskProvider<CMakeBuildLibrary> buildTask(final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final CMakeLinkType linkType, final String buildConfig) {
+      final CMakeResolvedToolchain toolchain, final String linkage, final String buildConfig) {
     final String taskName = CMakeTasksConventions.buildTaskName(library.getName(), toolchain.getName(),
-        linkType, buildConfig);
-    return taskContainer.register(taskName, CMakeBuildLibrary.class, library, toolchain, linkType,
+        linkage, buildConfig);
+    return taskContainer.register(taskName, CMakeBuildLibrary.class, library, toolchain, linkage,
         buildConfig);
   }
 
@@ -93,10 +93,10 @@ public class CMakeTaskRegistry {
   }
 
   public TaskProvider<CMakePackageLibrary> packageTask(final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final CMakeLinkType linkType, final String buildConfig) {
+      final CMakeResolvedToolchain toolchain, final String linkage, final String buildConfig) {
     final String taskName = CMakeTasksConventions.packageTaskName(library.getName(), toolchain.getName(),
-        linkType, buildConfig);
-    return taskContainer.register(taskName, CMakePackageLibrary.class, library, toolchain, linkType,
+        linkage, buildConfig);
+    return taskContainer.register(taskName, CMakePackageLibrary.class, library, toolchain, linkage,
         buildConfig);
   }
 
@@ -151,9 +151,10 @@ public class CMakeTaskRegistry {
 
   private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Collection<CMakeResolvedProjectDependency> dependencies) {
-    dependencies.stream().filter(dependency -> !Objects.equals(dependency.getType(), CMakeLinkType.INTERFACE))
+    dependencies.stream()
+        .filter(dependency -> !Objects.equals(dependency.getLinkage(), CMakeLinkage.INTERFACE.toString()))
         .forEach(dependency -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getProject().getName(),
-            dependency.getName(), toolchain.getName(), dependency.getType(), buildConfig)));
+            dependency.getName(), toolchain.getName(), dependency.getLinkage(), buildConfig)));
   }
 
 }

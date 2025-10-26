@@ -15,6 +15,7 @@ import java.util.Objects;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -194,7 +195,8 @@ public class CMakeListsFile extends CMakeFileContent {
   private void writeInterfaceLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary object, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkType.INTERFACE,
+    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain,
+        CMakeLinkage.INTERFACE.toString(),
         buildConfig);
     write(outputStream, indent, "add_library( %s INTERFACE )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
@@ -206,7 +208,7 @@ public class CMakeListsFile extends CMakeFileContent {
   private void writeStaticLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary object,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
-    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkType.STATIC,
+    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkage.STATIC.toString(),
         buildConfig);
     final Directory installDir = getBuildDirectory()
         .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName()));
@@ -228,7 +230,7 @@ public class CMakeListsFile extends CMakeFileContent {
   private void writeSharedLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary object,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
-    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkType.SHARED,
+    final String target = CMakeFileConventions.buildTarget(object.getName(), toolchain, CMakeLinkage.SHARED.toString(),
         buildConfig);
     final Directory installDir = getBuildDirectory()
         .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_INSTALL_PATH, toolchain.getName()));
@@ -362,7 +364,8 @@ public class CMakeListsFile extends CMakeFileContent {
     write(outputStream, indent, "target_link_libraries( %s %s", target, type);
     for (final CMakeResolvedProjectDependency projectModule : projectPackageDependencies) {
       write(outputStream, indent + 1, "%s::%s", projectModule.getProject().getName(),
-          CMakeFileConventions.buildTarget(projectModule.getName(), toolchain, projectModule.getType(), buildConfig));
+          CMakeFileConventions.buildTarget(projectModule.getName(), toolchain, projectModule.getLinkage(),
+              buildConfig));
     }
     for (final String packageDependency : packageDependencies) {
       write(outputStream, indent + 1, packageDependency);

@@ -4,46 +4,31 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Collection;
-import java.util.HashSet;
 
 import javax.inject.Inject;
 
+import org.gradle.api.Action;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.Nested;
 
 public abstract class CMakeLibrary extends CMakeBinary {
-
-  private Collection<String> publicCompileOptions = new HashSet<>();
-  private Collection<String> publicCompileDefinitions = new HashSet<>();
-  private Collection<String> publicLinkDependencies = new HashSet<>();
 
   @Inject
   public CMakeLibrary(ObjectFactory objectFactory) {
     super(objectFactory);
   }
 
-  public Collection<String> getPublicCompileOptions() {
-    return publicCompileOptions;
+  @Nested
+  public abstract CMakeCompile getPublicCompile();
+
+  public void publicCompile(Action<? super CMakeCompile> action) {
+    action.execute(getPublicCompile());
   }
 
-  public void setPublicCompileOptions(final Collection<CharSequence> values) {
-    this.publicCompileOptions = values.stream().map((value) -> value.toString()).sorted().toList();
-  }
+  @Nested
+  public abstract CMakeLinking getPublicLinking();
 
-  public Collection<String> getPublicCompileDefinitions() {
-    return publicCompileDefinitions;
+  public void publicLinking(Action<? super CMakeLinking> action) {
+    action.execute(getPublicLinking());
   }
-
-  public void setPublicCompileDefinitions(final Collection<CharSequence> values) {
-    this.publicCompileDefinitions = values.stream().map((value) -> value.toString()).sorted().toList();
-  }
-
-  public Collection<String> getPublicLinkDependencies() {
-    return publicLinkDependencies;
-  }
-
-  public void setPublicLinkDependencies(final Collection<CharSequence> values) {
-    this.publicLinkDependencies = values.stream().map((value) -> value.toString()).sorted().toList();
-  }
-
 }

@@ -4,24 +4,30 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
+
+import org.gradle.api.Action;
+import org.gradle.api.tasks.Nested;
 
 public abstract class CMakeBinaries {
 
-  private Collection<String> privateLinkDependencies = new HashSet<>();
   private Optional<Boolean> buildStatic = Optional.empty();
   private Optional<Boolean> buildShared = Optional.empty();
   private Optional<Boolean> stripDebug = Optional.empty();
   private Optional<Boolean> packageBuildOutputs = Optional.empty();
 
-  public Collection<String> getPrivateLinkDependencies() {
-    return privateLinkDependencies;
+  @Nested
+  public abstract CMakeCompile getPrivateCompile();
+
+  public void privateCompile(Action<? super CMakeCompile> action) {
+    action.execute(getPrivateCompile());
   }
 
-  public void setPrivateLinkDependencies(final Collection<CharSequence> values) {
-    this.privateLinkDependencies = values.stream().map((value) -> value.toString()).sorted().toList();
+  @Nested
+  public abstract CMakeLinking getPrivateLinking();
+
+  public void privateLinking(Action<? super CMakeLinking> action) {
+    action.execute(getPrivateLinking());
   }
 
   public Optional<Boolean> getBuildStatic() {

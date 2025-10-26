@@ -11,8 +11,8 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 
 public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolvedLibrary> {
 
-  private final Collection<String> publicCompileOptions;
-  private final Collection<String> publicCompileDefinitions;
+  private final Collection<String> publicCompileDefinitions = new TreeSet<>();
+  private final Collection<String> publicCompileOptions = new TreeSet<>();
   private final Collection<String> publicLinkOptions = new TreeSet<>();
   private final Collection<String> publicPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
@@ -20,16 +20,22 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   CMakeResolvedLibrary(final CMakeLibrary library, final boolean buildStatic, final boolean buildShared,
       final boolean stripDebug, final boolean packageBuildOutputs) {
     super(library, buildStatic, buildShared, stripDebug, packageBuildOutputs);
-    this.publicCompileOptions = new TreeSet<>(library.getPublicCompileOptions());
-    this.publicCompileDefinitions = new TreeSet<>(library.getPublicCompileDefinitions());
+  }
+
+  public Collection<String> getPublicCompileDefinitions() {
+    return publicCompileDefinitions;
+  }
+
+  void addPublicCompileDefinitions(final String definition) {
+    publicCompileDefinitions.add(definition);
   }
 
   public Collection<String> getPublicCompileOptions() {
     return publicCompileOptions;
   }
 
-  public Collection<String> getPublicCompileDefinitions() {
-    return publicCompileDefinitions;
+  void addPublicCompileOptions(final String option) {
+    publicCompileOptions.add(option);
   }
 
   public Collection<String> getPublicLinkOptions() {

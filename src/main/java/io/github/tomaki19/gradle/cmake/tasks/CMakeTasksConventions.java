@@ -5,7 +5,6 @@
 package io.github.tomaki19.gradle.cmake.tasks;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
-import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
 
 public final class CMakeTasksConventions {
 
@@ -35,13 +34,13 @@ public final class CMakeTasksConventions {
   }
 
   static String buildTaskName(final String projectName, final String targetName,
-      final String toolchainName, final CMakeLinkType targetType, final String buildConfig) {
-    return ":%s:build-%s-%s-%s-%s".formatted(projectName, targetName, toolchainName, targetType, buildConfig);
+      final String toolchainName, final String linkage, final String buildConfig) {
+    return ":%s:build-%s-%s-%s-%s".formatted(projectName, targetName, toolchainName, linkage, buildConfig);
   }
 
   static String buildTaskName(final String targetName, final String toolchainName,
-      final CMakeLinkType targetType, final String buildConfig) {
-    return "build-%s-%s-%s-%s".formatted(targetName, toolchainName, targetType, buildConfig);
+      final String linkage, final String buildConfig) {
+    return "build-%s-%s-%s-%s".formatted(targetName, toolchainName, linkage, buildConfig);
   }
 
   static String buildTaskName(final String targetName, final String toolchainName,
@@ -54,8 +53,8 @@ public final class CMakeTasksConventions {
   }
 
   static String checkTaskName(final String targetName, final String toolchainName,
-      final CMakeLinkType targetType, final String buildConfig) {
-    return "check-%s-%s-%s-%s".formatted(targetName, toolchainName, targetType, buildConfig);
+      final String linkage, final String buildConfig) {
+    return "check-%s-%s-%s-%s".formatted(targetName, toolchainName, linkage, buildConfig);
   }
 
   static String checkTaskName(final String targetName, final String toolchainName,
@@ -68,8 +67,8 @@ public final class CMakeTasksConventions {
   }
 
   static String packageTaskName(final String targetName, final String toolchainName,
-      final CMakeLinkType targetType, final String buildConfig) {
-    return "package-%s-%s-%s-%s".formatted(targetName, toolchainName, targetType, buildConfig);
+      final String linkage, final String buildConfig) {
+    return "package-%s-%s-%s-%s".formatted(targetName, toolchainName, linkage, buildConfig);
   }
 
   static String packageTaskName(final String targetName, final String toolchainName,

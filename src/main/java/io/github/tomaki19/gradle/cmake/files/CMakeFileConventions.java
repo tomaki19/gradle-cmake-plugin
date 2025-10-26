@@ -20,9 +20,9 @@ public class CMakeFileConventions {
     return "%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase());
   }
 
-  public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain, final CMakeLinkType type,
-      final String buildConfig) {
-    return "%s-%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), type.name().toLowerCase(),
+  public static String buildTarget(final String name, final CMakeResolvedToolchain toolchain,
+      final String linkage, final String buildConfig) {
+    return "%s-%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), linkage.toLowerCase(),
         buildConfig.toString().toLowerCase());
   }
 

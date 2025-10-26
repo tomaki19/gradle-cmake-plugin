@@ -24,12 +24,12 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   public static final OperatingSystem MacOS = OperatingSystem.MAC_OS;
   public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
-  private static final OperatingSystem DEFAULT_OPERATINGSYSYTEM = OperatingSystem.current();
-  private static final Collection<String> DEFAULT_BUILDCONFIGS = Arrays.asList("debug", "release");
+  private static final OperatingSystem DEFAULT_OPERATING_SYSTEM = OperatingSystem.current();
+  private static final Collection<String> DEFAULT_BUILD_CONFIGS = Arrays.asList("debug", "release");
 
-  private Optional<OperatingSystem> operatingSystem = Optional.of(DEFAULT_OPERATINGSYSYTEM);
+  private Optional<OperatingSystem> operatingSystem = Optional.of(DEFAULT_OPERATING_SYSTEM);
   private Optional<String> generator = Optional.empty();
-  private Collection<String> buildConfigs = new HashSet<>(DEFAULT_BUILDCONFIGS);
+  private Collection<String> buildConfigs = new HashSet<>(DEFAULT_BUILD_CONFIGS);
   private Map<String, String> environment = new HashMap<>();
   private Optional<File> environmentFile = Optional.empty();
   private Optional<File> toolchainFile = Optional.empty();
@@ -55,7 +55,7 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public void setBuildConfigs(final Collection<CharSequence> values) {
-    this.buildConfigs = values.stream().map((value) -> value.toString()).sorted().toList();
+    this.buildConfigs = values.stream().map((value) -> value.toString()).toList();
   }
 
   public void buildConfigs(final CharSequence... values) {
@@ -67,7 +67,7 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public void setEnvironment(final Map<CharSequence, CharSequence> values) {
-    this.environment = values.entrySet().stream().sorted().collect(
+    this.environment = values.entrySet().stream().collect(
         Collectors.toUnmodifiableMap((entry) -> entry.getKey().toString(), (entry) -> entry.getValue().toString()));
   }
 

@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.gradle.api.NamedDomainObjectProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 
 public final class TestCMakeBinaryLibrary {
@@ -27,30 +28,33 @@ public final class TestCMakeBinaryLibrary {
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> register(final String name, final CMakeExtension extension,
-      final Collection<CharSequence> toolchains) throws URISyntaxException {
+      final Collection<String> toolchains) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.setToolchains(toolchains);
+      object.getToolchains().addAll(toolchains);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateDependencies(final String name,
-      final CMakeExtension extension, final Collection<CharSequence> toolchains,
-      final Collection<CharSequence> dependencies) throws URISyntaxException {
+      final CMakeExtension extension, final Collection<String> toolchains,
+      final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.setPrivateLinkDependencies(dependencies);
+      object.getPrivateLinking().getDependencies().addAll(dependencies);
+      object.getPrivateLinking().getOptions().addAll(options);
+
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicDependencies(final String name,
-      final CMakeExtension extension, final Collection<CharSequence> toolchains,
-      final Collection<CharSequence> dependencies) throws URISyntaxException {
+      final CMakeExtension extension, final Collection<String> toolchains,
+      final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.setPublicLinkDependencies(dependencies);
+      object.getPublicLinking().getDependencies().addAll(dependencies);
+      object.getPublicLinking().getOptions().addAll(options);
     });
     return provider;
   }

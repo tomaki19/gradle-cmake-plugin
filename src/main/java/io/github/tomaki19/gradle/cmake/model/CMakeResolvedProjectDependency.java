@@ -4,28 +4,28 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-import org.gradle.api.Project;
+import java.util.Optional;
 
-import io.github.tomaki19.gradle.cmake.files.CMakeLinkType;
+import org.gradle.api.Project;
 
 public final class CMakeResolvedProjectDependency
     extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
   private final CMakeResolvedProject project;
-  private final CMakeLinkType type;
+  private final String linkage;
 
-  CMakeResolvedProjectDependency(final Project project, final String name, final CMakeLinkType type) {
+  CMakeResolvedProjectDependency(final Project project, final String name, final Optional<CMakeLinkage> linkage) {
     super(name);
     this.project = new CMakeResolvedProject(project);
-    this.type = type;
+    this.linkage = linkage.orElse(CMakeLinkage.SHARED).toString();
   }
 
   public CMakeResolvedProject getProject() {
     return project;
   }
 
-  public CMakeLinkType getType() {
-    return type;
+  public String getLinkage() {
+    return linkage;
   }
 
   @Override
@@ -33,7 +33,7 @@ public final class CMakeResolvedProjectDependency
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((project == null) ? 0 : project.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((linkage == null) ? 0 : linkage.hashCode());
     return result;
   }
 
@@ -51,7 +51,7 @@ public final class CMakeResolvedProjectDependency
         return false;
     } else if (!project.equals(other.project))
       return false;
-    if (type != other.type)
+    if (linkage != other.linkage)
       return false;
     return true;
   }
@@ -65,7 +65,7 @@ public final class CMakeResolvedProjectDependency
     if ((comparator = getName().compareTo(other.getName())) != 0) {
       return comparator;
     }
-    if ((comparator = getType().compareTo(other.getType())) != 0) {
+    if ((comparator = getLinkage().compareTo(other.getLinkage())) != 0) {
       return comparator;
     }
     return comparator;

@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.gradle.api.Action;
@@ -21,6 +20,7 @@ import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
+import io.github.tomaki19.gradle.cmake.helper.TestCMakeDependencies;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
@@ -40,11 +40,13 @@ public class CMakeApplicationResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-        new HashSet<>(Arrays.asList("Package0::target", "-loption",
-            "%s::InterfaceLibrary0::interface".formatted(project.getName()),
-            "%s::BinaryLibrary0::shared".formatted(project.getName()))));
+        Arrays.asList(
+            TestCMakeDependencies.create("target").from("Package0"),
+            TestCMakeDependencies.create("InterfaceLibrary0").getLinkInterface(),
+            TestCMakeDependencies.create("BinaryLibrary0").from(project.getName()).getLinkShared()),
+        Arrays.asList("-loption"));
     TestCMakeApplication.register("Application0", extension);
 
     assertEquals(1, extension.getPackages().size());
@@ -79,16 +81,20 @@ public class CMakeApplicationResolverTest {
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary1", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-        new HashSet<>(Arrays.asList("Package0::target", "-loption",
-            "%s::InterfaceLibrary0::interface".formatted(project.getName()),
-            "%s::BinaryLibrary0::shared".formatted(project.getName()))));
+        Arrays.asList(
+            TestCMakeDependencies.create("target").from("Package0"),
+            TestCMakeDependencies.create("InterfaceLibrary0").getLinkInterface(),
+            TestCMakeDependencies.create("BinaryLibrary0").from(project.getName()).getLinkShared()),
+        Arrays.asList("-loption"));
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain1", extension,
-        new HashSet<>(Arrays.asList("Package1::target", "-loption",
-            "%s::InterfaceLibrary1::interface".formatted(project.getName()))));
+        Arrays.asList(
+            TestCMakeDependencies.create("target").from("Package1"),
+            TestCMakeDependencies.create("InterfaceLibrary1").from(project.getName()).getLinkInterface()),
+        Arrays.asList("-loption"));
     TestCMakeApplication.register("Application0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0", "Toolchain1")));
+        Arrays.asList("Toolchain0", "Toolchain1"));
 
     assertEquals(2, extension.getPackages().size());
     assertEquals(2, extension.getToolchains().size());
@@ -139,13 +145,14 @@ public class CMakeApplicationResolverTest {
 
     TestCMakePackage.register("Package0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-        new HashSet<>());
+        Arrays.asList(), Arrays.asList());
     TestCMakeToolchain.registerWithTestDependencies("Toolchain1", extension,
-        new HashSet<>(Arrays.asList("Package0::target", "-loption")));
+        Arrays.asList(TestCMakeDependencies.create("target").from("Package0")),
+        Arrays.asList("-loption"));
     TestCMakeApplication.register("Application0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(2, extension.getToolchains().size());
@@ -184,13 +191,15 @@ public class CMakeApplicationResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-        new HashSet<>(Arrays.asList("Package0::target", "-loption",
-            "%s::InterfaceLibrary0::interface".formatted(project.getName()),
-            "%s::BinaryLibrary0::shared".formatted(project.getName()))));
+        Arrays.asList(
+            TestCMakeDependencies.create("target").from("Package0"),
+            TestCMakeDependencies.create("InterfaceLibrary0").getLinkInterface(),
+            TestCMakeDependencies.create("BinaryLibrary0").from(project.getName()).getLinkShared()),
+        Arrays.asList("-loption"));
     TestCMakeApplication.register("Application0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());
@@ -229,13 +238,15 @@ public class CMakeApplicationResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        Arrays.asList("Toolchain0"));
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeApplication.registerWithPrivateDependencies("Application0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")),
-        new HashSet<>(Arrays.asList("Package0::target", "-loption",
-            "%s::InterfaceLibrary0::interface".formatted(project.getName()),
-            "%s::BinaryLibrary0::shared".formatted(project.getName()))));
+        Arrays.asList("Toolchain0"),
+        Arrays.asList(
+            TestCMakeDependencies.create("target").from("Package0"),
+            TestCMakeDependencies.create("InterfaceLibrary0").getLinkInterface(),
+            TestCMakeDependencies.create("BinaryLibrary0").from(project.getName()).getLinkShared()),
+        Arrays.asList("-loption"));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());

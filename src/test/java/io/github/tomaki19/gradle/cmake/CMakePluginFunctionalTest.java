@@ -235,7 +235,7 @@ class CMakePluginFunctionalTest {
 
             libraries {
               TestLibrary {
-                toolchains = ['TestToolchain']
+                toolchains 'TestToolchain'
                 headers {
                   srcDir '%1$s'
                   include '*.hpp'
@@ -269,7 +269,7 @@ class CMakePluginFunctionalTest {
 
             libraries {
               TestLibrary {
-                toolchains = ['TestToolchain']
+                toolchains 'TestToolchain'
                 // Missing headers property
                 sources {
                   srcDir '%1$s'
@@ -352,7 +352,7 @@ class CMakePluginFunctionalTest {
 
             libraries {
               ValidLibrary {
-                toolchains = ['TestToolchain']  // Valid toolchain reference
+                toolchains 'TestToolchain'  // Valid toolchain reference
                 headers {
                   srcDir '%1$s'
                   include '*.hpp'
@@ -363,7 +363,7 @@ class CMakePluginFunctionalTest {
                 }
               }
               InvalidLibrary {
-                toolchains = ['NonExistentToolchain']  // Invalid toolchain reference
+                toolchains 'NonExistentToolchain'  // Invalid toolchain reference
                 headers {
                   srcDir '%1$s'
                   include '*.hpp'
