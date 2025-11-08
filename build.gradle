@@ -4,6 +4,7 @@ plugins {
   id('signing')
   alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.versions)
 }
 
 group = 'io.github.tomaki19'
