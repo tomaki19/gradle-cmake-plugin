@@ -5,37 +5,41 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Collection;
+import java.util.HashSet;
 
-import org.gradle.api.tasks.Nested;
+public class CMakeLinking {
 
-public abstract class CMakeLinking {
+  final Collection<String> options = new HashSet<>();
+  final Collection<CMakeDependencies> dependencyCollection = new HashSet<>();
 
-  @Nested
-  public abstract Collection<CMakeDependencies> getDependencies();
+  public Collection<String> getOptions() {
+    return options;
+  }
+
+  public void option(String value) {
+    options.add(value);
+  }
+
+  public void options(String... values) {
+    for (String value : values) {
+      options.add(value);
+    }
+  }
+
+  public Collection<CMakeDependencies> getDependencies() {
+    return dependencyCollection;
+  }
 
   public CMakeDependencies dependency(CharSequence name) {
     final CMakeDependencies dependencies = new CMakeDependencies(name);
-    getDependencies().add(dependencies);
+    dependencyCollection.add(dependencies);
     return dependencies;
   }
 
   public CMakeDependencies dependencies(CharSequence... names) {
     final CMakeDependencies dependencies = new CMakeDependencies(names);
-    getDependencies().add(dependencies);
+    dependencyCollection.add(dependencies);
     return dependencies;
-  }
-
-  @Nested
-  public abstract Collection<String> getOptions();
-
-  public void option(String value) {
-    getOptions().add(value);
-  }
-
-  public void options(String... values) {
-    for (String value : values) {
-      option(value);
-    }
   }
 
 }

@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-
 import javax.inject.Inject;
 
 import org.gradle.api.Action;
@@ -31,4 +30,5 @@ public abstract class CMakeLibrary extends CMakeBinary {
   public void publicLinking(Action<? super CMakeLinking> action) {
     action.execute(getPublicLinking());
   }
+
 }

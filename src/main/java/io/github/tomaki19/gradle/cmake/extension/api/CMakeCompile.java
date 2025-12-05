@@ -5,31 +5,35 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Collection;
+import java.util.HashSet;
 
-import org.gradle.api.tasks.Nested;
+public class CMakeCompile {
 
-public abstract class CMakeCompile {
+  private final Collection<String> defines = new HashSet<>();
+  private final Collection<String> options = new HashSet<>();
 
-  @Nested
-  public abstract Collection<String> getDefines();
+  public Collection<String> getDefines() {
+    return defines;
+  }
 
   public void define(String value) {
-    getDefines().add(value);
+    defines.add(value);
   }
 
   public void defines(Collection<String> values) {
-    getDefines().addAll(values);
+    defines.addAll(values);
   }
 
-  @Nested
-  public abstract Collection<String> getOptions();
+  public Collection<String> getOptions() {
+    return options;
+  }
 
   public void option(String value) {
-    getOptions().add(value);
+    options.add(value);
   }
 
   public void options(Collection<String> values) {
-    getOptions().addAll(values);
+    options.addAll(values);
   }
 
 }

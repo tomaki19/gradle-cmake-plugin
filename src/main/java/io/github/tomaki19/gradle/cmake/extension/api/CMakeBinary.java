@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -14,11 +15,11 @@ import org.gradle.api.Action;
 import org.gradle.api.Named;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.tasks.Nested;
 
 public abstract class CMakeBinary extends CMakeBinaries implements Named {
 
   private Optional<String> outputName = Optional.empty();
+  private final Collection<String> toolchains = new HashSet<>();
   private final SourceDirectorySet headers;
   private final SourceDirectorySet sources;
 
@@ -36,11 +37,12 @@ public abstract class CMakeBinary extends CMakeBinaries implements Named {
     this.outputName = Optional.of(value.toString());
   }
 
-  @Nested
-  public abstract Collection<String> getToolchains();
+  public Collection<String> getToolchains() {
+    return toolchains;
+  }
 
   public void toolchains(final CharSequence... values) {
-    getToolchains().addAll(Arrays.asList(values).stream().map((value) -> value.toString()).toList());
+    toolchains.addAll(Arrays.asList(values).stream().map((value) -> value.toString()).toList());
   }
 
   public SourceDirectorySet getHeaders() {

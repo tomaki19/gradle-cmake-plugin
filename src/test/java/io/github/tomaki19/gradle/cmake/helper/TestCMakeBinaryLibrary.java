@@ -43,7 +43,6 @@ public final class TestCMakeBinaryLibrary {
     provider.configure((object) -> {
       object.getPrivateLinking().getDependencies().addAll(dependencies);
       object.getPrivateLinking().getOptions().addAll(options);
-
     });
     return provider;
   }
