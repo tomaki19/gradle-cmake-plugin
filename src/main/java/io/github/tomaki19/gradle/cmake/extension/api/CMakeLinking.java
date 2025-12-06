@@ -10,36 +10,36 @@ import java.util.HashSet;
 public class CMakeLinking {
 
   final Collection<String> options = new HashSet<>();
-  final Collection<CMakeDependencies> dependencyCollection = new HashSet<>();
+  final Collection<CMakeDependencies> dependencies = new HashSet<>();
 
   public Collection<String> getOptions() {
     return options;
   }
 
-  public void option(String value) {
-    options.add(value);
+  public void option(CharSequence value) {
+    options.add(value.toString());
   }
 
-  public void options(String... values) {
-    for (String value : values) {
-      options.add(value);
+  public void options(CharSequence... values) {
+    for (CharSequence value : values) {
+      options.add(value.toString());
     }
   }
 
   public Collection<CMakeDependencies> getDependencies() {
-    return dependencyCollection;
+    return dependencies;
   }
 
   public CMakeDependencies dependency(CharSequence name) {
-    final CMakeDependencies dependencies = new CMakeDependencies(name);
-    dependencyCollection.add(dependencies);
-    return dependencies;
+    final CMakeDependencies entry = new CMakeDependencies(name);
+    dependencies.add(entry);
+    return entry;
   }
 
   public CMakeDependencies dependencies(CharSequence... names) {
-    final CMakeDependencies dependencies = new CMakeDependencies(names);
-    dependencyCollection.add(dependencies);
-    return dependencies;
+    final CMakeDependencies entry = new CMakeDependencies(names);
+    dependencies.add(entry);
+    return entry;
   }
 
 }

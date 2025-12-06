@@ -4,5 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-public abstract class CMakeApplications extends CMakeBinaries {
+public abstract class CMakeApplications implements CMakeBinaries {
+
 }

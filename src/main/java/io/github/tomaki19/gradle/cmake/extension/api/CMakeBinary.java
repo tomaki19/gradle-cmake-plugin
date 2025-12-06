@@ -16,7 +16,7 @@ import org.gradle.api.Named;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.model.ObjectFactory;
 
-public abstract class CMakeBinary extends CMakeBinaries implements Named {
+public abstract class CMakeBinary implements Named, CMakeBinaries {
 
   private Optional<String> outputName = Optional.empty();
   private final Collection<String> toolchains = new HashSet<>();

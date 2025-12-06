@@ -80,7 +80,9 @@ public class CMakeToolchainResolverTest {
 
     assertEquals("Toolchain0", toolchains[0].getName());
     assertEquals(0, toolchains[0].getPackages().size());
-    assertEquals(2, toolchains[0].getLibraries().size());
+    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+    assertEquals(0, toolchains[0].getStaticLibraries().size());
+    assertEquals(1, toolchains[0].getSharedLibraries().size());
     assertEquals(0, toolchains[0].getApplications().size());
     assertEquals(0, toolchains[0].getTests().size());
   }
@@ -96,7 +98,7 @@ public class CMakeToolchainResolverTest {
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
-    TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
+    TestCMakeToolchain.registerWithSharedLibraryDependencies("Toolchain0", extension,
         Arrays.asList(
             TestCMakeDependencies.create("target").from("Package0"),
             TestCMakeDependencies.create("InterfaceLibrary0").getLinkInterface(),
@@ -118,7 +120,9 @@ public class CMakeToolchainResolverTest {
 
     assertEquals("Toolchain0", toolchains[0].getName());
     assertEquals(1, toolchains[0].getPackages().size());
-    assertEquals(2, toolchains[0].getLibraries().size());
+    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+    assertEquals(0, toolchains[0].getStaticLibraries().size());
+    assertEquals(1, toolchains[0].getSharedLibraries().size());
     assertEquals(0, toolchains[0].getApplications().size());
     assertEquals(0, toolchains[0].getTests().size());
   }
@@ -156,7 +160,9 @@ public class CMakeToolchainResolverTest {
 
     assertEquals("Toolchain0", toolchains[0].getName());
     assertEquals(0, toolchains[0].getPackages().size());
-    assertEquals(2, toolchains[0].getLibraries().size());
+    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+    assertEquals(0, toolchains[0].getStaticLibraries().size());
+    assertEquals(1, toolchains[0].getSharedLibraries().size());
     assertEquals(0, toolchains[0].getApplications().size());
     assertEquals(0, toolchains[0].getTests().size());
   }
@@ -194,7 +200,9 @@ public class CMakeToolchainResolverTest {
 
     assertEquals("Toolchain0", toolchains[0].getName());
     assertEquals(0, toolchains[0].getPackages().size());
-    assertEquals(2, toolchains[0].getLibraries().size());
+    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+    assertEquals(0, toolchains[0].getStaticLibraries().size());
+    assertEquals(1, toolchains[0].getSharedLibraries().size());
     assertEquals(0, toolchains[0].getApplications().size());
     assertEquals(0, toolchains[0].getTests().size());
   }

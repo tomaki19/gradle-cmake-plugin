@@ -10,7 +10,7 @@ import org.gradle.api.Action;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Nested;
 
-public abstract class CMakeLibrary extends CMakeBinary {
+public abstract class CMakeLibrary extends CMakeBinary implements CMakeLibraries {
 
   @Inject
   public CMakeLibrary(ObjectFactory objectFactory) {
@@ -25,10 +25,23 @@ public abstract class CMakeLibrary extends CMakeBinary {
   }
 
   @Nested
-  public abstract CMakeLinking getPublicLinking();
+  public abstract CMakeLinking getPublicInterfaceLinking();
 
-  public void publicLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPublicLinking());
+  public void publicInterfaceLinking(Action<? super CMakeLinking> action) {
+    action.execute(getPublicInterfaceLinking());
   }
 
+  @Nested
+  public abstract CMakeLinking getPublicStaticLinking();
+
+  public void publicStaticLinking(Action<? super CMakeLinking> action) {
+    action.execute(getPublicStaticLinking());
+  }
+
+  @Nested
+  public abstract CMakeLinking getPublicSharedLinking();
+
+  public void publicSharedLinking(Action<? super CMakeLinking> action) {
+    action.execute(getPublicSharedLinking());
+  }
 }

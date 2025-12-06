@@ -20,21 +20,17 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final Collection<String> privateLinkOptions = new TreeSet<>();
   private final Collection<String> privateSystemPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> privateProjectPackageDependencies = new TreeSet<>();
-  private final boolean buildStatic;
-  private final boolean buildShared;
   private final boolean stripDebug;
   private final boolean packageBuildOutputs;
 
-  CMakeResolvedBinary(final CMakeBinary binary, final boolean buildStatic, final boolean buildShared,
-      final boolean stripDebug, final boolean packageBuildOutputs) throws IllegalArgumentException {
+  CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug, final boolean packageBuildOutputs)
+      throws IllegalArgumentException {
     super(binary.getName());
     this.outputName = binary.getOutputName().orElse(binary.getName());
     this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs());
     this.sources = new TreeSet<>(binary.getSources().getFiles());
-    this.buildStatic = buildStatic || binary.getBuildStatic().orElse(Boolean.FALSE);
-    this.buildShared = buildShared && binary.getBuildShared().orElse(Boolean.TRUE);
-    this.stripDebug = stripDebug || binary.getStripDebug().orElse(Boolean.FALSE);
-    this.packageBuildOutputs = packageBuildOutputs || binary.getPackageBuildOutputs().orElse(Boolean.FALSE);
+    this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);
+    this.packageBuildOutputs = packageBuildOutputs || binary.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
   }
 
   public String getOutputName() {
@@ -87,14 +83,6 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   void addPrivateProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {
     privateProjectPackageDependencies.add(dependency);
-  }
-
-  public boolean isBuildStatic() {
-    return buildStatic;
-  }
-
-  public boolean isBuildShared() {
-    return buildShared;
   }
 
   public boolean isStripDebug() {

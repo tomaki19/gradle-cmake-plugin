@@ -25,24 +25,68 @@ public final class TestCMakeInterfaceLibrary {
     return provider;
   }
 
-  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateDependencies(final String name,
+  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateInterfaceDependencies(final String name,
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options)
       throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getPrivateLinking().getDependencies().addAll(dependencies);
-      object.getPrivateLinking().getOptions().addAll(options);
+      object.getPrivateInterfaceLinking().getDependencies().addAll(dependencies);
+      object.getPrivateInterfaceLinking().getOptions().addAll(options);
     });
     return provider;
   }
 
-  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicDependencies(final String name,
+  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateStaticDependencies(final String name,
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options)
       throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getPublicLinking().getDependencies().addAll(dependencies);
-      object.getPublicLinking().getOptions().addAll(options);
+      object.getPrivateStaticLinking().getDependencies().addAll(dependencies);
+      object.getPrivateStaticLinking().getOptions().addAll(options);
+    });
+    return provider;
+  }
+
+  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPrivateSharedDependencies(final String name,
+      final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options)
+      throws URISyntaxException {
+    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
+    provider.configure((object) -> {
+      object.getPrivateSharedLinking().getDependencies().addAll(dependencies);
+      object.getPrivateSharedLinking().getOptions().addAll(options);
+    });
+    return provider;
+  }
+
+  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicInterfaceDependencies(final String name,
+      final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options)
+      throws URISyntaxException {
+    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
+    provider.configure((object) -> {
+      object.getPublicInterfaceLinking().getDependencies().addAll(dependencies);
+      object.getPublicInterfaceLinking().getOptions().addAll(options);
+    });
+    return provider;
+  }
+
+  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicStaticDependencies(final String name,
+      final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options)
+      throws URISyntaxException {
+    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
+    provider.configure((object) -> {
+      object.getPublicStaticLinking().getDependencies().addAll(dependencies);
+      object.getPublicStaticLinking().getOptions().addAll(options);
+    });
+    return provider;
+  }
+
+  public static NamedDomainObjectProvider<CMakeLibrary> registerWithPublicSharedDependencies(final String name,
+      final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options)
+      throws URISyntaxException {
+    final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
+    provider.configure((object) -> {
+      object.getPublicSharedLinking().getDependencies().addAll(dependencies);
+      object.getPublicSharedLinking().getOptions().addAll(options);
     });
     return provider;
   }

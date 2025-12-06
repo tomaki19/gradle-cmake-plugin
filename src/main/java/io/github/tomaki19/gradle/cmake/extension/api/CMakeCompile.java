@@ -16,24 +16,28 @@ public class CMakeCompile {
     return defines;
   }
 
-  public void define(String value) {
-    defines.add(value);
+  public void define(CharSequence value) {
+    defines.add(value.toString());
   }
 
-  public void defines(Collection<String> values) {
-    defines.addAll(values);
+  public void defines(CharSequence... values) {
+    for (final CharSequence value : values) {
+      defines.add(value.toString());
+    }
   }
 
   public Collection<String> getOptions() {
     return options;
   }
 
-  public void option(String value) {
-    options.add(value);
+  public void option(CharSequence value) {
+    options.add(value.toString());
   }
 
-  public void options(Collection<String> values) {
-    options.addAll(values);
+  public void options(CharSequence... values) {
+    for (final CharSequence value : values) {
+      options.add(value.toString());
+    }
   }
 
 }

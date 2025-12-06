@@ -20,22 +20,32 @@ public final class TestCMakeToolchain {
     return provider;
   }
 
-  public static NamedDomainObjectProvider<CMakeToolchain> registerWithBinaryDependencies(final String name,
+  public static NamedDomainObjectProvider<CMakeToolchain> registerWithInterfaceLibraryDependencies(final String name,
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getBinaries().getPrivateLinking().getDependencies().addAll(dependencies);
-      object.getBinaries().getPrivateLinking().getOptions().addAll(options);
+      object.getLibraries().getPrivateInterfaceLinking().getDependencies().addAll(dependencies);
+      object.getLibraries().getPrivateInterfaceLinking().getOptions().addAll(options);
     });
     return provider;
   }
 
-  public static NamedDomainObjectProvider<CMakeToolchain> registerWithLibraryDependencies(final String name,
+  public static NamedDomainObjectProvider<CMakeToolchain> registerWithStaticLibraryDependencies(final String name,
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraries().getPrivateLinking().getDependencies().addAll(dependencies);
-      object.getLibraries().getPrivateLinking().getOptions().addAll(options);
+      object.getLibraries().getPrivateStaticLinking().getDependencies().addAll(dependencies);
+      object.getLibraries().getPrivateStaticLinking().getOptions().addAll(options);
+    });
+    return provider;
+  }
+
+  public static NamedDomainObjectProvider<CMakeToolchain> registerWithSharedLibraryDependencies(final String name,
+      final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
+    final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
+    provider.configure((object) -> {
+      object.getLibraries().getPrivateSharedLinking().getDependencies().addAll(dependencies);
+      object.getLibraries().getPrivateSharedLinking().getOptions().addAll(options);
     });
     return provider;
   }

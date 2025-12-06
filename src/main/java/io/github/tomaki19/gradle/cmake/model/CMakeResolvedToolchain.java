@@ -26,7 +26,9 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Optional<File> toolchainFile;
   private final Collection<CMakeResolvedProject> projects = new TreeSet<>();
   private final Collection<CMakeResolvedPackage> packages = new TreeSet<>();
-  private final Collection<CMakeResolvedLibrary> libraries = new TreeSet<>();
+  private final Collection<CMakeResolvedLibrary> interfaceLibraries = new TreeSet<>();
+  private final Collection<CMakeResolvedLibrary> staticLibraries = new TreeSet<>();
+  private final Collection<CMakeResolvedLibrary> sharedLibraries = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> applications = new TreeSet<>();
   private final Collection<CMakeResolvedExecutable> tests = new TreeSet<>();
 
@@ -65,42 +67,56 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return toolchainFile;
   }
 
-  void addProject(final CMakeResolvedProject object) {
-    projects.add(object);
+  void addProject(final CMakeResolvedProject component) {
+    projects.add(component);
   }
 
   public Collection<CMakeResolvedPackage> getPackages() {
     return packages;
   }
 
-  void addPackage(final CMakeResolvedPackage object) {
-    packages.add(object);
+  void addPackage(final CMakeResolvedPackage component) {
+    packages.add(component);
   }
 
   public Collection<CMakeResolvedProject> getProjects() {
     return projects;
   }
 
-  void addLibrary(final CMakeResolvedLibrary object) {
-    libraries.add(object);
+  void addInterfaceLibrary(final CMakeResolvedLibrary component) {
+    interfaceLibraries.add(component);
   }
 
-  public Collection<CMakeResolvedLibrary> getLibraries() {
-    return libraries;
+  public Collection<CMakeResolvedLibrary> getInterfaceLibraries() {
+    return interfaceLibraries;
+  }
+
+  void addStaticLibrary(final CMakeResolvedLibrary component) {
+    staticLibraries.add(component);
+  }
+
+  public Collection<CMakeResolvedLibrary> getStaticLibraries() {
+    return staticLibraries;
+  }
+
+  void addSharedLibrary(final CMakeResolvedLibrary component) {
+    sharedLibraries.add(component);
+  }
+
+  public Collection<CMakeResolvedLibrary> getSharedLibraries() {
+    return sharedLibraries;
   }
 
   public boolean hasInterfaceLibraries() {
-    return libraries.stream()
-        .anyMatch((library) -> library.getSources().isEmpty() && !library.getHeaders().isEmpty());
+    return !interfaceLibraries.isEmpty();
   }
 
   public boolean hasBinaryLibraries() {
-    return libraries.stream()
-        .anyMatch((library) -> !library.getSources().isEmpty() && !library.getHeaders().isEmpty());
+    return !staticLibraries.isEmpty() || !sharedLibraries.isEmpty();
   }
 
-  void addApplication(final CMakeResolvedExecutable object) {
-    applications.add(object);
+  void addApplication(final CMakeResolvedExecutable component) {
+    applications.add(component);
   }
 
   public Collection<CMakeResolvedExecutable> getApplications() {
@@ -111,8 +127,8 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return !applications.isEmpty();
   }
 
-  void addTest(final CMakeResolvedExecutable object) {
-    tests.add(object);
+  void addTest(final CMakeResolvedExecutable component) {
+    tests.add(component);
   }
 
   public Collection<CMakeResolvedExecutable> getTests() {

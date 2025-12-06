@@ -6,7 +6,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Optional;
 
-public abstract class CMakeTests extends CMakeBinaries {
+public abstract class CMakeTests implements CMakeBinaries {
 
   private Optional<Boolean> testResultsXmlOutput = Optional.empty();
 

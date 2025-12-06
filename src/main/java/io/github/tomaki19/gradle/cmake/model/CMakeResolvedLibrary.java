@@ -17,9 +17,8 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   private final Collection<String> publicPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
 
-  CMakeResolvedLibrary(final CMakeLibrary library, final boolean buildStatic, final boolean buildShared,
-      final boolean stripDebug, final boolean packageBuildOutputs) {
-    super(library, buildStatic, buildShared, stripDebug, packageBuildOutputs);
+  CMakeResolvedLibrary(final CMakeLibrary library, final boolean stripDebug, final boolean packageBuildOutputs) {
+    super(library, stripDebug, packageBuildOutputs);
   }
 
   public Collection<String> getPublicCompileDefinitions() {
