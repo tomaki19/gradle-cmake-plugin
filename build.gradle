@@ -1,7 +1,8 @@
 plugins {
   id('java-gradle-plugin')
   id('jvm-test-suite')
-  id('signing')
+  id('jacoco')
+  // id('signing')
   alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
   alias(libs.plugins.versions)
@@ -45,14 +46,29 @@ tasks.withType(JavaCompile) {
   dependsOn(tasks.spotlessApply)
 }
 
-signing {
-  required = { hasProperty('signingPassword') && gradle.taskGraph.hasTask('publish') }
-  useGpgCmd()
-  sign publishing.publications
-}
+// signing {
+//   required = { hasProperty('signingPassword') && gradle.taskGraph.hasTask('publish') }
+//   useGpgCmd()
+//   sign publishing.publications
+// }
 
 tasks.withType(Javadoc).configureEach {
   options.addStringOption('Xdoclint:-missing', '-quiet')
+}
+
+jacoco {
+  toolVersion = '0.8.14'
+}
+
+jacocoTestReport {
+  reports {
+    xml.required = true
+  }
+  dependsOn test
+}
+
+test {
+  finalizedBy jacocoTestReport
 }
 
 testing {
@@ -67,7 +83,7 @@ testing {
       targets {
         all {
           testTask.configure {
-            shouldRunAfter(test)
+            shouldRunAfter(tasks.test)
           }
         }
       }
