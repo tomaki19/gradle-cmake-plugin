@@ -76,21 +76,79 @@ The `libraries` configuration block lets you specify library build items that ca
 
 ```groovy
 libraries {
-  '<name>' {
-    outputName = //optional: String, default: <name>
-    toolchains = //optional: List<String>
-    headers = //required: List<String>
-    sources = //optional: List<String>, (header only library, if not present)
-    privateCompileOptions = //optional: List<String>
-    publicCompileOptions = //optional: List<String>
-    privateCompileDefinitions = //optional: List<String>
-    publicCompileDefinitions = //optional: List<String>
-    privateLinkDependencies = //optional: List<String>
-    publicLinkDependencies = //optional: List<String>
-    buildStatic = //optional: boolean, default: false
-    buildShared = //optional: boolean, default: true
-    stripDebug = //optional: boolean, default: false
-    packageBuildOutputs = //optional: boolean, default: false
+  <String> {
+    toolchains <List<String>> //required
+    headers {
+      srcDir <String> //optional
+      srcDirs <List<String>> //optional
+    }
+    sources {
+      srcDir <String> //optional
+      srcDirs <List<String>> //optional
+    }
+    privateCompile {
+      define <String> //optional
+      defines <List<String>> //optional
+      option <String> //optional
+      options <List<String>> //optional
+    }
+    publicCompile {
+      define <String> //optional
+      defines <List<String>> //optional
+      option <String> //optional
+      options <List<String>> //optional
+    }
+    privateLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    privateInterfaceLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    privateStaticLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    privateSharedLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    publicLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    publicInterfaceLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    publicStaticLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    publicSharedLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    outputName <String> //optional
+    packageBuildOutputs = <boolean> //optional, default: false
+    stripDebug = <boolean> //optional, default: false
   }
 }
 ```
@@ -101,18 +159,31 @@ The `applications` configuration block lets you specify application build items.
 
 ```groovy
 applications {
-  '<name>' {
-    outputName = //optional: String, default: <name>
-    toolchains = //required: List<String>
-    headers = //optional: List<String>
-    sources = //required: List<String>
-    privateCompileOptions = //optional: List<String>
-    privateCompileDefinitions = //optional: List<String>
-    privateLinkDependencies = //optional: List<String>
-    buildStatic = //optional: boolean, default: false
-    buildShared = //optional: boolean, default: true
-    stripDebug = //optional: boolean, default: false
-    packageBuildOutputs = //optional: boolean, default: false
+  <String> {
+    toolchains <List<String>> //required
+    headers {
+      srcDir <String> //optional
+      srcDirs <List<String>> //optional
+    }
+    sources {
+      srcDir <String> //optional
+      srcDirs <List<String>> //optional
+    }
+    privateCompile {
+      define <String> //optional
+      defines <List<String>> //optional
+      option <String> //optional
+      options <List<String>> //optional
+    }
+    privateLinking {
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    outputName <String> //optional
+    packageBuildOutputs = <boolean> //optional, default: false
+    stripDebug = <boolean> //optional, default: false
   }
 }
 ```
@@ -123,19 +194,32 @@ The `tests` configuration block lets you specify test build items. Each test has
 
 ```groovy
 tests {
-  '<name>' {
-    outputName = //optional: String, default: <name>
-    toolchains = //required: List<String>
-    headers = //optional: List<String>
-    sources = //required: List<String>
-    privateCompileOptions = //optional: List<String>
-    privateCompileDefinitions = //optional: List<String>
-    privateLinkDependencies = //optional: List<String>
-    buildStatic = //optional: boolean, default: false
-    buildShared = //optional: boolean, default: true
-    stripDebug = //optional: boolean, default: false
-    packageBuildOutputs = //optional: boolean, default: false
-    testResultsXmlOutput = //optional: boolean, default: false
+  <String> {
+    toolchains <List<String>> //required
+    headers {
+      srcDir <String> //optional
+      srcDirs <List<String>> //optional
+    }
+    sources {
+      srcDir <String> //optional
+      srcDirs <List<String>> //optional
+    }
+    privateCompile {
+      define <String> //optional
+      defines <List<String>> //optional
+      option <String> //optional
+      options <List<String>> //optional
+    }
+    privateLinking{
+      option <String> //optional
+      options <List<String>> //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+    }
+    outputName <String> //optional
+    packageBuildOutputs = <boolean> //optional, default: false
+    stripDebug = <boolean> //optional, default: false
+    testResultsXmlOutput = <boolean> //optional, default: false
   }
 }
 ```

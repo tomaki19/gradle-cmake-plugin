@@ -14,8 +14,8 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   private final Collection<String> publicCompileDefinitions = new TreeSet<>();
   private final Collection<String> publicCompileOptions = new TreeSet<>();
   private final Collection<String> publicLinkOptions = new TreeSet<>();
-  private final Collection<String> publicPackageDependencies = new TreeSet<>();
-  private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
+  private final Collection<String> publicSystemPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> publicProjectPackageDependencies = new TreeSet<>();
 
   CMakeResolvedLibrary(final CMakeLibrary library, final boolean stripDebug, final boolean packageBuildOutputs) {
     super(library, stripDebug, packageBuildOutputs);
@@ -45,20 +45,20 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
     publicLinkOptions.add(option);
   }
 
-  public Collection<String> getPublicPackageDependencies() {
-    return publicPackageDependencies;
+  public Collection<String> getPublicSystemPackageDependencies() {
+    return publicSystemPackageDependencies;
   }
 
   public void addPublicSystemPackageDependency(final String dependency) {
-    publicPackageDependencies.add(dependency);
+    publicSystemPackageDependencies.add(dependency);
   }
 
-  public Collection<CMakeResolvedProjectDependency> getPublicProjectDependencies() {
-    return publicProjectDependencies;
+  public Collection<CMakeResolvedProjectDependency> getPublicProjectPackageDependencies() {
+    return publicProjectPackageDependencies;
   }
 
   public void addPublicProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {
-    publicProjectDependencies.add(dependency);
+    publicProjectPackageDependencies.add(dependency);
   }
 
 }

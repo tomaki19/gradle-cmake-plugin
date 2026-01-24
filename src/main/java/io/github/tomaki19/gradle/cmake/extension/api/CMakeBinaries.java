@@ -24,8 +24,8 @@ public interface CMakeBinaries {
     action.execute(getPrivateLinking());
   }
 
-  public Property<Boolean> getStripDebug();
-
   public Property<Boolean> getPackageBuildOutputs();
+
+  public Property<Boolean> getStripDebug();
 
 }

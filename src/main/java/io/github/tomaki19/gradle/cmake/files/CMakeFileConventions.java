@@ -12,7 +12,8 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeFileConventions {
 
-  public static String CMAKE_BUILD_PATH = "cmake/build";
+  public static String CMAKE_CONFIG_PATH = "cmake/config";
+  public static String CMAKE_EXPORT_PATH = "cmake/export";
   public static String CMAKE_INSTALL_PATH = "cmake/install";
   public static Set<String> DEFAULT_BUILD_CONFIGS = new HashSet<>(Arrays.asList("debug", "release"));
 

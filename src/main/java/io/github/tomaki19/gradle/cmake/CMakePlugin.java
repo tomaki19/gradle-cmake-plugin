@@ -114,7 +114,7 @@ public class CMakePlugin implements Plugin<Project> {
 
       final TaskProvider<Task> cleanTask = taskRegistry.cleanTask();
       final RegularFile cmakeListsFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME);
-      cleanTask.configure((task) -> task.doLast((action) -> {
+      cleanTask.configure((task) -> task.doLast("Delete CMakeLists.txt file.", (action) -> {
         cmakeListsFile.getAsFile().delete();
       }));
 

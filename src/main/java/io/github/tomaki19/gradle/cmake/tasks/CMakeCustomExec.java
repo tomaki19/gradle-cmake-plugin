@@ -15,7 +15,7 @@ public abstract class CMakeCustomExec extends CMakeExec {
   public CMakeCustomExec(final CMakeToolchain toolchain, final String buildConfig) {
     super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
     this.compileCommands = getProject().getLayout().getBuildDirectory().dir("%s/%s/%s/compile_commands.json"
-        .formatted(CMakeFileConventions.CMAKE_BUILD_PATH, toolchain.getName(), buildConfig))
+        .formatted(CMakeFileConventions.CMAKE_CONFIG_PATH, toolchain.getName(), buildConfig))
         .get().getAsFile().getAbsolutePath();
   }
 

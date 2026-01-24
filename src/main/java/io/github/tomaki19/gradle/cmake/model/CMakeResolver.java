@@ -75,6 +75,18 @@ public final class CMakeResolver {
           resolveCompiling(component.getPublicCompile(),
               resolvedLibrary::addPublicCompileDefinitions,
               resolvedLibrary::addPublicCompileOptions);
+          resolveLinking(toolchain.getLibraries().getPrivateLinking(), resolvedToolchain,
+              resolvedLibrary::addPrivateLinkOption,
+              resolvedLibrary::addPrivateSystemPackageDependency,
+              resolvedLibrary::addPrivateProjectPackageDependency);
+          resolveLinking(component.getPrivateLinking(), resolvedToolchain,
+              resolvedLibrary::addPrivateLinkOption,
+              resolvedLibrary::addPrivateSystemPackageDependency,
+              resolvedLibrary::addPrivateProjectPackageDependency);
+          resolveLinking(component.getPublicLinking(), resolvedToolchain,
+              resolvedLibrary::addPrivateLinkOption,
+              resolvedLibrary::addPrivateSystemPackageDependency,
+              resolvedLibrary::addPrivateProjectPackageDependency);
           if (component.getSources().isEmpty()) {
             resolveLinking(toolchain.getLibraries().getPrivateInterfaceLinking(), resolvedToolchain,
                 resolvedLibrary::addPrivateLinkOption,
@@ -90,14 +102,6 @@ public final class CMakeResolver {
                 resolvedLibrary::addPublicProjectPackageDependency);
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {
-            resolveLinking(toolchain.getLibraries().getPrivateLinking(), resolvedToolchain,
-                resolvedLibrary::addPrivateLinkOption,
-                resolvedLibrary::addPrivateSystemPackageDependency,
-                resolvedLibrary::addPrivateProjectPackageDependency);
-            resolveLinking(component.getPrivateLinking(), resolvedToolchain,
-                resolvedLibrary::addPrivateLinkOption,
-                resolvedLibrary::addPrivateSystemPackageDependency,
-                resolvedLibrary::addPrivateProjectPackageDependency);
             if (toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
                 || component.getBuildStatic().getOrElse(Boolean.FALSE)) {
               resolveLinking(toolchain.getLibraries().getPrivateStaticLinking(), resolvedToolchain,
@@ -265,13 +269,15 @@ public final class CMakeResolver {
 
   private void validateLibrary(final CMakeLibrary component) {
     if (component.getHeaders().isEmpty()) {
-      throw new IllegalArgumentException("Library '%s' does not provide any headers!".formatted(component.getName()));
+      throw new IllegalArgumentException(
+          "Library '%s' does not have any valid headers configured!".formatted(component.getName()));
     }
   }
 
   private void validateExecutable(final CMakeBinary component) {
     if (component.getSources().isEmpty()) {
-      throw new IllegalArgumentException("Executable '%s' has no sources to build!".formatted(component.getName()));
+      throw new IllegalArgumentException(
+          "Executable '%s' does not have any valid sources configured!".formatted(component.getName()));
     }
   }
 
