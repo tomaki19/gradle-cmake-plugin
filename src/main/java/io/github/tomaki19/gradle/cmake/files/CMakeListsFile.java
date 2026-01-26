@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +46,6 @@ public class CMakeListsFile extends CMakeFileContent {
     writeLibraries(outputStream, toolchains);
     writeApplications(outputStream, toolchains);
     writeTests(outputStream, toolchains);
-    writePackages(outputStream, toolchains);
   }
 
   private void writeHeader(final FileOutputStream outputStream) throws IOException {
@@ -56,16 +56,20 @@ public class CMakeListsFile extends CMakeFileContent {
     write(outputStream, """
         set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "" )
         set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON CACHE INTERNAL "" )
-        set( CMAKE_CONFIGURATION_TYPES $ENV{CMAKE_CONFIGURATION_TYPES} )
-        set( CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE} )
-        set( CMAKE_BUILD_TYPE $ENV{CMAKE_BUILD_TYPE} )
         set( CMAKE_TOOLCHAIN_NAME $ENV{CMAKE_TOOLCHAIN_NAME} )
-        set( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY )
         """);
-
     write(outputStream, """
         include(CMakePrintHelpers)
-        cmake_print_variables(CMAKE_APPBUNDLE_PATH)
+        cmake_print_variables(CMAKE_CONFIGURATION_TYPES)
+        cmake_print_variables(CMAKE_BUILD_TYPE)
+        cmake_print_variables(CMAKE_TOOLCHAIN_FILE)
+        cmake_print_variables(CMAKE_TOOLCHAIN_NAME)
+        cmake_print_variables(CMAKE_PREFIX_PATH)
+        cmake_print_variables(CMAKE_FIND_ROOT_PATH)
+        cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
+        cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY)
+        cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE)
+        cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE)
         """);
   }
 
@@ -75,29 +79,31 @@ public class CMakeListsFile extends CMakeFileContent {
       if (!toolchain.getPackages().isEmpty() || !toolchain.getProjects().isEmpty()) {
         writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        writeProjectDependencies(outputStream, 1, toolchain.getProjects(), toolchain);
-        writePackageDependencies(outputStream, 1, toolchain.getPackages());
+        writeSystemPackageDependencies(outputStream, 1, toolchain.getPackages());
+        writeProjectPackageDependencies(outputStream, 1, toolchain.getProjects(), toolchain);
         write(outputStream, "endif()");
       }
     }
   }
 
-  private void writeProjectDependencies(final FileOutputStream outputStream, final int indent,
+  private void writeProjectPackageDependencies(final FileOutputStream outputStream, final int indent,
       final Collection<CMakeResolvedProject> dependencies, final CMakeResolvedToolchain toolchain) throws IOException {
     for (final CMakeResolvedProject resolvedProject : dependencies) {
       if (!Objects.equals(getProjectName(), resolvedProject.getName())) {
         final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain);
         write(outputStream, indent, "if( NOT TARGET %s )", target);
-        write(outputStream, indent + 1, "list( APPEND CMAKE_FIND_ROOT_PATH  \"%s\" )",
-            resolvedProject.getBuildDirectory()
-                .dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toURI().getPath());
-        write(outputStream, indent + 1, "find_package( %s CONFIG REQUIRED )", target);
+        write(outputStream, indent + 1, "find_package( %s CONFIG REQUIRED", target);
+        write(outputStream, indent + 2, "NO_CMAKE_ENVIRONMENT_PATH");
+        write(outputStream, indent + 2, "NO_CMAKE_FIND_ROOT_PATH");
+        write(outputStream, indent + 2, "NO_CMAKE_SYSTEM_PATH");
+        write(outputStream, indent + 2, "NO_SYSTEM_ENVIRONMENT_PATH");
+        write(outputStream, indent + 1, ")");
         write(outputStream, indent, "endif()");
       }
     }
   }
 
-  private void writePackageDependencies(final FileOutputStream outputStream, final int indent,
+  private void writeSystemPackageDependencies(final FileOutputStream outputStream, final int indent,
       final Collection<CMakeResolvedPackage> dependencies) throws IOException {
     for (final CMakeResolvedPackage resolvedPackage : dependencies) {
       write(outputStream, indent, "if( NOT TARGET %s )", resolvedPackage.getName());
@@ -107,9 +113,11 @@ public class CMakeListsFile extends CMakeFileContent {
       }
       if (resolvedPackage.getComponents().isEmpty()) {
         if (resolvedPackage.isConfigMode()) {
-          write(outputStream, indent + 1, "find_package( %s REQUIRED CONFIG )", resolvedPackage.getName());
+          write(outputStream, indent + 1, "find_package( %s REQUIRED CONFIG )",
+              resolvedPackage.getName());
         } else {
-          write(outputStream, indent + 1, "find_package( %s REQUIRED )", resolvedPackage.getName());
+          write(outputStream, indent + 1, "find_package( %s REQUIRED )",
+              resolvedPackage.getName());
         }
       } else {
         write(outputStream, indent + 1, "find_package( %s REQUIRED", resolvedPackage.getName());
@@ -159,13 +167,6 @@ public class CMakeListsFile extends CMakeFileContent {
           for (final CMakeResolvedExecutable component : toolchain.getApplications()) {
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain, buildConfig);
             writeExecutable(outputStream, 1, target, component, toolchain, buildConfig);
-            final Directory installDir = getBuildDirectory()
-                .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_EXPORT_PATH, toolchain.getName()));
-            final String outputName = component.getOutputName();
-            writeOutputTargetProperties(outputStream, 1, target, installDir, outputName, toolchain, buildConfig);
-            if (component.isStripDebug()) {
-              writeStripDebugCommand(outputStream, 1, target);
-            }
           }
         }
         write(outputStream, "endif()");
@@ -186,10 +187,6 @@ public class CMakeListsFile extends CMakeFileContent {
           for (final CMakeResolvedExecutable component : toolchain.getTests()) {
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain, buildConfig);
             writeExecutable(outputStream, 1, target, component, toolchain, buildConfig);
-            final Directory installDir = getBuildDirectory()
-                .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_CONFIG_PATH, toolchain.getName()));
-            writeOutputTargetProperties(outputStream, 1, target, installDir, component.getOutputName(), toolchain,
-                buildConfig);
             writeAddTest(outputStream, 1, target, component.getOutputName());
           }
         }
@@ -198,37 +195,24 @@ public class CMakeListsFile extends CMakeFileContent {
     }
   }
 
-  private void writePackages(final FileOutputStream outputStream,
-      final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
-    for (final CMakeResolvedToolchain toolchain : toolchains) {
-      // TODO: define packages output
-    }
-    write(outputStream, "include( CPack )", getProjectName());
-  }
-
   private void writeInterfaceLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
     final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain,
-        CMakeLinkage.INTERFACE.toString(),
-        buildConfig);
+        CMakeLinkage.INTERFACE.toString(), buildConfig);
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s INTERFACE )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
     writeTargetIncludeDirectories(outputStream, indent, target, "INTERFACE", component.getHeaders());
     writePublicCompiling(outputStream, indent, target, component);
     writePublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
-    // writeExport(outputStream, indent, target);
   }
 
   private void writeStaticLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
     final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain,
-        CMakeLinkage.STATIC.toString(),
-        buildConfig);
-    final Directory installDir = getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_EXPORT_PATH, toolchain.getName()));
+        CMakeLinkage.STATIC.toString(), buildConfig);
     final String outputName = component.getOutputName();
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s STATIC )", target);
@@ -239,13 +223,9 @@ public class CMakeListsFile extends CMakeFileContent {
     writePublicCompiling(outputStream, indent, target, component);
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writePublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
-    writeOutputTargetProperties(outputStream, indent, target, installDir, outputName, toolchain, buildConfig);
-    // writeExport(outputStream, indent, target);
+    writeOutputTargetProperties(outputStream, indent, target, outputName, toolchain, buildConfig);
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, indent, target);
-    }
-    if (component.isPackageBuildOutputs()) {
-      writePackageBuildOutput(outputStream, indent, target, getBuildDirectory().dir("install"));
     }
   }
 
@@ -253,10 +233,7 @@ public class CMakeListsFile extends CMakeFileContent {
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
     final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain,
-        CMakeLinkage.SHARED.toString(),
-        buildConfig);
-    final Directory installDir = getBuildDirectory()
-        .dir("%s/%s".formatted(CMakeFileConventions.CMAKE_EXPORT_PATH, toolchain.getName()));
+        CMakeLinkage.SHARED.toString(), buildConfig);
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s SHARED )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
@@ -266,9 +243,8 @@ public class CMakeListsFile extends CMakeFileContent {
     writePublicCompiling(outputStream, indent, target, component);
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writePublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
-    writeOutputTargetProperties(outputStream, indent, target, installDir, component.getOutputName(), toolchain,
+    writeOutputTargetProperties(outputStream, indent, target, component.getOutputName(), toolchain,
         buildConfig);
-    // writeExport(outputStream, indent, target);
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, indent, target);
     }
@@ -283,6 +259,11 @@ public class CMakeListsFile extends CMakeFileContent {
     writeTargetSources(outputStream, indent, target, "PRIVATE", component.getSources());
     writePrivateCompiling(outputStream, indent, target, component);
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
+    writeOutputTargetProperties(outputStream, indent, target, component.getOutputName(), toolchain,
+        buildConfig);
+    if (component.isStripDebug()) {
+      writeStripDebugCommand(outputStream, 1, target);
+    }
   }
 
   private void writeAddTest(final FileOutputStream outputStream, final int indent, final String target,
@@ -299,8 +280,9 @@ public class CMakeListsFile extends CMakeFileContent {
     write(outputStream, indent, "target_include_directories( %s %s", target, access);
     final File workingDir = getProjectDirectory().getAsFile();
     for (final File headerDir : headers) {
-      write(outputStream, indent + 1, "${CMAKE_CURRENT_SOURCE_DIR}/%s",
+      write(outputStream, indent + 1, "\"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/%s>\"",
           workingDir.toPath().relativize(headerDir.toPath()));
+      write(outputStream, indent + 1, "\"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>\"");
     }
     write(outputStream, indent, ")");
   }
@@ -382,27 +364,6 @@ public class CMakeListsFile extends CMakeFileContent {
     }
   }
 
-  /*
-   * private void writeExport(final FileOutputStream outputStream, final int
-   * indent, final String target)
-   * throws IOException {
-   * final File projectDir = getProjectDirectory().getAsFile();
-   * final String targetFileName =
-   * "%s-%s-config".formatted(getProjectName().toLowerCase(),
-   * target.toLowerCase());
-   * write(outputStream, indent, "install( TARGETS %s EXPORT %s )", target,
-   * targetFileName);
-   * write(outputStream, indent, "export( TARGETS %s ", target);
-   * write(outputStream, indent + 1, "NAMESPACE %s::", getProjectName());
-   * write(outputStream, indent + 1,
-   * "FILE \"${CMAKE_CURRENT_SOURCE_DIR}/%s.cmake\"",
-   * projectDir.toPath().relativize(
-   * getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).file(
-   * targetFileName).getAsFile().toPath()));
-   * write(outputStream, indent, ")");
-   * }
-   */
-
   private void writeTargetLinkLibraries(final FileOutputStream outputStream, final int indent, final String target,
       final String type, final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Collection<CMakeResolvedProjectDependency> projectPackageDependencies,
@@ -423,31 +384,30 @@ public class CMakeListsFile extends CMakeFileContent {
   }
 
   private void writeOutputTargetProperties(final FileOutputStream outputStream, final int indent, final String target,
-      final Directory installDir, final String outputName, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) throws IOException {
-    final File projectDir = getProjectDirectory().getAsFile();
+      final String outputName, final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
+    final Directory exportDir = getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH)
+        .dir(toolchain.getName()).dir(buildConfig);
+    final Path projectPath = getProjectDirectory().getAsFile().toPath();
     write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
     write(outputStream, indent + 1, "OUTPUT_NAME \"%s\"", outputName);
     write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-        projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
+        projectPath.relativize(exportDir.dir("lib").getAsFile().toPath()));
     for (final String config : toolchain.getBuildConfigs()) {
       write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-          config.toString().toUpperCase(),
-          projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
+          config.toUpperCase(), projectPath.relativize(exportDir.dir("lib").getAsFile().toPath()));
     }
     write(outputStream, indent + 1, "LIBRARY_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-        projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
+        projectPath.relativize(exportDir.dir("lib").getAsFile().toPath()));
     for (final String config : toolchain.getBuildConfigs()) {
       write(outputStream, indent + 1, "LIBRARY_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-          config.toString().toUpperCase(),
-          projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
+          config.toUpperCase(), projectPath.relativize(exportDir.dir("lib").getAsFile().toPath()));
     }
     write(outputStream, indent + 1, "RUNTIME_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-        projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
+        projectPath.relativize(exportDir.dir("bin").getAsFile().toPath()));
     for (final String config : toolchain.getBuildConfigs()) {
       write(outputStream, indent + 1, "RUNTIME_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-          config.toString().toUpperCase(),
-          projectDir.toPath().relativize(installDir.dir(buildConfig.toString()).getAsFile().toPath()));
+          config.toUpperCase(),
+          projectPath.relativize(exportDir.dir("bin").getAsFile().toPath()));
     }
     write(outputStream, indent, ")");
   }
@@ -459,12 +419,6 @@ public class CMakeListsFile extends CMakeFileContent {
         target, target);
     write(outputStream, indent + 1, "COMMAND ${CMAKE_STRIP} -g $<TARGET_FILE:%s>", target);
     write(outputStream, indent, ")");
-  }
-
-  private void writePackageBuildOutput(final FileOutputStream outputStream, final int indent, final String target,
-      final Directory packageDir) throws IOException {
-    write(outputStream, indent, "install( TARGETS %s RUNTIME DESTINATION %s )", target,
-        packageDir.getAsFile().toPath());
   }
 
 }

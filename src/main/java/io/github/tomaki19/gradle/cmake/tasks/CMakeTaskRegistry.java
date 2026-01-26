@@ -124,7 +124,7 @@ public class CMakeTaskRegistry {
     return taskContainer.register(taskName);
   }
 
-  public static void configureRemote(final Task task, final CMakeResolvedToolchain toolchain,
+  public static void configureRemote(final CMakeConfigure task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Project project) {
     toolchain.getProjects().stream()
         .filter(dependency -> !Objects.equals(project.getName(), dependency.getName()))

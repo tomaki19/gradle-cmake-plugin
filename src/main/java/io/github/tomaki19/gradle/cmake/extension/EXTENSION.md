@@ -42,28 +42,24 @@ toolchains {
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
-      packageBuildOutputs = //optional: boolean, default: false
     }
     libraries {
       privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
-      packageBuildOutputs = //optional: boolean, default: false
     }
     applications {
       privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
-      packageBuildOutputs = //optional: boolean, default: false
     }
     tests {
       privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
       buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
-      packageBuildOutputs = //optional: boolean, default: false
       testResultsXmlOutput = //optional: boolean, default: false
     }
   }
@@ -147,7 +143,6 @@ libraries {
       dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
     }
     outputName <String> //optional
-    packageBuildOutputs = <boolean> //optional, default: false
     stripDebug = <boolean> //optional, default: false
   }
 }
@@ -182,7 +177,6 @@ applications {
       dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
     }
     outputName <String> //optional
-    packageBuildOutputs = <boolean> //optional, default: false
     stripDebug = <boolean> //optional, default: false
   }
 }
@@ -217,7 +211,6 @@ tests {
       dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
     }
     outputName <String> //optional
-    packageBuildOutputs = <boolean> //optional, default: false
     stripDebug = <boolean> //optional, default: false
     testResultsXmlOutput = <boolean> //optional, default: false
   }

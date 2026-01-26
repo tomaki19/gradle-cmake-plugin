@@ -21,16 +21,13 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final Collection<String> privateSystemPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> privateProjectPackageDependencies = new TreeSet<>();
   private final boolean stripDebug;
-  private final boolean packageBuildOutputs;
 
-  CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug, final boolean packageBuildOutputs)
-      throws IllegalArgumentException {
+  CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
     super(binary.getName());
     this.outputName = binary.getOutputName().orElse(binary.getName());
     this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs());
     this.sources = new TreeSet<>(binary.getSources().getFiles());
     this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);
-    this.packageBuildOutputs = packageBuildOutputs || binary.getPackageBuildOutputs().getOrElse(Boolean.FALSE);
   }
 
   public String getOutputName() {
@@ -87,10 +84,6 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   public boolean isStripDebug() {
     return stripDebug;
-  }
-
-  public boolean isPackageBuildOutputs() {
-    return packageBuildOutputs;
   }
 
 }

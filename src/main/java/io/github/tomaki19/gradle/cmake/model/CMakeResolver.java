@@ -60,9 +60,7 @@ public final class CMakeResolver {
           validateLibrary(component);
           final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component,
               toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-                  || toolchain.getLibraries().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
+                  || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
           resolveCompiling(toolchain.getBinaries().getPrivateCompile(),
               resolvedLibrary::addPrivateCompileDefinitions,
               resolvedLibrary::addPrivateCompileOptions);
@@ -145,9 +143,7 @@ public final class CMakeResolver {
           validateExecutable(component);
           final CMakeResolvedExecutable resolvedApplication = new CMakeResolvedExecutable(component,
               toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-                  || toolchain.getApplications().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
+                  || toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
           resolveCompiling(toolchain.getBinaries().getPrivateCompile(),
               resolvedApplication::addPrivateCompileDefinitions,
               resolvedApplication::addPrivateCompileOptions);
@@ -174,9 +170,7 @@ public final class CMakeResolver {
           validateExecutable(component);
           final CMakeResolvedExecutable resolvedTest = new CMakeResolvedExecutable(component,
               toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE),
-              toolchain.getBinaries().getPackageBuildOutputs().getOrElse(Boolean.FALSE)
-                  || toolchain.getTests().getPackageBuildOutputs().getOrElse(Boolean.FALSE));
+                  || toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
           resolveCompiling(toolchain.getBinaries().getPrivateCompile(),
               resolvedTest::addPrivateCompileDefinitions,
               resolvedTest::addPrivateCompileOptions);

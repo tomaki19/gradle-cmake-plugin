@@ -148,8 +148,8 @@ public class CMakePlugin implements Plugin<Project> {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           final TaskProvider<CMakeConfigure> configureTask = taskRegistry.configureTask(toolchain, buildConfig);
           configureTask.configure((task) -> {
-            CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, project);
             task.dependsOn(assembleListsTask);
+            CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, project);
           });
 
           if (customTaskProtos.containsKey(toolchain.getName())) {
@@ -164,51 +164,53 @@ public class CMakePlugin implements Plugin<Project> {
             final TaskProvider<CMakeBuildLibrary> buildTask = taskRegistry.buildTask(library, toolchain,
                 CMakeLinkage.STATIC.toString(), buildConfig);
             buildTask.configure((task) -> {
-              CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
               task.dependsOn(configureTask);
+              CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
-            if (library.isPackageBuildOutputs()) {
-              taskRegistry.packageTask(library, toolchain, CMakeLinkage.STATIC.toString(), buildConfig)
-                  .configure((task) -> task.dependsOn(buildTask));
-            }
+            // if (library.isPackageBuildOutputs()) {
+            // taskRegistry.packageTask(library, toolchain, CMakeLinkage.STATIC.toString(),
+            // buildConfig)
+            // .configure((task) -> task.dependsOn(buildTask));
+            // }
           }
           for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
 
             final TaskProvider<CMakeBuildLibrary> buildTask = taskRegistry.buildTask(library, toolchain,
                 CMakeLinkage.SHARED.toString(), buildConfig);
             buildTask.configure((task) -> {
-              CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
               task.dependsOn(configureTask);
+              CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
-            if (library.isPackageBuildOutputs()) {
-              taskRegistry.packageTask(library, toolchain, CMakeLinkage.SHARED.toString(), buildConfig)
-                  .configure((task) -> task.dependsOn(buildTask));
-            }
+            // if (library.isPackageBuildOutputs()) {
+            // taskRegistry.packageTask(library, toolchain, CMakeLinkage.SHARED.toString(),
+            // buildConfig)
+            // .configure((task) -> task.dependsOn(buildTask));
+            // }
           }
 
           for (final CMakeResolvedExecutable application : toolchain.getApplications()) {
             final TaskProvider<CMakeBuildExecutable> buildTask = taskRegistry.buildTask(application, toolchain,
                 buildConfig);
             buildTask.configure((task) -> {
-              CMakeTaskRegistry.configureRemote(task, application, toolchain, buildConfig);
               task.dependsOn(configureTask);
+              CMakeTaskRegistry.configureRemote(task, application, toolchain, buildConfig);
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
-            if (application.isPackageBuildOutputs()) {
-              taskRegistry.packageTask(application, toolchain, buildConfig)
-                  .configure((task) -> task.dependsOn(buildTask));
-            }
+            // if (application.isPackageBuildOutputs()) {
+            // taskRegistry.packageTask(application, toolchain, buildConfig)
+            // .configure((task) -> task.dependsOn(buildTask));
+            // }
           }
 
           for (final CMakeResolvedExecutable test : toolchain.getTests()) {
