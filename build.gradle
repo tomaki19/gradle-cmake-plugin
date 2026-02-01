@@ -68,9 +68,13 @@ jacocoTestReport {
   dependsOn test
 }
 
+spotbugs {
+    excludeFilter.set(file("${projectDir}/spotbugs-exclude.xml"))
+}
+
 test {
   finalizedBy jacocoTestReport
-  jvmArgs '-Dnet.bytebuddy.experimental=true'
+  jvmArgs '-Dnet.bytebuddy.experimental=true', '-XX:+EnableDynamicAgentLoading'
 }
 
 testing {
