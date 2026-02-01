@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.spotless)
   alias(libs.plugins.versions)
   alias(libs.plugins.jacocolog)
+  alias(libs.plugins.spotbugs)
 }
 
 group = 'io.github.tomaki19'
@@ -19,7 +20,7 @@ repositories {
 dependencies {
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
-}
+    spotbugs("com.github.spotbugs:spotbugs:+")}
 
 java {
   sourceCompatibility = JavaVersion.VERSION_17 // minimal java version supported by Gradle 9
