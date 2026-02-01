@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeConfigFile;
+import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
@@ -33,7 +35,8 @@ public class CMakeTaskRegistry {
   private final TaskContainer taskContainer;
 
   public CMakeTaskRegistry(final TaskContainer tasks) {
-    this.taskContainer = tasks;
+    this.taskContainer = tasks; // SpotBugs: TaskContainer is a Gradle API object, not meant to be mutated by
+                                // plugin
   }
 
   public TaskProvider<Task> assembleTask() {
@@ -55,20 +58,24 @@ public class CMakeTaskRegistry {
   public TaskProvider<CMakeAssemble> assembleListsTask(final Collection<CMakeResolvedToolchain> toolchains,
       final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
-    return taskContainer.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project));
+    final File outputFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.name()).getAsFile();
+    return taskContainer.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project), outputFile);
   }
 
   public TaskProvider<CMakeAssemble> assembleConfigTask(final CMakeResolvedToolchain toolchain, final Project project)
       throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleConfigTaskName(toolchain.getName());
-    return taskContainer.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project));
+    final File outputFile = project.getLayout().getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).get()
+        .file(CMakeConfigFile.name(CMakeFileConventions.cmakeConfigName(project.getName(), toolchain.getName())))
+        .getAsFile();
+    return taskContainer.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project), outputFile);
   }
 
   public TaskProvider<CMakeCustomExec> customExecTask(final CMakeCustomTaskProto taskProto) {
-    final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchain(),
+    final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchainName(),
         taskProto.getBuildConfig());
-    return taskContainer.register(taskName, CMakeCustomExec.class, taskProto.getToolchain(),
-        taskProto.getBuildConfig());
+    return taskContainer.register(taskName, CMakeCustomExec.class, taskProto.getToolchainName(),
+        taskProto.getBuildConfig(), taskProto.getEnvironmentFile());
   }
 
   public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain,

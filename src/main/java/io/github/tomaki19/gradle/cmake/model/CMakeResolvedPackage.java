@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.model;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,11 +33,11 @@ public final class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedP
   }
 
   public Map<String, String> getProperties() {
-    return properties;
+    return Collections.unmodifiableMap(properties);
   }
 
   public Collection<String> getComponents() {
-    return components;
+    return Collections.unmodifiableCollection(components);
   }
 
   public boolean isConfigMode() {
@@ -44,15 +45,15 @@ public final class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedP
   }
 
   public Collection<Path> getInterfaces() {
-    return interfaces;
+    return Collections.unmodifiableCollection(interfaces);
   }
 
   public Collection<Path> getStaticLibraries() {
-    return staticLibraries;
+    return Collections.unmodifiableCollection(staticLibraries);
   }
 
   public Collection<Path> getSharedLibraries() {
-    return sharedLibraries;
+    return Collections.unmodifiableCollection(sharedLibraries);
   }
 
 }

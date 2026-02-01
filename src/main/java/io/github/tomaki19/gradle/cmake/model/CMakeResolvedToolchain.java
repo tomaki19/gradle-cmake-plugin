@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake.model;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -48,7 +49,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<String> getBuildConfigs() {
-    return buildConfigs;
+    return Collections.unmodifiableCollection(buildConfigs);
   }
 
   public Optional<String> getGenerator() {
@@ -56,7 +57,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Map<String, String> getEnvironment() {
-    return environment;
+    return Collections.unmodifiableMap(environment);
   }
 
   public Optional<File> getEnvironmentFile() {
@@ -72,7 +73,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedPackage> getPackages() {
-    return packages;
+    return Collections.unmodifiableCollection(packages);
   }
 
   void addPackage(final CMakeResolvedPackage component) {
@@ -80,7 +81,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedProject> getProjects() {
-    return projects;
+    return Collections.unmodifiableCollection(projects);
   }
 
   void addInterfaceLibrary(final CMakeResolvedLibrary component) {
@@ -88,7 +89,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedLibrary> getInterfaceLibraries() {
-    return interfaceLibraries;
+    return Collections.unmodifiableCollection(interfaceLibraries);
   }
 
   void addStaticLibrary(final CMakeResolvedLibrary component) {
@@ -96,7 +97,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedLibrary> getStaticLibraries() {
-    return staticLibraries;
+    return Collections.unmodifiableCollection(staticLibraries);
   }
 
   void addSharedLibrary(final CMakeResolvedLibrary component) {
@@ -104,7 +105,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedLibrary> getSharedLibraries() {
-    return sharedLibraries;
+    return Collections.unmodifiableCollection(sharedLibraries);
   }
 
   public boolean hasInterfaceLibraries() {
@@ -120,7 +121,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedExecutable> getApplications() {
-    return applications;
+    return Collections.unmodifiableCollection(applications);
   }
 
   public boolean hasApplications() {
@@ -132,7 +133,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   }
 
   public Collection<CMakeResolvedExecutable> getTests() {
-    return tests;
+    return Collections.unmodifiableCollection(tests);
   }
 
   public boolean hasTests() {

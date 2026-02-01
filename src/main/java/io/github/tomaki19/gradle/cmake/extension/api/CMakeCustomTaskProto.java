@@ -4,19 +4,23 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.io.File;
+import java.util.Optional;
+
 import org.gradle.api.Named;
 
-public class CMakeCustomTaskProto implements Named {
+public final class CMakeCustomTaskProto implements Named {
 
   private final String name;
-  private final CMakeToolchain toolchain;
+  private final String toolchainName;
   private final String buildConfig;
+  private final Optional<File> environmentFile;
 
   public CMakeCustomTaskProto(final String name, final CMakeToolchain toolchain, final String buildConfig) {
     this.name = name;
-    this.toolchain = toolchain;
+    this.toolchainName = toolchain.getName();
     this.buildConfig = buildConfig;
-
+    this.environmentFile = toolchain.getEnvironmentFile();
   }
 
   @Override
@@ -24,12 +28,16 @@ public class CMakeCustomTaskProto implements Named {
     return name;
   }
 
-  public CMakeToolchain getToolchain() {
-    return toolchain;
+  public String getToolchainName() {
+    return toolchainName;
   }
 
   public String getBuildConfig() {
     return buildConfig;
+  }
+
+  public Optional<File> getEnvironmentFile() {
+    return environmentFile;
   }
 
   @Override
@@ -37,7 +45,7 @@ public class CMakeCustomTaskProto implements Named {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
+    result = prime * result + ((toolchainName == null) ? 0 : toolchainName.hashCode());
     result = prime * result + ((buildConfig == null) ? 0 : buildConfig.hashCode());
     return result;
   }
@@ -56,10 +64,10 @@ public class CMakeCustomTaskProto implements Named {
         return false;
     } else if (!name.equals(other.name))
       return false;
-    if (toolchain == null) {
-      if (other.toolchain != null)
+    if (toolchainName == null) {
+      if (other.toolchainName != null)
         return false;
-    } else if (!toolchain.equals(other.toolchain))
+    } else if (!toolchainName.equals(other.toolchainName))
       return false;
     if (buildConfig == null) {
       if (other.buildConfig != null)

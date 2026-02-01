@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
@@ -21,7 +22,7 @@ public class CMakeDependencies {
   }
 
   public Collection<String> getNames() {
-    return names;
+    return Collections.unmodifiableCollection(names);
   }
 
   public Optional<String> getFrom() {

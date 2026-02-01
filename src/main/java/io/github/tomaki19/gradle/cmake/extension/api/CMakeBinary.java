@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -38,11 +39,15 @@ public abstract class CMakeBinary implements Named, CMakeBinaries {
   }
 
   public Collection<String> getToolchains() {
-    return toolchains;
+    return Collections.unmodifiableCollection(toolchains);
   }
 
   public void toolchains(final CharSequence... values) {
     toolchains.addAll(Arrays.asList(values).stream().map((value) -> value.toString()).toList());
+  }
+
+  public void toolchains(final Collection<String> values) {
+    toolchains.addAll(values);
   }
 
   public SourceDirectorySet getHeaders() {

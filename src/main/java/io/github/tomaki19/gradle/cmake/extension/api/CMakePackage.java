@@ -4,7 +4,10 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -12,9 +15,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.gradle.api.Named;
-
-import java.nio.file.Paths;
-import java.nio.file.Path;
 
 public abstract class CMakePackage implements Named {
 
@@ -43,7 +43,7 @@ public abstract class CMakePackage implements Named {
   }
 
   public Collection<String> getComponents() {
-    return components;
+    return Collections.unmodifiableCollection(components);
   }
 
   public void setComponents(final Collection<CharSequence> values) {
@@ -51,7 +51,7 @@ public abstract class CMakePackage implements Named {
   }
 
   public Map<String, String> getProperties() {
-    return properties;
+    return Collections.unmodifiableMap(properties);
   }
 
   public void setProperties(final Map<CharSequence, CharSequence> values) {
@@ -60,7 +60,7 @@ public abstract class CMakePackage implements Named {
   }
 
   public Collection<Path> getInterfaces() {
-    return interfaces;
+    return Collections.unmodifiableCollection(interfaces);
   }
 
   public void setInterfaces(Collection<CharSequence> values) {
@@ -68,7 +68,7 @@ public abstract class CMakePackage implements Named {
   }
 
   public Collection<Path> getStaticLibraries() {
-    return staticLibraries;
+    return Collections.unmodifiableCollection(staticLibraries);
   }
 
   public void setStaticLibraries(Collection<CharSequence> values) {
@@ -76,7 +76,7 @@ public abstract class CMakePackage implements Named {
   }
 
   public Collection<Path> getSharedLibraries() {
-    return sharedLibraries;
+    return Collections.unmodifiableCollection(sharedLibraries);
   }
 
   public void setSharedLibraries(Collection<CharSequence> values) {

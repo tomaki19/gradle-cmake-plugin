@@ -31,7 +31,7 @@ public final class TestCMakeBinaryLibrary {
       final Collection<String> toolchains) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getToolchains().addAll(toolchains);
+      object.toolchains(toolchains);
     });
     return provider;
   }
@@ -41,8 +41,8 @@ public final class TestCMakeBinaryLibrary {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateInterfaceLinking().getDependencies().addAll(dependencies);
-      object.getPrivateInterfaceLinking().getOptions().addAll(options);
+      object.getPrivateInterfaceLinking().dependencies(dependencies);
+      object.getPrivateInterfaceLinking().options(options);
     });
     return provider;
   }
@@ -52,8 +52,8 @@ public final class TestCMakeBinaryLibrary {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateStaticLinking().getDependencies().addAll(dependencies);
-      object.getPrivateStaticLinking().getOptions().addAll(options);
+      object.getPrivateStaticLinking().dependencies(dependencies);
+      object.getPrivateStaticLinking().options(options);
     });
     return provider;
   }
@@ -63,8 +63,8 @@ public final class TestCMakeBinaryLibrary {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateSharedLinking().getDependencies().addAll(dependencies);
-      object.getPrivateSharedLinking().getOptions().addAll(options);
+      object.getPrivateSharedLinking().dependencies(dependencies);
+      object.getPrivateSharedLinking().options(options);
     });
     return provider;
   }
@@ -74,8 +74,8 @@ public final class TestCMakeBinaryLibrary {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPublicInterfaceLinking().getDependencies().addAll(dependencies);
-      object.getPublicInterfaceLinking().getOptions().addAll(options);
+      object.getPublicInterfaceLinking().dependencies(dependencies);
+      object.getPublicInterfaceLinking().options(options);
     });
     return provider;
   }
@@ -85,8 +85,8 @@ public final class TestCMakeBinaryLibrary {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPublicStaticLinking().getDependencies().addAll(dependencies);
-      object.getPublicStaticLinking().getOptions().addAll(options);
+      object.getPublicStaticLinking().dependencies(dependencies);
+      object.getPublicStaticLinking().options(options);
     });
     return provider;
   }
@@ -96,8 +96,8 @@ public final class TestCMakeBinaryLibrary {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPublicSharedLinking().getDependencies().addAll(dependencies);
-      object.getPublicSharedLinking().getOptions().addAll(options);
+      object.getPublicSharedLinking().dependencies(dependencies);
+      object.getPublicSharedLinking().options(options);
     });
     return provider;
   }

@@ -5,6 +5,7 @@
 package io.github.tomaki19.gradle.cmake.helper;
 
 import java.util.Collection;
+
 import org.gradle.api.NamedDomainObjectProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
@@ -24,8 +25,8 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraries().getPrivateInterfaceLinking().getDependencies().addAll(dependencies);
-      object.getLibraries().getPrivateInterfaceLinking().getOptions().addAll(options);
+      object.getLibraries().getPrivateInterfaceLinking().dependencies(dependencies);
+      object.getLibraries().getPrivateInterfaceLinking().options(options);
     });
     return provider;
   }
@@ -34,8 +35,8 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraries().getPrivateStaticLinking().getDependencies().addAll(dependencies);
-      object.getLibraries().getPrivateStaticLinking().getOptions().addAll(options);
+      object.getLibraries().getPrivateStaticLinking().dependencies(dependencies);
+      object.getLibraries().getPrivateStaticLinking().options(options);
     });
     return provider;
   }
@@ -44,8 +45,8 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraries().getPrivateSharedLinking().getDependencies().addAll(dependencies);
-      object.getLibraries().getPrivateSharedLinking().getOptions().addAll(options);
+      object.getLibraries().getPrivateSharedLinking().dependencies(dependencies);
+      object.getLibraries().getPrivateSharedLinking().options(options);
     });
     return provider;
   }
@@ -54,8 +55,8 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getApplications().getPrivateLinking().getDependencies().addAll(dependencies);
-      object.getApplications().getPrivateLinking().getOptions().addAll(options);
+      object.getApplications().getPrivateLinking().dependencies(dependencies);
+      object.getApplications().getPrivateLinking().options(options);
     });
     return provider;
   }
@@ -64,8 +65,8 @@ public final class TestCMakeToolchain {
       final CMakeExtension extension, final Collection<CMakeDependencies> dependencies, Collection<String> options) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getTests().getPrivateLinking().getDependencies().addAll(dependencies);
-      object.getTests().getPrivateLinking().getOptions().addAll(options);
+      object.getTests().getPrivateLinking().dependencies(dependencies);
+      object.getTests().getPrivateLinking().options(options);
     });
     return provider;
   }

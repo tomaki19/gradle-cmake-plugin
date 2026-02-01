@@ -5,6 +5,7 @@
 package io.github.tomaki19.gradle.cmake.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.TreeSet;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
@@ -22,7 +23,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   }
 
   public Collection<String> getPublicCompileDefinitions() {
-    return publicCompileDefinitions;
+    return Collections.unmodifiableCollection(publicCompileDefinitions);
   }
 
   void addPublicCompileDefinitions(final String definition) {
@@ -30,7 +31,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   }
 
   public Collection<String> getPublicCompileOptions() {
-    return publicCompileOptions;
+    return Collections.unmodifiableCollection(publicCompileOptions);
   }
 
   void addPublicCompileOptions(final String option) {
@@ -38,7 +39,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   }
 
   public Collection<String> getPublicLinkOptions() {
-    return publicLinkOptions;
+    return Collections.unmodifiableCollection(publicLinkOptions);
   }
 
   public void addPublicLinkOption(final String option) {
@@ -46,7 +47,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   }
 
   public Collection<String> getPublicSystemPackageDependencies() {
-    return publicSystemPackageDependencies;
+    return Collections.unmodifiableCollection(publicSystemPackageDependencies);
   }
 
   public void addPublicSystemPackageDependency(final String dependency) {
@@ -54,7 +55,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   }
 
   public Collection<CMakeResolvedProjectDependency> getPublicProjectPackageDependencies() {
-    return publicProjectPackageDependencies;
+    return Collections.unmodifiableCollection(publicProjectPackageDependencies);
   }
 
   public void addPublicProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {

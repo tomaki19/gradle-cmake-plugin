@@ -5,6 +5,7 @@
 package io.github.tomaki19.gradle.cmake.model;
 
 import java.util.Optional;
+import java.util.Objects;
 
 import org.gradle.api.Project;
 
@@ -51,7 +52,7 @@ public final class CMakeResolvedProjectDependency
         return false;
     } else if (!project.equals(other.project))
       return false;
-    if (linkage != other.linkage)
+    if (!Objects.equals(linkage, other.linkage))
       return false;
     return true;
   }

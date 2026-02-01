@@ -26,10 +26,12 @@ public class CMakeConfigFile extends CMakeFileContent {
   private final CMakeResolvedToolchain toolchain;
 
   public CMakeConfigFile(final CMakeResolvedToolchain toolchain, final Project project) throws FileNotFoundException {
-    super(project.getLayout().getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).get()
-        .file("%s-config.cmake".formatted(CMakeFileConventions.cmakeConfigName(project.getName(), toolchain))),
-        project);
-    this.toolchain = toolchain;
+    super(project);
+    this.toolchain = toolchain; // SpotBugs: toolchain is a resolved object, not meant to be mutated by plugin
+  }
+
+  public static String name(final String buildTarget) {
+    return "%s-config.cmake".formatted(buildTarget);
   }
 
   @Override
@@ -39,7 +41,7 @@ public class CMakeConfigFile extends CMakeFileContent {
     writeProjectPackageDependencies(outputStream, 0, toolchain);
     for (final String buildConfig : toolchain.getBuildConfigs()) {
       for (final CMakeResolvedLibrary library : toolchain.getInterfaceLibraries()) {
-        final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
+        final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain.getName(),
             CMakeLinkage.INTERFACE.toString(), buildConfig);
         writeLine(outputStream);
         write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
@@ -48,7 +50,7 @@ public class CMakeConfigFile extends CMakeFileContent {
         write(outputStream, "endif()");
       }
       for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
-        final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
+        final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain.getName(),
             CMakeLinkage.STATIC.toString(), buildConfig);
         final String outputName = toolchain.getOperatingSystem().getStaticLibraryName(library.getOutputName());
         writeLine(outputStream);
@@ -58,7 +60,7 @@ public class CMakeConfigFile extends CMakeFileContent {
         write(outputStream, "endif()");
       }
       for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
-        final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain,
+        final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain.getName(),
             CMakeLinkage.SHARED.toString(), buildConfig);
         final String outputName = toolchain.getOperatingSystem().getSharedLibraryName(library.getOutputName());
         writeLine(outputStream);
@@ -106,7 +108,7 @@ public class CMakeConfigFile extends CMakeFileContent {
       final CMakeResolvedToolchain toolchain) throws IOException {
     for (final CMakeResolvedProject resolvedProject : toolchain.getProjects()) {
       if (!Objects.equals(getProjectName(), resolvedProject.getName())) {
-        final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain);
+        final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain.getName());
         write(outputStream, indent + 1, "find_dependency( %s CONFIG REQUIRED", target);
         write(outputStream, indent + 2, "NO_CMAKE_ENVIRONMENT_PATH");
         write(outputStream, indent + 2, "NO_CMAKE_FIND_ROOT_PATH");
@@ -161,8 +163,8 @@ public class CMakeConfigFile extends CMakeFileContent {
       write(outputStream, 2, "INTERFACE_LINK_LIBRARIES");
       for (final CMakeResolvedProjectDependency projectDependency : library.getPublicProjectPackageDependencies()) {
         write(outputStream, 3, "%s::%s", projectDependency.getProject().getName(),
-            CMakeFileConventions.buildTarget(projectDependency.getName(), toolchain, projectDependency.getLinkage(),
-                buildConfig));
+            CMakeFileConventions.buildTarget(projectDependency.getName(), toolchain.getName(),
+                projectDependency.getLinkage(), buildConfig));
       }
       if (!library.getPublicSystemPackageDependencies().isEmpty()) {
         write(outputStream, 3, "\"%s\"", String.join(";", library.getPublicSystemPackageDependencies()));

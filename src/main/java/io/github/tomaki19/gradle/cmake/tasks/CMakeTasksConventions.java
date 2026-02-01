@@ -4,8 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
-
 public final class CMakeTasksConventions {
 
   static String assembleListsTaskName() {
@@ -20,8 +18,8 @@ public final class CMakeTasksConventions {
     return ":%s:assemble-%s-config".formatted(projectName, toolchainName);
   }
 
-  static String customExecTaskName(final String name, final CMakeToolchain toolchain, final String buildConfig) {
-    return "%s-%s-%s".formatted(name, toolchain.getName(), buildConfig);
+  static String customExecTaskName(final String name, final String toolchainName, final String buildConfig) {
+    return "%s-%s-%s".formatted(name, toolchainName, buildConfig);
   }
 
   static String configureTaskName(final String projectName, final String toolchainName,

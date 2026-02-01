@@ -34,10 +34,10 @@ public final class CMakeResolver {
   private final Map<String, CMakeToolchain> availableToolchains;
 
   public CMakeResolver(final Project project, final Set<CMakePackage> packages, final Set<CMakeToolchain> toolchains) {
-    this.currentProject = project;
     Objects.requireNonNull(project, "Project must not be null!");
     Objects.requireNonNull(packages, "Packages must not be null!");
     Objects.requireNonNull(toolchains, "Toolchains must not be null!");
+    this.currentProject = project; // SpotBugs: Project is a Gradle API object, not meant to be mutated by plugin
     this.availablePackages = packages.stream()
         .collect(Collectors.toUnmodifiableMap(CMakePackage::getName, Function.identity()));
     this.availableToolchains = toolchains.stream()

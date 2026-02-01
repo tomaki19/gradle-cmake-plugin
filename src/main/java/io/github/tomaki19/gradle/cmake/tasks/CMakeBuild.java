@@ -16,7 +16,7 @@ public abstract class CMakeBuild extends CMakeExec {
 
   @javax.inject.Inject
   CMakeBuild(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
+    super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
     this.buildTarget = buildTarget;
     getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
     getBaseArguments().add("--build");

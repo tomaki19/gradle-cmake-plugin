@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -51,7 +52,7 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public Collection<String> getBuildConfigs() {
-    return buildConfigs;
+    return Collections.unmodifiableCollection(buildConfigs);
   }
 
   public void setBuildConfigs(final Collection<CharSequence> values) {
@@ -63,7 +64,7 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public Map<String, String> getEnvironment() {
-    return environment;
+    return Collections.unmodifiableMap(environment);
   }
 
   public void setEnvironment(final Map<CharSequence, CharSequence> values) {

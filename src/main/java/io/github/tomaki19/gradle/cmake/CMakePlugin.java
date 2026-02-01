@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.gradle.api.component.AdhocComponentWithVariants;
-import org.gradle.api.component.SoftwareComponentFactory;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.component.AdhocComponentWithVariants;
+import org.gradle.api.component.SoftwareComponentFactory;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
@@ -113,9 +113,11 @@ public class CMakePlugin implements Plugin<Project> {
       taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
 
       final TaskProvider<Task> cleanTask = taskRegistry.cleanTask();
-      final RegularFile cmakeListsFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.NAME);
+      final RegularFile cmakeListsFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.name());
       cleanTask.configure((task) -> task.doLast("Delete CMakeLists.txt file.", (action) -> {
-        cmakeListsFile.getAsFile().delete();
+        if (!cmakeListsFile.getAsFile().delete()) {
+          project.getLogger().error("Failed to delete %s!".formatted(cmakeListsFile.getAsFile().getName()));
+        }
       }));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {

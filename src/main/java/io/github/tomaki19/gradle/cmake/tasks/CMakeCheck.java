@@ -17,8 +17,8 @@ public abstract class CMakeCheck extends CMakeExec {
   @javax.inject.Inject
   public CMakeCheck(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
-    this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain, buildConfig);
+    super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+    this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain.getName(), buildConfig);
     getBaseCommand().set(OperatingSystem.current().getExecutableName("ctest"));
     getBaseArguments().add("-T");
     getBaseArguments().add("Test");

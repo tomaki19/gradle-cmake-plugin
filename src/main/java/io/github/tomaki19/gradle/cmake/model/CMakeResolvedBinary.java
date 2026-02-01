@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.model;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.TreeSet;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
@@ -35,15 +36,15 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   }
 
   public Collection<File> getHeaders() {
-    return headers;
+    return Collections.unmodifiableCollection(headers);
   }
 
   public Collection<File> getSources() {
-    return sources;
+    return Collections.unmodifiableCollection(sources);
   }
 
   public Collection<String> getPrivateCompileDefinitions() {
-    return privateCompileDefinitions;
+    return Collections.unmodifiableCollection(privateCompileDefinitions);
   }
 
   void addPrivateCompileDefinitions(final String definition) {
@@ -51,7 +52,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   }
 
   public Collection<String> getPrivateCompileOptions() {
-    return privateCompileOptions;
+    return Collections.unmodifiableCollection(privateCompileOptions);
   }
 
   void addPrivateCompileOptions(final String option) {
@@ -59,7 +60,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   }
 
   public Collection<String> getPrivateLinkOptions() {
-    return privateLinkOptions;
+    return Collections.unmodifiableCollection(privateLinkOptions);
   }
 
   void addPrivateLinkOption(final String option) {
@@ -67,7 +68,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   }
 
   public Collection<String> getPrivateSystemPackageDependencies() {
-    return privateSystemPackageDependencies;
+    return Collections.unmodifiableCollection(privateSystemPackageDependencies);
   }
 
   void addPrivateSystemPackageDependency(final String dependency) {
@@ -75,7 +76,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   }
 
   public Collection<CMakeResolvedProjectDependency> getPrivateProjectPackageDependencies() {
-    return privateProjectPackageDependencies;
+    return Collections.unmodifiableCollection(privateProjectPackageDependencies);
   }
 
   void addPrivateProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {

@@ -31,7 +31,7 @@ public final class TestCMakeTest {
       final Collection<String> toolchains) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getToolchains().addAll(toolchains);
+      object.toolchains(toolchains);
     });
     return provider;
   }
@@ -41,8 +41,8 @@ public final class TestCMakeTest {
       final Collection<CMakeDependencies> dependencies, Collection<String> options) throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateLinking().getDependencies().addAll(dependencies);
-      object.getPrivateLinking().getOptions().addAll(options);
+      object.getPrivateLinking().dependencies(dependencies);
+      object.getPrivateLinking().options(options);
     });
     return provider;
   }

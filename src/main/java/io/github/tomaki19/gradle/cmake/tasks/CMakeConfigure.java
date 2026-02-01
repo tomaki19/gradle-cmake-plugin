@@ -16,7 +16,7 @@ public abstract class CMakeConfigure extends CMakeExec {
 
   @javax.inject.Inject
   public CMakeConfigure(final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    super(toolchain.getName(), toolchain.getEnvironmentFile(), buildConfig);
+    super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
     final Directory outputDirectory = getProject().getLayout().getBuildDirectory()
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_CONFIG_PATH, toolchain.getName(), buildConfig)).get();
     // tasks with same output directory are not run in parallel

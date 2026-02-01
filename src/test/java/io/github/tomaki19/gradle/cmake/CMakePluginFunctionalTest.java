@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -31,7 +32,10 @@ class CMakePluginFunctionalTest {
   void setup() throws IOException {
     buildFile = new File(testProjectDir, "build.gradle");
     sourcesDir = new File(testProjectDir, "src");
-    sourcesDir.mkdirs();
+    if (!sourcesDir.mkdirs()) {
+      // Handle the case where mkdirs() fails
+      throw new IOException("Failed to create sources directory: " + sourcesDir.getAbsolutePath());
+    }
     Files.createFile(Paths.get(sourcesDir.getAbsolutePath(), "test.hpp"));
     Files.createFile(Paths.get(sourcesDir.getAbsolutePath(), "test.cpp"));
   }
@@ -147,8 +151,14 @@ class CMakePluginFunctionalTest {
 
     // Create a read-only directory to simulate file system errors
     File readOnlyDir = new File(testProjectDir, "readonly");
-    readOnlyDir.mkdirs();
-    readOnlyDir.setReadOnly();
+    if (!readOnlyDir.mkdirs()) {
+      // Handle the case where mkdirs() fails
+      throw new IOException("Failed to create read-only directory: " + readOnlyDir.getAbsolutePath());
+    }
+    if (!readOnlyDir.setReadOnly()) {
+      // Handle the case where setReadOnly() fails
+      throw new IOException("Failed to set read-only directory: " + readOnlyDir.getAbsolutePath());
+    }
 
     try {
       GradleRunner.create()
@@ -166,7 +176,9 @@ class CMakePluginFunctionalTest {
           "Should handle file system errors gracefully");
     } finally {
       // Clean up
-      readOnlyDir.setWritable(true);
+      if (readOnlyDir.exists()) {
+        readOnlyDir.setWritable(true);
+      }
     }
   }
 
@@ -215,7 +227,7 @@ class CMakePluginFunctionalTest {
   }
 
   private void writeValidBuildFile() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
+    try (FileWriter writer = new FileWriter(buildFile, StandardCharsets.UTF_8)) {
       writer.write("""
           plugins {
             id 'io.github.tomaki19.gradle-cmake-plugin'
@@ -247,12 +259,12 @@ class CMakePluginFunctionalTest {
               }
             }
           }
-          """.formatted(sourcesDir.getAbsolutePath()));
+          """.replace("\n", System.lineSeparator()).formatted(sourcesDir.getAbsolutePath()));
     }
   }
 
   private void writeBuildFileWithMissingLibraryProperties() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
+    try (FileWriter writer = new FileWriter(buildFile, StandardCharsets.UTF_8)) {
       writer.write("""
           plugins {
             id 'io.github.tomaki19.gradle-cmake-plugin'
@@ -278,12 +290,12 @@ class CMakePluginFunctionalTest {
               }
             }
           }
-          """.formatted(sourcesDir.getAbsolutePath()));
+          """.replace("\n", System.lineSeparator()).formatted(sourcesDir.getAbsolutePath()));
     }
   }
 
   private void writeBuildFileWithMissingApplicationProperties() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
+    try (FileWriter writer = new FileWriter(buildFile, StandardCharsets.UTF_8)) {
       writer.write("""
           plugins {
             id 'io.github.tomaki19.gradle-cmake-plugin'
@@ -304,12 +316,12 @@ class CMakePluginFunctionalTest {
               }
             }
           }
-          """);
+          """.replace("\n", System.lineSeparator()));
     }
   }
 
   private void writeBuildFileWithMissingTestProperties() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
+    try (FileWriter writer = new FileWriter(buildFile, StandardCharsets.UTF_8)) {
       writer.write("""
           plugins {
             id 'io.github.tomaki19.gradle-cmake-plugin'
@@ -330,12 +342,12 @@ class CMakePluginFunctionalTest {
               }
             }
           }
-          """);
+          """.replace("\n", System.lineSeparator()));
     }
   }
 
   private void writeBuildFileWithInvalidToolchainReference() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
+    try (FileWriter writer = new FileWriter(buildFile, StandardCharsets.UTF_8)) {
       writer.write("""
           plugins {
             id 'io.github.tomaki19.gradle-cmake-plugin'
@@ -375,12 +387,12 @@ class CMakePluginFunctionalTest {
               }
             }
           }
-          """.formatted(sourcesDir.getAbsolutePath()));
+          """.replace("\n", System.lineSeparator()).formatted(sourcesDir.getAbsolutePath()));
     }
   }
 
   private void writeBuildFileWithEmptyConfiguration() throws IOException {
-    try (FileWriter writer = new FileWriter(buildFile)) {
+    try (FileWriter writer = new FileWriter(buildFile, StandardCharsets.UTF_8)) {
       writer.write("""
           plugins {
             id 'io.github.tomaki19.gradle-cmake-plugin'
@@ -389,7 +401,7 @@ class CMakePluginFunctionalTest {
           cmake {
             // Empty configuration - no toolchains, libraries, etc.
           }
-          """);
+          """.replace("\n", System.lineSeparator()));
     }
   }
 }

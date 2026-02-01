@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -15,17 +16,19 @@ import io.github.tomaki19.gradle.cmake.files.CMakeFileContent;
 public abstract class CMakeAssemble extends DefaultTask {
 
   private final CMakeFileContent content;
+  private final File outputFile;
 
   @javax.inject.Inject
-  public CMakeAssemble(final CMakeFileContent content) {
+  public CMakeAssemble(final CMakeFileContent content, final File outputFile) {
     this.content = content;
-    setOnlyIf((action) -> true);
-    getOutputs().file(content.getFile());
+    this.outputFile = outputFile;
+    // setOnlyIf((action) -> true);
+    getOutputs().file(outputFile);
   }
 
   @TaskAction
   protected void assemble() throws IOException {
-    try (final FileOutputStream outputStream = new FileOutputStream(content.getFile().getAsFile())) {
+    try (final FileOutputStream outputStream = new FileOutputStream(outputFile)) {
       content.writeTo(outputStream);
       outputStream.flush();
     }
