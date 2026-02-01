@@ -21,7 +21,7 @@ class CMakeResolvedToolchainTest {
     void testToolchainCreation() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
+
         assertNotNull(resolvedToolchain);
         // No getToolchain method exists, so we can't test this
         // assertEquals(toolchain, resolvedToolchain.getToolchain());
@@ -31,7 +31,7 @@ class CMakeResolvedToolchainTest {
     void testGetBuildConfigs() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
+
         final Collection<String> buildConfigs = resolvedToolchain.getBuildConfigs();
         assertNotNull(buildConfigs);
         assertEquals(2, buildConfigs.size());
@@ -41,8 +41,9 @@ class CMakeResolvedToolchainTest {
     void testGetPackages() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage> packages = resolvedToolchain.getPackages();
+
+        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage> packages = resolvedToolchain
+                .getPackages();
         assertNotNull(packages);
         // Should be empty initially
         assertEquals(0, packages.size());
@@ -52,8 +53,9 @@ class CMakeResolvedToolchainTest {
     void testGetInterfaceLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain.getInterfaceLibraries();
+
+        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain
+                .getInterfaceLibraries();
         assertNotNull(libraries);
         // Should be empty initially
         assertEquals(0, libraries.size());
@@ -63,8 +65,9 @@ class CMakeResolvedToolchainTest {
     void testGetStaticLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain.getStaticLibraries();
+
+        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain
+                .getStaticLibraries();
         assertNotNull(libraries);
         // Should be empty initially
         assertEquals(0, libraries.size());
@@ -74,8 +77,9 @@ class CMakeResolvedToolchainTest {
     void testGetSharedLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain.getSharedLibraries();
+
+        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain
+                .getSharedLibraries();
         assertNotNull(libraries);
         // Should be empty initially
         assertEquals(0, libraries.size());
@@ -85,8 +89,9 @@ class CMakeResolvedToolchainTest {
     void testGetApplications() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable> applications = resolvedToolchain.getApplications();
+
+        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable> applications = resolvedToolchain
+                .getApplications();
         assertNotNull(applications);
         // Should be empty initially
         assertEquals(0, applications.size());
@@ -96,8 +101,9 @@ class CMakeResolvedToolchainTest {
     void testGetTests() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-        
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable> tests = resolvedToolchain.getTests();
+
+        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable> tests = resolvedToolchain
+                .getTests();
         assertNotNull(tests);
         // Should be empty initially
         assertEquals(0, tests.size());

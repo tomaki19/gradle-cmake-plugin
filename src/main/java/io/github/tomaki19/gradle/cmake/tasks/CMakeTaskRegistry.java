@@ -26,109 +26,102 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
-public class CMakeTaskRegistry {
+public final class CMakeTaskRegistry {
 
   public static final String GROUP_BUILD = "cmake build";
   public static final String GROUP_CHECK = "cmake test";
   public static final String GROUP_PACKAGE = "cmake package";
 
-  private final TaskContainer taskContainer;
-
-  public CMakeTaskRegistry(final TaskContainer tasks) {
-    this.taskContainer = tasks; // SpotBugs: TaskContainer is a Gradle API object, not meant to be mutated by
-                                // plugin
+  public TaskProvider<Task> assembleTask(final TaskContainer tasks) {
+    return tasks.named("assemble");
   }
 
-  public TaskProvider<Task> assembleTask() {
-    return taskContainer.named("assemble");
+  public TaskProvider<Task> buildTask(final TaskContainer tasks) {
+    return tasks.named("build");
   }
 
-  public TaskProvider<Task> buildTask() {
-    return taskContainer.named("build");
+  public TaskProvider<Task> checkTask(final TaskContainer tasks) {
+    return tasks.named("check");
   }
 
-  public TaskProvider<Task> checkTask() {
-    return taskContainer.named("check");
+  public TaskProvider<Task> cleanTask(final TaskContainer tasks) {
+    return tasks.named("clean");
   }
 
-  public TaskProvider<Task> cleanTask() {
-    return taskContainer.named("clean");
-  }
-
-  public TaskProvider<CMakeAssemble> assembleListsTask(final Collection<CMakeResolvedToolchain> toolchains,
-      final Project project) throws FileNotFoundException {
+  public TaskProvider<CMakeAssemble> assembleListsTask(final TaskContainer tasks,
+      final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
     final File outputFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.name()).getAsFile();
-    return taskContainer.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project), outputFile);
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project), outputFile);
   }
 
-  public TaskProvider<CMakeAssemble> assembleConfigTask(final CMakeResolvedToolchain toolchain, final Project project)
-      throws FileNotFoundException {
+  public TaskProvider<CMakeAssemble> assembleConfigTask(final TaskContainer tasks,
+      final CMakeResolvedToolchain toolchain, final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleConfigTaskName(toolchain.getName());
     final File outputFile = project.getLayout().getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).get()
         .file(CMakeConfigFile.name(CMakeFileConventions.cmakeConfigName(project.getName(), toolchain.getName())))
         .getAsFile();
-    return taskContainer.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project), outputFile);
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project), outputFile);
   }
 
-  public TaskProvider<CMakeCustomExec> customExecTask(final CMakeCustomTaskProto taskProto) {
+  public TaskProvider<CMakeCustomExec> customExecTask(final TaskContainer tasks, final CMakeCustomTaskProto taskProto) {
     final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchainName(),
         taskProto.getBuildConfig());
-    return taskContainer.register(taskName, CMakeCustomExec.class, taskProto.getToolchainName(),
+    return tasks.register(taskName, CMakeCustomExec.class, taskProto.getToolchainName(),
         taskProto.getBuildConfig(), taskProto.getEnvironmentFile());
   }
 
-  public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain,
+  public TaskProvider<CMakeConfigure> configureTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     final String taskName = CMakeTasksConventions.configureTaskName(toolchain.getName(), buildConfig);
-    return taskContainer.register(taskName, CMakeConfigure.class, toolchain, buildConfig);
+    return tasks.register(taskName, CMakeConfigure.class, toolchain, buildConfig);
   }
 
-  public TaskProvider<CMakeBuildLibrary> buildTask(final CMakeResolvedLibrary library,
+  public TaskProvider<CMakeBuildLibrary> buildTask(final TaskContainer tasks, final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String linkage, final String buildConfig) {
     final String taskName = CMakeTasksConventions.buildTaskName(library.getName(), toolchain.getName(),
         linkage, buildConfig);
-    return taskContainer.register(taskName, CMakeBuildLibrary.class, library, toolchain, linkage,
+    return tasks.register(taskName, CMakeBuildLibrary.class, library, toolchain, linkage,
         buildConfig);
   }
 
-  public TaskProvider<CMakeBuildExecutable> buildTask(final CMakeResolvedBinary<?> binary,
+  public TaskProvider<CMakeBuildExecutable> buildTask(final TaskContainer tasks, final CMakeResolvedBinary<?> binary,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.buildTaskName(binary.getName(), toolchain.getName(),
         buildConfig);
-    return taskContainer.register(taskName, CMakeBuildExecutable.class, binary, toolchain, buildConfig);
+    return tasks.register(taskName, CMakeBuildExecutable.class, binary, toolchain, buildConfig);
   }
 
-  public TaskProvider<CMakePackageLibrary> packageTask(final CMakeResolvedLibrary library,
+  public TaskProvider<CMakePackageLibrary> packageTask(final TaskContainer tasks, final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String linkage, final String buildConfig) {
     final String taskName = CMakeTasksConventions.packageTaskName(library.getName(), toolchain.getName(),
         linkage, buildConfig);
-    return taskContainer.register(taskName, CMakePackageLibrary.class, library, toolchain, linkage,
+    return tasks.register(taskName, CMakePackageLibrary.class, library, toolchain, linkage,
         buildConfig);
   }
 
-  public TaskProvider<CMakePackageExecutable> packageTask(final CMakeResolvedBinary<?> binary,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+  public TaskProvider<CMakePackageExecutable> packageTask(final TaskContainer tasks,
+      final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.packageTaskName(binary.getName(), toolchain.getName(),
         buildConfig);
-    return taskContainer.register(taskName, CMakePackageExecutable.class, binary, toolchain, buildConfig);
+    return tasks.register(taskName, CMakePackageExecutable.class, binary, toolchain, buildConfig);
   }
 
-  public TaskProvider<CMakeCheck> checkTask(final CMakeResolvedExecutable test, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) {
+  public TaskProvider<CMakeCheck> checkTask(final TaskContainer tasks, final CMakeResolvedExecutable test,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.checkTaskName(test.getName(), toolchain.getName(),
         buildConfig);
-    return taskContainer.register(taskName, CMakeCheck.class, test, toolchain, buildConfig);
+    return tasks.register(taskName, CMakeCheck.class, test, toolchain, buildConfig);
   }
 
-  public TaskProvider<Task> buildAllToolchainTask(final CMakeResolvedToolchain toolchain) {
+  public TaskProvider<Task> buildAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
     final String taskName = CMakeTasksConventions.buildAllTaskName(toolchain.getName());
-    return taskContainer.register(taskName);
+    return tasks.register(taskName);
   }
 
-  public TaskProvider<Task> checkAllToolchainTask(final CMakeResolvedToolchain toolchain) {
+  public TaskProvider<Task> checkAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
     final String taskName = CMakeTasksConventions.checkAllTaskName(toolchain.getName());
-    return taskContainer.register(taskName);
+    return tasks.register(taskName);
   }
 
   public static void configureRemote(final CMakeConfigure task, final CMakeResolvedToolchain toolchain,

@@ -7,7 +7,7 @@ package io.github.tomaki19.gradle.cmake.model;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
-public class CMakeResolvedProject extends CMakeResolvedName<CMakeResolvedProject> {
+public final class CMakeResolvedProject extends CMakeResolvedName<CMakeResolvedProject> {
 
   private final String identifier;
   private final Directory projectDirectory;

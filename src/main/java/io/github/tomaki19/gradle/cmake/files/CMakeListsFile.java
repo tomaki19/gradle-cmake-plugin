@@ -26,7 +26,7 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
-public class CMakeListsFile extends CMakeFileContent {
+public final class CMakeListsFile extends CMakeFileContent {
 
   private static final String CMAKE_MINIMUM_VERSION = "3.21";
 
