@@ -25,5 +25,4 @@ class CMakePluginTest {
         project.getPluginManager().apply(CMakePlugin.class);
         assertNotNull(project.getExtensions().getByName("cmake"));
     }
-
 }

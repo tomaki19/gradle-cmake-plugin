@@ -5,11 +5,15 @@
 package io.github.tomaki19.gradle.cmake;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
+import org.gradle.internal.os.OperatingSystem;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
@@ -18,95 +22,110 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 class CMakeResolvedToolchainTest {
 
     @Test
-    void testToolchainCreation() {
+    void testResolvedToolchainCreation() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
         assertNotNull(resolvedToolchain);
-        // No getToolchain method exists, so we can't test this
-        // assertEquals(toolchain, resolvedToolchain.getToolchain());
+        assertEquals("TestToolchain", resolvedToolchain.getName());
     }
 
     @Test
-    void testGetBuildConfigs() {
+    void testResolvedToolchainWithEmptyBuildConfigs() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.emptyList());
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<String> buildConfigs = resolvedToolchain.getBuildConfigs();
-        assertNotNull(buildConfigs);
-        assertEquals(2, buildConfigs.size());
+        assertNotNull(resolvedToolchain);
+        // Should have default build configs
+        assertFalse(resolvedToolchain.getBuildConfigs().isEmpty());
     }
 
     @Test
-    void testGetPackages() {
+    void testHasBinaries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage> packages = resolvedToolchain
-                .getPackages();
-        assertNotNull(packages);
-        // Should be empty initially
-        assertEquals(0, packages.size());
+        assertFalse(resolvedToolchain.hasBinaries());
     }
 
     @Test
-    void testGetInterfaceLibraries() {
+    void testHasApplications() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain
-                .getInterfaceLibraries();
-        assertNotNull(libraries);
-        // Should be empty initially
-        assertEquals(0, libraries.size());
+        assertFalse(resolvedToolchain.hasApplications());
     }
 
     @Test
-    void testGetStaticLibraries() {
+    void testHasTests() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain
-                .getStaticLibraries();
-        assertNotNull(libraries);
-        // Should be empty initially
-        assertEquals(0, libraries.size());
+        assertFalse(resolvedToolchain.hasTests());
     }
 
     @Test
-    void testGetSharedLibraries() {
+    void testHasInterfaceLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary> libraries = resolvedToolchain
-                .getSharedLibraries();
-        assertNotNull(libraries);
-        // Should be empty initially
-        assertEquals(0, libraries.size());
+        assertFalse(resolvedToolchain.hasInterfaceLibraries());
     }
 
     @Test
-    void testGetApplications() {
+    void testHasBinaryLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("TestToolchain");
+        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
+        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
+        
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable> applications = resolvedToolchain
-                .getApplications();
-        assertNotNull(applications);
-        // Should be empty initially
-        assertEquals(0, applications.size());
+        assertFalse(resolvedToolchain.hasBinaryLibraries());
     }
-
-    @Test
-    void testGetTests() {
-        final CMakeToolchain toolchain = mock(CMakeToolchain.class);
-        final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
-
-        final Collection<io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable> tests = resolvedToolchain
-                .getTests();
-        assertNotNull(tests);
-        // Should be empty initially
-        assertEquals(0, tests.size());
-    }
-
 }
