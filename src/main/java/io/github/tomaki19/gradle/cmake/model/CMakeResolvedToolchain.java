@@ -19,11 +19,11 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolvedToolchain> {
 
   private final OperatingSystem operatingSystem;
+  private final String generator;
   private final Collection<String> buildConfigs;
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
-  private final Optional<String> generator;
   private final Collection<CMakeResolvedProject> projects = new TreeSet<>();
   private final Collection<CMakeResolvedPackage> packages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> interfaceLibraries = new TreeSet<>();
@@ -35,15 +35,19 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
     this.operatingSystem = toolchain.getOperatingSystem();
+    this.generator = toolchain.getGenerator().getOrElse("Unix Makefiles");
     this.buildConfigs = new TreeSet<>(toolchain.getBuildConfigs());
     this.environment = new TreeMap<>(toolchain.getEnvironment());
     this.environmentFile = toolchain.getEnvironmentFile();
     this.toolchainFile = toolchain.getToolchainFile();
-    this.generator = toolchain.getGenerator();
   }
 
   public OperatingSystem getOperatingSystem() {
     return operatingSystem;
+  }
+
+  public String getGenerator() {
+    return generator;
   }
 
   public Collection<String> getBuildConfigs() {
@@ -60,10 +64,6 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public Optional<File> getToolchainFile() {
     return toolchainFile;
-  }
-
-  public Optional<String> getGenerator() {
-    return generator;
   }
 
   void addProject(final CMakeResolvedProject component) {

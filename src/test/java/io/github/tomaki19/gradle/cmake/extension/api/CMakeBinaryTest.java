@@ -15,6 +15,7 @@ import java.util.Collection;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.SourceDirectorySet;
+import org.gradle.api.provider.Property;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
@@ -40,8 +41,8 @@ class CMakeBinaryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getStripDebug() {
+                return mock(Property.class);
             }
         };
         assertNotNull(binary);
@@ -67,8 +68,8 @@ class CMakeBinaryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getStripDebug() {
+                return mock(Property.class);
             }
         };
 
@@ -101,8 +102,8 @@ class CMakeBinaryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getStripDebug() {
+                return mock(Property.class);
             }
         };
 
@@ -140,8 +141,8 @@ class CMakeBinaryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getStripDebug() {
+                return mock(Property.class);
             }
         };
 
@@ -170,8 +171,8 @@ class CMakeBinaryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getStripDebug() {
+                return mock(Property.class);
             }
         };
 

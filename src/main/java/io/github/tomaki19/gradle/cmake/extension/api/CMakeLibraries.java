@@ -10,9 +10,9 @@ import org.gradle.api.tasks.Nested;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
-  public Property<Boolean> getBuildStatic();
+  public abstract Property<Boolean> getBuildStatic();
 
-  public Property<Boolean> getBuildShared();
+  public abstract Property<Boolean> getBuildShared();
 
   @Nested
   public abstract CMakeLinking getPrivateInterfaceLinking();

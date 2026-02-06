@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.gradle.api.Project;
+import org.gradle.api.provider.Property;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +34,8 @@ class CMakeLibraryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getStripDebug() {
+                return mock(Property.class);
             }
 
             @Override
@@ -63,13 +64,13 @@ class CMakeLibraryTest {
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getBuildStatic() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getBuildStatic() {
+                return mock(Property.class);
             }
 
             @Override
-            public org.gradle.api.provider.Property<Boolean> getBuildShared() {
-                return mock(org.gradle.api.provider.Property.class);
+            public Property<Boolean> getBuildShared() {
+                return mock(Property.class);
             }
 
             @Override

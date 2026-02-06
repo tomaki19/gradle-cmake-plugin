@@ -27,9 +27,7 @@ public abstract class CMakeConfigure extends CMakeExec {
     getBaseArguments().add("-S \"%s\"".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
     getBaseArguments().add("-B \"%s\"".formatted(outputDirectory.getAsFile().getAbsolutePath()));
-    toolchain.getGenerator().ifPresent((generator) -> {
-      getBaseArguments().add("-G \"%s\"".formatted(generator));
-    });
+    getBaseArguments().add("-G \"%s\"".formatted(toolchain.getGenerator()));
     getBaseArguments().add("-D CMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
     getBaseArguments().add("-D CMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
     final StringBuffer appBundlePaths = new StringBuffer();

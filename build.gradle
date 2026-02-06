@@ -18,9 +18,9 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.mockito:mockito-core:5.12.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
-    spotbugs("com.github.spotbugs:spotbugs:+")}
+    testImplementation libs.bundles.mockito
+    spotbugs("com.github.spotbugs:spotbugs:+")
+}
 
 java {
   sourceCompatibility = JavaVersion.VERSION_17 // minimal java version supported by Gradle 9
@@ -46,6 +46,7 @@ spotless {
     removeUnusedImports()
   }
 }
+
 tasks.withType(JavaCompile) {
   dependsOn(tasks.spotlessApply)
 }
@@ -74,7 +75,7 @@ spotbugs {
 
 test {
   finalizedBy jacocoTestReport
-  jvmArgs '-Dnet.bytebuddy.experimental=true', '-XX:+EnableDynamicAgentLoading'
+  jvmArgs '-XX:+EnableDynamicAgentLoading'
 }
 
 testing {

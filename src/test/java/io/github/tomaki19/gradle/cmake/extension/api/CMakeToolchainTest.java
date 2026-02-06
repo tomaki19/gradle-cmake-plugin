@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.gradle.api.provider.Property;
 import org.gradle.internal.os.OperatingSystem;
 import org.junit.jupiter.api.Test;
 
@@ -48,6 +49,11 @@ class CMakeToolchainTest {
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
             }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
+            }
         };
         assertNotNull(toolchain);
     }
@@ -79,6 +85,11 @@ class CMakeToolchainTest {
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
             }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
+            }
         };
 
         // Test default value
@@ -87,44 +98,6 @@ class CMakeToolchainTest {
         // Test setting value
         toolchain.setOperatingSystem(OperatingSystem.LINUX);
         assertEquals(OperatingSystem.LINUX, toolchain.getOperatingSystem());
-    }
-
-    @Test
-    void testGenerator() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
-
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
-
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
-
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
-        };
-
-        // Test default value
-        assertFalse(toolchain.getGenerator().isPresent());
-
-        // Test setting value
-        toolchain.setGenerator("testGenerator");
-        assertTrue(toolchain.getGenerator().isPresent());
-        assertEquals("testGenerator", toolchain.getGenerator().get());
     }
 
     @Test
@@ -153,6 +126,11 @@ class CMakeToolchainTest {
             @Override
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
+            }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
             }
         };
 
@@ -198,6 +176,11 @@ class CMakeToolchainTest {
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
             }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
+            }
         };
 
         // Test default value
@@ -238,6 +221,11 @@ class CMakeToolchainTest {
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
             }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
+            }
         };
 
         // Test default value
@@ -276,6 +264,11 @@ class CMakeToolchainTest {
             @Override
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
+            }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
             }
         };
 
@@ -316,6 +309,11 @@ class CMakeToolchainTest {
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
             }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
+            }
         };
 
         final CMakeToolchain toolchain2 = new CMakeToolchain() {
@@ -342,6 +340,11 @@ class CMakeToolchainTest {
             @Override
             public CMakeTests getTests() {
                 return mock(CMakeTests.class);
+            }
+
+            @Override
+            public Property<String> getGenerator() {
+                return mock(Property.class);
             }
         };
 

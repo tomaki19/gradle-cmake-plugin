@@ -1,14 +1,23 @@
 [versions]
+publish = "2.0.0"
+spotless = "8.2.1"
+shadow = "9.3.1"
+versions = "0.53.0"
+jacocolog = "4.0.1"
 spotbugs = "6.4.8"
+mockito = "5.21.0"
 
 [libraries]
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 
 [bundles]
+mockito = ["mockito-core", "mockito-junit-jupiter"]
 
 [plugins]
-publish = { id = "com.gradle.plugin-publish", version = "2.0.0" }
-spotless = { id = "com.diffplug.spotless", version = "8.2.1" }
-shadow = { id = "com.gradleup.shadow", version = "9.3.1" }
-versions = { id = "com.github.ben-manes.versions", version = "0.53.0" }
-jacocolog = { id = "org.barfuin.gradle.jacocolog", version = "4.0.1" }
+publish = { id = "com.gradle.plugin-publish", version.ref = "publish" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
+jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.gradle.api.Action;
 import org.gradle.api.Named;
+import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Nested;
 import org.gradle.internal.os.OperatingSystem;
 
@@ -25,12 +26,8 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   public static final OperatingSystem MacOS = OperatingSystem.MAC_OS;
   public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
 
-  private static final OperatingSystem DEFAULT_OPERATING_SYSTEM = OperatingSystem.current();
-  private static final Collection<String> DEFAULT_BUILD_CONFIGS = Arrays.asList("debug", "release");
-
-  private OperatingSystem operatingSystem = DEFAULT_OPERATING_SYSTEM;
-  private Optional<String> generator = Optional.empty();
-  private Collection<String> buildConfigs = new HashSet<>(DEFAULT_BUILD_CONFIGS);
+  private OperatingSystem operatingSystem = OperatingSystem.current();
+  private Collection<String> buildConfigs = new HashSet<>(Arrays.asList("debug", "release"));
   private Map<String, String> environment = new HashMap<>();
   private Optional<File> environmentFile = Optional.empty();
   private Optional<File> toolchainFile = Optional.empty();
@@ -43,15 +40,7 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
     this.operatingSystem = value;
   }
 
-  public Optional<String> getGenerator() {
-    return generator;
-  }
-
-  public void setGenerator(final CharSequence value) {
-    if (!value.isEmpty()) {
-      this.generator = Optional.of(value.toString());
-    }
-  }
+  public abstract Property<String> getGenerator();
 
   public Collection<String> getBuildConfigs() {
     return Collections.unmodifiableCollection(buildConfigs);

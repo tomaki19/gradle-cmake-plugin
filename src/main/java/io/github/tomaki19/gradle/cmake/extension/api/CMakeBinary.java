@@ -35,7 +35,9 @@ public abstract class CMakeBinary implements Named, CMakeBinaries {
   }
 
   public void setOutputName(final CharSequence value) {
-    this.outputName = Optional.of(value.toString());
+    if (!value.isEmpty()) {
+      this.outputName = Optional.of(value.toString());
+    }
   }
 
   public Collection<String> getToolchains() {

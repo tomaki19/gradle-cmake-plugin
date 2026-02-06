@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
 
-public class CMakeDependencies {
+public final class CMakeDependencies {
 
   private final Collection<String> names;
   private Optional<String> from = Optional.empty();

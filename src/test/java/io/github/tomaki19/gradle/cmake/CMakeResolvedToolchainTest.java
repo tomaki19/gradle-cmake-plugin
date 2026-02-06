@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.gradle.api.provider.Property;
 import org.gradle.internal.os.OperatingSystem;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
@@ -44,7 +45,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.emptyList());
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
@@ -60,7 +61,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
@@ -75,7 +76,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
@@ -90,7 +91,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
@@ -105,7 +106,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
@@ -120,7 +121,7 @@ class CMakeResolvedToolchainTest {
         when(toolchain.getName()).thenReturn("TestToolchain");
         when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
-        when(toolchain.getGenerator()).thenReturn(Optional.empty());
+        when(toolchain.getGenerator()).thenReturn(mock(Property.class));
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
