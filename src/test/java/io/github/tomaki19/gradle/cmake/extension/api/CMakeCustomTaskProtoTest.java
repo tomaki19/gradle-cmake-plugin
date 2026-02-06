@@ -6,9 +6,11 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -31,5 +33,42 @@ class CMakeCustomTaskProtoTest {
         assertEquals("test-toolchain", proto.getToolchainName());
         assertEquals("debug", proto.getBuildConfig());
         assertNotNull(proto.getEnvironmentFile());
+    }
+    
+    @Test
+    void testGetters() {
+        // Create a mock toolchain
+        CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        when(toolchain.getName()).thenReturn("test-toolchain");
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
+        
+        // Create a custom task proto
+        CMakeCustomTaskProto proto = new CMakeCustomTaskProto("test-task", toolchain, "debug");
+        
+        // Verify all getters work correctly
+        assertEquals("test-task", proto.getName());
+        assertEquals("test-toolchain", proto.getToolchainName());
+        assertEquals("debug", proto.getBuildConfig());
+        assertNotNull(proto.getEnvironmentFile());
+    }
+    
+    @Test
+    void testGettersWithFile() {
+        // Create a mock toolchain
+        CMakeToolchain toolchain = mock(CMakeToolchain.class);
+        File testFile = new File("test.txt");
+        when(toolchain.getName()).thenReturn("test-toolchain");
+        when(toolchain.getEnvironmentFile()).thenReturn(Optional.of(testFile));
+        
+        // Create a custom task proto
+        CMakeCustomTaskProto proto = new CMakeCustomTaskProto("test-task", toolchain, "debug");
+        
+        // Verify all getters work correctly
+        assertEquals("test-task", proto.getName());
+        assertEquals("test-toolchain", proto.getToolchainName());
+        assertEquals("debug", proto.getBuildConfig());
+        assertNotNull(proto.getEnvironmentFile());
+        assertTrue(proto.getEnvironmentFile().isPresent());
+        assertEquals(testFile, proto.getEnvironmentFile().get());
     }
 }

@@ -41,8 +41,7 @@ public final class CMakeResolver {
     this.availablePackages = packages.stream()
         .collect(Collectors.toUnmodifiableMap(CMakePackage::getName, Function.identity()));
     this.availableToolchains = toolchains.stream()
-        .filter((toolchain) -> toolchain.getOperatingSystem().isPresent()
-            && Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem().get()))
+        .filter((toolchain) -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem()))
         .collect(Collectors.toUnmodifiableMap(CMakeToolchain::getName, Function.identity()));
 
   }

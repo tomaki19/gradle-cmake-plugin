@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,13 +26,13 @@ class CMakeResolvedToolchainTest {
     void testResolvedToolchainCreation() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertNotNull(resolvedToolchain);
         assertEquals("TestToolchain", resolvedToolchain.getName());
@@ -41,30 +42,29 @@ class CMakeResolvedToolchainTest {
     void testResolvedToolchainWithEmptyBuildConfigs() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.emptyList());
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertNotNull(resolvedToolchain);
-        // Should have default build configs
-        assertFalse(resolvedToolchain.getBuildConfigs().isEmpty());
+        assertTrue(resolvedToolchain.getBuildConfigs().isEmpty());
     }
 
     @Test
     void testHasBinaries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertFalse(resolvedToolchain.hasBinaries());
     }
@@ -73,13 +73,13 @@ class CMakeResolvedToolchainTest {
     void testHasApplications() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertFalse(resolvedToolchain.hasApplications());
     }
@@ -88,13 +88,13 @@ class CMakeResolvedToolchainTest {
     void testHasTests() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertFalse(resolvedToolchain.hasTests());
     }
@@ -103,13 +103,13 @@ class CMakeResolvedToolchainTest {
     void testHasInterfaceLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertFalse(resolvedToolchain.hasInterfaceLibraries());
     }
@@ -118,13 +118,13 @@ class CMakeResolvedToolchainTest {
     void testHasBinaryLibraries() {
         final CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("TestToolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(Optional.of(OperatingSystem.current()));
+        when(toolchain.getOperatingSystem()).thenReturn(OperatingSystem.current());
         when(toolchain.getBuildConfigs()).thenReturn(Collections.singletonList("Debug"));
         when(toolchain.getGenerator()).thenReturn(Optional.empty());
         when(toolchain.getEnvironment()).thenReturn(Collections.emptyMap());
         when(toolchain.getEnvironmentFile()).thenReturn(Optional.empty());
         when(toolchain.getToolchainFile()).thenReturn(Optional.empty());
-        
+
         final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
         assertFalse(resolvedToolchain.hasBinaryLibraries());
     }

@@ -7,17 +7,36 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import org.gradle.api.Project;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
-
 
 class CMakeApplicationTest {
 
     @Test
-    void testApplicationProperties() {
-        // Create a mock application
-        CMakeApplication application = mock(CMakeApplication.class);
-        
-        // Test that we can access the methods (this is just to verify the class exists and methods can be called)
+    void testConstructor() {
+        final Project project = ProjectBuilder.builder().build();
+        final CMakeApplication application = new CMakeApplication(project.getObjects()) {
+            @Override
+            public String getName() {
+                return "test";
+            }
+
+            @Override
+            public CMakeCompile getPrivateCompile() {
+                return mock(CMakeCompile.class);
+            }
+
+            @Override
+            public CMakeLinking getPrivateLinking() {
+                return mock(CMakeLinking.class);
+            }
+
+            @Override
+            public org.gradle.api.provider.Property<Boolean> getStripDebug() {
+                return mock(org.gradle.api.provider.Property.class);
+            }
+        };
         assertNotNull(application);
     }
 }

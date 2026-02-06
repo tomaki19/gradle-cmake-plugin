@@ -28,19 +28,19 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   private static final OperatingSystem DEFAULT_OPERATING_SYSTEM = OperatingSystem.current();
   private static final Collection<String> DEFAULT_BUILD_CONFIGS = Arrays.asList("debug", "release");
 
-  private Optional<OperatingSystem> operatingSystem = Optional.of(DEFAULT_OPERATING_SYSTEM);
+  private OperatingSystem operatingSystem = DEFAULT_OPERATING_SYSTEM;
   private Optional<String> generator = Optional.empty();
   private Collection<String> buildConfigs = new HashSet<>(DEFAULT_BUILD_CONFIGS);
   private Map<String, String> environment = new HashMap<>();
   private Optional<File> environmentFile = Optional.empty();
   private Optional<File> toolchainFile = Optional.empty();
 
-  public Optional<OperatingSystem> getOperatingSystem() {
+  public OperatingSystem getOperatingSystem() {
     return operatingSystem;
   }
 
   public void setOperatingSystem(final OperatingSystem value) {
-    this.operatingSystem = Optional.of(value);
+    this.operatingSystem = value;
   }
 
   public Optional<String> getGenerator() {
@@ -48,7 +48,9 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public void setGenerator(final CharSequence value) {
-    this.generator = Optional.of(value.toString());
+    if (!value.isEmpty()) {
+      this.generator = Optional.of(value.toString());
+    }
   }
 
   public Collection<String> getBuildConfigs() {
@@ -56,7 +58,9 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public void setBuildConfigs(final Collection<CharSequence> values) {
-    this.buildConfigs = values.stream().map((value) -> value.toString()).toList();
+    if (!values.isEmpty()) {
+      this.buildConfigs = values.stream().map((value) -> value.toString()).toList();
+    }
   }
 
   public void buildConfigs(final CharSequence... values) {
@@ -68,8 +72,10 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   public void setEnvironment(final Map<CharSequence, CharSequence> values) {
-    this.environment = values.entrySet().stream().collect(
-        Collectors.toUnmodifiableMap((entry) -> entry.getKey().toString(), (entry) -> entry.getValue().toString()));
+    if (!values.isEmpty()) {
+      this.environment = values.entrySet().stream().collect(
+          Collectors.toUnmodifiableMap((entry) -> entry.getKey().toString(), (entry) -> entry.getValue().toString()));
+    }
   }
 
   public Optional<File> getEnvironmentFile() {

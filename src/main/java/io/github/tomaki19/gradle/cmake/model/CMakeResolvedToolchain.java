@@ -5,7 +5,6 @@
 package io.github.tomaki19.gradle.cmake.model;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -21,10 +20,10 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   private final OperatingSystem operatingSystem;
   private final Collection<String> buildConfigs;
-  private final Optional<String> generator;
   private final Map<String, String> environment;
   private final Optional<File> environmentFile;
   private final Optional<File> toolchainFile;
+  private final Optional<String> generator;
   private final Collection<CMakeResolvedProject> projects = new TreeSet<>();
   private final Collection<CMakeResolvedPackage> packages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> interfaceLibraries = new TreeSet<>();
@@ -35,13 +34,12 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
-    this.operatingSystem = toolchain.getOperatingSystem().orElse(OperatingSystem.current());
-    this.buildConfigs = toolchain.getBuildConfigs().isEmpty() ? Arrays.asList("debug", "release")
-        : new TreeSet<>(toolchain.getBuildConfigs());
-    this.generator = toolchain.getGenerator();
+    this.operatingSystem = toolchain.getOperatingSystem();
+    this.buildConfigs = new TreeSet<>(toolchain.getBuildConfigs());
     this.environment = new TreeMap<>(toolchain.getEnvironment());
     this.environmentFile = toolchain.getEnvironmentFile();
     this.toolchainFile = toolchain.getToolchainFile();
+    this.generator = toolchain.getGenerator();
   }
 
   public OperatingSystem getOperatingSystem() {
@@ -50,10 +48,6 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public Collection<String> getBuildConfigs() {
     return Collections.unmodifiableCollection(buildConfigs);
-  }
-
-  public Optional<String> getGenerator() {
-    return generator;
   }
 
   public Map<String, String> getEnvironment() {
@@ -66,6 +60,10 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public Optional<File> getToolchainFile() {
     return toolchainFile;
+  }
+
+  public Optional<String> getGenerator() {
+    return generator;
   }
 
   void addProject(final CMakeResolvedProject component) {
