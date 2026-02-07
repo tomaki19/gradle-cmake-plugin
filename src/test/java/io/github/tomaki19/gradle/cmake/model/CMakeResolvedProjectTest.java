@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -31,5 +32,36 @@ class CMakeResolvedProjectTest {
         
         // Test that the name is correctly retrieved
         assertEquals("test-project", resolvedProject.getName());
+    }
+
+    @Test
+    void testGetIdentifier() {
+        Project project = ProjectBuilder.builder().withName("test-project").build();
+        
+        CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
+        assertNotNull(resolvedProject);
+        
+        // Test that the identifier is correctly retrieved
+        String identifier = resolvedProject.getIdentifier();
+        assertNotNull(identifier);
+        assertTrue(identifier.contains("test-project"));
+    }
+
+    @Test
+    void testGetProjectDirectory() {
+        Project project = ProjectBuilder.builder().withName("test-project").build();
+        
+        CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
+        assertNotNull(resolvedProject);
+        assertNotNull(resolvedProject.getProjectDirectory());
+    }
+
+    @Test
+    void testGetBuildDirectory() {
+        Project project = ProjectBuilder.builder().withName("test-project").build();
+        
+        CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
+        assertNotNull(resolvedProject);
+        assertNotNull(resolvedProject.getBuildDirectory());
     }
 }

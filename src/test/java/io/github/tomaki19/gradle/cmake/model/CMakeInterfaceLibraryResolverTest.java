@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package io.github.tomaki19.gradle.cmake;
+package io.github.tomaki19.gradle.cmake.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,8 +23,6 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
 
 public class CMakeInterfaceLibraryResolverTest {
 

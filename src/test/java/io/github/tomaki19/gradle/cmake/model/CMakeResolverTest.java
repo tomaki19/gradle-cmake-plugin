@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -27,11 +28,71 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 class CMakeResolverTest {
 
     @Test
+    void testResolverCreation() {
+        final Project project = mock(Project.class);
+        final Set<CMakePackage> packages = Set.of();
+        final Set<CMakeToolchain> toolchains = Set.of();
+
+        final CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+        assertNotNull(resolver);
+    }
+
+    @Test
+    void testProcessWithEmptyCollections() {
+        final Project project = mock(Project.class);
+        final Set<CMakePackage> packages = Set.of();
+        final Set<CMakeToolchain> toolchains = Set.of();
+
+        final CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+
+        final Set<CMakeLibrary> libraries = Set.of();
+        final Set<CMakeApplication> applications = Set.of();
+        final Set<CMakeTest> tests = Set.of();
+
+        final Collection<?> results = resolver.process(libraries, applications, tests);
+        assertNotNull(results);
+        assertEquals(0, results.size());
+    }
+
+    @Test
+    void testProcessWithNullToolchains() {
+        final Project project = mock(Project.class);
+        final Set<CMakePackage> packages = Set.of();
+        final Set<CMakeToolchain> toolchains = null;
+
+        assertThrows(NullPointerException.class, () -> {
+            new CMakeResolver(project, packages, toolchains);
+        });
+    }
+
+    @Test
+    void testProcessWithNullPackages() {
+        final Project project = mock(Project.class);
+        final Set<CMakePackage> packages = null;
+        final Set<CMakeToolchain> toolchains = Set.of();
+
+        assertThrows(NullPointerException.class, () -> {
+            new CMakeResolver(project, packages, toolchains);
+        });
+    }
+
+    @Test
+    void testProcessWithNullProject() {
+        final Project project = null;
+        final Set<CMakePackage> packages = Set.of();
+        final Set<CMakeToolchain> toolchains = Set.of();
+
+        assertThrows(NullPointerException.class, () -> {
+            new CMakeResolver(project, packages, toolchains);
+        });
+    }
+
+    @Test
     void testConstructorWithNullProject() {
         Project project = null;
         Set<CMakePackage> packages = Collections.emptySet();
         Set<CMakeToolchain> toolchains = Collections.emptySet();
-        
+
         assertThrows(NullPointerException.class, () -> {
             new CMakeResolver(project, packages, toolchains);
         });
@@ -42,7 +103,7 @@ class CMakeResolverTest {
         Project project = ProjectBuilder.builder().build();
         Set<CMakePackage> packages = null;
         Set<CMakeToolchain> toolchains = Collections.emptySet();
-        
+
         assertThrows(NullPointerException.class, () -> {
             new CMakeResolver(project, packages, toolchains);
         });
@@ -53,7 +114,7 @@ class CMakeResolverTest {
         Project project = ProjectBuilder.builder().build();
         Set<CMakePackage> packages = Collections.emptySet();
         Set<CMakeToolchain> toolchains = null;
-        
+
         assertThrows(NullPointerException.class, () -> {
             new CMakeResolver(project, packages, toolchains);
         });
@@ -64,7 +125,7 @@ class CMakeResolverTest {
         Project project = ProjectBuilder.builder().build();
         Set<CMakePackage> packages = Collections.emptySet();
         Set<CMakeToolchain> toolchains = Collections.emptySet();
-        
+
         CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
         assertNotNull(resolver);
     }
@@ -77,10 +138,10 @@ class CMakeResolverTest {
         Set<CMakeLibrary> libraries = Collections.emptySet();
         Set<CMakeApplication> applications = Collections.emptySet();
         Set<CMakeTest> tests = Collections.emptySet();
-        
+
         CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
         assertNotNull(resolver);
-        
+
         // This should not throw any exception
         var result = resolver.process(libraries, applications, tests);
         assertNotNull(result);
@@ -91,20 +152,20 @@ class CMakeResolverTest {
     void testProcessWithToolchain() {
         Project project = ProjectBuilder.builder().build();
         Set<CMakePackage> packages = Collections.emptySet();
-        
+
         // Create a mock toolchain
         CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("test-toolchain");
         when(toolchain.getOperatingSystem()).thenReturn(org.gradle.internal.os.OperatingSystem.current());
-        
+
         Set<CMakeToolchain> toolchains = Set.of(toolchain);
         Set<CMakeLibrary> libraries = Collections.emptySet();
         Set<CMakeApplication> applications = Collections.emptySet();
         Set<CMakeTest> tests = Collections.emptySet();
-        
+
         CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
         assertNotNull(resolver);
-        
+
         // This should not throw any exception
         var result = resolver.process(libraries, applications, tests);
         assertNotNull(result);
