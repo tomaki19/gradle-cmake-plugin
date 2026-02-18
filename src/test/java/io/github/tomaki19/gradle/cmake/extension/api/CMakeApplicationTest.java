@@ -6,147 +6,47 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 import org.gradle.api.Project;
-import org.gradle.api.provider.Property;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
+
 class CMakeApplicationTest {
 
-    @Test
-    void testConstructor() {
-        final Project project = ProjectBuilder.builder().build();
-        final CMakeApplication application = new CMakeApplication(project.getObjects()) {
-            @Override
-            public String getName() {
-                return "test";
-            }
+  @Test
+  void testConstructor() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    assertNotNull(application);
+  }
 
-            @Override
-            public CMakeCompile getPrivateCompile() {
-                return mock(CMakeCompile.class);
-            }
+  @Test
+  void testGetName() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    assertEquals("test", application.getName());
+  }
 
-            @Override
-            public CMakeLinking getPrivateLinking() {
-                return mock(CMakeLinking.class);
-            }
+  @Test
+  void testGetPrivateCompile() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    assertNotNull(application.getPrivateCompile());
+  }
 
-            @Override
-            public Property<Boolean> getStripDebug() {
-                return mock(Property.class);
-            }
-        };
-        assertNotNull(application);
-    }
+  @Test
+  void testGetPrivateLinking() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    assertNotNull(application.getPrivateLinking());
+  }
 
-    @Test
-    void testGetName() {
-        final Project project = ProjectBuilder.builder().build();
-        final CMakeApplication application = new CMakeApplication(project.getObjects()) {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeCompile getPrivateCompile() {
-                return mock(CMakeCompile.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateLinking() {
-                return mock(CMakeLinking.class);
-            }
-
-            @Override
-            public Property<Boolean> getStripDebug() {
-                return mock(Property.class);
-            }
-        };
-        assertEquals("test", application.getName());
-    }
-
-    @Test
-    void testGetPrivateCompile() {
-        final Project project = ProjectBuilder.builder().build();
-        final CMakeApplication application = new CMakeApplication(project.getObjects()) {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeCompile getPrivateCompile() {
-                return mock(CMakeCompile.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateLinking() {
-                return mock(CMakeLinking.class);
-            }
-
-            @Override
-            public Property<Boolean> getStripDebug() {
-                return mock(Property.class);
-            }
-        };
-        assertNotNull(application.getPrivateCompile());
-    }
-
-    @Test
-    void testGetPrivateLinking() {
-        final Project project = ProjectBuilder.builder().build();
-        final CMakeApplication application = new CMakeApplication(project.getObjects()) {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeCompile getPrivateCompile() {
-                return mock(CMakeCompile.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateLinking() {
-                return mock(CMakeLinking.class);
-            }
-
-            @Override
-            public Property<Boolean> getStripDebug() {
-                return mock(Property.class);
-            }
-        };
-        assertNotNull(application.getPrivateLinking());
-    }
-
-    @Test
-    void testGetStripDebug() {
-        final Project project = ProjectBuilder.builder().build();
-        final CMakeApplication application = new CMakeApplication(project.getObjects()) {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeCompile getPrivateCompile() {
-                return mock(CMakeCompile.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateLinking() {
-                return mock(CMakeLinking.class);
-            }
-
-            @Override
-            public Property<Boolean> getStripDebug() {
-                return mock(Property.class);
-            }
-        };
-        assertNotNull(application.getStripDebug());
-    }
+  @Test
+  void testGetStripDebug() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    assertNotNull(application.getStripDebug());
+  }
 }

@@ -4,27 +4,15 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 
 import org.gradle.api.model.ObjectFactory;
 
-public abstract class CMakeTest extends CMakeBinary {
-
-  private Optional<Boolean> testResultsXmlOutput = Optional.empty();
+public abstract class CMakeTest extends CMakeBinary implements CMakeTests {
 
   @Inject
   public CMakeTest(ObjectFactory objectFactory) {
     super(objectFactory);
-  }
-
-  public Optional<Boolean> getTestResultsXmlOutput() {
-    return testResultsXmlOutput;
-  }
-
-  public void setTestResultsXmlOutput(final Boolean value) {
-    this.testResultsXmlOutput = Optional.of(value);
   }
 
 }

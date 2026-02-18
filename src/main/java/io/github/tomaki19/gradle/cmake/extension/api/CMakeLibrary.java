@@ -20,35 +20,15 @@ public abstract class CMakeLibrary extends CMakeBinary implements CMakeLibraries
   @Nested
   public abstract CMakeCompile getPublicCompile();
 
-  public void publicCompile(Action<? super CMakeCompile> action) {
+  public void publicCompile(Action<CMakeCompile> action) {
     action.execute(getPublicCompile());
   }
 
   @Nested
-  public abstract CMakeLinking getPublicLinking();
+  public abstract CMakeLibraryLinking getPublicLinking();
 
-  public void publicLinking(Action<? super CMakeLinking> action) {
+  public void publicLinking(Action<CMakeLibraryLinking> action) {
     action.execute(getPublicLinking());
   }
 
-  @Nested
-  public abstract CMakeLinking getPublicInterfaceLinking();
-
-  public void publicInterfaceLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPublicInterfaceLinking());
-  }
-
-  @Nested
-  public abstract CMakeLinking getPublicStaticLinking();
-
-  public void publicStaticLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPublicStaticLinking());
-  }
-
-  @Nested
-  public abstract CMakeLinking getPublicSharedLinking();
-
-  public void publicSharedLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPublicSharedLinking());
-  }
 }

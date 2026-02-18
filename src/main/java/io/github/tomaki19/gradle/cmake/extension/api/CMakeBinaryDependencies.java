@@ -9,15 +9,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 
-public final class CMakeDependencies {
+abstract class CMakeBinaryDependencies {
 
   private final Collection<String> names;
   private Optional<String> from = Optional.empty();
-  private Optional<CMakeLinkage> linkage = Optional.empty();
+  private Optional<CMakeLinkType> linkage = Optional.empty();
 
-  public CMakeDependencies(CharSequence... names) {
+  protected CMakeBinaryDependencies(final CharSequence... names) {
     this.names = Arrays.asList(names).stream().map((name) -> name.toString()).toList();
   }
 
@@ -25,32 +25,20 @@ public final class CMakeDependencies {
     return Collections.unmodifiableCollection(names);
   }
 
+  protected void setFrom(final String value) {
+    this.from = Optional.of(value);
+  }
+
   public Optional<String> getFrom() {
     return from;
   }
 
-  public CMakeDependencies from(final CharSequence value) {
-    this.from = Optional.of(value.toString());
-    return this;
+  protected void setLinkage(final CMakeLinkType value) {
+    this.linkage = Optional.of(value);
   }
 
-  public Optional<CMakeLinkage> getLinkage() {
+  public Optional<CMakeLinkType> getLinkage() {
     return linkage;
-  }
-
-  public CMakeDependencies getLinkStatic() {
-    this.linkage = Optional.of(CMakeLinkage.STATIC);
-    return this;
-  }
-
-  public CMakeDependencies getLinkShared() {
-    this.linkage = Optional.of(CMakeLinkage.SHARED);
-    return this;
-  }
-
-  public CMakeDependencies getLinkInterface() {
-    this.linkage = Optional.of(CMakeLinkage.INTERFACE);
-    return this;
   }
 
   @Override
@@ -69,7 +57,7 @@ public final class CMakeDependencies {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    CMakeDependencies other = (CMakeDependencies) obj;
+    CMakeBinaryDependencies other = (CMakeBinaryDependencies) obj;
     if (names == null) {
       if (other.names != null)
         return false;

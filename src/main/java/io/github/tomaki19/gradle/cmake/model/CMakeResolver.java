@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.model;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,8 +21,11 @@ import org.gradle.internal.os.OperatingSystem;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompile;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinking;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLinking;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
@@ -61,11 +65,8 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           validateLibrary(component);
           final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component,
-              toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
-          resolveCompiling(toolchain.getBinaries().getPrivateCompile(),
-              resolvedLibrary::addPrivateCompileDefinitions,
-              resolvedLibrary::addPrivateCompileOptions);
+              toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
+          final Set<CMakeLinkType> libraryTypes = new HashSet<>();
           resolveCompiling(toolchain.getLibraries().getPrivateCompile(),
               resolvedLibrary::addPublicCompileDefinitions,
               resolvedLibrary::addPublicCompileOptions);
@@ -75,63 +76,32 @@ public final class CMakeResolver {
           resolveCompiling(component.getPublicCompile(),
               resolvedLibrary::addPublicCompileDefinitions,
               resolvedLibrary::addPublicCompileOptions);
-          resolveLinking(toolchain.getLibraries().getPrivateLinking(), resolvedToolchain,
-              resolvedLibrary::addPrivateLinkOption,
+          resolveLinkingOptions(toolchain.getLibraries().getPrivateLinking(), resolvedToolchain,
+              resolvedLibrary::addPrivateLinkOption);
+          resolveLinkingOptions(component.getPrivateLinking(), resolvedToolchain,
+              resolvedLibrary::addPrivateLinkOption);
+          resolveLinkingOptions(component.getPublicLinking(), resolvedToolchain,
+              resolvedLibrary::addPublicLinkOption);
+          resolveLinking(toolchain.getLibraries().getPrivateLinking(), resolvedToolchain, libraryTypes::add,
               resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
-          resolveLinking(component.getPrivateLinking(), resolvedToolchain,
-              resolvedLibrary::addPrivateLinkOption,
+          resolveLinking(component.getPrivateLinking(), resolvedToolchain, libraryTypes::add,
               resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
-          resolveLinking(component.getPublicLinking(), resolvedToolchain,
-              resolvedLibrary::addPrivateLinkOption,
+          resolveLinking(component.getPublicLinking(), resolvedToolchain, libraryTypes::add,
               resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
           if (component.getSources().isEmpty()) {
-            resolveLinking(toolchain.getLibraries().getPrivateInterfaceLinking(), resolvedToolchain,
-                resolvedLibrary::addPrivateLinkOption,
-                resolvedLibrary::addPrivateSystemPackageDependency,
-                resolvedLibrary::addPrivateProjectPackageDependency);
-            resolveLinking(component.getPrivateInterfaceLinking(), resolvedToolchain,
-                resolvedLibrary::addPrivateLinkOption,
-                resolvedLibrary::addPrivateSystemPackageDependency,
-                resolvedLibrary::addPrivateProjectPackageDependency);
-            resolveLinking(component.getPublicInterfaceLinking(), resolvedToolchain,
-                resolvedLibrary::addPublicLinkOption,
-                resolvedLibrary::addPublicSystemPackageDependency,
-                resolvedLibrary::addPublicProjectPackageDependency);
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {
             if (toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
-                || component.getBuildStatic().getOrElse(Boolean.FALSE)) {
-              resolveLinking(toolchain.getLibraries().getPrivateStaticLinking(), resolvedToolchain,
-                  resolvedLibrary::addPrivateLinkOption,
-                  resolvedLibrary::addPrivateSystemPackageDependency,
-                  resolvedLibrary::addPrivateProjectPackageDependency);
-              resolveLinking(component.getPrivateStaticLinking(), resolvedToolchain,
-                  resolvedLibrary::addPrivateLinkOption,
-                  resolvedLibrary::addPrivateSystemPackageDependency,
-                  resolvedLibrary::addPrivateProjectPackageDependency);
-              resolveLinking(component.getPublicStaticLinking(), resolvedToolchain,
-                  resolvedLibrary::addPublicLinkOption,
-                  resolvedLibrary::addPublicSystemPackageDependency,
-                  resolvedLibrary::addPublicProjectPackageDependency);
+                || component.getBuildStatic().getOrElse(Boolean.FALSE) ||
+                libraryTypes.contains(CMakeLinkType.STATIC)) {
               resolvedToolchain.addStaticLibrary(resolvedLibrary);
             }
             if (toolchain.getLibraries().getBuildShared().getOrElse(Boolean.TRUE)
-                && component.getBuildShared().getOrElse(Boolean.TRUE)) {
-              resolveLinking(toolchain.getLibraries().getPrivateSharedLinking(), resolvedToolchain,
-                  resolvedLibrary::addPrivateLinkOption,
-                  resolvedLibrary::addPrivateSystemPackageDependency,
-                  resolvedLibrary::addPrivateProjectPackageDependency);
-              resolveLinking(component.getPrivateSharedLinking(), resolvedToolchain,
-                  resolvedLibrary::addPrivateLinkOption,
-                  resolvedLibrary::addPrivateSystemPackageDependency,
-                  resolvedLibrary::addPrivateProjectPackageDependency);
-              resolveLinking(component.getPublicSharedLinking(), resolvedToolchain,
-                  resolvedLibrary::addPublicLinkOption,
-                  resolvedLibrary::addPublicSystemPackageDependency,
-                  resolvedLibrary::addPublicProjectPackageDependency);
+                && component.getBuildShared().getOrElse(Boolean.TRUE) ||
+                libraryTypes.contains(CMakeLinkType.SHARED)) {
               resolvedToolchain.addSharedLibrary(resolvedLibrary);
             }
           }
@@ -144,23 +114,20 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           validateExecutable(component);
           final CMakeResolvedExecutable resolvedApplication = new CMakeResolvedExecutable(component,
-              toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
-          resolveCompiling(toolchain.getBinaries().getPrivateCompile(),
-              resolvedApplication::addPrivateCompileDefinitions,
-              resolvedApplication::addPrivateCompileOptions);
+              toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
           resolveCompiling(component.getPrivateCompile(),
               resolvedApplication::addPrivateCompileDefinitions,
               resolvedApplication::addPrivateCompileOptions);
+          resolveLinkingOptions(toolchain.getApplications().getPrivateLinking(), resolvedToolchain,
+              resolvedApplication::addPrivateLinkOption);
+          resolveLinkingOptions(component.getPrivateLinking(), resolvedToolchain,
+              resolvedApplication::addPrivateLinkOption);
           resolveLinking(toolchain.getApplications().getPrivateLinking(), resolvedToolchain,
-              resolvedApplication::addPrivateLinkOption,
               resolvedApplication::addPrivateSystemPackageDependency,
               resolvedApplication::addPrivateProjectPackageDependency);
           resolveLinking(component.getPrivateLinking(), resolvedToolchain,
-              resolvedApplication::addPrivateLinkOption,
               resolvedApplication::addPrivateSystemPackageDependency,
               resolvedApplication::addPrivateProjectPackageDependency);
-
           resolvedToolchain.addApplication(resolvedApplication);
         }));
   }
@@ -171,20 +138,18 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           validateExecutable(component);
           final CMakeResolvedExecutable resolvedTest = new CMakeResolvedExecutable(component,
-              toolchain.getBinaries().getStripDebug().getOrElse(Boolean.FALSE)
-                  || toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
-          resolveCompiling(toolchain.getBinaries().getPrivateCompile(),
-              resolvedTest::addPrivateCompileDefinitions,
-              resolvedTest::addPrivateCompileOptions);
+              toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
           resolveCompiling(component.getPrivateCompile(),
               resolvedTest::addPrivateCompileDefinitions,
               resolvedTest::addPrivateCompileOptions);
+          resolveLinkingOptions(toolchain.getTests().getPrivateLinking(), resolvedToolchain,
+              resolvedTest::addPrivateLinkOption);
+          resolveLinkingOptions(component.getPrivateLinking(), resolvedToolchain,
+              resolvedTest::addPrivateLinkOption);
           resolveLinking(toolchain.getTests().getPrivateLinking(), resolvedToolchain,
-              resolvedTest::addPrivateLinkOption,
               resolvedTest::addPrivateSystemPackageDependency,
               resolvedTest::addPrivateProjectPackageDependency);
           resolveLinking(component.getPrivateLinking(), resolvedToolchain,
-              resolvedTest::addPrivateLinkOption,
               resolvedTest::addPrivateSystemPackageDependency,
               resolvedTest::addPrivateProjectPackageDependency);
           resolvedToolchain.addTest(resolvedTest);
@@ -217,13 +182,17 @@ public final class CMakeResolver {
     }
   }
 
-  private void resolveLinking(final CMakeLinking linking, final CMakeResolvedToolchain toolchain,
-      final Consumer<String> optionConsumer, final Consumer<String> packageDependencyConsumer,
-      final Consumer<CMakeResolvedProjectDependency> projectDependencyConsumer) {
+  private void resolveLinkingOptions(final CMakeLinking linking, final CMakeResolvedToolchain toolchain,
+      final Consumer<String> optionConsumer) {
     for (final String option : linking.getOptions()) {
       optionConsumer.accept(option);
     }
-    for (final CMakeDependencies dependency : linking.getDependencies()) {
+  }
+
+  private void resolveLinking(final CMakeExecutableLinking linking, final CMakeResolvedToolchain toolchain,
+      final Consumer<String> packageDependencyConsumer,
+      final Consumer<CMakeResolvedProjectDependency> projectDependencyConsumer) {
+    for (final CMakeExecutableDependencies dependency : linking.getDependencies()) {
       for (final String name : dependency.getNames()) {
         if (!resolvePackageReference(name, dependency.getFrom(), packageDependencyConsumer, toolchain::addPackage)
             && !resolveProjectReference(name, dependency.getFrom(), dependency.getLinkage(), projectDependencyConsumer,
@@ -231,6 +200,23 @@ public final class CMakeResolver {
           throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(name));
         }
       }
+    }
+  }
+
+  private void resolveLinking(final CMakeLibraryLinking linking, final CMakeResolvedToolchain toolchain,
+      final Consumer<CMakeLinkType> libraryTypeConsumer, final Consumer<String> packageDependencyConsumer,
+      final Consumer<CMakeResolvedProjectDependency> projectDependencyConsumer) {
+    for (final CMakeLibraryDependencies dependency : linking.getDependencies()) {
+      for (final String name : dependency.getNames()) {
+        if (!resolvePackageReference(name, dependency.getFrom(), packageDependencyConsumer, toolchain::addPackage)
+            && !resolveProjectReference(name, dependency.getFrom(), dependency.getLinkage(), projectDependencyConsumer,
+                toolchain::addProject)) {
+          throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(name));
+        }
+      }
+      dependency.getBuildType().ifPresent((buildType) -> {
+        libraryTypeConsumer.accept(buildType);
+      });
     }
   }
 
@@ -248,7 +234,7 @@ public final class CMakeResolver {
   }
 
   private boolean resolveProjectReference(final String name, final Optional<String> from,
-      final Optional<CMakeLinkage> linkage, final Consumer<CMakeResolvedProjectDependency> cmakeConsumer,
+      final Optional<CMakeLinkType> linkage, final Consumer<CMakeResolvedProjectDependency> cmakeConsumer,
       final Consumer<CMakeResolvedProject> toolchainConsumer) throws IllegalArgumentException {
     final Project referencedProject = from.isEmpty() || Objects.equals(currentProject.getName(), from.get())
         ? currentProject

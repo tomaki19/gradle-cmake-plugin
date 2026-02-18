@@ -10,29 +10,15 @@ import org.gradle.api.tasks.Nested;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
+  @Nested
+  public abstract CMakeLibraryLinking getPrivateLinking();
+
+  public default void privateLinking(Action<CMakeLibraryLinking> action) {
+    action.execute(getPrivateLinking());
+  }
+
   public abstract Property<Boolean> getBuildStatic();
 
   public abstract Property<Boolean> getBuildShared();
-
-  @Nested
-  public abstract CMakeLinking getPrivateInterfaceLinking();
-
-  public default void privateInterfaceLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPrivateInterfaceLinking());
-  }
-
-  @Nested
-  public abstract CMakeLinking getPrivateStaticLinking();
-
-  public default void privateStaticLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPrivateStaticLinking());
-  }
-
-  @Nested
-  public abstract CMakeLinking getPrivateSharedLinking();
-
-  public default void privateSharedLinking(Action<? super CMakeLinking> action) {
-    action.execute(getPrivateSharedLinking());
-  }
 
 }

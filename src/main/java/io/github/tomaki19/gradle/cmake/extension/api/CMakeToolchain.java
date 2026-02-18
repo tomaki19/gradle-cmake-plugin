@@ -84,13 +84,6 @@ public abstract class CMakeToolchain implements Named, Comparable<CMakeToolchain
   }
 
   @Nested
-  public abstract CMakeBinaries getBinaries();
-
-  public void binaries(Action<? super CMakeBinaries> action) {
-    action.execute(getBinaries());
-  }
-
-  @Nested
   public abstract CMakeLibraries getLibraries();
 
   public void libraries(Action<? super CMakeLibraries> action) {

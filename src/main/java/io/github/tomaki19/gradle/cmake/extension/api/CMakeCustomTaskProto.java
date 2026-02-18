@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import org.gradle.api.Named;
 
-public final class CMakeCustomTaskProto implements Named {
+public class CMakeCustomTaskProto implements Named {
 
   private final String name;
   private final String toolchainName;

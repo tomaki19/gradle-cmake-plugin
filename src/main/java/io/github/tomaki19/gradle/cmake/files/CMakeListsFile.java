@@ -17,7 +17,7 @@ import java.util.Objects;
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -204,7 +204,7 @@ public final class CMakeListsFile extends CMakeFileContent {
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
     final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
-        CMakeLinkage.INTERFACE.toString(), buildConfig);
+        CMakeLinkType.INTERFACE.toString(), buildConfig);
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s INTERFACE )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
@@ -217,7 +217,7 @@ public final class CMakeListsFile extends CMakeFileContent {
       final CMakeResolvedLibrary component,
       final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
     final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
-        CMakeLinkage.STATIC.toString(), buildConfig);
+        CMakeLinkType.STATIC.toString(), buildConfig);
     final String outputName = component.getOutputName();
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s STATIC )", target);
@@ -238,7 +238,7 @@ public final class CMakeListsFile extends CMakeFileContent {
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
     final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
-        CMakeLinkage.SHARED.toString(), buildConfig);
+        CMakeLinkType.SHARED.toString(), buildConfig);
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s SHARED )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);

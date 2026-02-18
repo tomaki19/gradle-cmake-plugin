@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.util.Arrays;
@@ -16,340 +15,152 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.gradle.api.provider.Property;
 import org.gradle.internal.os.OperatingSystem;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
+
 class CMakeToolchainTest {
 
-    @Test
-    void testConstructor() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
+  @Test
+  void testConstructor() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
+    assertNotNull(toolchain);
+  }
 
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
+  @Test
+  void testOperatingSystem() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
+    // Test default value
+    assertEquals(OperatingSystem.current(), toolchain.getOperatingSystem());
 
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
+    // Test setting value
+    toolchain.setOperatingSystem(OperatingSystem.LINUX);
+    assertEquals(OperatingSystem.LINUX, toolchain.getOperatingSystem());
+  }
 
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
-        assertNotNull(toolchain);
-    }
+  @Test
+  void testBuildConfigs() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-    @Test
-    void testOperatingSystem() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
+    // Test default value
+    Collection<String> buildConfigs = toolchain.getBuildConfigs();
+    assertNotNull(buildConfigs);
+    assertFalse(buildConfigs.isEmpty());
+    assertEquals(2, buildConfigs.size());
 
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
+    // Test setting value with collection
+    toolchain.setBuildConfigs(Arrays.asList("debug", "release", "custom"));
+    assertEquals(3, toolchain.getBuildConfigs().size());
 
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
+    // Test with varargs
+    toolchain.buildConfigs("test1", "test2");
+    assertEquals(2, toolchain.getBuildConfigs().size());
+  }
 
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
+  @Test
+  void testEnvironment() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
+    // Test default value
+    Map<String, String> environment = toolchain.getEnvironment();
+    assertNotNull(environment);
+    assertTrue(environment.isEmpty());
 
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
+    // Test setting value
+    toolchain.setEnvironment(Collections.singletonMap("key", "value"));
+    assertFalse(toolchain.getEnvironment().isEmpty());
+    assertEquals(1, toolchain.getEnvironment().size());
+  }
 
-        // Test default value
-        assertEquals(OperatingSystem.current(), toolchain.getOperatingSystem());
+  @Test
+  void testEnvironmentFile() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-        // Test setting value
-        toolchain.setOperatingSystem(OperatingSystem.LINUX);
-        assertEquals(OperatingSystem.LINUX, toolchain.getOperatingSystem());
-    }
+    // Test default value
+    assertFalse(toolchain.getEnvironmentFile().isPresent());
 
-    @Test
-    void testBuildConfigs() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
+    // Test setting value
+    File testFile = new File("test.txt");
+    toolchain.setEnvironmentFile(testFile);
+    assertTrue(toolchain.getEnvironmentFile().isPresent());
+    assertEquals(testFile, toolchain.getEnvironmentFile().get());
+  }
 
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
+  @Test
+  void testToolchainFile() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
+    // Test default value
+    assertFalse(toolchain.getToolchainFile().isPresent());
 
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
+    // Test setting value
+    File testFile = new File("test.txt");
+    toolchain.setToolchainFile(testFile);
+    assertTrue(toolchain.getToolchainFile().isPresent());
+    assertEquals(testFile, toolchain.getToolchainFile().get());
+  }
 
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
+  @Test
+  void testCompareTo() {
+    final CMakeToolchain toolchain1 = new MockCMakeToolchain("test1");
 
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
+    final CMakeToolchain toolchain2 = new MockCMakeToolchain("test2");
 
-        // Test default value
-        Collection<String> buildConfigs = toolchain.getBuildConfigs();
-        assertNotNull(buildConfigs);
-        assertFalse(buildConfigs.isEmpty());
-        assertEquals(2, buildConfigs.size());
+    // Test comparison
+    int result = toolchain1.compareTo(toolchain2);
+    assertTrue(result < 0);
+  }
 
-        // Test setting value with collection
-        toolchain.setBuildConfigs(Arrays.asList("debug", "release", "custom"));
-        assertEquals(3, toolchain.getBuildConfigs().size());
+  @Test
+  void testSetOperatingSystem() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-        // Test with varargs
-        toolchain.buildConfigs("test1", "test2");
-        assertEquals(2, toolchain.getBuildConfigs().size());
-    }
+    // Test setting operating system
+    toolchain.setOperatingSystem(OperatingSystem.MAC_OS);
+    assertEquals(OperatingSystem.MAC_OS, toolchain.getOperatingSystem());
+  }
 
-    @Test
-    void testEnvironment() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
+  @Test
+  void testSetBuildConfigs() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
+    // Test setting build configs with collection
+    toolchain.setBuildConfigs(Arrays.asList("debug", "release", "custom"));
+    assertEquals(3, toolchain.getBuildConfigs().size());
+  }
 
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
+  @Test
+  void testSetEnvironment() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
+    // Test setting environment
+    toolchain.setEnvironment(Collections.singletonMap("key", "value"));
+    assertFalse(toolchain.getEnvironment().isEmpty());
+    assertEquals(1, toolchain.getEnvironment().size());
+  }
 
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
+  @Test
+  void testSetEnvironmentFile() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
+    // Test setting environment file
+    File testFile = new File("test.txt");
+    toolchain.setEnvironmentFile(testFile);
+    assertTrue(toolchain.getEnvironmentFile().isPresent());
+    assertEquals(testFile, toolchain.getEnvironmentFile().get());
+  }
 
-        // Test default value
-        Map<String, String> environment = toolchain.getEnvironment();
-        assertNotNull(environment);
-        assertTrue(environment.isEmpty());
+  @Test
+  void testSetToolchainFile() {
+    final CMakeToolchain toolchain = new MockCMakeToolchain("test");
 
-        // Test setting value
-        toolchain.setEnvironment(Collections.singletonMap("key", "value"));
-        assertFalse(toolchain.getEnvironment().isEmpty());
-        assertEquals(1, toolchain.getEnvironment().size());
-    }
-
-    @Test
-    void testEnvironmentFile() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
-
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
-
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
-
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
-
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
-
-        // Test default value
-        assertFalse(toolchain.getEnvironmentFile().isPresent());
-
-        // Test setting value
-        File testFile = new File("test.txt");
-        toolchain.setEnvironmentFile(testFile);
-        assertTrue(toolchain.getEnvironmentFile().isPresent());
-        assertEquals(testFile, toolchain.getEnvironmentFile().get());
-    }
-
-    @Test
-    void testToolchainFile() {
-        final CMakeToolchain toolchain = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
-
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
-
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
-
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
-
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
-
-        // Test default value
-        assertFalse(toolchain.getToolchainFile().isPresent());
-
-        // Test setting value
-        File testFile = new File("test.txt");
-        toolchain.setToolchainFile(testFile);
-        assertTrue(toolchain.getToolchainFile().isPresent());
-        assertEquals(testFile, toolchain.getToolchainFile().get());
-    }
-
-    @Test
-    void testCompareTo() {
-        final CMakeToolchain toolchain1 = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test1";
-            }
-
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
-
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
-
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
-
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
-
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
-
-        final CMakeToolchain toolchain2 = new CMakeToolchain() {
-            @Override
-            public String getName() {
-                return "test2";
-            }
-
-            @Override
-            public CMakeBinaries getBinaries() {
-                return mock(CMakeBinaries.class);
-            }
-
-            @Override
-            public CMakeLibraries getLibraries() {
-                return mock(CMakeLibraries.class);
-            }
-
-            @Override
-            public CMakeApplications getApplications() {
-                return mock(CMakeApplications.class);
-            }
-
-            @Override
-            public CMakeTests getTests() {
-                return mock(CMakeTests.class);
-            }
-
-            @Override
-            public Property<String> getGenerator() {
-                return mock(Property.class);
-            }
-        };
-
-        // Test comparison
-        int result = toolchain1.compareTo(toolchain2);
-        assertTrue(result < 0);
-    }
+    // Test setting toolchain file
+    File testFile = new File("test.txt");
+    toolchain.setToolchainFile(testFile);
+    assertTrue(toolchain.getToolchainFile().isPresent());
+    assertEquals(testFile, toolchain.getToolchainFile().get());
+  }
 }

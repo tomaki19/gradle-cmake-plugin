@@ -11,14 +11,14 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
-
 class CMakeResolvedProjectDependencyTest {
 
     @Test
     void testConstructor() {
         Project project = ProjectBuilder.builder().withName("test-project").build();
-        
-        CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency(project, "test-lib", java.util.Optional.empty());
+
+        CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency(project, "test-lib",
+                java.util.Optional.empty());
         assertNotNull(dependency);
         assertEquals("test-lib", dependency.getName());
     }
@@ -26,10 +26,11 @@ class CMakeResolvedProjectDependencyTest {
     @Test
     void testGetters() {
         Project project = ProjectBuilder.builder().withName("test-project").build();
-        
-        CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency(project, "test-lib", java.util.Optional.of(CMakeLinkage.STATIC));
+
+        CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency(project, "test-lib",
+                java.util.Optional.of(CMakeLinkType.STATIC));
         assertNotNull(dependency);
-        
+
         // Test that the name is correctly retrieved
         assertEquals("test-lib", dependency.getName());
         // Test that the linkage is correctly retrieved

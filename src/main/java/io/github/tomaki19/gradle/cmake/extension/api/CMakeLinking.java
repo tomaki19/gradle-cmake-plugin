@@ -8,10 +8,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-public class CMakeLinking {
+public abstract class CMakeLinking {
 
   final Collection<String> options = new HashSet<>();
-  final Collection<CMakeDependencies> dependencies = new HashSet<>();
 
   public Collection<String> getOptions() {
     return Collections.unmodifiableCollection(options);
@@ -29,30 +28,6 @@ public class CMakeLinking {
 
   public void options(final Collection<String> values) {
     options.addAll(values);
-  }
-
-  public Collection<CMakeDependencies> getDependencies() {
-    return Collections.unmodifiableCollection(dependencies);
-  }
-
-  public CMakeDependencies dependency(final CharSequence name) {
-    final CMakeDependencies entry = new CMakeDependencies(name);
-    dependencies.add(entry);
-    return entry;
-  }
-
-  public void dependency(final CMakeDependencies entry) {
-    dependencies.add(entry);
-  }
-
-  public CMakeDependencies dependencies(final CharSequence... names) {
-    final CMakeDependencies entry = new CMakeDependencies(names);
-    dependencies.add(entry);
-    return entry;
-  }
-
-  public void dependencies(final Collection<CMakeDependencies> entries) {
-    dependencies.addAll(entries);
   }
 
 }

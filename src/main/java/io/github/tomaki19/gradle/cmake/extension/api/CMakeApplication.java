@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import org.gradle.api.model.ObjectFactory;
 
-public abstract class CMakeApplication extends CMakeBinary {
+public abstract class CMakeApplication extends CMakeBinary implements CMakeApplications {
 
   @Inject
   public CMakeApplication(ObjectFactory objectFactory) {

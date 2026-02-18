@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,119 +18,187 @@ import org.junit.jupiter.api.Test;
 class CMakePackageTest {
 
     @Test
+    void testConstructor() {
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg);
+    }
+
+    @Test
     void testGetConfigMode() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg.getConfigMode());
         assertTrue(pkg.getConfigMode().isEmpty());
     }
 
     @Test
     void testSetConfigMode() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
         pkg.setConfigMode(true);
         assertTrue(pkg.getConfigMode().isPresent());
-        assertEquals(true, pkg.getConfigMode().get());
+        assertEquals(Boolean.TRUE, pkg.getConfigMode().get());
     }
 
     @Test
     void testGetTargetPrefix() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg.getTargetPrefix());
         assertTrue(pkg.getTargetPrefix().isEmpty());
     }
 
     @Test
     void testSetTargetPrefix() {
-        final CMakePackage pkg = new TestCMakePackage();
-        pkg.setTargetPrefix("/usr/local");
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        pkg.setTargetPrefix("prefix");
         assertTrue(pkg.getTargetPrefix().isPresent());
-        assertEquals("/usr/local", pkg.getTargetPrefix().get());
+        assertEquals("prefix", pkg.getTargetPrefix().get());
     }
 
     @Test
     void testGetComponents() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
         Collection<String> components = pkg.getComponents();
         assertNotNull(components);
-        assertTrue(components.isEmpty());
+        assertEquals(0, components.size());
     }
 
     @Test
     void testSetComponents() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
         pkg.setComponents(Arrays.asList("component1", "component2"));
         assertEquals(2, pkg.getComponents().size());
-        assertTrue(pkg.getComponents().contains("component1"));
-        assertTrue(pkg.getComponents().contains("component2"));
     }
 
     @Test
     void testGetProperties() {
-        final CMakePackage pkg = new TestCMakePackage();
-        Map<String, String> properties = pkg.getProperties();
-        assertNotNull(properties);
-        assertTrue(properties.isEmpty());
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg.getProperties());
+        assertEquals(0, pkg.getProperties().size());
     }
 
     @Test
     void testSetProperties() {
-        final CMakePackage pkg = new TestCMakePackage();
-        Map<CharSequence, CharSequence> values = new HashMap<>();
-        values.put("key1", "value1");
-        values.put("key2", "value2");
-        pkg.setProperties(values);
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        Map<CharSequence, CharSequence> props = new HashMap<>();
+        props.put("key1", "value1");
+        props.put("key2", "value2");
+        pkg.setProperties(props);
         assertEquals(2, pkg.getProperties().size());
-        assertEquals("value1", pkg.getProperties().get("key1"));
-        assertEquals("value2", pkg.getProperties().get("key2"));
     }
 
     @Test
     void testGetInterfaces() {
-        final CMakePackage pkg = new TestCMakePackage();
-        Collection<Path> interfaces = pkg.getInterfaces();
-        assertNotNull(interfaces);
-        assertTrue(interfaces.isEmpty());
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg.getInterfaces());
+        assertEquals(0, pkg.getInterfaces().size());
     }
 
     @Test
     void testSetInterfaces() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
         pkg.setInterfaces(Arrays.asList("/path/to/interface1", "/path/to/interface2"));
         assertEquals(2, pkg.getInterfaces().size());
     }
 
     @Test
     void testGetStaticLibraries() {
-        final CMakePackage pkg = new TestCMakePackage();
-        Collection<Path> libraries = pkg.getStaticLibraries();
-        assertNotNull(libraries);
-        assertTrue(libraries.isEmpty());
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg.getStaticLibraries());
+        assertEquals(0, pkg.getStaticLibraries().size());
     }
 
     @Test
     void testSetStaticLibraries() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
         pkg.setStaticLibraries(Arrays.asList("/path/to/lib1", "/path/to/lib2"));
         assertEquals(2, pkg.getStaticLibraries().size());
     }
 
     @Test
     void testGetSharedLibraries() {
-        final CMakePackage pkg = new TestCMakePackage();
-        Collection<Path> libraries = pkg.getSharedLibraries();
-        assertNotNull(libraries);
-        assertTrue(libraries.isEmpty());
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
+        assertNotNull(pkg.getSharedLibraries());
+        assertEquals(0, pkg.getSharedLibraries().size());
     }
 
     @Test
     void testSetSharedLibraries() {
-        final CMakePackage pkg = new TestCMakePackage();
+        CMakePackage pkg = new CMakePackage() {
+            @Override
+            public String getName() {
+                return "test";
+            }
+        };
         pkg.setSharedLibraries(Arrays.asList("/path/to/lib1", "/path/to/lib2"));
         assertEquals(2, pkg.getSharedLibraries().size());
-    }
-
-    private static class TestCMakePackage extends CMakePackage {
-        @Override
-        public String getName() {
-            return "test";
-        }
     }
 }

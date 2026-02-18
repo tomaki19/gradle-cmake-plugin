@@ -37,12 +37,6 @@ toolchains {
     environment = //optional: Map<String,String>, default: none
     environmentFile = //optional: File, default: none
     toolchainFile = //optional: File, default: none
-    binaries {
-      privateLinkDependencies = //optional: List<String>, default: none
-      buildStatic = //optional: boolean, default: false
-      buildShared = //optional: boolean, default: true
-      stripDebug = //optional: boolean, default: false
-    }
     libraries {
       privateLinkDependencies = //optional: List<String>, default: none
       buildStatic = //optional: boolean, default: false
@@ -97,50 +91,14 @@ libraries {
     privateLinking {
       option <String> //optional
       options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
-    }
-    privateInterfaceLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
-    }
-    privateStaticLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
-    }
-    privateSharedLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
     }
     publicLinking {
       option <String> //optional
       options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
-    }
-    publicInterfaceLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
-    }
-    publicStaticLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
-    }
-    publicSharedLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild //optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -173,8 +131,8 @@ applications {
     privateLinking {
       option <String> //optional
       options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -207,8 +165,8 @@ tests {
     privateLinking{
       option <String> //optional
       options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface //optional
+      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false

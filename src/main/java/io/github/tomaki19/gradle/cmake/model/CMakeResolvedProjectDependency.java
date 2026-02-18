@@ -15,10 +15,10 @@ public final class CMakeResolvedProjectDependency
   private final CMakeResolvedProject project;
   private final String linkage;
 
-  CMakeResolvedProjectDependency(final Project project, final String name, final Optional<CMakeLinkage> linkage) {
+  CMakeResolvedProjectDependency(final Project project, final String name, final Optional<CMakeLinkType> linkage) {
     super(name);
     this.project = new CMakeResolvedProject(project);
-    this.linkage = linkage.orElse(CMakeLinkage.SHARED).toString();
+    this.linkage = linkage.orElse(CMakeLinkType.SHARED).toString();
   }
 
   public CMakeResolvedProject getProject() {

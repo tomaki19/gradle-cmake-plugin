@@ -15,7 +15,7 @@ import java.util.Objects;
 
 import org.gradle.api.Project;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkage;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
@@ -43,7 +43,7 @@ public final class CMakeConfigFile extends CMakeFileContent {
     for (final String buildConfig : toolchain.getBuildConfigs()) {
       for (final CMakeResolvedLibrary library : toolchain.getInterfaceLibraries()) {
         final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain.getName(),
-            CMakeLinkage.INTERFACE.toString(), buildConfig);
+            CMakeLinkType.INTERFACE.toString(), buildConfig);
         writeLine(outputStream);
         write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
         write(outputStream, 1, "add_library( %s::%s INTERFACE IMPORTED )", getProjectName(), libraryTarget);
@@ -52,7 +52,7 @@ public final class CMakeConfigFile extends CMakeFileContent {
       }
       for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
         final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain.getName(),
-            CMakeLinkage.STATIC.toString(), buildConfig);
+            CMakeLinkType.STATIC.toString(), buildConfig);
         final String outputName = toolchain.getOperatingSystem().getStaticLibraryName(library.getOutputName());
         writeLine(outputStream);
         write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);
@@ -62,7 +62,7 @@ public final class CMakeConfigFile extends CMakeFileContent {
       }
       for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
         final String libraryTarget = CMakeFileConventions.buildTarget(library.getName(), toolchain.getName(),
-            CMakeLinkage.SHARED.toString(), buildConfig);
+            CMakeLinkType.SHARED.toString(), buildConfig);
         final String outputName = toolchain.getOperatingSystem().getSharedLibraryName(library.getOutputName());
         writeLine(outputStream);
         write(outputStream, "if( NOT TARGET %s::%s )", getProjectName(), libraryTarget);

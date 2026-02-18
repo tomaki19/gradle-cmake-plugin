@@ -8,14 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.helper.MockCMakeTests;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibraries;
 
-class CMakeTestsTest {
+class CMakeLibrariesTest {
 
   @Test
   void testConstructor() {
-    final CMakeTests tests = new MockCMakeTests();
-    assertNotNull(tests);
+    final CMakeLibraries libraries = new MockCMakeLibraries();
+    assertNotNull(libraries);
   }
-
 }

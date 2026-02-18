@@ -5,89 +5,74 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 import org.gradle.api.Project;
-import org.gradle.api.provider.Property;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
+
 class CMakeLibraryTest {
 
-    @Test
-    void testConstructor() {
-        final Project project = ProjectBuilder.builder().build();
-        final CMakeLibrary library = new CMakeLibrary(project.getObjects()) {
-            @Override
-            public String getName() {
-                return "test";
-            }
+  @Test
+  void testConstructor() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
+    assertNotNull(library);
+  }
 
-            @Override
-            public CMakeCompile getPrivateCompile() {
-                return mock(CMakeCompile.class);
-            }
+  @Test
+  void testPublicCompile() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-            @Override
-            public CMakeLinking getPrivateLinking() {
-                return mock(CMakeLinking.class);
-            }
+    // Test public compile action
+    library.publicCompile(compile -> {
+      compile.define("TEST_DEFINE");
+    });
+  }
 
-            @Override
-            public Property<Boolean> getStripDebug() {
-                return mock(Property.class);
-            }
+  @Test
+  void testPublicLinking() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-            @Override
-            public CMakeCompile getPublicCompile() {
-                return mock(CMakeCompile.class);
-            }
+    // Test public linking action
+    library.publicLinking(linking -> {
+      linking.option("-Wl,--no-undefined");
+    });
+  }
 
-            @Override
-            public CMakeLinking getPublicLinking() {
-                return mock(CMakeLinking.class);
-            }
+  @Test
+  void testPublicInterfaceLinking() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-            @Override
-            public CMakeLinking getPublicInterfaceLinking() {
-                return mock(CMakeLinking.class);
-            }
+    // Test public interface linking action
+    library.publicLinking(linking -> {
+      linking.option("-Wl,--no-undefined");
+    });
+  }
 
-            @Override
-            public CMakeLinking getPublicStaticLinking() {
-                return mock(CMakeLinking.class);
-            }
+  @Test
+  void testPublicStaticLinking() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-            @Override
-            public CMakeLinking getPublicSharedLinking() {
-                return mock(CMakeLinking.class);
-            }
+    // Test public static linking action
+    library.publicLinking(linking -> {
+      linking.option("-static");
+    });
+  }
 
-            @Override
-            public Property<Boolean> getBuildStatic() {
-                return mock(Property.class);
-            }
+  @Test
+  void testPublicSharedLinking() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-            @Override
-            public Property<Boolean> getBuildShared() {
-                return mock(Property.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateInterfaceLinking() {
-                return mock(CMakeLinking.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateStaticLinking() {
-                return mock(CMakeLinking.class);
-            }
-
-            @Override
-            public CMakeLinking getPrivateSharedLinking() {
-                return mock(CMakeLinking.class);
-            }
-        };
-        assertNotNull(library);
-    }
+    // Test public shared linking action
+    library.publicLinking(linking -> {
+      linking.option("-shared");
+    });
+  }
 }

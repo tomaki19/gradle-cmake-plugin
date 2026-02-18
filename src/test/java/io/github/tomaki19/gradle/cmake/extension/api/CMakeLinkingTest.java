@@ -6,98 +6,87 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 
-class CMakeLinkingTest {
+class CMakeExecutableLinkingTest {
 
-    @Test
-    void testConstructor() {
-        final CMakeLinking linking = new CMakeLinking();
-        assertNotNull(linking);
-    }
+  @Test
+  void testConstructor() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    assertNotNull(linking);
+  }
 
-    @Test
-    void testGetOptions() {
-        final CMakeLinking linking = new CMakeLinking();
-        Collection<String> options = linking.getOptions();
-        assertNotNull(options);
-        assertTrue(options.isEmpty());
-    }
+  @Test
+  void testGetOptions() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    Collection<String> options = linking.getOptions();
+    assertNotNull(options);
+    assertEquals(0, options.size());
+  }
 
-    @Test
-    void testOption() {
-        final CMakeLinking linking = new CMakeLinking();
-        linking.option("-Wall");
-        assertEquals(1, linking.getOptions().size());
-        assertTrue(linking.getOptions().contains("-Wall"));
-    }
+  @Test
+  void testGetDependencies() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    Collection<CMakeExecutableDependencies> dependencies = linking.getDependencies();
+    assertNotNull(dependencies);
+    assertEquals(0, dependencies.size());
+  }
 
-    @Test
-    void testOptionsVarargs() {
-        final CMakeLinking linking = new CMakeLinking();
-        linking.options("-Wall", "-Wextra");
-        assertEquals(2, linking.getOptions().size());
-        assertTrue(linking.getOptions().contains("-Wall"));
-        assertTrue(linking.getOptions().contains("-Wextra"));
-    }
+  @Test
+  void testOption() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    linking.option("-L/usr/lib");
+    assertEquals(1, linking.getOptions().size());
+    assertEquals("-L/usr/lib", linking.getOptions().iterator().next());
+  }
 
-    @Test
-    void testOptionsCollection() {
-        final CMakeLinking linking = new CMakeLinking();
-        linking.options(Arrays.asList("-Wall", "-Wextra"));
-        assertEquals(2, linking.getOptions().size());
-        assertTrue(linking.getOptions().contains("-Wall"));
-        assertTrue(linking.getOptions().contains("-Wextra"));
-    }
+  @Test
+  void testOptionsVarargs() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    linking.options("-L/usr/lib", "-L/usr/local/lib");
+    assertEquals(2, linking.getOptions().size());
+  }
 
-    @Test
-    void testGetDependencies() {
-        final CMakeLinking linking = new CMakeLinking();
-        Collection<CMakeDependencies> dependencies = linking.getDependencies();
-        assertNotNull(dependencies);
-        assertTrue(dependencies.isEmpty());
-    }
+  @Test
+  void testOptionsCollection() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    linking.options(java.util.Arrays.asList("-L/usr/lib", "-L/usr/local/lib"));
+    assertEquals(2, linking.getOptions().size());
+  }
 
-    @Test
-    void testDependencyCharSequence() {
-        final CMakeLinking linking = new CMakeLinking();
-        final CMakeDependencies dep = linking.dependency("mylib");
-        assertNotNull(dep);
-        assertEquals(1, linking.getDependencies().size());
-        assertTrue(linking.getDependencies().contains(dep));
-    }
+  @Test
+  void testDependencyCharSequence() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    CMakeBinaryDependencies dep = linking.dependency("mylib");
+    assertNotNull(dep);
+    assertEquals(1, linking.getDependencies().size());
+  }
 
-    @Test
-    void testDependencyCMakeDependencies() {
-        final CMakeLinking linking = new CMakeLinking();
-        final CMakeDependencies dep = new CMakeDependencies("mylib");
-        linking.dependency(dep);
-        assertEquals(1, linking.getDependencies().size());
-        assertTrue(linking.getDependencies().contains(dep));
-    }
+  @Test
+  void testDependencyObject() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    CMakeExecutableDependencies dep = new CMakeExecutableDependencies("mylib");
+    linking.dependency(dep);
+    assertEquals(1, linking.getDependencies().size());
+  }
 
-    @Test
-    void testDependenciesVarargs() {
-        final CMakeLinking linking = new CMakeLinking();
-        final CMakeDependencies deps = linking.dependencies("lib1", "lib2");
-        assertNotNull(deps);
-        assertEquals(1, linking.getDependencies().size());
-        assertTrue(linking.getDependencies().contains(deps));
-    }
+  @Test
+  void testDependenciesVarargs() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    CMakeExecutableDependencies dep = linking.dependencies("lib1", "lib2");
+    assertNotNull(dep);
+    assertEquals(1, linking.getDependencies().size());
+  }
 
-    @Test
-    void testDependenciesCollection() {
-        final CMakeLinking linking = new CMakeLinking();
-        final CMakeDependencies dep1 = new CMakeDependencies("lib1");
-        final CMakeDependencies dep2 = new CMakeDependencies("lib2");
-        linking.dependencies(Arrays.asList(dep1, dep2));
-        assertEquals(2, linking.getDependencies().size());
-        assertTrue(linking.getDependencies().contains(dep1));
-        assertTrue(linking.getDependencies().contains(dep2));
-    }
+  @Test
+  void testDependenciesCollection() {
+    CMakeExecutableLinking linking = new CMakeExecutableLinking();
+    CMakeExecutableDependencies dep1 = new CMakeExecutableDependencies("lib1");
+    CMakeExecutableDependencies dep2 = new CMakeExecutableDependencies("lib2");
+    linking.dependencies(java.util.Arrays.asList(dep1, dep2));
+    assertEquals(2, linking.getDependencies().size());
+  }
 }

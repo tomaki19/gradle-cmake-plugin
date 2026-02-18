@@ -4,7 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-public enum CMakeLinkage {
+public enum CMakeLinkType {
   STATIC, SHARED, INTERFACE;
 
   @Override
