@@ -46,6 +46,7 @@ abstract class CMakeBinaryDependencies {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((names == null) ? 0 : names.hashCode());
+    result = prime * result + ((from == null) ? 0 : from.hashCode());
     return result;
   }
 
@@ -62,6 +63,11 @@ abstract class CMakeBinaryDependencies {
       if (other.names != null)
         return false;
     } else if (!names.equals(other.names))
+      return false;
+    if (from == null) {
+      if (other.from != null)
+        return false;
+    } else if (!from.equals(other.from))
       return false;
     return true;
   }
