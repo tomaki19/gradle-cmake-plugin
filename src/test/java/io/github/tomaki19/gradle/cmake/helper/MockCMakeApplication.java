@@ -16,10 +16,12 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinking;
 public class MockCMakeApplication extends CMakeApplication {
 
   private final String name;
+  private final Property<Boolean> stripDebug;
 
   public MockCMakeApplication(final String name, final ObjectFactory factory) {
     super(factory);
     this.name = name;
+    this.stripDebug = factory.property(Boolean.class);
   }
 
   @Override
@@ -39,7 +41,7 @@ public class MockCMakeApplication extends CMakeApplication {
 
   @Override
   public Property<Boolean> getStripDebug() {
-    return mock(Property.class);
+    return stripDebug;
   }
 
 }

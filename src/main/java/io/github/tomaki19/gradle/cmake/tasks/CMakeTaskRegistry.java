@@ -48,11 +48,17 @@ public final class CMakeTaskRegistry {
     return tasks.named("clean");
   }
 
+  public TaskProvider<CMakeClean> cleanListsTask(final TaskContainer tasks) {
+    final String taskName = CMakeTasksConventions.cleanListsTaskName();
+    return tasks.register(taskName, CMakeClean.class);
+  }
+
   public TaskProvider<CMakeAssemble> assembleListsTask(final TaskContainer tasks,
       final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
     final File outputFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.name()).getAsFile();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project), outputFile);
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project.getName(),
+        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()), outputFile);
   }
 
   public TaskProvider<CMakeAssemble> assembleConfigTask(final TaskContainer tasks,
@@ -61,7 +67,8 @@ public final class CMakeTaskRegistry {
     final File outputFile = project.getLayout().getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).get()
         .file(CMakeConfigFile.name(CMakeFileConventions.cmakeConfigName(project.getName(), toolchain.getName())))
         .getAsFile();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project), outputFile);
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project.getName(),
+        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()), outputFile);
   }
 
   public TaskProvider<CMakeCustomExec> customExecTask(final TaskContainer tasks, final CMakeCustomTaskProto taskProto) {

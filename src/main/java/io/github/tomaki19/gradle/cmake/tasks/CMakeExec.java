@@ -4,11 +4,11 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
@@ -19,10 +19,10 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
   protected final String toolchainName;
   protected final String buildConfig;
 
-  private final Optional<File> environmentFile;
+  private final Optional<RegularFile> environmentFile;
 
   @javax.inject.Inject
-  CMakeExec(final String toolchainName, final String buildConfig, final Optional<File> environmentFile) {
+  CMakeExec(final String toolchainName, final String buildConfig, final Optional<RegularFile> environmentFile) {
     super(CMakeExec.class);
     this.toolchainName = toolchainName;
     this.buildConfig = buildConfig;
@@ -45,7 +45,7 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
     final List<String> commandLine = new ArrayList<>();
     environmentFile.ifPresent((file) -> {
       commandLine.add(".");
-      commandLine.add(file.getAbsolutePath());
+      commandLine.add(file.getAsFile().getAbsolutePath());
       commandLine.add("&&");
     });
     commandLine.add(getBaseCommand().get());

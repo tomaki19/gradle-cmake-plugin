@@ -40,7 +40,7 @@ public abstract class CMakeConfigure extends CMakeExec {
     });
     getBaseArguments().add("-D CMAKE_PREFIX_PATH=\"%s\"".formatted(appBundlePaths.toString()));
     toolchain.getToolchainFile().ifPresent((toolchainFile) -> {
-      getBaseArguments().add("--toolchain \"%s\"".formatted(toolchainFile.getAbsolutePath()));
+      getBaseArguments().add("--toolchain \"%s\"".formatted(toolchainFile.getAsFile().getAbsolutePath()));
     });
   }
 }

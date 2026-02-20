@@ -16,10 +16,14 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 public class MockCMakeTest extends CMakeTest {
 
   private final String name;
+  private final Property<Boolean> stripDebug;
+  private final Property<Boolean> testResultsXmlOutput;
 
   public MockCMakeTest(final String name, final ObjectFactory factory) {
     super(factory);
     this.name = name;
+    this.stripDebug = factory.property(Boolean.class);
+    this.testResultsXmlOutput = factory.property(Boolean.class);
   }
 
   @Override
@@ -39,12 +43,12 @@ public class MockCMakeTest extends CMakeTest {
 
   @Override
   public Property<Boolean> getStripDebug() {
-    return mock(Property.class);
+    return stripDebug;
   }
 
   @Override
   public Property<Boolean> getTestResultsXmlOutput() {
-    return mock(Property.class);
+    return testResultsXmlOutput;
   }
 
 }

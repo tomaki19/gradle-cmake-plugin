@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
-import org.gradle.api.Project;
+import org.gradle.api.file.Directory;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -26,8 +26,9 @@ public final class CMakeConfigFile extends CMakeFileContent {
 
   private final CMakeResolvedToolchain toolchain;
 
-  public CMakeConfigFile(final CMakeResolvedToolchain toolchain, final Project project) throws FileNotFoundException {
-    super(project);
+  public CMakeConfigFile(final CMakeResolvedToolchain toolchain, final String projectName,
+      final Directory projectDirectory, final Directory buildDirectory) throws FileNotFoundException {
+    super(projectName, projectDirectory, buildDirectory);
     this.toolchain = toolchain;
   }
 
@@ -126,7 +127,7 @@ public final class CMakeConfigFile extends CMakeFileContent {
     write(outputStream, 2, "INTERFACE_INCLUDE_DIRECTORIES");
     final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath();
     for (final File headerDir : library.getHeaders()) {
-      write(outputStream, 3, "\"${CMAKE_CURRENT_LIST_DIR}/%s\"",
+      write(outputStream, 3, "\"$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/%s>\"",
           exportPath.relativize(headerDir.toPath()));
     }
     write(outputStream, 1, ")");

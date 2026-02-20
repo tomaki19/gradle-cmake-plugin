@@ -6,6 +6,10 @@ package io.github.tomaki19.gradle.cmake.tasks;
 
 public final class CMakeTasksConventions {
 
+  static String cleanListsTaskName() {
+    return "clean-cmake-lists";
+  }
+
   static String assembleListsTaskName() {
     return "assemble-cmake-lists";
   }

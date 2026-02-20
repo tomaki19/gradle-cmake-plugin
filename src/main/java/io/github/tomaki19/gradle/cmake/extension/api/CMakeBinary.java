@@ -13,11 +13,10 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.gradle.api.Action;
-import org.gradle.api.Named;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.model.ObjectFactory;
 
-public abstract class CMakeBinary implements Named, CMakeBinaries {
+public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinaries {
 
   private Optional<String> outputName = Optional.empty();
   private final Collection<String> toolchains = new HashSet<>();

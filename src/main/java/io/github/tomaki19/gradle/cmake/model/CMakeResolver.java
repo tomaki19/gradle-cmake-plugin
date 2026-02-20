@@ -45,7 +45,9 @@ public final class CMakeResolver {
     this.availablePackages = packages.stream()
         .collect(Collectors.toUnmodifiableMap(CMakePackage::getName, Function.identity()));
     this.availableToolchains = toolchains.stream()
-        .filter((toolchain) -> Objects.equals(OperatingSystem.current(), toolchain.getOperatingSystem()))
+        .filter((toolchain) -> Objects.isNull(toolchain.getOperatingSystem())
+            || Objects.equals(OperatingSystem.current(),
+                toolchain.getOperatingSystem().getOrElse(OperatingSystem.current())))
         .collect(Collectors.toUnmodifiableMap(CMakeToolchain::getName, Function.identity()));
 
   }
@@ -68,8 +70,8 @@ public final class CMakeResolver {
               toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
           final Set<CMakeLinkType> libraryTypes = new HashSet<>();
           resolveCompiling(toolchain.getLibraries().getPrivateCompile(),
-              resolvedLibrary::addPublicCompileDefinitions,
-              resolvedLibrary::addPublicCompileOptions);
+              resolvedLibrary::addPrivateCompileDefinitions,
+              resolvedLibrary::addPrivateCompileOptions);
           resolveCompiling(component.getPrivateCompile(),
               resolvedLibrary::addPrivateCompileDefinitions,
               resolvedLibrary::addPrivateCompileOptions);
@@ -89,8 +91,8 @@ public final class CMakeResolver {
               resolvedLibrary::addPrivateSystemPackageDependency,
               resolvedLibrary::addPrivateProjectPackageDependency);
           resolveLinking(component.getPublicLinking(), resolvedToolchain, libraryTypes::add,
-              resolvedLibrary::addPrivateSystemPackageDependency,
-              resolvedLibrary::addPrivateProjectPackageDependency);
+              resolvedLibrary::addPublicSystemPackageDependency,
+              resolvedLibrary::addPublicProjectPackageDependency);
           if (component.getSources().isEmpty()) {
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {

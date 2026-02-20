@@ -10,11 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
@@ -32,10 +30,11 @@ public final class CMakeListsFile extends CMakeFileContent {
 
   private final Collection<CMakeResolvedToolchain> toolchains;
 
-  public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final Project project)
+  public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final String projectName,
+      final Directory projectDirectory, final Directory buildDirectory)
       throws FileNotFoundException {
-    super(project);
-    this.toolchains = Collections.unmodifiableCollection(toolchains);
+    super(projectName, projectDirectory, buildDirectory);
+    this.toolchains = toolchains;
   }
 
   public static String name() {
@@ -94,14 +93,12 @@ public final class CMakeListsFile extends CMakeFileContent {
     for (final CMakeResolvedProject resolvedProject : dependencies) {
       if (!Objects.equals(getProjectName(), resolvedProject.getName())) {
         final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain.getName());
-        write(outputStream, indent, "if( NOT TARGET %s )", target);
-        write(outputStream, indent + 1, "find_package( %s CONFIG REQUIRED", target);
-        write(outputStream, indent + 2, "NO_CMAKE_ENVIRONMENT_PATH");
-        write(outputStream, indent + 2, "NO_CMAKE_FIND_ROOT_PATH");
-        write(outputStream, indent + 2, "NO_CMAKE_SYSTEM_PATH");
-        write(outputStream, indent + 2, "NO_SYSTEM_ENVIRONMENT_PATH");
-        write(outputStream, indent + 1, ")");
-        write(outputStream, indent, "endif()");
+        write(outputStream, indent, "find_package( %s CONFIG REQUIRED", target);
+        write(outputStream, indent + 1, "NO_CMAKE_ENVIRONMENT_PATH");
+        write(outputStream, indent + 1, "NO_CMAKE_FIND_ROOT_PATH");
+        write(outputStream, indent + 1, "NO_CMAKE_SYSTEM_PATH");
+        write(outputStream, indent + 1, "NO_SYSTEM_ENVIRONMENT_PATH");
+        write(outputStream, indent, ")");
       }
     }
   }
@@ -109,31 +106,29 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeSystemPackageDependencies(final FileOutputStream outputStream, final int indent,
       final Collection<CMakeResolvedPackage> dependencies) throws IOException {
     for (final CMakeResolvedPackage resolvedPackage : dependencies) {
-      write(outputStream, indent, "if( NOT TARGET %s )", resolvedPackage.getName());
       for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-        write(outputStream, indent + 1, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
+        write(outputStream, indent, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
             property.getValue().toUpperCase());
       }
       if (resolvedPackage.getComponents().isEmpty()) {
         if (resolvedPackage.isConfigMode()) {
-          write(outputStream, indent + 1, "find_package( %s REQUIRED CONFIG )",
+          write(outputStream, indent, "find_package( %s REQUIRED CONFIG )",
               resolvedPackage.getName());
         } else {
-          write(outputStream, indent + 1, "find_package( %s REQUIRED )",
+          write(outputStream, indent, "find_package( %s REQUIRED )",
               resolvedPackage.getName());
         }
       } else {
-        write(outputStream, indent + 1, "find_package( %s REQUIRED", resolvedPackage.getName());
-        write(outputStream, indent + 2, "COMPONENTS");
+        write(outputStream, indent, "find_package( %s REQUIRED", resolvedPackage.getName());
+        write(outputStream, indent + 1, "COMPONENTS");
         for (final String component : resolvedPackage.getComponents()) {
-          write(outputStream, indent + 3, component);
+          write(outputStream, indent + 2, component);
         }
         if (resolvedPackage.isConfigMode()) {
-          write(outputStream, indent + 2, "CONFIG");
+          write(outputStream, indent + 1, "CONFIG");
         }
-        write(outputStream, indent + 1, ")");
+        write(outputStream, indent, ")");
       }
-      write(outputStream, indent, "endif()");
     }
   }
 
@@ -287,7 +282,6 @@ public final class CMakeListsFile extends CMakeFileContent {
     for (final File headerDir : headers) {
       write(outputStream, indent + 1, "\"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/%s>\"",
           workingDir.toPath().relativize(headerDir.toPath()));
-      write(outputStream, indent + 1, "\"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>\"");
     }
     write(outputStream, indent, ")");
   }

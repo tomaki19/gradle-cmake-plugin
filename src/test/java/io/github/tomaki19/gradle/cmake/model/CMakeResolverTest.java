@@ -156,7 +156,6 @@ class CMakeResolverTest {
         // Create a mock toolchain
         CMakeToolchain toolchain = mock(CMakeToolchain.class);
         when(toolchain.getName()).thenReturn("test-toolchain");
-        when(toolchain.getOperatingSystem()).thenReturn(org.gradle.internal.os.OperatingSystem.current());
 
         Set<CMakeToolchain> toolchains = Set.of(toolchain);
         Set<CMakeLibrary> libraries = Collections.emptySet();

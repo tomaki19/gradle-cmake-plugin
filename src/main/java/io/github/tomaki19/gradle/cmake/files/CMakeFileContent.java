@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
 public abstract class CMakeFileContent {
@@ -20,10 +19,11 @@ public abstract class CMakeFileContent {
 
   private static final int INDENT_SIZE = 4;
 
-  public CMakeFileContent(final Project project) throws FileNotFoundException {
-    this.projectName = project.getName();
-    this.projectDirectory = project.getLayout().getProjectDirectory();
-    this.buildDirectory = project.getLayout().getBuildDirectory().get();
+  public CMakeFileContent(final String projectName, final Directory projectDirectory, final Directory buildDirectory)
+      throws FileNotFoundException {
+    this.projectName = projectName;
+    this.projectDirectory = projectDirectory;
+    this.buildDirectory = buildDirectory;
   }
 
   protected String getProjectName() {

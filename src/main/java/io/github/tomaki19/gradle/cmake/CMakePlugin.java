@@ -14,16 +14,13 @@ import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.SoftwareComponentFactory;
-import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
-import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -33,6 +30,7 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildExecutable;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
@@ -108,17 +106,12 @@ public class CMakePlugin implements Plugin<Project> {
 
       final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry();
 
+      final TaskProvider<CMakeClean> cleanListsTask = taskRegistry.cleanListsTask(project.getTasks());
+      taskRegistry.cleanTask(project.getTasks()).configure((task) -> task.dependsOn(cleanListsTask));
+
       final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(project.getTasks(),
           toolchains, project);
       taskRegistry.assembleTask(project.getTasks()).configure((task) -> task.dependsOn(assembleListsTask));
-
-      final TaskProvider<Task> cleanTask = taskRegistry.cleanTask(project.getTasks());
-      final RegularFile cmakeListsFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.name());
-      cleanTask.configure((task) -> task.doLast("Delete CMakeLists.txt file.", (action) -> {
-        if (!cmakeListsFile.getAsFile().delete()) {
-          project.getLogger().error("Failed to delete %s!".formatted(cmakeListsFile.getAsFile().getName()));
-        }
-      }));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
 

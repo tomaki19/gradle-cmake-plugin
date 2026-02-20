@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
     <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.extension.CMakeExtension"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
         <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
@@ -15,4 +20,14 @@
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
+    <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.files.CMakeListsFile"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Package name="io.github.tomaki19.gradle.cmake.helper"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+
 </FindBugsFilter>

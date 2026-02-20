@@ -5,7 +5,6 @@
 package io.github.tomaki19.gradle.cmake.extension;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public abstract class CMakeExtension {
 
   @javax.inject.Inject
   public CMakeExtension(final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
-    this.customTasks = Collections.unmodifiableMap(customTasks);
+    this.customTasks = customTasks;
   }
 
   public abstract NamedDomainObjectContainer<CMakeToolchain> getToolchains();
@@ -72,10 +71,12 @@ public abstract class CMakeExtension {
     }
   }
 
-  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto, final Action<CMakeCustomTaskProto> action) {
+  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto,
+      final Action<CMakeCustomTaskProto> action) {
     if (!customTasks.containsKey(proto.getToolchainName())) {
       customTasks.put(proto.getToolchainName(), new HashMap<>());
     }
     customTasks.get(proto.getToolchainName()).put(proto, action);
   }
+
 }

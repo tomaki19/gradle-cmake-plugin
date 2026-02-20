@@ -6,6 +6,8 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.gradle.api.Project;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplications;
@@ -14,7 +16,8 @@ class CMakeApplicationsTest {
 
   @Test
   void testConstructor() {
-    final CMakeApplications applications = new MockCMakeApplications();
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplications applications = new MockCMakeApplications(project.getObjects());
     assertNotNull(applications);
   }
 }

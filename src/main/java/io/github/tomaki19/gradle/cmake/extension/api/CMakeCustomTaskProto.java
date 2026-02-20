@@ -4,26 +4,24 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.io.File;
 import java.util.Optional;
 
-import org.gradle.api.Named;
+import org.gradle.api.file.RegularFile;
 
-public class CMakeCustomTaskProto implements Named {
+public final class CMakeCustomTaskProto {
 
   private final String name;
   private final String toolchainName;
   private final String buildConfig;
-  private final Optional<File> environmentFile;
+  private final Optional<RegularFile> environmentFile;
 
   public CMakeCustomTaskProto(final String name, final CMakeToolchain toolchain, final String buildConfig) {
     this.name = name;
     this.toolchainName = toolchain.getName();
     this.buildConfig = buildConfig;
-    this.environmentFile = toolchain.getEnvironmentFile();
+    this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
   }
 
-  @Override
   public String getName() {
     return name;
   }
@@ -36,7 +34,7 @@ public class CMakeCustomTaskProto implements Named {
     return buildConfig;
   }
 
-  public Optional<File> getEnvironmentFile() {
+  public Optional<RegularFile> getEnvironmentFile() {
     return environmentFile;
   }
 

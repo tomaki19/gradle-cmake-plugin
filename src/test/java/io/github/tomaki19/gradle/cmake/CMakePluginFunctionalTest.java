@@ -241,7 +241,7 @@ class CMakePluginFunctionalTest {
 
             toolchains {
               TestToolchain {
-                buildConfigs = ['Debug']
+                buildConfigs 'Debug'
               }
             }
 
@@ -274,8 +274,8 @@ class CMakePluginFunctionalTest {
             toolchains {
               TestToolchain {
                 operatingSystem = org.gradle.internal.os.OperatingSystem.current()
-                buildConfigs = ['Debug']
                 generator = 'Unix Makefiles'
+                buildConfigs 'Debug'
               }
             }
 
@@ -305,8 +305,8 @@ class CMakePluginFunctionalTest {
             toolchains {
               TestToolchain {
                 operatingSystem = org.gradle.internal.os.OperatingSystem.current()
-                buildConfigs = ['Debug']
                 generator = 'Unix Makefiles'
+                buildConfigs 'Debug'
               }
             }
 
@@ -331,8 +331,8 @@ class CMakePluginFunctionalTest {
             toolchains {
               TestToolchain {
                 operatingSystem = org.gradle.internal.os.OperatingSystem.current()
-                buildConfigs = ['Debug']
                 generator = 'Unix Makefiles'
+                buildConfigs 'Debug'
               }
             }
 
@@ -357,8 +357,8 @@ class CMakePluginFunctionalTest {
             toolchains {
               TestToolchain {
                 operatingSystem = org.gradle.internal.os.OperatingSystem.current()
-                buildConfigs = ['Debug']
                 generator = 'Unix Makefiles'
+                buildConfigs 'Debug'
               }
             }
 
