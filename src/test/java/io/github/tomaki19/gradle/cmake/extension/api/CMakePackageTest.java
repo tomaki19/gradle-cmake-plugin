@@ -5,200 +5,89 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gradle.api.Project;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
+
+import io.github.tomaki19.gradle.cmake.helper.MockCMakePackage;
 
 class CMakePackageTest {
 
-    @Test
-    void testConstructor() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg);
-    }
+  @Test
+  void testConstructor() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    assertNotNull(pkg);
+  }
 
-    @Test
-    void testGetConfigMode() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg.getConfigMode());
-        assertTrue(pkg.getConfigMode().isEmpty());
-    }
+  @Test
+  void testGetConfigMode() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    assertFalse(pkg.getConfigMode().isPresent());
+  }
 
-    @Test
-    void testSetConfigMode() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        pkg.setConfigMode(true);
-        assertTrue(pkg.getConfigMode().isPresent());
-        assertEquals(Boolean.TRUE, pkg.getConfigMode().get());
-    }
+  @Test
+  void testSetConfigMode() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    pkg.getConfigMode().set(true);
+    assertEquals(Boolean.TRUE, pkg.getConfigMode().get());
+  }
 
-    @Test
-    void testGetTargetPrefix() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg.getTargetPrefix());
-        assertTrue(pkg.getTargetPrefix().isEmpty());
-    }
+  @Test
+  void testGetTargetPrefix() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    assertFalse(pkg.getTargetPrefix().isPresent());
+  }
 
-    @Test
-    void testSetTargetPrefix() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        pkg.setTargetPrefix("prefix");
-        assertTrue(pkg.getTargetPrefix().isPresent());
-        assertEquals("prefix", pkg.getTargetPrefix().get());
-    }
+  @Test
+  void testSetTargetPrefix() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    pkg.getTargetPrefix().set("prefix");
+    assertEquals("prefix", pkg.getTargetPrefix().get());
+  }
 
-    @Test
-    void testGetComponents() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        Collection<String> components = pkg.getComponents();
-        assertNotNull(components);
-        assertEquals(0, components.size());
-    }
+  @Test
+  void testGetComponents() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    assertEquals(0, pkg.getComponents().get().size());
+  }
 
-    @Test
-    void testSetComponents() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        pkg.setComponents(Arrays.asList("component1", "component2"));
-        assertEquals(2, pkg.getComponents().size());
-    }
+  @Test
+  void testSetComponents() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    pkg.getComponents().set(Arrays.asList("component1", "component2"));
+    assertEquals(2, pkg.getComponents().get().size());
+  }
 
-    @Test
-    void testGetProperties() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg.getProperties());
-        assertEquals(0, pkg.getProperties().size());
-    }
+  @Test
+  void testGetProperties() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    assertEquals(0, pkg.getProperties().get().size());
+  }
 
-    @Test
-    void testSetProperties() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        Map<CharSequence, CharSequence> props = new HashMap<>();
-        props.put("key1", "value1");
-        props.put("key2", "value2");
-        pkg.setProperties(props);
-        assertEquals(2, pkg.getProperties().size());
-    }
+  @Test
+  void testSetProperties() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
+    Map<String, String> props = new HashMap<>();
+    props.put("key1", "value1");
+    props.put("key2", "value2");
+    pkg.getProperties().putAll(props);
+    assertEquals(2, pkg.getProperties().get().size());
+  }
 
-    @Test
-    void testGetInterfaces() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg.getInterfaces());
-        assertEquals(0, pkg.getInterfaces().size());
-    }
-
-    @Test
-    void testSetInterfaces() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        pkg.setInterfaces(Arrays.asList("/path/to/interface1", "/path/to/interface2"));
-        assertEquals(2, pkg.getInterfaces().size());
-    }
-
-    @Test
-    void testGetStaticLibraries() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg.getStaticLibraries());
-        assertEquals(0, pkg.getStaticLibraries().size());
-    }
-
-    @Test
-    void testSetStaticLibraries() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        pkg.setStaticLibraries(Arrays.asList("/path/to/lib1", "/path/to/lib2"));
-        assertEquals(2, pkg.getStaticLibraries().size());
-    }
-
-    @Test
-    void testGetSharedLibraries() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        assertNotNull(pkg.getSharedLibraries());
-        assertEquals(0, pkg.getSharedLibraries().size());
-    }
-
-    @Test
-    void testSetSharedLibraries() {
-        CMakePackage pkg = new CMakePackage() {
-            @Override
-            public String getName() {
-                return "test";
-            }
-        };
-        pkg.setSharedLibraries(Arrays.asList("/path/to/lib1", "/path/to/lib2"));
-        assertEquals(2, pkg.getSharedLibraries().size());
-    }
 }

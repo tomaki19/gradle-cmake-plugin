@@ -227,7 +227,7 @@ public final class CMakeResolver {
     if (from.isPresent()
         && availablePackages.containsKey(from.get())) {
       final CMakePackage availablePackage = availablePackages.get(from.get());
-      final String targetPrefix = availablePackage.getTargetPrefix().orElse(availablePackage.getName());
+      final String targetPrefix = availablePackage.getTargetPrefix().getOrElse(availablePackage.getName());
       cmakeConsumer.accept("%s::%s".formatted(targetPrefix, name));
       toolchainConsumer.accept(new CMakeResolvedPackage(availablePackage));
       return true;

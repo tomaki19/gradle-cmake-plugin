@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,18 +17,12 @@ public final class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedP
   private final Map<String, String> properties;
   private final Collection<String> components;
   private final boolean configMode;
-  private final Collection<Path> interfaces;
-  private final Collection<Path> staticLibraries;
-  private final Collection<Path> sharedLibraries;
 
   CMakeResolvedPackage(final CMakePackage object) {
     super(object.getName());
-    this.properties = new TreeMap<>(object.getProperties());
-    this.components = new HashSet<>(object.getComponents());
-    this.configMode = object.getConfigMode().orElse(Boolean.FALSE);
-    this.interfaces = object.getInterfaces();
-    this.staticLibraries = object.getStaticLibraries();
-    this.sharedLibraries = object.getSharedLibraries();
+    this.configMode = object.getConfigMode().getOrElse(Boolean.FALSE);
+    this.properties = new TreeMap<>(object.getProperties().get());
+    this.components = new HashSet<>(object.getComponents().get());
   }
 
   public Map<String, String> getProperties() {
@@ -42,18 +35,6 @@ public final class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedP
 
   public boolean isConfigMode() {
     return configMode;
-  }
-
-  public Collection<Path> getInterfaces() {
-    return Collections.unmodifiableCollection(interfaces);
-  }
-
-  public Collection<Path> getStaticLibraries() {
-    return Collections.unmodifiableCollection(staticLibraries);
-  }
-
-  public Collection<Path> getSharedLibraries() {
-    return Collections.unmodifiableCollection(sharedLibraries);
   }
 
 }

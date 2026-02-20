@@ -25,7 +25,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
     super(binary.getName());
-    this.outputName = binary.getOutputName().orElse(binary.getName());
+    this.outputName = binary.getOutputName().getOrElse(binary.getName());
     this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs());
     this.sources = new TreeSet<>(binary.getSources().getFiles());
     this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);

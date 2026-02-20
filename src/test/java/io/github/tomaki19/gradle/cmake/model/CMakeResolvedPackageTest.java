@@ -6,34 +6,24 @@ package io.github.tomaki19.gradle.cmake.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import org.gradle.api.Project;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakePackage;
 
 class CMakeResolvedPackageTest {
 
-    @Test
-    void testConstructor() {
-        CMakePackage pkg = mock(CMakePackage.class);
-        when(pkg.getName()).thenReturn("test-package");
-        
-        CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
-        assertNotNull(resolvedPackage);
-        assertEquals("test-package", resolvedPackage.getName());
-    }
+  @Test
+  void testConstructor() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakePackage pkg = new MockCMakePackage("test-package", project.getObjects());
 
-    @Test
-    void testGetters() {
-        CMakePackage pkg = mock(CMakePackage.class);
-        when(pkg.getName()).thenReturn("test-package");
-        
-        CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
-        assertNotNull(resolvedPackage);
-        
-        // Test that the name is correctly retrieved
-        assertEquals("test-package", resolvedPackage.getName());
-    }
+    final CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
+    assertNotNull(resolvedPackage);
+    assertEquals("test-package", resolvedPackage.getName());
+  }
+
 }

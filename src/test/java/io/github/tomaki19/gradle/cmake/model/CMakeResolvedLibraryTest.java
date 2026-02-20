@@ -8,190 +8,178 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 
-import org.gradle.api.file.SourceDirectorySet;
-import org.gradle.api.provider.Property;
+import org.gradle.api.Project;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
 
 class CMakeResolvedLibraryTest {
 
-    private CMakeLibrary mockLibrary(final String name) {
-        CMakeLibrary library = mock(CMakeLibrary.class);
-        when(library.getName()).thenReturn(name);
+  @Test
+  void testConstructor() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        // Mock headers and sources to avoid NullPointerException
-        SourceDirectorySet headers = mock(SourceDirectorySet.class);
-        when(headers.getSrcDirs()).thenReturn(Collections.emptySet());
-        when(library.getHeaders()).thenReturn(headers);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
+    assertEquals("test-library", resolvedLibrary.getName());
+  }
 
-        SourceDirectorySet sources = mock(SourceDirectorySet.class);
-        when(sources.getFiles()).thenReturn(Collections.emptySet());
-        when(library.getSources()).thenReturn(sources);
+  @Test
+  void testGetters() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        Property<Boolean> stripDebug = mock(Property.class);
-        when(stripDebug.get()).thenReturn(Boolean.FALSE);
-        when(stripDebug.getOrElse(Boolean.FALSE)).thenReturn(Boolean.FALSE);
-        when(stripDebug.getOrElse(Boolean.TRUE)).thenReturn(Boolean.TRUE);
-        when(library.getStripDebug()).thenReturn(stripDebug);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-        return library;
-    }
+    // Test default values
+    assertFalse(resolvedLibrary.isStripDebug());
+    assertTrue(resolvedLibrary.getPrivateCompileDefinitions().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateCompileOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPublicCompileDefinitions().isEmpty());
+    assertTrue(resolvedLibrary.getPublicCompileOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateLinkOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPublicLinkOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateSystemPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPublicSystemPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateProjectPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPublicProjectPackageDependencies().isEmpty());
+  }
 
-    @Test
-    void testConstructor() {
-        CMakeLibrary library = mockLibrary("test-library");
+  @Test
+  void testAddPrivateCompileDefinitions() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
-        assertEquals("test-library", resolvedLibrary.getName());
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testGetters() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPrivateCompileDefinitions("TEST_DEFINE");
+    assertFalse(resolvedLibrary.getPrivateCompileDefinitions().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateCompileDefinitions().contains("TEST_DEFINE"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPrivateCompileOptions() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        // Test default values
-        assertFalse(resolvedLibrary.isStripDebug());
-        assertTrue(resolvedLibrary.getPrivateCompileDefinitions().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateCompileOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPublicCompileDefinitions().isEmpty());
-        assertTrue(resolvedLibrary.getPublicCompileOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateLinkOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPublicLinkOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateSystemPackageDependencies().isEmpty());
-        assertTrue(resolvedLibrary.getPublicSystemPackageDependencies().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateProjectPackageDependencies().isEmpty());
-        assertTrue(resolvedLibrary.getPublicProjectPackageDependencies().isEmpty());
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPrivateCompileDefinitions() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPrivateCompileOptions("-O2");
+    assertFalse(resolvedLibrary.getPrivateCompileOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateCompileOptions().contains("-O2"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPublicCompileDefinitions() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPrivateCompileDefinitions("TEST_DEFINE");
-        assertFalse(resolvedLibrary.getPrivateCompileDefinitions().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateCompileDefinitions().contains("TEST_DEFINE"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPrivateCompileOptions() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPublicCompileDefinitions("PUBLIC_DEFINE");
+    assertFalse(resolvedLibrary.getPublicCompileDefinitions().isEmpty());
+    assertTrue(resolvedLibrary.getPublicCompileDefinitions().contains("PUBLIC_DEFINE"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPublicCompileOptions() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPrivateCompileOptions("-O2");
-        assertFalse(resolvedLibrary.getPrivateCompileOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateCompileOptions().contains("-O2"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPublicCompileDefinitions() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPublicCompileOptions("-Wall");
+    assertFalse(resolvedLibrary.getPublicCompileOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPublicCompileOptions().contains("-Wall"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPrivateLinkOption() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPublicCompileDefinitions("PUBLIC_DEFINE");
-        assertFalse(resolvedLibrary.getPublicCompileDefinitions().isEmpty());
-        assertTrue(resolvedLibrary.getPublicCompileDefinitions().contains("PUBLIC_DEFINE"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPublicCompileOptions() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPrivateLinkOption("-ltest");
+    assertFalse(resolvedLibrary.getPrivateLinkOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateLinkOptions().contains("-ltest"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPublicLinkOption() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPublicCompileOptions("-Wall");
-        assertFalse(resolvedLibrary.getPublicCompileOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPublicCompileOptions().contains("-Wall"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPrivateLinkOption() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPublicLinkOption("-lpublic");
+    assertFalse(resolvedLibrary.getPublicLinkOptions().isEmpty());
+    assertTrue(resolvedLibrary.getPublicLinkOptions().contains("-lpublic"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPrivateSystemPackageDependency() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPrivateLinkOption("-ltest");
-        assertFalse(resolvedLibrary.getPrivateLinkOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateLinkOptions().contains("-ltest"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPublicLinkOption() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPrivateSystemPackageDependency("pkg-config");
+    assertFalse(resolvedLibrary.getPrivateSystemPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateSystemPackageDependencies().contains("pkg-config"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPublicSystemPackageDependency() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPublicLinkOption("-lpublic");
-        assertFalse(resolvedLibrary.getPublicLinkOptions().isEmpty());
-        assertTrue(resolvedLibrary.getPublicLinkOptions().contains("-lpublic"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPrivateSystemPackageDependency() {
-        CMakeLibrary library = mockLibrary("test-library");
+    resolvedLibrary.addPublicSystemPackageDependency("pkg-config-public");
+    assertFalse(resolvedLibrary.getPublicSystemPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPublicSystemPackageDependencies().contains("pkg-config-public"));
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPrivateProjectPackageDependency() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPrivateSystemPackageDependency("pkg-config");
-        assertFalse(resolvedLibrary.getPrivateSystemPackageDependencies().isEmpty());
-        assertTrue(resolvedLibrary.getPrivateSystemPackageDependencies().contains("pkg-config"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPublicSystemPackageDependency() {
-        CMakeLibrary library = mockLibrary("test-library");
+    // This would require a CMakeResolvedProjectDependency object, so we'll just
+    // test that it doesn't throw
+    // The actual implementation would be tested in integration tests
+    assertTrue(true); // Placeholder test
+  }
 
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
+  @Test
+  void testAddPublicProjectPackageDependency() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-        resolvedLibrary.addPublicSystemPackageDependency("pkg-config-public");
-        assertFalse(resolvedLibrary.getPublicSystemPackageDependencies().isEmpty());
-        assertTrue(resolvedLibrary.getPublicSystemPackageDependencies().contains("pkg-config-public"));
-    }
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
+    assertNotNull(resolvedLibrary);
 
-    @Test
-    void testAddPrivateProjectPackageDependency() {
-        CMakeLibrary library = mockLibrary("test-library");
-
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
-
-        // This would require a CMakeResolvedProjectDependency object, so we'll just
-        // test that it doesn't throw
-        // The actual implementation would be tested in integration tests
-        assertTrue(true); // Placeholder test
-    }
-
-    @Test
-    void testAddPublicProjectPackageDependency() {
-        CMakeLibrary library = mockLibrary("test-library");
-
-        CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
-        assertNotNull(resolvedLibrary);
-
-        // This would require a CMakeResolvedProjectDependency object, so we'll just
-        // test that it doesn't throw
-        // The actual implementation would be tested in integration tests
-        assertTrue(true); // Placeholder test
-    }
+    // This would require a CMakeResolvedProjectDependency object, so we'll just
+    // test that it doesn't throw
+    // The actual implementation would be tested in integration tests
+    assertTrue(true); // Placeholder test
+  }
 }

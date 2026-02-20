@@ -16,17 +16,24 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinking;
 public class MockCMakeApplication extends CMakeApplication {
 
   private final String name;
+  private final Property<String> outputName;
   private final Property<Boolean> stripDebug;
 
   public MockCMakeApplication(final String name, final ObjectFactory factory) {
     super(factory);
     this.name = name;
+    this.outputName = factory.property(String.class);
     this.stripDebug = factory.property(Boolean.class);
   }
 
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public Property<String> getOutputName() {
+    return outputName;
   }
 
   @Override

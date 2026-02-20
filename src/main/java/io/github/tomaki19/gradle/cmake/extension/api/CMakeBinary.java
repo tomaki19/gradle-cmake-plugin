@@ -8,17 +8,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
 import org.gradle.api.Action;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Property;
 
 public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinaries {
 
-  private Optional<String> outputName = Optional.empty();
   private final Collection<String> toolchains = new HashSet<>();
   private final SourceDirectorySet headers;
   private final SourceDirectorySet sources;
@@ -29,15 +28,7 @@ public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinar
     this.sources = objectFactory.sourceDirectorySet("sources", "CMake sources");
   }
 
-  public Optional<String> getOutputName() {
-    return outputName;
-  }
-
-  public void setOutputName(final CharSequence value) {
-    if (!value.isEmpty()) {
-      this.outputName = Optional.of(value.toString());
-    }
-  }
+  public abstract Property<String> getOutputName();
 
   public Collection<String> getToolchains() {
     return Collections.unmodifiableCollection(toolchains);

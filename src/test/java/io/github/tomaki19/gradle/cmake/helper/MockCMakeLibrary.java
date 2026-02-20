@@ -16,6 +16,7 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
 public class MockCMakeLibrary extends CMakeLibrary {
 
   private final String name;
+  private final Property<String> outputName;
   private final Property<Boolean> stripDebug;
   private final Property<Boolean> buildStatic;
   private final Property<Boolean> buildShared;
@@ -23,6 +24,7 @@ public class MockCMakeLibrary extends CMakeLibrary {
   public MockCMakeLibrary(final String name, final ObjectFactory factory) {
     super(factory);
     this.name = name;
+    this.outputName = factory.property(String.class);
     this.stripDebug = factory.property(Boolean.class);
     this.buildStatic = factory.property(Boolean.class);
     this.buildShared = factory.property(Boolean.class);
@@ -31,6 +33,11 @@ public class MockCMakeLibrary extends CMakeLibrary {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public Property<String> getOutputName() {
+    return outputName;
   }
 
   @Override
