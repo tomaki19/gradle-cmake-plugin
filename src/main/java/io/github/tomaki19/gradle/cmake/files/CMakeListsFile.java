@@ -20,6 +20,7 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackageDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -82,7 +83,7 @@ public final class CMakeListsFile extends CMakeFileContent {
       if (!toolchain.getPackages().isEmpty() || !toolchain.getProjects().isEmpty()) {
         writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        writeSystemPackageDependencies(outputStream, 1, toolchain.getPackages());
+        writeGlobalPackageDependencies(outputStream, 1, toolchain.getPackages());
         writeProjectPackageDependencies(outputStream, 1, toolchain.getProjects(), toolchain);
         write(outputStream, "endif()");
       }
@@ -104,7 +105,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     }
   }
 
-  private void writeSystemPackageDependencies(final FileOutputStream outputStream, final int indent,
+  private void writeGlobalPackageDependencies(final FileOutputStream outputStream, final int indent,
       final Collection<CMakeResolvedPackage> dependencies) throws IOException {
     for (final CMakeResolvedPackage resolvedPackage : dependencies) {
       for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
@@ -341,12 +342,12 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writePrivateLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    if (!binary.getPrivateProjectPackageDependencies().isEmpty() ||
-        !binary.getPrivateSystemPackageDependencies().isEmpty() ||
+    if (!binary.getPrivateProjectDependencies().isEmpty() ||
+        !binary.getPrivatePackageDependencies().isEmpty() ||
         !binary.getPrivateLinkOptions().isEmpty()) {
       writeTargetLinkLibraries(outputStream, indent, target, "PRIVATE", toolchain, buildConfig,
-          binary.getPrivateProjectPackageDependencies(),
-          binary.getPrivateSystemPackageDependencies(),
+          binary.getPrivateProjectDependencies(),
+          binary.getPrivatePackageDependencies(),
           binary.getPrivateLinkOptions());
     }
   }
@@ -354,28 +355,29 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writePublicLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    if (!library.getPublicProjectPackageDependencies().isEmpty() ||
-        !library.getPublicSystemPackageDependencies().isEmpty() ||
+    if (!library.getPublicProjectDependencies().isEmpty() ||
+        !library.getPublicPackageDependencies().isEmpty() ||
         !library.getPublicLinkOptions().isEmpty()) {
       writeTargetLinkLibraries(outputStream, indent, target, "PUBLIC", toolchain, buildConfig,
-          library.getPublicProjectPackageDependencies(),
-          library.getPublicSystemPackageDependencies(),
+          library.getPublicProjectDependencies(),
+          library.getPublicPackageDependencies(),
           library.getPublicLinkOptions());
     }
   }
 
   private void writeTargetLinkLibraries(final FileOutputStream outputStream, final int indent, final String target,
       final String type, final CMakeResolvedToolchain toolchain, final String buildConfig,
-      final Collection<CMakeResolvedProjectDependency> projectPackageDependencies,
-      final Collection<String> packageDependencies, final Collection<String> options) throws IOException {
+      final Collection<CMakeResolvedProjectDependency> projectDependencies,
+      final Collection<CMakeResolvedPackageDependency> packageDependencies, final Collection<String> options)
+      throws IOException {
     write(outputStream, indent, "target_link_libraries( %s %s", target, type);
-    for (final CMakeResolvedProjectDependency projectModule : projectPackageDependencies) {
-      write(outputStream, indent + 1, "%s::%s", projectModule.getProject().getName(),
+    for (final CMakeResolvedProjectDependency projectModule : projectDependencies) {
+      write(outputStream, indent + 1, "%s::%s", projectModule.getProjectName(),
           CMakeFileConventions.buildTarget(projectModule.getName(), toolchain.getName(), projectModule.getLinkage(),
               buildConfig));
     }
-    for (final String packageDependency : packageDependencies) {
-      write(outputStream, indent + 1, packageDependency);
+    for (final CMakeResolvedPackageDependency packageDependency : packageDependencies) {
+      write(outputStream, indent + 1, "%s::%s", packageDependency.getTargetPrefix(), packageDependency.getName());
     }
     for (final String option : options) {
       write(outputStream, indent + 1, option);

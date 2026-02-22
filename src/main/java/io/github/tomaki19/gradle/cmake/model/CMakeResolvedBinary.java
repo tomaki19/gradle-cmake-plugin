@@ -19,8 +19,8 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final Collection<String> privateCompileDefinitions = new TreeSet<>();
   private final Collection<String> privateCompileOptions = new TreeSet<>();
   private final Collection<String> privateLinkOptions = new TreeSet<>();
-  private final Collection<String> privateSystemPackageDependencies = new TreeSet<>();
-  private final Collection<CMakeResolvedProjectDependency> privateProjectPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedPackageDependency> privatePackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> privateProjectDependencies = new TreeSet<>();
   private final boolean stripDebug;
 
   CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
@@ -67,20 +67,20 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
     privateLinkOptions.add(option);
   }
 
-  public Collection<String> getPrivateSystemPackageDependencies() {
-    return Collections.unmodifiableCollection(privateSystemPackageDependencies);
+  public Collection<CMakeResolvedPackageDependency> getPrivatePackageDependencies() {
+    return Collections.unmodifiableCollection(privatePackageDependencies);
   }
 
-  void addPrivateSystemPackageDependency(final String dependency) {
-    privateSystemPackageDependencies.add(dependency);
+  void addPrivatePackageDependency(final CMakeResolvedPackageDependency dependency) {
+    privatePackageDependencies.add(dependency);
   }
 
-  public Collection<CMakeResolvedProjectDependency> getPrivateProjectPackageDependencies() {
-    return Collections.unmodifiableCollection(privateProjectPackageDependencies);
+  public Collection<CMakeResolvedProjectDependency> getPrivateProjectDependencies() {
+    return Collections.unmodifiableCollection(privateProjectDependencies);
   }
 
-  void addPrivateProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {
-    privateProjectPackageDependencies.add(dependency);
+  void addPrivateProjectDependency(final CMakeResolvedProjectDependency dependency) {
+    privateProjectDependencies.add(dependency);
   }
 
   public boolean isStripDebug() {

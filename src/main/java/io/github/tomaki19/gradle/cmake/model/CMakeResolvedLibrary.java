@@ -15,8 +15,8 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   private final Collection<String> publicCompileDefinitions = new TreeSet<>();
   private final Collection<String> publicCompileOptions = new TreeSet<>();
   private final Collection<String> publicLinkOptions = new TreeSet<>();
-  private final Collection<String> publicSystemPackageDependencies = new TreeSet<>();
-  private final Collection<CMakeResolvedProjectDependency> publicProjectPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedPackageDependency> publicPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
 
   CMakeResolvedLibrary(final CMakeLibrary library, final boolean stripDebug) {
     super(library, stripDebug);
@@ -46,20 +46,20 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
     publicLinkOptions.add(option);
   }
 
-  public Collection<String> getPublicSystemPackageDependencies() {
-    return Collections.unmodifiableCollection(publicSystemPackageDependencies);
+  public Collection<CMakeResolvedPackageDependency> getPublicPackageDependencies() {
+    return Collections.unmodifiableCollection(publicPackageDependencies);
   }
 
-  public void addPublicSystemPackageDependency(final String dependency) {
-    publicSystemPackageDependencies.add(dependency);
+  public void addPublicPackageDependency(final CMakeResolvedPackageDependency dependency) {
+    publicPackageDependencies.add(dependency);
   }
 
-  public Collection<CMakeResolvedProjectDependency> getPublicProjectPackageDependencies() {
-    return Collections.unmodifiableCollection(publicProjectPackageDependencies);
+  public Collection<CMakeResolvedProjectDependency> getPublicProjectDependencies() {
+    return Collections.unmodifiableCollection(publicProjectDependencies);
   }
 
-  public void addPublicProjectPackageDependency(final CMakeResolvedProjectDependency dependency) {
-    publicProjectPackageDependencies.add(dependency);
+  public void addPublicProjectDependency(final CMakeResolvedProjectDependency dependency) {
+    publicProjectDependencies.add(dependency);
   }
 
 }

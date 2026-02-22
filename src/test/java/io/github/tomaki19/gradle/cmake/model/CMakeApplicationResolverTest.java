@@ -123,8 +123,8 @@ public class CMakeApplicationResolverTest {
                 {
                         final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
                                         .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
-                        assertEquals(1, applications[0].getPrivateSystemPackageDependencies().size());
-                        assertEquals(2, applications[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(1, applications[0].getPrivatePackageDependencies().size());
+                        assertEquals(2, applications[0].getPrivateProjectDependencies().size());
                         assertEquals(1, applications[0].getPrivateLinkOptions().size());
                 }
                 assertEquals(0, toolchains[0].getTests().size());
@@ -138,8 +138,8 @@ public class CMakeApplicationResolverTest {
                 {
                         final CMakeResolvedExecutable[] applications = toolchains[1].getApplications()
                                         .toArray(new CMakeResolvedExecutable[toolchains[1].getApplications().size()]);
-                        assertEquals(1, applications[0].getPrivateSystemPackageDependencies().size());
-                        assertEquals(1, applications[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(1, applications[0].getPrivatePackageDependencies().size());
+                        assertEquals(1, applications[0].getPrivateProjectDependencies().size());
                         assertEquals(1, applications[0].getPrivateLinkOptions().size());
                 }
                 assertEquals(0, toolchains[1].getTests().size());
@@ -186,8 +186,8 @@ public class CMakeApplicationResolverTest {
                 {
                         final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
                                         .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
-                        assertEquals(0, applications[0].getPrivateSystemPackageDependencies().size());
-                        assertEquals(0, applications[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(0, applications[0].getPrivatePackageDependencies().size());
+                        assertEquals(0, applications[0].getPrivateProjectDependencies().size());
                         assertEquals(0, applications[0].getPrivateLinkOptions().size());
                 }
                 assertEquals(0, toolchains[0].getTests().size());
@@ -237,8 +237,8 @@ public class CMakeApplicationResolverTest {
                 {
                         final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
                                         .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
-                        assertEquals(1, applications[0].getPrivateSystemPackageDependencies().size());
-                        assertEquals(2, applications[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(1, applications[0].getPrivatePackageDependencies().size());
+                        assertEquals(2, applications[0].getPrivateProjectDependencies().size());
                         assertEquals(1, applications[0].getPrivateLinkOptions().size());
                 }
                 assertEquals(0, toolchains[0].getTests().size());
@@ -288,8 +288,8 @@ public class CMakeApplicationResolverTest {
                 {
                         final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
                                         .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
-                        assertEquals(1, applications[0].getPrivateSystemPackageDependencies().size());
-                        assertEquals(2, applications[0].getPrivateProjectPackageDependencies().size());
+                        assertEquals(1, applications[0].getPrivatePackageDependencies().size());
+                        assertEquals(2, applications[0].getPrivateProjectDependencies().size());
                         assertEquals(1, applications[0].getPrivateLinkOptions().size());
                 }
                 assertEquals(0, toolchains[0].getTests().size());

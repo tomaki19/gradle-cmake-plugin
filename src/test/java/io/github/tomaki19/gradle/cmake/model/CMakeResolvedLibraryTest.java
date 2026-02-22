@@ -9,13 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakePackage;
 
 class CMakeResolvedLibraryTest {
 
@@ -45,10 +48,10 @@ class CMakeResolvedLibraryTest {
     assertTrue(resolvedLibrary.getPublicCompileOptions().isEmpty());
     assertTrue(resolvedLibrary.getPrivateLinkOptions().isEmpty());
     assertTrue(resolvedLibrary.getPublicLinkOptions().isEmpty());
-    assertTrue(resolvedLibrary.getPrivateSystemPackageDependencies().isEmpty());
-    assertTrue(resolvedLibrary.getPublicSystemPackageDependencies().isEmpty());
-    assertTrue(resolvedLibrary.getPrivateProjectPackageDependencies().isEmpty());
-    assertTrue(resolvedLibrary.getPublicProjectPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPrivatePackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPublicPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPrivateProjectDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPublicProjectDependencies().isEmpty());
   }
 
   @Test
@@ -133,26 +136,34 @@ class CMakeResolvedLibraryTest {
   void testAddPrivateSystemPackageDependency() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+    final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
     CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
     assertNotNull(resolvedLibrary);
 
-    resolvedLibrary.addPrivateSystemPackageDependency("pkg-config");
-    assertFalse(resolvedLibrary.getPrivateSystemPackageDependencies().isEmpty());
-    assertTrue(resolvedLibrary.getPrivateSystemPackageDependencies().contains("pkg-config"));
+    CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
+    CMakeResolvedPackageDependency resolvedPackageDependency = new CMakeResolvedPackageDependency("pkg-config",
+        resolvedPackage, Optional.of("test-prefix"));
+    resolvedLibrary.addPrivatePackageDependency(resolvedPackageDependency);
+    assertFalse(resolvedLibrary.getPrivatePackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPrivatePackageDependencies().contains(resolvedPackageDependency));
   }
 
   @Test
   void testAddPublicSystemPackageDependency() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+    final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
     CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, false);
     assertNotNull(resolvedLibrary);
 
-    resolvedLibrary.addPublicSystemPackageDependency("pkg-config-public");
-    assertFalse(resolvedLibrary.getPublicSystemPackageDependencies().isEmpty());
-    assertTrue(resolvedLibrary.getPublicSystemPackageDependencies().contains("pkg-config-public"));
+    CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
+    CMakeResolvedPackageDependency resolvedPackageDependency = new CMakeResolvedPackageDependency("pkg-config",
+        resolvedPackage, Optional.of("test-prefix"));
+    resolvedLibrary.addPublicPackageDependency(resolvedPackageDependency);
+    assertFalse(resolvedLibrary.getPublicPackageDependencies().isEmpty());
+    assertTrue(resolvedLibrary.getPublicPackageDependencies().contains(resolvedPackageDependency));
   }
 
   @Test

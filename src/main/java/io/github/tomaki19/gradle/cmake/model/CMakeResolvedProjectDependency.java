@@ -7,33 +7,35 @@ package io.github.tomaki19.gradle.cmake.model;
 import java.util.Optional;
 import java.util.Objects;
 
-import org.gradle.api.Project;
+public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
-public final class CMakeResolvedProjectDependency
-    extends CMakeResolvedName<CMakeResolvedProjectDependency> {
-
-  private final CMakeResolvedProject project;
+  private final CMakeResolvedProject resolvedProject;
   private final String linkage;
 
-  CMakeResolvedProjectDependency(final Project project, final String name, final Optional<CMakeLinkType> linkage) {
+  CMakeResolvedProjectDependency(final String name, final CMakeResolvedProject resolvedProject,
+      final Optional<CMakeLinkType> linkage) {
     super(name);
-    this.project = new CMakeResolvedProject(project);
+    this.resolvedProject = resolvedProject;
     this.linkage = linkage.orElse(CMakeLinkType.SHARED).toString();
   }
 
-  public CMakeResolvedProject getProject() {
-    return project;
+  public CMakeResolvedProject getResolvedProject() {
+    return resolvedProject;
   }
 
   public String getLinkage() {
     return linkage;
   }
 
+  public String getProjectName() {
+    return resolvedProject.getName();
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((project == null) ? 0 : project.hashCode());
+    result = prime * result + ((resolvedProject == null) ? 0 : resolvedProject.hashCode());
     result = prime * result + ((linkage == null) ? 0 : linkage.hashCode());
     return result;
   }
@@ -47,10 +49,10 @@ public final class CMakeResolvedProjectDependency
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectDependency other = (CMakeResolvedProjectDependency) obj;
-    if (project == null) {
-      if (other.project != null)
+    if (resolvedProject == null) {
+      if (other.resolvedProject != null)
         return false;
-    } else if (!project.equals(other.project))
+    } else if (!resolvedProject.equals(other.resolvedProject))
       return false;
     if (!Objects.equals(linkage, other.linkage))
       return false;
@@ -60,7 +62,7 @@ public final class CMakeResolvedProjectDependency
   @Override
   public int compareTo(CMakeResolvedProjectDependency other) {
     int comparator = 0;
-    if ((comparator = getProject().compareTo(other.getProject())) != 0) {
+    if ((comparator = getResolvedProject().compareTo(other.getResolvedProject())) != 0) {
       return comparator;
     }
     if ((comparator = getName().compareTo(other.getName())) != 0) {

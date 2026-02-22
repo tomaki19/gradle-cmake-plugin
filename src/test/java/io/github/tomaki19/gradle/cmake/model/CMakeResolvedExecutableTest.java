@@ -9,12 +9,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeTest;
 
 class CMakeResolvedExecutableTest {
@@ -42,8 +45,8 @@ class CMakeResolvedExecutableTest {
     assertTrue(resolvedExecutable.getPrivateCompileDefinitions().isEmpty());
     assertTrue(resolvedExecutable.getPrivateCompileOptions().isEmpty());
     assertTrue(resolvedExecutable.getPrivateLinkOptions().isEmpty());
-    assertTrue(resolvedExecutable.getPrivateSystemPackageDependencies().isEmpty());
-    assertTrue(resolvedExecutable.getPrivateProjectPackageDependencies().isEmpty());
+    assertTrue(resolvedExecutable.getPrivatePackageDependencies().isEmpty());
+    assertTrue(resolvedExecutable.getPrivateProjectDependencies().isEmpty());
   }
 
   @Test
@@ -89,13 +92,17 @@ class CMakeResolvedExecutableTest {
   void testAddPrivateSystemPackageDependency() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
     CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
     assertNotNull(resolvedExecutable);
 
-    resolvedExecutable.addPrivateSystemPackageDependency("pkg-config");
-    assertFalse(resolvedExecutable.getPrivateSystemPackageDependencies().isEmpty());
-    assertTrue(resolvedExecutable.getPrivateSystemPackageDependencies().contains("pkg-config"));
+    CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
+    CMakeResolvedPackageDependency resolvedPackageDependency = new CMakeResolvedPackageDependency("pkg-config",
+        resolvedPackage, Optional.of("test-prefix"));
+    resolvedExecutable.addPrivatePackageDependency(resolvedPackageDependency);
+    assertFalse(resolvedExecutable.getPrivatePackageDependencies().isEmpty());
+    assertTrue(resolvedExecutable.getPrivatePackageDependencies().contains(resolvedPackageDependency));
   }
 
   @Test

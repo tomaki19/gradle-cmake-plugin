@@ -146,22 +146,23 @@ public final class CMakeTaskRegistry {
   public static void configureRemote(final CMakeBuild task, final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
-    dependencies.addAll(library.getPrivateProjectPackageDependencies());
-    dependencies.addAll(library.getPublicProjectPackageDependencies());
+    dependencies.addAll(library.getPrivateProjectDependencies());
+    dependencies.addAll(library.getPublicProjectDependencies());
     configureRemote(task, toolchain, buildConfig, dependencies);
   }
 
   public static void configureRemote(final CMakeBuild task, final CMakeResolvedExecutable executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    configureRemote(task, toolchain, buildConfig, executable.getPrivateProjectPackageDependencies());
+    configureRemote(task, toolchain, buildConfig, executable.getPrivateProjectDependencies());
   }
 
   private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Collection<CMakeResolvedProjectDependency> dependencies) {
     dependencies.stream()
         .filter(dependency -> !Objects.equals(dependency.getLinkage(), CMakeLinkType.INTERFACE.toString()))
-        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getProject().getName(),
-            dependency.getName(), toolchain.getName(), dependency.getLinkage(), buildConfig)));
+        .forEach(
+            dependency -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getResolvedProject().getName(),
+                dependency.getName(), toolchain.getName(), dependency.getLinkage(), buildConfig)));
   }
 
 }

@@ -18,6 +18,7 @@ import org.gradle.api.file.Directory;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackageDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -139,70 +140,42 @@ public final class CMakeConfigFile extends CMakeFileContent {
   private void writeTargetProperties(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary library, final String target, final String buildConfig, final String outputName)
       throws IOException {
-    // write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY",
-    // target);
-    // write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s ",
-    // buildConfig.toUpperCase());
-    // write(outputStream, indent, ")");
     write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
     final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath();
     final Path installPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH)
         .dir(toolchain.getName()).dir(buildConfig).dir("lib").getAsFile().toPath();
+    write(outputStream, indent + 1, "INTERFACE_INCLUDE_DIRECTORIES");
+    for (final File headerDir : library.getHeaders()) {
+      write(outputStream, indent + 2, "\"${CMAKE_CURRENT_LIST_DIR}/%s\"", exportPath.relativize(headerDir.toPath()));
+    }
+    if (!library.getPublicCompileOptions().isEmpty()) {
+      write(outputStream, indent + 1, "INTERFACE_COMPILE_OPTIONS");
+      write(outputStream, indent + 2, "\"%s\"", String.join(";", library.getPublicCompileOptions()));
+    }
+    if (!library.getPublicCompileDefinitions().isEmpty()) {
+      write(outputStream, indent + 1, "INTERFACE_COMPILE_DEFINITIONS");
+      write(outputStream, indent + 2, "\"%s\"", String.join(";", library.getPublicCompileDefinitions()));
+    }
     write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s ", buildConfig.toUpperCase());
     write(outputStream, indent + 1, "IMPORTED_LOCATION \"${CMAKE_CURRENT_LIST_DIR}/%s/%s\"",
         exportPath.relativize(installPath), outputName);
-    // write(outputStream, indent + 1, "IMPORTED_LOCATION_%s
-    // \"${CMAKE_CURRENT_LIST_DIR}/%s/%s\"",
-    // buildConfig.toUpperCase(), exportPath.relativize(installPath), outputName);
-    write(outputStream, indent + 1, "INTERFACE_INCLUDE_DIRECTORIES");
-    for (final File headerDir : library.getHeaders()) {
-      write(outputStream, indent + 2, "\"${CMAKE_CURRENT_LIST_DIR}/%s\"",
-          exportPath.relativize(headerDir.toPath()));
-    }
-    // if (!library.getPublicCompileOptions().isEmpty()) {
-    // write(outputStream, indent + 1, "INTERFACE_COMPILE_OPTIONS");
-    // write(outputStream, indent + 2, "\"%s\"", String.join(";",
-    // library.getPublicCompileOptions()));
-    // }
-    // if (!library.getPublicCompileDefinitions().isEmpty()) {
-    // write(outputStream, indent + 1, "INTERFACE_COMPILE_DEFINITIONS");
-    // write(outputStream, indent + 2, "\"%s\"", String.join(";",
-    // library.getPublicCompileDefinitions()));
-    // }
-    if (!library.getPublicProjectPackageDependencies().isEmpty()
-        || !library.getPublicSystemPackageDependencies().isEmpty()
+    if (!library.getPublicProjectDependencies().isEmpty()
+        || !library.getPublicPackageDependencies().isEmpty()
         || !library.getPublicLinkOptions().isEmpty()) {
       write(outputStream, indent + 1, "IMPORTED_LINK_INTERFACE_LIBRARIES");
-      for (final CMakeResolvedProjectDependency projectDependency : library.getPublicProjectPackageDependencies()) {
-        write(outputStream, indent + 2, "%s::%s", projectDependency.getProject().getName(),
-            CMakeFileConventions.buildTarget(projectDependency.getName(), toolchain.getName(),
-                projectDependency.getLinkage(), buildConfig));
+      for (final CMakeResolvedProjectDependency dependency : library.getPublicProjectDependencies()) {
+        write(outputStream, indent + 2, "%s::%s", dependency.getProjectName(),
+            CMakeFileConventions.buildTarget(dependency.getName(), toolchain.getName(), dependency.getLinkage(),
+                buildConfig));
       }
-      if (!library.getPublicSystemPackageDependencies().isEmpty()) {
-        write(outputStream, indent + 2, "\"%s\"", String.join(";", library.getPublicSystemPackageDependencies()));
+      for (final CMakeResolvedPackageDependency dependency : library.getPublicPackageDependencies()) {
+        write(outputStream, indent + 2, "%s::%s", dependency.getTargetPrefix(), dependency.getName());
       }
-      if (!library.getPublicLinkOptions().isEmpty()) {
-        write(outputStream, indent + 2, "\"%s\"", String.join(";", library.getPublicLinkOptions()));
+      for (final String option : library.getPublicLinkOptions()) {
+        write(outputStream, indent + 2, option);
       }
-      // write(outputStream, indent + 1, "IMPORTED_LINK_INTERFACE_LIBRARIES_%s",
-      // buildConfig.toUpperCase());
-      // for (final CMakeResolvedProjectDependency projectDependency :
-      // library.getPublicProjectPackageDependencies()) {
-      // write(outputStream, indent + 2, "%s::%s",
-      // projectDependency.getProject().getName(),
-      // CMakeFileConventions.buildTarget(projectDependency.getName(),
-      // toolchain.getName(),
-      // projectDependency.getLinkage(), buildConfig));
-      // }
-      // if (!library.getPublicSystemPackageDependencies().isEmpty()) {
-      // write(outputStream, indent + 2, "\"%s\"", String.join(";",
-      // library.getPublicSystemPackageDependencies()));
-      // }
-      // if (!library.getPublicLinkOptions().isEmpty()) {
-      // write(outputStream, indent + 2, "\"%s\"", String.join(";",
-      // library.getPublicLinkOptions()));
-      // }
     }
+
     write(outputStream, indent, ")");
   }
 

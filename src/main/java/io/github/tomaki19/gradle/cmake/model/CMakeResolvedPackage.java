@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 
-public final class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedPackage> {
+public class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedPackage> {
 
   private final Map<String, String> properties;
   private final Collection<String> components;
