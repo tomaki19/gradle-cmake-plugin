@@ -45,14 +45,10 @@ toolchains {
     }
     applications {
       privateLinkDependencies = //optional: List<String>, default: none
-      buildStatic = //optional: boolean, default: false
-      buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
     }
     tests {
       privateLinkDependencies = //optional: List<String>, default: none
-      buildStatic = //optional: boolean, default: false
-      buildShared = //optional: boolean, default: true
       stripDebug = //optional: boolean, default: false
       testResultsXmlOutput = //optional: boolean, default: false
     }
@@ -89,18 +85,20 @@ libraries {
       options <List<String>> //optional
     }
     privateLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      option(<String>) //optional
+      options(<List<String>>) //optional
+      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
+      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
     }
     publicLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild //optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      option(<String>) //optional
+      options(<List<String>>) //optional
+      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
+      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
     }
     outputName <String> //optional
+    buildShared = <boolean> //optional, default: true
+    buildStatic = <boolean> //optional, default: false
     stripDebug = <boolean> //optional, default: false
   }
 }
@@ -129,10 +127,10 @@ applications {
       options <List<String>> //optional
     }
     privateLinking {
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      option(<String>) //optional
+      options(<List<String>>) //optional
+      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
+      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -163,10 +161,10 @@ tests {
       options <List<String>> //optional
     }
     privateLinking{
-      option <String> //optional
-      options <List<String>> //optional
-      dependency <String> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
-      dependencies <List<String>> from <String> linkStatic|linkShared|linkInterface forStaticBuild|forSharedBuild//optional
+      option(<String>) //optional
+      options(<List<String>>) //optional
+      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
+      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false

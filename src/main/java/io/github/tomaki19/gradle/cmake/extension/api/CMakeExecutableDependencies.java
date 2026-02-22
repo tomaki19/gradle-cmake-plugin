@@ -17,17 +17,17 @@ public class CMakeExecutableDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeExecutableDependencies getLinkStatic() {
+  public CMakeExecutableDependencies linkStatic() {
     setLinkage(CMakeLinkType.STATIC);
     return this;
   }
 
-  public CMakeExecutableDependencies getLinkShared() {
+  public CMakeExecutableDependencies linkShared() {
     setLinkage(CMakeLinkType.SHARED);
     return this;
   }
 
-  public CMakeExecutableDependencies getLinkInterface() {
+  public CMakeExecutableDependencies linkInterface() {
     setLinkage(CMakeLinkType.INTERFACE);
     return this;
   }

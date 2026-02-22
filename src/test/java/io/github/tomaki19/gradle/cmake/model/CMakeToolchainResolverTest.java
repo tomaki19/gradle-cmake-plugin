@@ -27,182 +27,190 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
 
 public class CMakeToolchainResolverTest {
 
-  @Test
-  void resolveNoLinkDependenciesTest() throws Exception {
-    final Project project = ProjectBuilder.builder().build();
-    final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-        CMakeExtension.class, customTasks);
+        @Test
+        void resolveNoLinkDependenciesTest() throws Exception {
+                final Project project = ProjectBuilder.builder().build();
+                final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
+                final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+                                CMakeExtension.class, customTasks);
 
-    TestCMakePackage.register("Package0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
-    TestCMakeToolchain.register("Toolchain0", extension);
+                TestCMakePackage.register("Package0", extension);
+                TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
+                TestCMakeToolchain.register("Toolchain0", extension);
 
-    assertEquals(1, extension.getPackages().size());
-    assertEquals(1, extension.getToolchains().size());
-    assertEquals(1, extension.getLibraries().size());
-    assertEquals(0, extension.getApplications().size());
-    assertEquals(0, extension.getTests().size());
+                assertEquals(1, extension.getPackages().size());
+                assertEquals(1, extension.getToolchains().size());
+                assertEquals(1, extension.getLibraries().size());
+                assertEquals(0, extension.getApplications().size());
+                assertEquals(0, extension.getTests().size());
 
-    final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
-    final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
-        extension.getApplications(), extension.getTests());
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+                                extension.getApplications(), extension.getTests());
 
-    final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
-    assertEquals(1, toolchains.length);
-  }
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
+        }
 
-  @Test
-  void resolveInterfaceLinkDependenciesTest() throws Exception {
-    final Project project = ProjectBuilder.builder().build();
-    final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-        CMakeExtension.class, customTasks);
+        @Test
+        void resolveInterfaceLinkDependenciesTest() throws Exception {
+                final Project project = ProjectBuilder.builder().build();
+                final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
+                final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+                                CMakeExtension.class, customTasks);
 
-    TestCMakePackage.register("Package0", extension);
-    TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
-    TestCMakeToolchain.register("Toolchain0", extension);
+                TestCMakePackage.register("Package0", extension);
+                TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
+                TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
+                TestCMakeToolchain.register("Toolchain0", extension);
 
-    assertEquals(1, extension.getPackages().size());
-    assertEquals(1, extension.getToolchains().size());
-    assertEquals(2, extension.getLibraries().size());
-    assertEquals(0, extension.getApplications().size());
-    assertEquals(0, extension.getTests().size());
+                assertEquals(1, extension.getPackages().size());
+                assertEquals(1, extension.getToolchains().size());
+                assertEquals(2, extension.getLibraries().size());
+                assertEquals(0, extension.getApplications().size());
+                assertEquals(0, extension.getTests().size());
 
-    final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
-    final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
-        extension.getApplications(), extension.getTests());
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+                                extension.getApplications(), extension.getTests());
 
-    final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
-    assertEquals(1, toolchains.length);
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
 
-    assertEquals("Toolchain0", toolchains[0].getName());
-    assertEquals(0, toolchains[0].getPackages().size());
-    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-    assertEquals(0, toolchains[0].getStaticLibraries().size());
-    assertEquals(1, toolchains[0].getSharedLibraries().size());
-    assertEquals(0, toolchains[0].getApplications().size());
-    assertEquals(0, toolchains[0].getTests().size());
-  }
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(0, toolchains[0].getPackages().size());
+                assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+                assertEquals(0, toolchains[0].getStaticLibraries().size());
+                assertEquals(1, toolchains[0].getSharedLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(0, toolchains[0].getTests().size());
+        }
 
-  @Test
-  void resolveLibraryLinkDependenciesTest() throws Exception {
-    final Project project = ProjectBuilder.builder().build();
-    final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-        CMakeExtension.class, customTasks);
+        @Test
+        void resolveLibraryLinkDependenciesTest() throws Exception {
+                final Project project = ProjectBuilder.builder().build();
+                final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
+                final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+                                CMakeExtension.class, customTasks);
 
-    TestCMakePackage.register("Package0", extension);
-    TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        Arrays.asList("Toolchain0"));
-    TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-        Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0"),
-            new CMakeLibraryDependencies("InterfaceLibrary0").getLinkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).getLinkShared()),
-        Arrays.asList("-loption"));
+                TestCMakePackage.register("Package0", extension);
+                TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
+                TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
+                                Arrays.asList("Toolchain0"));
+                TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
+                                Arrays.asList(
+                                                new CMakeLibraryDependencies("target").from("Package0"),
+                                                new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface(),
+                                                new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName())
+                                                                .linkShared()),
+                                Arrays.asList("-loption"));
 
-    assertEquals(1, extension.getPackages().size());
-    assertEquals(1, extension.getToolchains().size());
-    assertEquals(2, extension.getLibraries().size());
-    assertEquals(0, extension.getApplications().size());
-    assertEquals(0, extension.getTests().size());
+                assertEquals(1, extension.getPackages().size());
+                assertEquals(1, extension.getToolchains().size());
+                assertEquals(2, extension.getLibraries().size());
+                assertEquals(0, extension.getApplications().size());
+                assertEquals(0, extension.getTests().size());
 
-    final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
-    final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
-        extension.getApplications(), extension.getTests());
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+                                extension.getApplications(), extension.getTests());
 
-    final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
-    assertEquals(1, toolchains.length);
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
 
-    assertEquals("Toolchain0", toolchains[0].getName());
-    assertEquals(1, toolchains[0].getPackages().size());
-    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-    assertEquals(0, toolchains[0].getStaticLibraries().size());
-    assertEquals(1, toolchains[0].getSharedLibraries().size());
-    assertEquals(0, toolchains[0].getApplications().size());
-    assertEquals(0, toolchains[0].getTests().size());
-  }
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(1, toolchains[0].getPackages().size());
+                assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+                assertEquals(0, toolchains[0].getStaticLibraries().size());
+                assertEquals(1, toolchains[0].getSharedLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(0, toolchains[0].getTests().size());
+        }
 
-  @Test
-  void resolveApplicationLinkDependenciesTest() throws Exception {
-    final Project project = ProjectBuilder.builder().build();
-    final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-        CMakeExtension.class, customTasks);
+        @Test
+        void resolveApplicationLinkDependenciesTest() throws Exception {
+                final Project project = ProjectBuilder.builder().build();
+                final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
+                final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+                                CMakeExtension.class, customTasks);
 
-    TestCMakePackage.register("Package0", extension);
-    TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        Arrays.asList("Toolchain0"));
-    TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-        Arrays.asList(
-            new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").from(project.getName()).getLinkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").getLinkShared()),
-        Arrays.asList("-loption"));
+                TestCMakePackage.register("Package0", extension);
+                TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
+                TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
+                                Arrays.asList("Toolchain0"));
+                TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
+                                Arrays.asList(
+                                                new CMakeExecutableDependencies("target").from("Package0"),
+                                                new CMakeExecutableDependencies("InterfaceLibrary0")
+                                                                .from(project.getName()).linkInterface(),
+                                                new CMakeExecutableDependencies("BinaryLibrary0").linkShared()),
+                                Arrays.asList("-loption"));
 
-    assertEquals(1, extension.getPackages().size());
-    assertEquals(1, extension.getToolchains().size());
-    assertEquals(2, extension.getLibraries().size());
-    assertEquals(0, extension.getApplications().size());
-    assertEquals(0, extension.getTests().size());
+                assertEquals(1, extension.getPackages().size());
+                assertEquals(1, extension.getToolchains().size());
+                assertEquals(2, extension.getLibraries().size());
+                assertEquals(0, extension.getApplications().size());
+                assertEquals(0, extension.getTests().size());
 
-    final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
-    final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
-        extension.getApplications(), extension.getTests());
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+                                extension.getApplications(), extension.getTests());
 
-    final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
-    assertEquals(1, toolchains.length);
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
 
-    assertEquals("Toolchain0", toolchains[0].getName());
-    assertEquals(0, toolchains[0].getPackages().size());
-    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-    assertEquals(0, toolchains[0].getStaticLibraries().size());
-    assertEquals(1, toolchains[0].getSharedLibraries().size());
-    assertEquals(0, toolchains[0].getApplications().size());
-    assertEquals(0, toolchains[0].getTests().size());
-  }
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(0, toolchains[0].getPackages().size());
+                assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+                assertEquals(0, toolchains[0].getStaticLibraries().size());
+                assertEquals(1, toolchains[0].getSharedLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(0, toolchains[0].getTests().size());
+        }
 
-  @Test
-  void resolveTestLinkDependenciesTest() throws Exception {
-    final Project project = ProjectBuilder.builder().build();
-    final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-        CMakeExtension.class, customTasks);
+        @Test
+        void resolveTestLinkDependenciesTest() throws Exception {
+                final Project project = ProjectBuilder.builder().build();
+                final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
+                final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+                                CMakeExtension.class, customTasks);
 
-    TestCMakePackage.register("Package0", extension);
-    TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        Arrays.asList("Toolchain0"));
-    TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
-        Arrays.asList(
-            new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").from(project.getName()).getLinkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").getLinkShared()),
-        Arrays.asList("-loption"));
+                TestCMakePackage.register("Package0", extension);
+                TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
+                TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
+                                Arrays.asList("Toolchain0"));
+                TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
+                                Arrays.asList(
+                                                new CMakeExecutableDependencies("target").from("Package0"),
+                                                new CMakeExecutableDependencies("InterfaceLibrary0")
+                                                                .from(project.getName()).linkInterface(),
+                                                new CMakeExecutableDependencies("BinaryLibrary0").linkShared()),
+                                Arrays.asList("-loption"));
 
-    assertEquals(1, extension.getPackages().size());
-    assertEquals(1, extension.getToolchains().size());
-    assertEquals(2, extension.getLibraries().size());
-    assertEquals(0, extension.getApplications().size());
-    assertEquals(0, extension.getTests().size());
+                assertEquals(1, extension.getPackages().size());
+                assertEquals(1, extension.getToolchains().size());
+                assertEquals(2, extension.getLibraries().size());
+                assertEquals(0, extension.getApplications().size());
+                assertEquals(0, extension.getTests().size());
 
-    final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
-    final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
-        extension.getApplications(), extension.getTests());
+                final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(),
+                                extension.getToolchains());
+                final Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+                                extension.getApplications(), extension.getTests());
 
-    final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
-    assertEquals(1, toolchains.length);
+                final CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
+                assertEquals(1, toolchains.length);
 
-    assertEquals("Toolchain0", toolchains[0].getName());
-    assertEquals(0, toolchains[0].getPackages().size());
-    assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-    assertEquals(0, toolchains[0].getStaticLibraries().size());
-    assertEquals(1, toolchains[0].getSharedLibraries().size());
-    assertEquals(0, toolchains[0].getApplications().size());
-    assertEquals(0, toolchains[0].getTests().size());
-  }
+                assertEquals("Toolchain0", toolchains[0].getName());
+                assertEquals(0, toolchains[0].getPackages().size());
+                assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+                assertEquals(0, toolchains[0].getStaticLibraries().size());
+                assertEquals(1, toolchains[0].getSharedLibraries().size());
+                assertEquals(0, toolchains[0].getApplications().size());
+                assertEquals(0, toolchains[0].getTests().size());
+        }
 }

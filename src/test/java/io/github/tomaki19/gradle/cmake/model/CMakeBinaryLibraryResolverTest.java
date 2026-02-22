@@ -37,8 +37,8 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
         Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0").getForStaticBuild(),
-            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).getLinkShared().getForStaticBuild()),
+            new CMakeLibraryDependencies("target").from("Package0").forStaticBuild(),
+            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).linkShared().forStaticBuild()),
         Arrays.asList("-loption"));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension);
 
@@ -142,9 +142,9 @@ public class CMakeBinaryLibraryResolverTest {
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
         Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0").getForSharedBuild(),
-            new CMakeLibraryDependencies("InterfaceLibrary0").getLinkInterface().getForSharedBuild(),
-            new CMakeLibraryDependencies("BinaryLibrary0").getLinkShared().getForSharedBuild()),
+            new CMakeLibraryDependencies("target").from("Package0").forSharedBuild(),
+            new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface().forSharedBuild(),
+            new CMakeLibraryDependencies("BinaryLibrary0").linkShared().forSharedBuild()),
         Arrays.asList("-loption"));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"));
@@ -187,8 +187,8 @@ public class CMakeBinaryLibraryResolverTest {
         Arrays.asList("Toolchain0"),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0"),
-            new CMakeLibraryDependencies("InterfaceLibrary0").getLinkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").getLinkShared()),
+            new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface(),
+            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()),
         Arrays.asList("-loption"));
 
     assertEquals(1, extension.getPackages().size());
@@ -229,8 +229,8 @@ public class CMakeBinaryLibraryResolverTest {
         Arrays.asList("Toolchain0"),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0"),
-            new CMakeLibraryDependencies("InterfaceLibrary0").from(project.getName()).getLinkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").getLinkShared()),
+            new CMakeLibraryDependencies("InterfaceLibrary0").from(project.getName()).linkInterface(),
+            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()),
         Arrays.asList("-loption"));
 
     assertEquals(1, extension.getPackages().size());

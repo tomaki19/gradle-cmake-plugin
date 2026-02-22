@@ -55,6 +55,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeLine(outputStream);
     write(outputStream, "project( %s LANGUAGES C CXX )", getProjectName());
     writeLine(outputStream);
+    write(outputStream, "include( GNUInstallDirs )");
     write(outputStream, """
         set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "" )
         set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON CACHE INTERNAL "" )
@@ -217,8 +218,8 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeLine(outputStream);
     write(outputStream, indent, "add_library( %s STATIC )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
-    writeTargetSources(outputStream, indent, target, "PUBLIC", component.getSources());
     writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", component.getHeaders());
+    writeTargetSources(outputStream, indent, target, "PRIVATE", component.getSources());
     writePrivateCompiling(outputStream, indent, target, component);
     writePublicCompiling(outputStream, indent, target, component);
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
@@ -238,7 +239,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     write(outputStream, indent, "add_library( %s SHARED )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
     writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", component.getHeaders());
-    writeTargetSources(outputStream, indent, target, "PUBLIC", component.getSources());
+    writeTargetSources(outputStream, indent, target, "PRIVATE", component.getSources());
     writePrivateCompiling(outputStream, indent, target, component);
     writePublicCompiling(outputStream, indent, target, component);
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
@@ -255,7 +256,7 @@ public final class CMakeListsFile extends CMakeFileContent {
       throws IOException {
     writeLine(outputStream);
     write(outputStream, indent, "add_executable( %s )", target);
-    writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", component.getHeaders());
+    writeTargetIncludeDirectories(outputStream, indent, target, "PRIVATE", component.getHeaders());
     writeTargetSources(outputStream, indent, target, "PRIVATE", component.getSources());
     writePrivateCompiling(outputStream, indent, target, component);
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
@@ -283,6 +284,7 @@ public final class CMakeListsFile extends CMakeFileContent {
       write(outputStream, indent + 1, "\"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/%s>\"",
           workingDir.toPath().relativize(headerDir.toPath()));
     }
+    write(outputStream, indent + 1, "\"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>\"");
     write(outputStream, indent, ")");
   }
 
@@ -290,10 +292,9 @@ public final class CMakeListsFile extends CMakeFileContent {
       final String access,
       final Collection<File> sources) throws IOException {
     write(outputStream, indent, "target_sources( %s %s", target, access);
-    final File workingDir = getProjectDirectory().getAsFile();
+    final Path workingDir = getProjectDirectory().getAsFile().toPath();
     for (final File sourceFile : sources) {
-      write(outputStream, indent + 1, "\"${CMAKE_CURRENT_SOURCE_DIR}/%s\"",
-          workingDir.toPath().relativize(sourceFile.toPath()));
+      write(outputStream, indent + 1, "\"${CMAKE_CURRENT_SOURCE_DIR}/%s\"", workingDir.relativize(sourceFile.toPath()));
     }
     write(outputStream, indent, ")");
   }
@@ -410,6 +411,42 @@ public final class CMakeListsFile extends CMakeFileContent {
     }
     write(outputStream, indent, ")");
   }
+
+  // private void writeInstallTargets(final FileOutputStream outputStream, final
+  // int indent, final String target,
+  // final CMakeResolvedToolchain toolchain, final String buildConfig,
+  // final Collection<CMakeResolvedProjectDependency> projectPackageDependencies)
+  // throws IOException {
+  // write(outputStream, indent, "install( TARGETS %s", target);
+  // write(outputStream, indent + 1, "COMPONENT %s", target);
+  // write(outputStream, indent + 1, "EXPORT %s-target", target);
+  // write(outputStream, indent + 1, "RUNTIME_DEPENDENCY_SET runtime");
+  // write(outputStream, indent + 1, "RUNTIME_DEPENDENCIES");
+  // write(outputStream, indent, ")");
+
+  // final Path projectDir = getProjectDirectory().getAsFile().toPath();
+  // final Path exportPath =
+  // getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath();
+  // write(outputStream, indent, "install( EXPORT %s-target", target);
+  // write(outputStream, indent + 1, "COMPONENT %s-target", target);
+  // write(outputStream, indent + 1, "DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/%s",
+  // projectDir.relativize(exportPath));
+  // write(outputStream, indent + 1, "NAMESPACE ${PROJECT_NAME}::", target);
+  // write(outputStream, indent, ")");
+
+  // write(outputStream, indent, "install( RUNTIME_DEPENDENCY_SET runtime )",
+  // target);
+  // }
+
+  // private void writeInstallImporedRuntimeArtefacts(final FileOutputStream
+  // outputStream, final int indent,
+  // final String target, final CMakeResolvedToolchain toolchain, final String
+  // buildConfig) throws IOException {
+  // write(outputStream, indent, "install( IMPORTED_RUNTIME_ARTIFACTS %s",
+  // target);
+  // write(outputStream, indent + 1, "COMPONENT %s", target);
+  // write(outputStream, indent, ")");
+  // }
 
   private void writeStripDebugCommand(final FileOutputStream outputStream, final int indent, final String target)
       throws IOException {

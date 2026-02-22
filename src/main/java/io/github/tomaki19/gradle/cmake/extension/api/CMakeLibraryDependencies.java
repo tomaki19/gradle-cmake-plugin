@@ -21,17 +21,17 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeLibraryDependencies getLinkStatic() {
+  public CMakeLibraryDependencies linkStatic() {
     setLinkage(CMakeLinkType.STATIC);
     return this;
   }
 
-  public CMakeLibraryDependencies getLinkShared() {
+  public CMakeLibraryDependencies linkShared() {
     setLinkage(CMakeLinkType.SHARED);
     return this;
   }
 
-  public CMakeLibraryDependencies getLinkInterface() {
+  public CMakeLibraryDependencies linkInterface() {
     setLinkage(CMakeLinkType.INTERFACE);
     return this;
   }
@@ -40,12 +40,12 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
     return buildType;
   }
 
-  public CMakeLibraryDependencies getForStaticBuild() {
+  public CMakeLibraryDependencies forStaticBuild() {
     this.buildType = Optional.of(CMakeLinkType.STATIC);
     return this;
   }
 
-  public CMakeLibraryDependencies getForSharedBuild() {
+  public CMakeLibraryDependencies forSharedBuild() {
     this.buildType = Optional.of(CMakeLinkType.SHARED);
     return this;
   }

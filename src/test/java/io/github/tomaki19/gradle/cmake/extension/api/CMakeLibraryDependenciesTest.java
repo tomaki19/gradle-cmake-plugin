@@ -33,35 +33,35 @@ class CMakeLibraryDependenciesTest {
   @Test
   void testGetLinkStatic() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.getLinkStatic();
+    deps.linkStatic();
     assertEquals("static", deps.getLinkage().get().toString());
   }
 
   @Test
   void testGetLinkShared() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.getLinkShared();
+    deps.linkShared();
     assertEquals("shared", deps.getLinkage().get().toString());
   }
 
   @Test
   void testGetLinkInterface() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.getLinkInterface();
+    deps.linkInterface();
     assertEquals("interface", deps.getLinkage().get().toString());
   }
 
   @Test
   void testGetForStaticBuild() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.getForStaticBuild();
+    deps.forStaticBuild();
     assertEquals("static", deps.getBuildType().get().toString());
   }
 
   @Test
   void testGetForSharedBuild() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.getForSharedBuild();
+    deps.forSharedBuild();
     assertEquals("shared", deps.getBuildType().get().toString());
   }
 }

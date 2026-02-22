@@ -41,8 +41,8 @@ public class CMakeTestResolverTest {
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").getLinkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").from(project.getName()).getLinkShared()),
+            new CMakeExecutableDependencies("InterfaceLibrary0").linkInterface(),
+            new CMakeExecutableDependencies("BinaryLibrary0").from(project.getName()).linkShared()),
         Arrays.asList("-loption"));
     TestCMakeTest.register("Test0", extension);
 
@@ -84,13 +84,13 @@ public class CMakeTestResolverTest {
     TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").getLinkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").from(project.getName()).getLinkShared()),
+            new CMakeExecutableDependencies("InterfaceLibrary0").linkInterface(),
+            new CMakeExecutableDependencies("BinaryLibrary0").from(project.getName()).linkShared()),
         Arrays.asList("-loption"));
     TestCMakeToolchain.registerWithTestDependencies("Toolchain1", extension,
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package1"),
-            new CMakeExecutableDependencies("InterfaceLibrary1").from(project.getName()).getLinkInterface()),
+            new CMakeExecutableDependencies("InterfaceLibrary1").from(project.getName()).linkInterface()),
         Arrays.asList("-loption"));
     TestCMakeTest.register("Test0", extension,
         Arrays.asList("Toolchain1", "Toolchain0"));
@@ -191,8 +191,8 @@ public class CMakeTestResolverTest {
     TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").from(project.getName()).getLinkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").getLinkShared()),
+            new CMakeExecutableDependencies("InterfaceLibrary0").from(project.getName()).linkInterface(),
+            new CMakeExecutableDependencies("BinaryLibrary0").linkShared()),
         Arrays.asList("-loption"));
     TestCMakeTest.register("Test0", extension,
         Arrays.asList("Toolchain0"));
@@ -235,8 +235,8 @@ public class CMakeTestResolverTest {
         Arrays.asList("Toolchain0"),
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").from(project.getName()).getLinkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").getLinkShared()),
+            new CMakeExecutableDependencies("InterfaceLibrary0").from(project.getName()).linkInterface(),
+            new CMakeExecutableDependencies("BinaryLibrary0").linkShared()),
         Arrays.asList("-loption"));
 
     assertEquals(1, extension.getPackages().size());
