@@ -4,11 +4,12 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -16,7 +17,7 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
-import io.github.tomaki19.gradle.cmake.files.CMakeConfigFile;
+import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
@@ -56,19 +57,21 @@ public final class CMakeTaskRegistry {
   public TaskProvider<CMakeAssemble> assembleListsTask(final TaskContainer tasks,
       final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
-    final File outputFile = project.getLayout().getProjectDirectory().file(CMakeListsFile.name()).getAsFile();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project.getName(),
-        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()), outputFile);
+    return tasks.register(taskName, CMakeAssemble.class, Arrays.asList(new CMakeListsFile(toolchains, project.getName(),
+        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get())),
+        project.getLayout().getProjectDirectory());
   }
 
-  public TaskProvider<CMakeAssemble> assembleConfigTask(final TaskContainer tasks,
-      final CMakeResolvedToolchain toolchain, final Project project) throws FileNotFoundException {
-    final String taskName = CMakeTasksConventions.assembleConfigTaskName(toolchain.getName());
-    final File outputFile = project.getLayout().getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).get()
-        .file(CMakeConfigFile.name(CMakeFileConventions.cmakeConfigName(project.getName(), toolchain.getName())))
-        .getAsFile();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeConfigFile(toolchain, project.getName(),
-        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()), outputFile);
+  public TaskProvider<CMakeAssemble> assembleModulesTask(final TaskContainer tasks,
+      final Collection<CMakeResolvedLibrary> libraries, final CMakeResolvedToolchain toolchain,
+      final String buildConfig, final Project project) throws FileNotFoundException {
+    final String taskName = CMakeTasksConventions.assembleModulesTaskName(toolchain.getName(), buildConfig);
+    final Collection<CMakeModuleFile> moduleFiles = libraries.stream()
+        .map((library) -> new CMakeModuleFile(library, toolchain, buildConfig, project.getName(),
+            project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()))
+        .collect(Collectors.toList());
+    return tasks.register(taskName, CMakeAssemble.class, moduleFiles,
+        project.getLayout().getBuildDirectory().get().dir(CMakeFileConventions.CMAKE_EXPORT_PATH));
   }
 
   public TaskProvider<CMakeCustomExec> customExecTask(final TaskContainer tasks, final CMakeCustomTaskProto taskProto) {
@@ -85,11 +88,10 @@ public final class CMakeTaskRegistry {
   }
 
   public TaskProvider<CMakeBuildLibrary> buildTask(final TaskContainer tasks, final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String linkage, final String buildConfig) {
-    final String taskName = CMakeTasksConventions.buildTaskName(library.getName(), toolchain.getName(),
-        linkage, buildConfig);
-    return tasks.register(taskName, CMakeBuildLibrary.class, library, toolchain, linkage,
-        buildConfig);
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String taskName = CMakeTasksConventions.buildTaskName(library.getName(), library.getLinkType(),
+        toolchain.getName(), buildConfig);
+    return tasks.register(taskName, CMakeBuildLibrary.class, library, toolchain, buildConfig);
   }
 
   public TaskProvider<CMakeBuildExecutable> buildTask(final TaskContainer tasks, final CMakeResolvedBinary<?> binary,
@@ -100,11 +102,10 @@ public final class CMakeTaskRegistry {
   }
 
   public TaskProvider<CMakePackageLibrary> packageTask(final TaskContainer tasks, final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String linkage, final String buildConfig) {
+      final CMakeLinkType linkType, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.packageTaskName(library.getName(), toolchain.getName(),
-        linkage, buildConfig);
-    return tasks.register(taskName, CMakePackageLibrary.class, library, toolchain, linkage,
         buildConfig);
+    return tasks.register(taskName, CMakePackageLibrary.class, library, linkType, toolchain, buildConfig);
   }
 
   public TaskProvider<CMakePackageExecutable> packageTask(final TaskContainer tasks,
@@ -131,16 +132,48 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName);
   }
 
-  public static void configureRemote(final CMakeConfigure task, final CMakeResolvedToolchain toolchain,
-      final String buildConfig, final Project project) {
-    toolchain.getProjects().stream()
-        .filter(dependency -> !Objects.equals(project.getName(), dependency.getName()))
-        .forEach(dependency -> {
-          task.dependsOn(CMakeTasksConventions.assembleConfigTaskName(dependency.getName(),
-              toolchain.getName()));
-          task.dependsOn(CMakeTasksConventions.configureTaskName(dependency.getName(),
-              toolchain.getName(), buildConfig));
-        });
+  public static void configureRemote(final CMakeAssemble task, final Project project,
+      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
+    dependencies.addAll(library.getPrivateProjectDependencies());
+    dependencies.addAll(library.getPublicProjectDependencies());
+    configureRemote(task, project, toolchain, buildConfig, dependencies);
+  }
+
+  public static void configureRemote(final CMakeAssemble task, final Project project,
+      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    configureRemote(task, project, toolchain, buildConfig, executable.getPrivateProjectDependencies());
+  }
+
+  private static void configureRemote(final CMakeAssemble task, final Project project,
+      final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final Collection<CMakeResolvedProjectDependency> dependencies) {
+    dependencies.stream()
+        .filter(dependency -> !Objects.equals(project.getName(), dependency.getProjectName()))
+        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.assembleModulesTaskName(dependency.getProjectName(),
+            toolchain.getName(), buildConfig)));
+  }
+
+  public static void configureRemote(final CMakeConfigure task, final Project project,
+      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
+    dependencies.addAll(library.getPrivateProjectDependencies());
+    dependencies.addAll(library.getPublicProjectDependencies());
+    configureRemote(task, project, toolchain, buildConfig, dependencies);
+  }
+
+  public static void configureRemote(final CMakeConfigure task, final Project project,
+      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    configureRemote(task, project, toolchain, buildConfig, executable.getPrivateProjectDependencies());
+  }
+
+  private static void configureRemote(final CMakeConfigure task, final Project project,
+      final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final Collection<CMakeResolvedProjectDependency> dependencies) {
+    dependencies.stream()
+        .filter(dependency -> !Objects.equals(project.getName(), dependency.getProjectName()))
+        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.configureTaskName(dependency.getProjectName(),
+            toolchain.getName(), buildConfig)));
   }
 
   public static void configureRemote(final CMakeBuild task, final CMakeResolvedLibrary library,
@@ -159,10 +192,10 @@ public final class CMakeTaskRegistry {
   private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Collection<CMakeResolvedProjectDependency> dependencies) {
     dependencies.stream()
-        .filter(dependency -> !Objects.equals(dependency.getLinkage(), CMakeLinkType.INTERFACE.toString()))
-        .forEach(
-            dependency -> task.dependsOn(CMakeTasksConventions.buildTaskName(dependency.getResolvedProject().getName(),
-                dependency.getName(), toolchain.getName(), dependency.getLinkage(), buildConfig)));
+        .filter((dependency) -> !Objects.equals(dependency.getLinkType(), CMakeLinkType.INTERFACE))
+        .forEach((dependency) -> task.dependsOn(CMakeTasksConventions.buildTaskName(
+            dependency.getResolvedProject().getName(), dependency.getName(), dependency.getLinkType(),
+            toolchain.getName(), buildConfig)));
   }
 
 }

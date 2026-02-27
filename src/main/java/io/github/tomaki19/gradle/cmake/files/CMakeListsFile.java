@@ -5,13 +5,13 @@
 package io.github.tomaki19.gradle.cmake.files;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 
 import org.gradle.api.file.Directory;
 
@@ -21,31 +21,26 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackageDependency;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProject;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public final class CMakeListsFile extends CMakeFileContent {
+
+  public static final String NAME = "CMakeLists.txt";
 
   private static final String CMAKE_MINIMUM_VERSION = "3.21";
 
   private final Collection<CMakeResolvedToolchain> toolchains;
 
   public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final String projectName,
-      final Directory projectDirectory, final Directory buildDirectory)
-      throws FileNotFoundException {
-    super(projectName, projectDirectory, buildDirectory);
+      final Directory projectDirectory, final Directory buildDirectory) {
+    super(NAME, projectName, projectDirectory, buildDirectory);
     this.toolchains = toolchains;
-  }
-
-  public static String name() {
-    return "CMakeLists.txt";
   }
 
   @Override
   public void writeTo(final FileOutputStream outputStream) throws IOException {
     writeHeader(outputStream);
-    writeDependencies(outputStream, toolchains);
     writeLibraries(outputStream, toolchains);
     writeApplications(outputStream, toolchains);
     writeTests(outputStream, toolchains);
@@ -53,9 +48,7 @@ public final class CMakeListsFile extends CMakeFileContent {
 
   private void writeHeader(final FileOutputStream outputStream) throws IOException {
     write(outputStream, "cmake_minimum_required( VERSION %s )", CMAKE_MINIMUM_VERSION);
-    writeLine(outputStream);
     write(outputStream, "project( %s LANGUAGES C CXX )", getProjectName());
-    writeLine(outputStream);
     write(outputStream, "include( GNUInstallDirs )");
     write(outputStream, """
         set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "" )
@@ -68,6 +61,7 @@ public final class CMakeListsFile extends CMakeFileContent {
         cmake_print_variables(CMAKE_BUILD_TYPE)
         cmake_print_variables(CMAKE_TOOLCHAIN_FILE)
         cmake_print_variables(CMAKE_TOOLCHAIN_NAME)
+        cmake_print_variables(CMAKE_MODULE_PATH)
         cmake_print_variables(CMAKE_PREFIX_PATH)
         cmake_print_variables(CMAKE_FIND_ROOT_PATH)
         cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
@@ -77,78 +71,49 @@ public final class CMakeListsFile extends CMakeFileContent {
         """);
   }
 
-  private void writeDependencies(final FileOutputStream outputStream,
-      final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
-    for (final CMakeResolvedToolchain toolchain : toolchains) {
-      if (!toolchain.getPackages().isEmpty() || !toolchain.getProjects().isEmpty()) {
-        writeLine(outputStream);
-        write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        writeGlobalPackageDependencies(outputStream, 1, toolchain.getPackages());
-        writeProjectPackageDependencies(outputStream, 1, toolchain.getProjects(), toolchain);
-        write(outputStream, "endif()");
-      }
-    }
-  }
-
-  private void writeProjectPackageDependencies(final FileOutputStream outputStream, final int indent,
-      final Collection<CMakeResolvedProject> dependencies, final CMakeResolvedToolchain toolchain) throws IOException {
-    for (final CMakeResolvedProject resolvedProject : dependencies) {
-      if (!Objects.equals(getProjectName(), resolvedProject.getName())) {
-        final String target = CMakeFileConventions.cmakeConfigName(resolvedProject.getName(), toolchain.getName());
-        write(outputStream, indent, "find_package( %s CONFIG REQUIRED", target);
-        write(outputStream, indent + 1, "NO_CMAKE_ENVIRONMENT_PATH");
-        write(outputStream, indent + 1, "NO_CMAKE_FIND_ROOT_PATH");
-        write(outputStream, indent + 1, "NO_CMAKE_SYSTEM_PATH");
-        write(outputStream, indent + 1, "NO_SYSTEM_ENVIRONMENT_PATH");
-        write(outputStream, indent, ")");
-      }
-    }
-  }
-
-  private void writeGlobalPackageDependencies(final FileOutputStream outputStream, final int indent,
-      final Collection<CMakeResolvedPackage> dependencies) throws IOException {
-    for (final CMakeResolvedPackage resolvedPackage : dependencies) {
-      for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-        write(outputStream, indent, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
-            property.getValue().toUpperCase());
-      }
-      if (resolvedPackage.getComponents().isEmpty()) {
-        if (resolvedPackage.isConfigMode()) {
-          write(outputStream, indent, "find_package( %s REQUIRED CONFIG )",
-              resolvedPackage.getName());
-        } else {
-          write(outputStream, indent, "find_package( %s REQUIRED )",
-              resolvedPackage.getName());
-        }
-      } else {
-        write(outputStream, indent, "find_package( %s REQUIRED", resolvedPackage.getName());
-        write(outputStream, indent + 1, "COMPONENTS");
-        for (final String component : resolvedPackage.getComponents()) {
-          write(outputStream, indent + 2, component);
-        }
-        if (resolvedPackage.isConfigMode()) {
-          write(outputStream, indent + 1, "CONFIG");
-        }
-        write(outputStream, indent, ")");
-      }
-    }
-  }
-
   private void writeLibraries(final FileOutputStream outputStream,
       final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
-      if (!toolchain.getInterfaceLibraries().isEmpty() || !toolchain.getStaticLibraries().isEmpty()
+      if (!toolchain.getInterfaceLibraries().isEmpty()
+          || !toolchain.getStaticLibraries().isEmpty()
           || !toolchain.getSharedLibraries().isEmpty()) {
-        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final String buildConfig : toolchain.getBuildConfigs()) {
-          for (final CMakeResolvedLibrary component : toolchain.getInterfaceLibraries()) {
+        for (final CMakeResolvedLibrary component : toolchain.getInterfaceLibraries()) {
+          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
+          packageDependencies.addAll(component.getPrivatePackageDependencies());
+          packageDependencies.addAll(component.getPublicPackageDependencies());
+          writePackageDependencies(outputStream, 1, packageDependencies);
+          for (final String buildConfig : toolchain.getBuildConfigs()) {
+            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
+            projectDependencies.addAll(component.getPrivateProjectDependencies());
+            projectDependencies.addAll(component.getPublicProjectDependencies());
+            writeProjectDependencies(outputStream, 1, projectDependencies, toolchain, buildConfig);
             writeInterfaceLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
-          for (final CMakeResolvedLibrary component : toolchain.getStaticLibraries()) {
+        }
+        for (final CMakeResolvedLibrary component : toolchain.getStaticLibraries()) {
+          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
+          packageDependencies.addAll(component.getPrivatePackageDependencies());
+          packageDependencies.addAll(component.getPublicPackageDependencies());
+          writePackageDependencies(outputStream, 1, packageDependencies);
+          for (final String buildConfig : toolchain.getBuildConfigs()) {
+            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
+            projectDependencies.addAll(component.getPrivateProjectDependencies());
+            projectDependencies.addAll(component.getPublicProjectDependencies());
+            writeProjectDependencies(outputStream, 1, projectDependencies, toolchain, buildConfig);
             writeStaticLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
-          for (final CMakeResolvedLibrary component : toolchain.getSharedLibraries()) {
+        }
+        for (final CMakeResolvedLibrary component : toolchain.getSharedLibraries()) {
+          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
+          packageDependencies.addAll(component.getPrivatePackageDependencies());
+          packageDependencies.addAll(component.getPublicPackageDependencies());
+          writePackageDependencies(outputStream, 1, packageDependencies);
+          for (final String buildConfig : toolchain.getBuildConfigs()) {
+            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
+            projectDependencies.addAll(component.getPrivateProjectDependencies());
+            projectDependencies.addAll(component.getPublicProjectDependencies());
+            writeProjectDependencies(outputStream, 1, projectDependencies, toolchain, buildConfig);
             writeSharedLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
         }
@@ -161,10 +126,12 @@ public final class CMakeListsFile extends CMakeFileContent {
       final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getApplications().isEmpty()) {
-        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final String buildConfig : toolchain.getBuildConfigs()) {
-          for (final CMakeResolvedExecutable component : toolchain.getApplications()) {
+        for (final CMakeResolvedExecutable component : toolchain.getApplications()) {
+          writePackageDependencies(outputStream, 1, component.getPrivatePackageDependencies());
+          for (final String buildConfig : toolchain.getBuildConfigs()) {
+            writeProjectDependencies(outputStream, 1, component.getPrivateProjectDependencies(), toolchain,
+                buildConfig);
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
                 buildConfig);
             writeExecutable(outputStream, 1, target, component, toolchain, buildConfig);
@@ -179,13 +146,14 @@ public final class CMakeListsFile extends CMakeFileContent {
       final Collection<CMakeResolvedToolchain> toolchains) throws IOException {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getTests().isEmpty()) {
-        writeLine(outputStream);
         write(outputStream, "enable_testing()");
         write(outputStream, "include( CTest )");
-        writeLine(outputStream);
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final String buildConfig : toolchain.getBuildConfigs()) {
-          for (final CMakeResolvedExecutable component : toolchain.getTests()) {
+        for (final CMakeResolvedExecutable component : toolchain.getTests()) {
+          writePackageDependencies(outputStream, 1, component.getPrivatePackageDependencies());
+          for (final String buildConfig : toolchain.getBuildConfigs()) {
+            writeProjectDependencies(outputStream, 1, component.getPrivateProjectDependencies(), toolchain,
+                buildConfig);
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
                 buildConfig);
             writeExecutable(outputStream, 1, target, component, toolchain, buildConfig);
@@ -200,9 +168,8 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeInterfaceLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
-        CMakeLinkType.INTERFACE.toString(), buildConfig);
-    writeLine(outputStream);
+    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkType.INTERFACE,
+        toolchain.getName(), buildConfig);
     write(outputStream, indent, "add_library( %s INTERFACE )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
     writeTargetIncludeDirectories(outputStream, indent, target, "INTERFACE", component.getHeaders());
@@ -211,12 +178,11 @@ public final class CMakeListsFile extends CMakeFileContent {
   }
 
   private void writeStaticLibrary(final FileOutputStream outputStream, final int indent,
-      final CMakeResolvedLibrary component,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
-    final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
-        CMakeLinkType.STATIC.toString(), buildConfig);
+      final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
+      throws IOException {
+    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkType.STATIC,
+        toolchain.getName(), buildConfig);
     final String outputName = component.getOutputName();
-    writeLine(outputStream);
     write(outputStream, indent, "add_library( %s STATIC )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
     writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", component.getHeaders());
@@ -234,9 +200,8 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeSharedLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
-        CMakeLinkType.SHARED.toString(), buildConfig);
-    writeLine(outputStream);
+    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkType.SHARED,
+        toolchain.getName(), buildConfig);
     write(outputStream, indent, "add_library( %s SHARED )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
     writeTargetIncludeDirectories(outputStream, indent, target, "PUBLIC", component.getHeaders());
@@ -255,7 +220,6 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeExecutable(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    writeLine(outputStream);
     write(outputStream, indent, "add_executable( %s )", target);
     writeTargetIncludeDirectories(outputStream, indent, target, "PRIVATE", component.getHeaders());
     writeTargetSources(outputStream, indent, target, "PRIVATE", component.getSources());
@@ -263,6 +227,8 @@ public final class CMakeListsFile extends CMakeFileContent {
     writePrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeOutputTargetProperties(outputStream, indent, target, component.getOutputName(), toolchain,
         buildConfig);
+    writeInstallTargets(outputStream, indent, target, toolchain, buildConfig,
+        component.getPrivateProjectDependencies());
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, 1, target);
     }
@@ -270,11 +236,46 @@ public final class CMakeListsFile extends CMakeFileContent {
 
   private void writeAddTest(final FileOutputStream outputStream, final int indent, final String target,
       final String outputName) throws IOException {
-    writeLine(outputStream);
     write(outputStream, indent, "add_test(");
     write(outputStream, indent + 1, "NAME %s", target);
     write(outputStream, indent + 1, "COMMAND $<TARGET_FILE:%s>", target);
     write(outputStream, indent, ")");
+  }
+
+  private void writePackageDependencies(final FileOutputStream outputStream, final int indent,
+      final Collection<CMakeResolvedPackageDependency> dependencies) throws IOException {
+    for (final CMakeResolvedPackageDependency dependency : dependencies) {
+      final CMakeResolvedPackage resolvedPackage = dependency.getResolvedPackage();
+      write(outputStream, indent, "find_package( %s REQUIRED", resolvedPackage.getName());
+      if (resolvedPackage.isModuleMode()) {
+        write(outputStream, indent + 1, "MODULE");
+      } else {
+        write(outputStream, indent + 1, "CONFIG");
+      }
+      if (!resolvedPackage.getComponents().isEmpty()) {
+        write(outputStream, indent + 1, "COMPONENTS");
+        for (final String component : resolvedPackage.getComponents()) {
+          write(outputStream, indent + 2, component);
+        }
+      }
+      write(outputStream, indent, ")");
+      for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
+        write(outputStream, indent, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
+            property.getValue().toUpperCase());
+      }
+    }
+  }
+
+  private void writeProjectDependencies(final FileOutputStream outputStream, final int indent,
+      final Collection<CMakeResolvedProjectDependency> dependencies, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) throws IOException {
+    for (final CMakeResolvedProjectDependency dependency : dependencies) {
+      if (!Objects.equals(getProjectName(), dependency.getProjectName())) {
+        final String projectTarget = CMakeFileConventions.projectTarget(dependency.getProjectName(),
+            dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig);
+        write(outputStream, indent, "find_package( %s REQUIRED MODULE )", projectTarget);
+      }
+    }
   }
 
   private void writeTargetIncludeDirectories(final FileOutputStream outputStream, final int indent, final String target,
@@ -372,9 +373,8 @@ public final class CMakeListsFile extends CMakeFileContent {
       throws IOException {
     write(outputStream, indent, "target_link_libraries( %s %s", target, type);
     for (final CMakeResolvedProjectDependency projectModule : projectDependencies) {
-      write(outputStream, indent + 1, "%s::%s", projectModule.getProjectName(),
-          CMakeFileConventions.buildTarget(projectModule.getName(), toolchain.getName(), projectModule.getLinkage(),
-              buildConfig));
+      write(outputStream, indent + 1, "%s", CMakeFileConventions.buildTarget(projectModule.getProjectName(),
+          projectModule.getName(), projectModule.getLinkType(), toolchain.getName(), buildConfig));
     }
     for (final CMakeResolvedPackageDependency packageDependency : packageDependencies) {
       write(outputStream, indent + 1, "%s::%s", packageDependency.getTargetPrefix(), packageDependency.getName());
@@ -414,41 +414,73 @@ public final class CMakeListsFile extends CMakeFileContent {
     write(outputStream, indent, ")");
   }
 
-  // private void writeInstallTargets(final FileOutputStream outputStream, final
-  // int indent, final String target,
-  // final CMakeResolvedToolchain toolchain, final String buildConfig,
-  // final Collection<CMakeResolvedProjectDependency> projectPackageDependencies)
-  // throws IOException {
-  // write(outputStream, indent, "install( TARGETS %s", target);
-  // write(outputStream, indent + 1, "COMPONENT %s", target);
-  // write(outputStream, indent + 1, "EXPORT %s-target", target);
-  // write(outputStream, indent + 1, "RUNTIME_DEPENDENCY_SET runtime");
-  // write(outputStream, indent + 1, "RUNTIME_DEPENDENCIES");
-  // write(outputStream, indent, ")");
+  private void writeInstallTargets(final FileOutputStream outputStream, final int indent, final String target,
+      final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final Collection<CMakeResolvedProjectDependency> dependencies) throws IOException {
 
-  // final Path projectDir = getProjectDirectory().getAsFile().toPath();
-  // final Path exportPath =
-  // getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath();
-  // write(outputStream, indent, "install( EXPORT %s-target", target);
-  // write(outputStream, indent + 1, "COMPONENT %s-target", target);
-  // write(outputStream, indent + 1, "DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/%s",
-  // projectDir.relativize(exportPath));
-  // write(outputStream, indent + 1, "NAMESPACE ${PROJECT_NAME}::", target);
-  // write(outputStream, indent, ")");
+    // for (final CMakeResolvedProjectDependency dependency : dependencies) {
+    // final String libTarget = "%s::%s".formatted(dependency.getProjectName(),
+    // CMakeFileConventions.buildTarget(dependency.getName(),
+    // dependency.getLinkType(), toolchain.getName(),
+    // buildConfig));
+    // write(outputStream, indent, "get_target_property(_location %s LOCATION)",
+    // libTarget);
+    // write(outputStream, indent, "message(\"Found %s shared library file:
+    // ${_location}\")", libTarget);
 
-  // write(outputStream, indent, "install( RUNTIME_DEPENDENCY_SET runtime )",
-  // target);
-  // }
+    write(outputStream, indent, "install( TARGETS %s", target);
+    // write(outputStream, indent, "install( TARGETS");
+    // write(outputStream, indent + 1, "%s", target);
+    // for (final CMakeResolvedProjectDependency dependency : dependencies) {
+    // write(outputStream, indent + 1, "%s::%s", dependency.getProjectName(),
+    // CMakeFileConventions.buildTarget(dependency.getName(),
+    // dependency.getLinkType(), toolchain.getName(),
+    // buildConfig));
+    // }
+    // write(outputStream, indent + 1, "RUNTIME_DEPENDENCY_SET runtime");
+    // write(outputStream, indent + 1, "RUNTIME_DEPENDENCIES");
+    // write(outputStream, indent + 1, "EXPORT %s-target", target);
+    write(outputStream, indent + 1, "COMPONENT %s", target);
+    write(outputStream, indent, ")");
 
-  // private void writeInstallImporedRuntimeArtefacts(final FileOutputStream
-  // outputStream, final int indent,
-  // final String target, final CMakeResolvedToolchain toolchain, final String
-  // buildConfig) throws IOException {
-  // write(outputStream, indent, "install( IMPORTED_RUNTIME_ARTIFACTS %s",
-  // target);
-  // write(outputStream, indent + 1, "COMPONENT %s", target);
-  // write(outputStream, indent, ")");
-  // }
+    // write(outputStream, indent, "install( IMPORTED_RUNTIME_ARTIFACTS");
+    // write(outputStream, indent, "install( IMPORTED_RUNTIME_ARTIFACTS");
+    // for (final CMakeResolvedProjectDependency dependency : dependencies) {
+    //   write(outputStream, indent + 1, "%s", CMakeFileConventions.projectTarget(dependency.getProjectName(),
+    //       dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig));
+    // }
+    // write(outputStream, indent + 1, "COMPONENT %s", target);
+    // write(outputStream, indent, ")");
+
+    // write(outputStream, indent, "install( IMPORTED_RUNTIME_ARTIFACTS %s",
+    // target);
+    // write(outputStream, indent + 1, "COMPONENT %s", target);
+    // write(outputStream, indent + 1, "RUNTIME_DEPENDENCY_SET runtime");
+    // write(outputStream, indent, ")");
+
+    // write(outputStream, indent, "install( RUNTIME_DEPENDENCY_SET runtime");
+    // write(outputStream, indent + 1, "COMPONENT %s", target);
+    // write(outputStream, indent, ")");
+
+    // final Path projectDir = getProjectDirectory().getAsFile().toPath();
+    // final Path exportPath =
+    // getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath();
+    // write(outputStream, indent, "install( EXPORT %s-target", target);
+    // write(outputStream, indent + 1, "COMPONENT %s-target", target);
+    // write(outputStream, indent + 1, "DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/%s",
+    // projectDir.relativize(exportPath));
+    // write(outputStream, indent + 1, "NAMESPACE ${PROJECT_NAME}::", target);
+    // write(outputStream, indent, ")");
+
+    // private void writeInstallImporedRuntimeArtefacts(final FileOutputStream
+    // outputStream, final int indent,
+    // final String target, final CMakeResolvedToolchain toolchain, final String
+    // buildConfig) throws IOException {
+    // write(outputStream, indent, "install( IMPORTED_RUNTIME_ARTIFACTS %s",
+    // target);
+    // write(outputStream, indent + 1, "COMPONENT %s", target);
+    // write(outputStream, indent, ")");
+  }
 
   private void writeStripDebugCommand(final FileOutputStream outputStream, final int indent, final String target)
       throws IOException {

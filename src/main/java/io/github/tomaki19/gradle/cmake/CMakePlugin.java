@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,6 @@ import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -115,10 +115,6 @@ public class CMakePlugin implements Plugin<Project> {
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
 
-        final TaskProvider<CMakeAssemble> assembleConfigTask = taskRegistry.assembleConfigTask(project.getTasks(),
-            toolchain, project);
-        taskRegistry.assembleTask(project.getTasks()).configure((task) -> task.dependsOn(assembleConfigTask));
-
         Optional<TaskProvider<?>> buildAllToolchainTask = Optional.empty();
         if (toolchain.hasBinaries()) {
           buildAllToolchainTask = Optional.of(taskRegistry.buildAllToolchainTask(project.getTasks(), toolchain));
@@ -146,7 +142,6 @@ public class CMakePlugin implements Plugin<Project> {
               buildConfig);
           configureTask.configure((task) -> {
             task.dependsOn(assembleListsTask);
-            CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, project);
           });
 
           if (customTaskProtos.containsKey(toolchain.getName())) {
@@ -157,9 +152,25 @@ public class CMakePlugin implements Plugin<Project> {
             });
           }
 
+          final Collection<CMakeResolvedLibrary> resolvedLibraries = new ArrayList<>();
+          resolvedLibraries.addAll(toolchain.getInterfaceLibraries());
+          resolvedLibraries.addAll(toolchain.getSharedLibraries());
+          resolvedLibraries.addAll(toolchain.getStaticLibraries());
+          final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModulesTask(project.getTasks(),
+              resolvedLibraries, toolchain, buildConfig, project);
+          taskRegistry.assembleTask(project.getTasks()).configure((task) -> task.dependsOn(assembleModulesTask));
+
           for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
+            assembleListsTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, library, toolchain, buildConfig);
+            });
+
+            configureTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, library, toolchain, buildConfig);
+            });
+
             final TaskProvider<CMakeBuildLibrary> buildTask = taskRegistry.buildTask(project.getTasks(), library,
-                toolchain, CMakeLinkType.STATIC.toString(), buildConfig);
+                toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
               CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
@@ -175,9 +186,16 @@ public class CMakePlugin implements Plugin<Project> {
             // }
           }
           for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
+            assembleListsTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, library, toolchain, buildConfig);
+            });
+
+            configureTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, library, toolchain, buildConfig);
+            });
 
             final TaskProvider<CMakeBuildLibrary> buildTask = taskRegistry.buildTask(project.getTasks(), library,
-                toolchain, CMakeLinkType.SHARED.toString(), buildConfig);
+                toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
               CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
@@ -194,6 +212,14 @@ public class CMakePlugin implements Plugin<Project> {
           }
 
           for (final CMakeResolvedExecutable application : toolchain.getApplications()) {
+            assembleListsTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, application, toolchain, buildConfig);
+            });
+
+            configureTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, application, toolchain, buildConfig);
+            });
+
             final TaskProvider<CMakeBuildExecutable> buildTask = taskRegistry.buildTask(project.getTasks(), application,
                 toolchain, buildConfig);
             buildTask.configure((task) -> {
@@ -211,6 +237,14 @@ public class CMakePlugin implements Plugin<Project> {
           }
 
           for (final CMakeResolvedExecutable test : toolchain.getTests()) {
+            assembleListsTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, test, toolchain, buildConfig);
+            });
+
+            configureTask.configure((task) -> {
+              CMakeTaskRegistry.configureRemote(task, project, test, toolchain, buildConfig);
+            });
+
             final TaskProvider<CMakeBuildExecutable> buildTask = taskRegistry.buildTask(project.getTasks(), test,
                 toolchain, buildConfig);
             buildTask.configure((task) -> {

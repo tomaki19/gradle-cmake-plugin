@@ -10,21 +10,21 @@ import java.util.Objects;
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
   private final CMakeResolvedProject resolvedProject;
-  private final String linkage;
+  private final CMakeLinkType linkType;
 
   CMakeResolvedProjectDependency(final String name, final CMakeResolvedProject resolvedProject,
       final Optional<CMakeLinkType> linkage) {
     super(name);
     this.resolvedProject = resolvedProject;
-    this.linkage = linkage.orElse(CMakeLinkType.SHARED).toString();
+    this.linkType = linkage.orElse(CMakeLinkType.SHARED);
   }
 
   public CMakeResolvedProject getResolvedProject() {
     return resolvedProject;
   }
 
-  public String getLinkage() {
-    return linkage;
+  public CMakeLinkType getLinkType() {
+    return linkType;
   }
 
   public String getProjectName() {
@@ -36,7 +36,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((resolvedProject == null) ? 0 : resolvedProject.hashCode());
-    result = prime * result + ((linkage == null) ? 0 : linkage.hashCode());
+    result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
     return result;
   }
 
@@ -54,7 +54,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
         return false;
     } else if (!resolvedProject.equals(other.resolvedProject))
       return false;
-    if (!Objects.equals(linkage, other.linkage))
+    if (!Objects.equals(linkType, other.linkType))
       return false;
     return true;
   }
@@ -68,7 +68,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     if ((comparator = getName().compareTo(other.getName())) != 0) {
       return comparator;
     }
-    if ((comparator = getLinkage().compareTo(other.getLinkage())) != 0) {
+    if ((comparator = getLinkType().compareTo(other.getLinkType())) != 0) {
       return comparator;
     }
     return comparator;

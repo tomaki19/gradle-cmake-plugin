@@ -20,9 +20,9 @@ public abstract class CMakeBuild extends CMakeExec {
     this.buildTarget = buildTarget;
     getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
     getBaseArguments().add("--build");
-    getBaseArguments().add(getProject().getLayout().getBuildDirectory()
+    getBaseArguments().add(getProject().getLayout().getBuildDirectory().get()
         .dir("%s/%s/%s".formatted(CMakeFileConventions.CMAKE_CONFIG_PATH, toolchain.getName(), buildConfig))
-        .get().getAsFile().getAbsolutePath());
+        .getAsFile().getAbsolutePath());
     getBaseArguments().add("--target");
     getBaseArguments().add(buildTarget);
     getBaseArguments().add("--config");

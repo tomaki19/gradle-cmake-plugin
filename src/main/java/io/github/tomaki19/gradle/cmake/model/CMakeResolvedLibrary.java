@@ -12,14 +12,20 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 
 public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolvedLibrary> {
 
+  private final CMakeLinkType linkType;
   private final Collection<String> publicCompileDefinitions = new TreeSet<>();
   private final Collection<String> publicCompileOptions = new TreeSet<>();
   private final Collection<String> publicLinkOptions = new TreeSet<>();
   private final Collection<CMakeResolvedPackageDependency> publicPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
 
-  CMakeResolvedLibrary(final CMakeLibrary library, final boolean stripDebug) {
+  CMakeResolvedLibrary(final CMakeLibrary library, final CMakeLinkType linkType, final boolean stripDebug) {
     super(library, stripDebug);
+    this.linkType = linkType;
+  }
+
+  public CMakeLinkType getLinkType() {
+    return linkType;
   }
 
   public Collection<String> getPublicCompileDefinitions() {
@@ -60,6 +66,30 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
 
   public void addPublicProjectDependency(final CMakeResolvedProjectDependency dependency) {
     publicProjectDependencies.add(dependency);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    CMakeResolvedLibrary other = (CMakeResolvedLibrary) obj;
+    if (linkType != other.linkType)
+      return false;
+    return true;
   }
 
 }

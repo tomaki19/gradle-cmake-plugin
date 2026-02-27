@@ -11,4 +11,9 @@ public enum CMakeLinkType {
   public String toString() {
     return name().toLowerCase();
   }
+
+  public String toLowerCase() {
+    return name().toLowerCase();
+  }
+
 }

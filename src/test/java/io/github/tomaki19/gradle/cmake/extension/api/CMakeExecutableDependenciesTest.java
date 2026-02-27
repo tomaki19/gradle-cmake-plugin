@@ -34,20 +34,20 @@ class CMakeExecutableDependenciesTest {
   void testGetLinkStatic() {
     CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
     deps.linkStatic();
-    assertEquals("static", deps.getLinkage().get().toString());
+    assertEquals("static", deps.getLinkType().get().toString());
   }
 
   @Test
   void testGetLinkShared() {
     CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
     deps.linkShared();
-    assertEquals("shared", deps.getLinkage().get().toString());
+    assertEquals("shared", deps.getLinkType().get().toString());
   }
 
   @Test
   void testGetLinkInterface() {
     CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
     deps.linkInterface();
-    assertEquals("interface", deps.getLinkage().get().toString());
+    assertEquals("interface", deps.getLinkType().get().toString());
   }
 }

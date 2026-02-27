@@ -5,15 +5,16 @@
 package io.github.tomaki19.gradle.cmake.tasks;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeBuildLibrary extends CMakeBuild {
 
   @javax.inject.Inject
-  public CMakeBuildLibrary(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
-      final String linkage, final String buildConfig) {
-    super(CMakeFileConventions.buildTarget(binary.getName(), toolchain.getName(), linkage, buildConfig), toolchain, buildConfig);
+  public CMakeBuildLibrary(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    super(CMakeFileConventions.buildTarget(library.getName(), library.getLinkType(), toolchain.getName(), buildConfig),
+        toolchain, buildConfig);
   }
 
 }

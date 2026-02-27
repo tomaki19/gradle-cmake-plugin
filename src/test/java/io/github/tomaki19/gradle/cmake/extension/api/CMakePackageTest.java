@@ -31,15 +31,15 @@ class CMakePackageTest {
   void testGetConfigMode() {
     final Project project = ProjectBuilder.builder().build();
     final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
-    assertFalse(pkg.getConfigMode().isPresent());
+    assertFalse(pkg.getModuleMode().isPresent());
   }
 
   @Test
   void testSetConfigMode() {
     final Project project = ProjectBuilder.builder().build();
     final CMakePackage pkg = new MockCMakePackage("test", project.getObjects());
-    pkg.getConfigMode().set(true);
-    assertEquals(Boolean.TRUE, pkg.getConfigMode().get());
+    pkg.getModuleMode().set(true);
+    assertEquals(Boolean.TRUE, pkg.getModuleMode().get());
   }
 
   @Test

@@ -12,7 +12,7 @@ public abstract class CMakeClean extends Delete {
 
   @javax.inject.Inject
   public CMakeClean() {
-    delete(getProject().getLayout().getProjectDirectory().file(CMakeListsFile.name()));
+    delete(getProject().getLayout().getProjectDirectory().file(CMakeListsFile.NAME));
   }
 
 }

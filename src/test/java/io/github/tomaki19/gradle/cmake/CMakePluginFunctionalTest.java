@@ -60,9 +60,8 @@ class CMakePluginFunctionalTest {
 
     // Verify CMake-specific tasks exist
     assertTrue(output.contains("assemble-cmake-lists"), "Should contain assemble-cmake-lists task");
-    assertTrue(output.contains("assemble-TestToolchain-config"), "Should contain assemble-config task");
-    assertTrue(output.contains("configure-TestToolchain"), "Should contain configure task");
-    assertTrue(output.contains("build-all-TestToolchain"), "Should contain build-all task");
+    assertTrue(output.contains("configure-testtoolchain"), "Should contain configure task");
+    assertTrue(output.contains("build-all-testtoolchain"), "Should contain build-all task");
   }
 
   @Test
@@ -137,12 +136,12 @@ class CMakePluginFunctionalTest {
 
     // Should contain tasks for the valid toolchain but not for the invalid
     // reference
-    assertTrue(output.contains("configure-TestToolchain"), "Should contain configure task for valid toolchain");
-    assertFalse(output.contains("configure-NonExistentToolchain"), "Should not contain tasks for invalid toolchain");
+    assertTrue(output.contains("configure-testtoolchain"), "Should contain configure task for valid toolchain");
+    assertFalse(output.contains("configure-nonexistenttoolchain"), "Should not contain tasks for invalid toolchain");
 
     // Should contain tasks for the valid library but not for the invalid library
-    assertTrue(output.contains("ValidLibrary"), "Should contain tasks for valid library");
-    assertFalse(output.contains("InvalidLibrary"), "Should not contain tasks for invalid library");
+    assertTrue(output.contains("validlibrary"), "Should contain tasks for valid library");
+    assertFalse(output.contains("invalidlibrary"), "Should not contain tasks for invalid library");
   }
 
   @Test

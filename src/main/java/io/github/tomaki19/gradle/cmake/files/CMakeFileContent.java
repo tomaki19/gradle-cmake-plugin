@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.files;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,17 +12,23 @@ import org.gradle.api.file.Directory;
 
 public abstract class CMakeFileContent {
 
+  private final String name;
   private final String projectName;
   private final Directory projectDirectory;
   private final Directory buildDirectory;
 
   private static final int INDENT_SIZE = 4;
 
-  public CMakeFileContent(final String projectName, final Directory projectDirectory, final Directory buildDirectory)
-      throws FileNotFoundException {
+  public CMakeFileContent(final String name, final String projectName, final Directory projectDirectory,
+      final Directory buildDirectory) {
+    this.name = name;
     this.projectName = projectName;
     this.projectDirectory = projectDirectory;
     this.buildDirectory = buildDirectory;
+  }
+
+  public String getName() {
+    return name;
   }
 
   protected String getProjectName() {

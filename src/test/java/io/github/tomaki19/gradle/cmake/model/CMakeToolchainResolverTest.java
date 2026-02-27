@@ -80,7 +80,6 @@ public class CMakeToolchainResolverTest {
                 assertEquals(1, toolchains.length);
 
                 assertEquals("Toolchain0", toolchains[0].getName());
-                assertEquals(0, toolchains[0].getPackages().size());
                 assertEquals(1, toolchains[0].getInterfaceLibraries().size());
                 assertEquals(0, toolchains[0].getStaticLibraries().size());
                 assertEquals(1, toolchains[0].getSharedLibraries().size());
@@ -122,7 +121,6 @@ public class CMakeToolchainResolverTest {
                 assertEquals(1, toolchains.length);
 
                 assertEquals("Toolchain0", toolchains[0].getName());
-                assertEquals(1, toolchains[0].getPackages().size());
                 assertEquals(1, toolchains[0].getInterfaceLibraries().size());
                 assertEquals(0, toolchains[0].getStaticLibraries().size());
                 assertEquals(1, toolchains[0].getSharedLibraries().size());
@@ -164,7 +162,6 @@ public class CMakeToolchainResolverTest {
                 assertEquals(1, toolchains.length);
 
                 assertEquals("Toolchain0", toolchains[0].getName());
-                assertEquals(0, toolchains[0].getPackages().size());
                 assertEquals(1, toolchains[0].getInterfaceLibraries().size());
                 assertEquals(0, toolchains[0].getStaticLibraries().size());
                 assertEquals(1, toolchains[0].getSharedLibraries().size());
@@ -206,7 +203,6 @@ public class CMakeToolchainResolverTest {
                 assertEquals(1, toolchains.length);
 
                 assertEquals("Toolchain0", toolchains[0].getName());
-                assertEquals(0, toolchains[0].getPackages().size());
                 assertEquals(1, toolchains[0].getInterfaceLibraries().size());
                 assertEquals(0, toolchains[0].getStaticLibraries().size());
                 assertEquals(1, toolchains[0].getSharedLibraries().size());

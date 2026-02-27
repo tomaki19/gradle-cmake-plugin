@@ -23,15 +23,11 @@ import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
 
-class CMakeConfigFileTest {
-
-  @Test
-  void testName() {
-    assertEquals("project-config.cmake", CMakeConfigFile.name("project"));
-  }
+class CMakeModuleFileTest {
 
   @Test
   void testConstructor() throws IOException, URISyntaxException {
@@ -55,10 +51,16 @@ class CMakeConfigFileTest {
       CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
       assertNotNull(toolchains);
       assertEquals(1, toolchains.length);
+      assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+      assertEquals(2, toolchains[0].getBuildConfigs().size());
 
-      CMakeConfigFile file = new CMakeConfigFile(toolchains[0], project.getName(),
-          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
-      assertNotNull(file);
+      for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
+        for (final String buildConfig : toolchains[0].getBuildConfigs()) {
+          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project.getName(),
+              project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+          assertNotNull(file);
+        }
+      }
     } finally {
       deleteRecursively(tempDir);
     }
@@ -86,18 +88,25 @@ class CMakeConfigFileTest {
       CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
       assertNotNull(toolchains);
       assertEquals(1, toolchains.length);
+      assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+      assertEquals(2, toolchains[0].getBuildConfigs().size());
 
-      CMakeConfigFile file = new CMakeConfigFile(toolchains[0], project.getName(),
-          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+      for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
+        for (final String buildConfig : toolchains[0].getBuildConfigs()) {
+          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project.getName(),
+              project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+          assertNotNull(file);
 
-      File outputFile = new File(tempDir, "config.cmake");
-      try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-        file.writeTo(fos);
+          File outputFile = new File(tempDir, "config-%s-%s.cmake".formatted(toolchains[0].getName(), buildConfig));
+          try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            file.writeTo(fos);
+          }
+
+          // Verify file was created
+          assertNotNull(outputFile);
+          assertTrue(outputFile.exists());
+        }
       }
-
-      // Verify file was created
-      assertNotNull(outputFile);
-      assertTrue(outputFile.exists());
     } finally {
       deleteRecursively(tempDir);
     }
@@ -125,18 +134,25 @@ class CMakeConfigFileTest {
       CMakeResolvedToolchain[] toolchains = results.toArray(new CMakeResolvedToolchain[results.size()]);
       assertNotNull(toolchains);
       assertEquals(1, toolchains.length);
+      assertEquals(1, toolchains[0].getInterfaceLibraries().size());
+      assertEquals(2, toolchains[0].getBuildConfigs().size());
 
-      CMakeConfigFile file = new CMakeConfigFile(toolchains[0], project.getName(),
-          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+      for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
+        for (final String buildConfig : toolchains[0].getBuildConfigs()) {
+          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project.getName(),
+              project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+          assertNotNull(file);
 
-      File outputFile = new File(tempDir, "config.cmake");
-      try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-        file.writeTo(fos);
+          File outputFile = new File(tempDir, "config-%s-%s.cmake".formatted(toolchains[0].getName(), buildConfig));
+          try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            file.writeTo(fos);
+          }
+
+          // Verify file was created
+          assertNotNull(outputFile);
+          assertTrue(outputFile.exists());
+        }
       }
-
-      // Verify file was created
-      assertNotNull(outputFile);
-      assertTrue(outputFile.exists());
     } finally {
       deleteRecursively(tempDir);
     }

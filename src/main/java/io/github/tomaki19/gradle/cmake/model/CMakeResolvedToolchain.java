@@ -26,8 +26,6 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Map<String, String> environment;
   private final Optional<RegularFile> environmentFile;
   private final Optional<RegularFile> toolchainFile;
-  private final Collection<CMakeResolvedProject> projects = new TreeSet<>();
-  private final Collection<CMakeResolvedPackage> packages = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> interfaceLibraries = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> staticLibraries = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> sharedLibraries = new TreeSet<>();
@@ -66,22 +64,6 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
 
   public Optional<RegularFile> getToolchainFile() {
     return toolchainFile;
-  }
-
-  void addProject(final CMakeResolvedProject component) {
-    projects.add(component);
-  }
-
-  public Collection<CMakeResolvedPackage> getPackages() {
-    return Collections.unmodifiableCollection(packages);
-  }
-
-  void addPackage(final CMakeResolvedPackage component) {
-    packages.add(component);
-  }
-
-  public Collection<CMakeResolvedProject> getProjects() {
-    return Collections.unmodifiableCollection(projects);
   }
 
   void addInterfaceLibrary(final CMakeResolvedLibrary component) {

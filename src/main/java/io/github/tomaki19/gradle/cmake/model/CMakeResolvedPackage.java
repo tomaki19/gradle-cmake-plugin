@@ -16,11 +16,11 @@ public class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedPackage
 
   private final Map<String, String> properties;
   private final Collection<String> components;
-  private final boolean configMode;
+  private final boolean moduleMode;
 
   CMakeResolvedPackage(final CMakePackage object) {
     super(object.getName());
-    this.configMode = object.getConfigMode().getOrElse(Boolean.FALSE);
+    this.moduleMode = object.getModuleMode().getOrElse(Boolean.FALSE);
     this.properties = new TreeMap<>(object.getProperties().get());
     this.components = new HashSet<>(object.getComponents().get());
   }
@@ -33,8 +33,8 @@ public class CMakeResolvedPackage extends CMakeResolvedName<CMakeResolvedPackage
     return Collections.unmodifiableCollection(components);
   }
 
-  public boolean isConfigMode() {
-    return configMode;
+  public boolean isModuleMode() {
+    return moduleMode;
   }
 
 }

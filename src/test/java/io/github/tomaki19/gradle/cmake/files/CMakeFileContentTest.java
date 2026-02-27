@@ -24,8 +24,8 @@ class CMakeFileContentTest {
     }
     try {
       org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
-      CMakeFileContent content = new CMakeFileContent(project.getName(), project.getLayout().getProjectDirectory(),
-          project.getLayout().getBuildDirectory().get()) {
+      CMakeFileContent content = new CMakeFileContent("Test", project.getName(),
+          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()) {
 
         @Override
         public void writeTo(FileOutputStream outputStream) throws IOException {
@@ -46,8 +46,8 @@ class CMakeFileContentTest {
     }
     try {
       org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
-      CMakeFileContent content = new CMakeFileContent(project.getName(), project.getLayout().getProjectDirectory(),
-          project.getLayout().getBuildDirectory().get()) {
+      CMakeFileContent content = new CMakeFileContent("Test", project.getName(),
+          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()) {
 
         @Override
         public void writeTo(FileOutputStream outputStream) throws IOException {
@@ -68,8 +68,8 @@ class CMakeFileContentTest {
     }
     try {
       org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
-      CMakeFileContent content = new CMakeFileContent(project.getName(), project.getLayout().getProjectDirectory(),
-          project.getLayout().getBuildDirectory().get()) {
+      CMakeFileContent content = new CMakeFileContent("Test", project.getName(),
+          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()) {
 
         @Override
         public void writeTo(FileOutputStream outputStream) throws IOException {

@@ -36,14 +36,14 @@ class CMakeBinaryDependenciesTest {
   void testGetLinkage() {
     CMakeBinaryDependencies deps = new TestCMakeBinaryDependencies("mylib");
     deps.setLinkage(io.github.tomaki19.gradle.cmake.model.CMakeLinkType.STATIC);
-    assertEquals("static", deps.getLinkage().get().toString());
+    assertEquals("static", deps.getLinkType().get().toString());
   }
 
   @Test
   void testHashCode() {
     CMakeBinaryDependencies deps1 = new TestCMakeBinaryDependencies("mylib");
     CMakeBinaryDependencies deps2 = new TestCMakeBinaryDependencies("mylib");
-    
+
     assertEquals(deps1.hashCode(), deps2.hashCode());
   }
 
@@ -51,7 +51,7 @@ class CMakeBinaryDependenciesTest {
   void testEquals() {
     CMakeBinaryDependencies deps1 = new TestCMakeBinaryDependencies("mylib");
     CMakeBinaryDependencies deps2 = new TestCMakeBinaryDependencies("mylib");
-    
+
     assertEquals(deps1, deps2);
   }
 
@@ -59,7 +59,7 @@ class CMakeBinaryDependenciesTest {
   void testEqualsWithDifferentNames() {
     CMakeBinaryDependencies deps1 = new TestCMakeBinaryDependencies("lib1");
     CMakeBinaryDependencies deps2 = new TestCMakeBinaryDependencies("lib2");
-    
+
     assertNotEquals(deps1, deps2);
   }
 
@@ -67,24 +67,24 @@ class CMakeBinaryDependenciesTest {
   void testEqualsWithDifferentFrom() {
     CMakeBinaryDependencies deps1 = new TestCMakeBinaryDependencies("mylib");
     deps1.setFrom("project1");
-    
+
     CMakeBinaryDependencies deps2 = new TestCMakeBinaryDependencies("mylib");
     deps2.setFrom("project2");
-    
+
     assertNotEquals(deps1, deps2);
   }
 
   @Test
   void testEqualsWithNull() {
     CMakeBinaryDependencies deps = new TestCMakeBinaryDependencies("mylib");
-    
+
     assertFalse(deps.equals(null));
   }
 
   @Test
   void testEqualsWithDifferentClass() {
     CMakeBinaryDependencies deps = new TestCMakeBinaryDependencies("mylib");
-    
+
     assertFalse(deps.equals("not a dependency"));
   }
 

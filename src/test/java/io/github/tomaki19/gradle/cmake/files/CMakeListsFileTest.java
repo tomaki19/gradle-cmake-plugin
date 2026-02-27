@@ -18,7 +18,7 @@ class CMakeListsFileTest {
 
   @Test
   void testName() {
-    assertEquals("CMakeLists.txt", CMakeListsFile.name());
+    assertEquals("CMakeLists.txt", CMakeListsFile.NAME);
   }
 
   @Test

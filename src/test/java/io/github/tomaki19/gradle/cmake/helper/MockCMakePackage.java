@@ -33,7 +33,7 @@ public class MockCMakePackage extends CMakePackage {
   }
 
   @Override
-  public Property<Boolean> getConfigMode() {
+  public Property<Boolean> getModuleMode() {
     return configMode;
   }
 

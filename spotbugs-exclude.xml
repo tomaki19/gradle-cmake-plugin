@@ -16,12 +16,12 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.files.CMakeConfigFile"/>
+        <Class name="io.github.tomaki19.gradle.cmake.files.CMakeListsFile"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.files.CMakeListsFile"/>
+        <Class name="io.github.tomaki19.gradle.cmake.files.CMakeModuleFile"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>

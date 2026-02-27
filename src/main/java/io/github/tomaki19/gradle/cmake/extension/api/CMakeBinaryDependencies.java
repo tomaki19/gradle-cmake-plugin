@@ -11,11 +11,11 @@ import java.util.Optional;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 
-abstract class CMakeBinaryDependencies {
+public abstract class CMakeBinaryDependencies {
 
   private final Collection<String> names;
   private Optional<String> from = Optional.empty();
-  private Optional<CMakeLinkType> linkage = Optional.empty();
+  private Optional<CMakeLinkType> linkType = Optional.empty();
 
   protected CMakeBinaryDependencies(final CharSequence... names) {
     this.names = Arrays.asList(names).stream().map((name) -> name.toString()).toList();
@@ -34,11 +34,11 @@ abstract class CMakeBinaryDependencies {
   }
 
   protected void setLinkage(final CMakeLinkType value) {
-    this.linkage = Optional.of(value);
+    this.linkType = Optional.of(value);
   }
 
-  public Optional<CMakeLinkType> getLinkage() {
-    return linkage;
+  public Optional<CMakeLinkType> getLinkType() {
+    return linkType;
   }
 
   @Override
@@ -47,6 +47,7 @@ abstract class CMakeBinaryDependencies {
     int result = 1;
     result = prime * result + ((names == null) ? 0 : names.hashCode());
     result = prime * result + ((from == null) ? 0 : from.hashCode());
+    result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
     return result;
   }
 
@@ -68,6 +69,11 @@ abstract class CMakeBinaryDependencies {
       if (other.from != null)
         return false;
     } else if (!from.equals(other.from))
+      return false;
+    if (linkType == null) {
+      if (other.linkType != null)
+        return false;
+    } else if (!linkType.equals(other.linkType))
       return false;
     return true;
   }
