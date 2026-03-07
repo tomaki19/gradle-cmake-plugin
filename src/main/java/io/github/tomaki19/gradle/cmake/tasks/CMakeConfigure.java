@@ -39,7 +39,7 @@ public abstract class CMakeConfigure extends CMakeExec {
       if (!Objects.equals(subproject.getName(), getProject().getName())
           && !Objects.equals(subproject.getName(), getProject().getRootProject().getName())) {
         exportPaths.add(subproject.getLayout().getBuildDirectory().get()
-            .dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath().toString());
+            .dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath().toString());
       }
     });
     getBaseArguments().add("-DCMAKE_MODULE_PATH=\"%s\"".formatted(String.join(";", exportPaths)));

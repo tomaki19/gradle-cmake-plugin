@@ -9,7 +9,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 public class CMakeFileConventions {
 
   public static final String CMAKE_CONFIG_PATH = "cmake/config";
-  public static final String CMAKE_EXPORT_PATH = "cmake/export";
   public static final String CMAKE_INSTALL_PATH = "cmake/install";
 
   public static String moduleTarget(final String projectName, final String name, final CMakeLinkType linkType,

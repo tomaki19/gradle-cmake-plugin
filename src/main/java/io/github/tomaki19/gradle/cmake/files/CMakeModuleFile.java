@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -91,22 +92,20 @@ public final class CMakeModuleFile extends CMakeFileContent {
 
   private void writeTargetProperties(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary library, final String target, final String buildConfig) throws IOException {
-    final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH).getAsFile().toPath();
-    final Path importPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_EXPORT_PATH)
-        .dir(toolchain.getName()).dir(buildConfig).dir("lib").getAsFile().toPath();
+    final Path targetPath = Paths.get(toolchain.getName(), buildConfig);
     switch (library.getLinkType()) {
       case SHARED: {
         write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
         write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s", buildConfig.toUpperCase());
-        write(outputStream, indent + 1, "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s\"",
-            buildConfig.toUpperCase(), exportPath.relativize(importPath),
+        write(outputStream, indent + 1, "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/lib/%s\"",
+            buildConfig.toUpperCase(), targetPath,
             OperatingSystem.current().getSharedLibraryName(library.getOutputName()));
         if (OperatingSystem.current().isLinux()) {
-          write(outputStream, indent + 1, "IMPORTED_SONAME_%s \"%s\"",
-              buildConfig.toUpperCase(), OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
+          write(outputStream, indent + 1, "IMPORTED_SONAME_%s \"%s\"", buildConfig.toUpperCase(),
+              OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
         } else if (OperatingSystem.current().isWindows()) {
-          write(outputStream, indent + 1, "IMPORTED_IMPLIB_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s\"",
-              buildConfig.toUpperCase(), exportPath.relativize(importPath),
+          write(outputStream, indent + 1,
+              "IMPORTED_IMPLIB_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/lib/%s\"", buildConfig.toUpperCase(), targetPath,
               OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
         }
         write(outputStream, indent, ")");
@@ -115,8 +114,8 @@ public final class CMakeModuleFile extends CMakeFileContent {
       case STATIC: {
         write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
         write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s", buildConfig.toUpperCase());
-        write(outputStream, indent + 1, "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s\"",
-            buildConfig.toUpperCase(), exportPath.relativize(importPath),
+        write(outputStream, indent + 1,
+            "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/bin/%s\"", buildConfig.toUpperCase(), targetPath,
             OperatingSystem.current().getStaticLibraryName(library.getOutputName()));
         write(outputStream, indent, ")");
         break;
@@ -125,6 +124,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
         break;
     }
     for (final File headerDir : library.getHeaders()) {
+      final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath();
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
       write(outputStream, indent + 1, "INTERFACE_INCLUDE_DIRECTORIES \"${CMAKE_CURRENT_LIST_DIR}/%s\"",
           exportPath.relativize(headerDir.toPath()));

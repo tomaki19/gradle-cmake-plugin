@@ -68,7 +68,7 @@ public final class CMakeTaskRegistry {
     final CMakeModuleFile moduleFile = new CMakeModuleFile(library, toolchain, buildConfig, project.getName(),
         project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
     return tasks.register(taskName, CMakeAssemble.class, moduleFile,
-        project.getLayout().getBuildDirectory().get().dir(CMakeFileConventions.CMAKE_EXPORT_PATH));
+        project.getLayout().getBuildDirectory().get().dir(CMakeFileConventions.CMAKE_CONFIG_PATH));
   }
 
   public TaskProvider<CMakeCustomExec> customExecTask(final TaskContainer tasks, final CMakeCustomTaskProto taskProto) {
