@@ -5,11 +5,13 @@
 package io.github.tomaki19.gradle.cmake.tasks;
 
 import org.gradle.api.provider.SetProperty;
+import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
+@CacheableTask
 public abstract class CMakeBuild extends CMakeExec {
 
   protected final String buildTarget;
@@ -29,6 +31,7 @@ public abstract class CMakeBuild extends CMakeExec {
     getBaseArguments().add(buildConfig);
     setWorkingDir(getProject().getProjectDir());
     setGroup(CMakeTaskRegistry.GROUP_BUILD);
+    getInputs().files(getProject().fileTree(getProject().getLayout().getProjectDirectory()).getFiles());
   }
 
   @org.gradle.api.tasks.Input

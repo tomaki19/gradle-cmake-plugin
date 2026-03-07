@@ -12,9 +12,9 @@ public class CMakeFileConventions {
   public static final String CMAKE_EXPORT_PATH = "cmake/export";
   public static final String CMAKE_INSTALL_PATH = "cmake/install";
 
-  public static String projectTarget(final String projectName, final String name, final CMakeLinkType linkType,
+  public static String moduleTarget(final String projectName, final String name, final CMakeLinkType linkType,
       final String toolchainName, final String buildConfig) {
-    return "%s-%s-%s-%s-%s".formatted(projectName, name.toLowerCase(), linkType.toLowerCase(),
+    return "%s-%s-%s-%s-%s-module".formatted(projectName, name.toLowerCase(), linkType.toLowerCase(),
         toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 

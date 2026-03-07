@@ -4,10 +4,13 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import org.gradle.api.tasks.CacheableTask;
+
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
+@CacheableTask
 public abstract class CMakeBuildLibrary extends CMakeBuild {
 
   @javax.inject.Inject

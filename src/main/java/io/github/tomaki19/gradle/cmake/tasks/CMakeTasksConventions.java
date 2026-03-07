@@ -16,14 +16,16 @@ public final class CMakeTasksConventions {
     return "assemble-cmake-lists";
   }
 
-  static String assembleModulesTaskName(final String toolchainName, final String buildConfig) {
-    return "assemble-cmake-modules-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
+  static String assembleModuleTaskName(final String name, CMakeLinkType linkType,
+      final String toolchainName, final String buildConfig) {
+    return "assemble-%s-%s-%s-%s-module".formatted(name.toLowerCase(), linkType.toLowerCase(),
+        toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String assembleModulesTaskName(final String projectName, final String toolchainName,
-      final String buildConfig) {
-    return ":%s:assemble-cmake-modules-%s-%s".formatted(projectName, toolchainName.toLowerCase(),
-        buildConfig.toLowerCase());
+  static String assembleModuleTaskName(final String projectName, final String name, CMakeLinkType linkType,
+      final String toolchainName, final String buildConfig) {
+    return ":%s:assemble-%s-%s-%s-%s-module".formatted(projectName, name.toLowerCase(), linkType.toLowerCase(),
+        toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
   static String customExecTaskName(final String name, final String toolchainName, final String buildConfig) {
@@ -73,14 +75,14 @@ public final class CMakeTasksConventions {
     return "check-all-%s".formatted(toolchainName.toLowerCase());
   }
 
-  static String packageTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,
+  static String installTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,
       final String buildConfig) {
-    return "package-%s-%s-%s-%s".formatted(targetName.toLowerCase(), linkType.toLowerCase(),
+    return "install-%s-%s-%s-%s".formatted(targetName.toLowerCase(), linkType.toLowerCase(),
         toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String packageTaskName(final String targetName, final String toolchainName, final String buildConfig) {
-    return "package-%s-%s-%s".formatted(targetName.toLowerCase(), toolchainName.toLowerCase(),
+  static String installTaskName(final String targetName, final String toolchainName, final String buildConfig) {
+    return "install-%s-%s-%s".formatted(targetName.toLowerCase(), toolchainName.toLowerCase(),
         buildConfig.toLowerCase());
   }
 

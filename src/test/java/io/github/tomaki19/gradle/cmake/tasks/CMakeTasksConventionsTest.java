@@ -20,14 +20,15 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testAssembleFindTaskNameToolchain() {
-    assertEquals("assemble-cmake-modules-mytoolchain-debug",
-        CMakeTasksConventions.assembleModulesTaskName("MyToolchain", "Debug"));
+    assertEquals("assemble-mylib-shared-mytoolchain-debug-module",
+        CMakeTasksConventions.assembleModuleTaskName("MyLib", CMakeLinkType.SHARED, "MyToolchain", "Debug"));
   }
 
   @Test
   void testAssembleFindTaskNameProjectToolchain() {
-    assertEquals(":MyProject:assemble-cmake-modules-mytoolchain-debug",
-        CMakeTasksConventions.assembleModulesTaskName("MyProject", "MyToolchain", "Debug"));
+    assertEquals(":MyProject:assemble-mylib-shared-mytoolchain-debug-module",
+        CMakeTasksConventions.assembleModuleTaskName("MyProject", "MyLib", CMakeLinkType.SHARED, "MyToolchain",
+            "Debug"));
   }
 
   @Test
@@ -90,13 +91,13 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testPackageTaskNameTargetToolchainLinkageBuildConfig() {
-    assertEquals("package-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.packageTaskName("MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+    assertEquals("install-mytarget-static-mytoolchain-debug",
+        CMakeTasksConventions.installTaskName("MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test
   void testPackageTaskNameTargetToolchainBuildConfig() {
-    assertEquals("package-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.packageTaskName("MyTarget", "MyToolchain", "Debug"));
+    assertEquals("install-mytarget-mytoolchain-debug",
+        CMakeTasksConventions.installTaskName("MyTarget", "MyToolchain", "Debug"));
   }
 }

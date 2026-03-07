@@ -7,9 +7,11 @@ package io.github.tomaki19.gradle.cmake.tasks;
 import java.util.Optional;
 
 import org.gradle.api.file.RegularFile;
+import org.gradle.api.tasks.CacheableTask;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 
+@CacheableTask
 public abstract class CMakeCustomExec extends CMakeExec {
 
   protected final String compileCommands;

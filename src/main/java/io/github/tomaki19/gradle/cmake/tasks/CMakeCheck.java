@@ -4,12 +4,14 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
+@CacheableTask
 public abstract class CMakeCheck extends CMakeExec {
 
   protected final String checkTarget;

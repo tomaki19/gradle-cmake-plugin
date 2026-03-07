@@ -16,7 +16,7 @@ class CMakeTaskRegistryTest {
     void testTaskRegistryGroups() {
         assertEquals("cmake build", CMakeTaskRegistry.GROUP_BUILD);
         assertEquals("cmake test", CMakeTaskRegistry.GROUP_CHECK);
-        assertEquals("cmake package", CMakeTaskRegistry.GROUP_PACKAGE);
+        assertEquals("cmake install", CMakeTaskRegistry.GROUP_INSTALL);
     }
 
     @Test

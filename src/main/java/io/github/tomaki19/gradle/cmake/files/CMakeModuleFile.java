@@ -30,7 +30,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
   public CMakeModuleFile(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final String projectName, final Directory projectDirectory,
       final Directory buildDirectory) {
-    super("Find%s.cmake".formatted(CMakeFileConventions.projectTarget(projectName, library.getName(),
+    super("%s.cmake".formatted(CMakeFileConventions.moduleTarget(projectName, library.getName(),
         library.getLinkType(), toolchain.getName(), buildConfig)), projectName, projectDirectory,
         buildDirectory);
     this.library = library;
@@ -84,9 +84,8 @@ public final class CMakeModuleFile extends CMakeFileContent {
       final Collection<CMakeResolvedProjectDependency> dependencies, final CMakeResolvedToolchain toolchain,
       final String buildConfig) throws IOException {
     for (final CMakeResolvedProjectDependency dependency : dependencies) {
-      final String projectTarget = CMakeFileConventions.projectTarget(dependency.getProjectName(),
-          dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig);
-      write(outputStream, indent, "find_package( %s REQUIRED MODULE )", projectTarget);
+      write(outputStream, indent, "include( %s )", CMakeFileConventions.moduleTarget(dependency.getProjectName(),
+          dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig));
     }
   }
 
@@ -127,36 +126,36 @@ public final class CMakeModuleFile extends CMakeFileContent {
     }
     for (final File headerDir : library.getHeaders()) {
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_INCLUDE_DIRECTORIES_LIST \"${CMAKE_CURRENT_LIST_DIR}/%s\"",
+      write(outputStream, indent + 1, "INTERFACE_INCLUDE_DIRECTORIES \"${CMAKE_CURRENT_LIST_DIR}/%s\"",
           exportPath.relativize(headerDir.toPath()));
       write(outputStream, indent, ")");
     }
     for (final String compileOption : library.getPublicCompileOptions()) {
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_COMPILE_OPTIONS_LIST %s", compileOption);
+      write(outputStream, indent + 1, "INTERFACE_COMPILE_OPTIONS %s", compileOption);
       write(outputStream, indent, ")");
     }
     for (final String compileDefinition : library.getPrivateCompileDefinitions()) {
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_COMPILE_DEFINITIONS_LIST %s", compileDefinition);
+      write(outputStream, indent + 1, "INTERFACE_COMPILE_DEFINITIONS %s", compileDefinition);
       write(outputStream, indent, ")");
     }
     for (final CMakeResolvedProjectDependency dependency : library.getPublicProjectDependencies()) {
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES_LIST %s",
+      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES %s",
           CMakeFileConventions.buildTarget(dependency.getProjectName(), dependency.getName(), dependency.getLinkType(),
               toolchain.getName(), buildConfig));
       write(outputStream, indent, ")");
     }
     for (final CMakeResolvedPackageDependency dependency : library.getPublicPackageDependencies()) {
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES_LIST %s::%s", dependency.getTargetPrefix(),
+      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES %s::%s", dependency.getTargetPrefix(),
           dependency.getName());
       write(outputStream, indent, ")");
     }
     for (final String option : library.getPublicLinkOptions()) {
       write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES_LIST %s", option);
+      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES %s", option);
       write(outputStream, indent, ")");
     }
   }

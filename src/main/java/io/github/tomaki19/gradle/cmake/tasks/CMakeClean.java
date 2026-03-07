@@ -4,10 +4,12 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Delete;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 
+@CacheableTask
 public abstract class CMakeClean extends Delete {
 
   @javax.inject.Inject

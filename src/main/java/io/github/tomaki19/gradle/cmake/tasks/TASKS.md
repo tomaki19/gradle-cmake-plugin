@@ -53,28 +53,11 @@ tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
 }
 ```
 
-# Package Tasks
+# Install Tasks
 
-[`io.github.tomaki19.gradle.cmake.tasks.CMakePackage`](CMakePackage.java)
+[`io.github.tomaki19.gradle.cmake.tasks.CMakeInstall`](CMakeInstall.java)
 
-These tasks create zip packages containing the built binaries. The default package name is <buildTarget>-<version>.zip
-
-### Customize Package Tasks
-
-You may want to customize the package tasks, e.g. by adding additional files:
-
-```groovy
-tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakePackage) {
-    doFirst {
-        mkdir('build/tmp')
-        file('build/tmp/description.txt').write("""
-            name=${archiveBaseName}
-            version=${project.version}
-            """)
-    }
-    from("${project.buildDir}/tmp").include('description.txt')
-}
-```
+These tasks copy the primary artifact of a build, as well as all its runtime dependencies to a install directory: build/cmake/install/<buildTarget>/
 
 # Custom Exec Tasks
 

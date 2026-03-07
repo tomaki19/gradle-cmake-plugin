@@ -20,9 +20,9 @@ class CMakeFileConventionsTest {
   }
 
   @Test
-  void testProjectTargetWithLinkage() {
-    assertEquals("MyProject-mytarget-static-mytoolchain-debug",
-        CMakeFileConventions.projectTarget("MyProject", "MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+  void testModuleTargetWithLinkage() {
+    assertEquals("MyProject-mytarget-static-mytoolchain-debug-module",
+        CMakeFileConventions.moduleTarget("MyProject", "MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test

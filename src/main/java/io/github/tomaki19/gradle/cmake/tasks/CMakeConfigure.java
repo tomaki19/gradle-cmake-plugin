@@ -9,11 +9,13 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.gradle.api.file.Directory;
+import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
+@CacheableTask
 public abstract class CMakeConfigure extends CMakeExec {
 
   @javax.inject.Inject
