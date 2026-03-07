@@ -15,7 +15,6 @@ class CMakeFileConventionsTest {
   @Test
   void testConstants() {
     assertEquals("cmake/config", CMakeFileConventions.CMAKE_CONFIG_PATH);
-    // assertEquals("cmake/export", CMakeFileConventions.CMAKE_EXPORT_PATH);
     assertEquals("cmake/install", CMakeFileConventions.CMAKE_INSTALL_PATH);
   }
 
