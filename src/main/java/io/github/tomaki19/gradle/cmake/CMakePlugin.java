@@ -32,6 +32,7 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeInstall;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
 
 public class CMakePlugin implements Plugin<Project> {
@@ -118,25 +119,58 @@ public class CMakePlugin implements Plugin<Project> {
         if (toolchain.hasBinaries()) {
           buildAllToolchainTask = Optional.of(taskRegistry.buildAllToolchainTask(project.getTasks(), toolchain));
           buildAllToolchainTask.ifPresent((taskProvider) -> {
-            taskProvider.configure((task) -> {
-              task.setGroup(CMakeTaskRegistry.GROUP_BUILD);
-            });
+            taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_BUILD));
             taskRegistry.buildTask(project.getTasks()).configure((task) -> task.dependsOn(taskProvider));
           });
         }
 
         Optional<TaskProvider<?>> checkAllToolchainTask = Optional.empty();
-        if (toolchain.hasBinaries()) {
+        if (toolchain.hasTests()) {
           checkAllToolchainTask = Optional.of(taskRegistry.checkAllToolchainTask(project.getTasks(), toolchain));
           checkAllToolchainTask.ifPresent((taskProvider) -> {
-            taskProvider.configure((task) -> {
-              task.setGroup(CMakeTaskRegistry.GROUP_CHECK);
-            });
+            taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_CHECK));
             taskRegistry.checkTask(project.getTasks()).configure((task) -> task.dependsOn(taskProvider));
           });
         }
 
+        Optional<TaskProvider<?>> installAllToolchainTask = Optional.empty();
+        if (toolchain.hasApplications() || toolchain.hasBinaryLibraries()) {
+          installAllToolchainTask = Optional.of(taskRegistry.installAllToolchainTask(project.getTasks(), toolchain));
+          installAllToolchainTask.ifPresent((taskProvider) -> {
+            taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_INSTALL));
+          });
+        }
+
         for (final String buildConfig : toolchain.getBuildConfigs()) {
+          Optional<TaskProvider<?>> buildAllBuildConfigTask = Optional.empty();
+          if (toolchain.hasBinaries()) {
+            buildAllBuildConfigTask = Optional.of(taskRegistry.buildAllBuildConfigTask(project.getTasks(), toolchain,
+                buildConfig));
+            buildAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_BUILD));
+              taskRegistry.buildTask(project.getTasks()).configure((task) -> task.dependsOn(taskProvider));
+            });
+          }
+
+          Optional<TaskProvider<?>> checkAllBuildConfigTask = Optional.empty();
+          if (toolchain.hasTests()) {
+            checkAllBuildConfigTask = Optional.of(taskRegistry.checkAllBuildConfigTask(project.getTasks(), toolchain,
+                buildConfig));
+            checkAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_CHECK));
+              taskRegistry.checkTask(project.getTasks()).configure((task) -> task.dependsOn(taskProvider));
+            });
+          }
+
+          Optional<TaskProvider<?>> installAllBuildConfigTask = Optional.empty();
+          if (toolchain.hasApplications() || toolchain.hasBinaryLibraries()) {
+            installAllBuildConfigTask = Optional.of(taskRegistry.installAllBuildConfigTask(project.getTasks(),
+                toolchain, buildConfig));
+            installAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_INSTALL));
+            });
+          }
+
           final TaskProvider<CMakeConfigure> configureTask = taskRegistry.configureTask(project.getTasks(), toolchain,
               buildConfig);
           configureTask.configure((task) -> {
@@ -178,6 +212,19 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
+            buildAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(buildTask));
+            });
+
+            final TaskProvider<CMakeInstall> installTask = taskRegistry.installTask(project.getTasks(), library,
+                toolchain, buildConfig);
+            installTask.configure((task) -> task.dependsOn(buildTask));
+            installAllToolchainTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(installTask));
+            });
+            installAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(installTask));
+            });
           }
           for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
             final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModuleTask(project.getTasks(),
@@ -201,8 +248,19 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
-            taskRegistry.installTask(project.getTasks(), library, toolchain, buildConfig)
-                .configure((task) -> task.dependsOn(buildTask));
+            buildAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(buildTask));
+            });
+
+            final TaskProvider<CMakeInstall> installTask = taskRegistry.installTask(project.getTasks(), library,
+                toolchain, buildConfig);
+            installTask.configure((task) -> task.dependsOn(buildTask));
+            installAllToolchainTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(installTask));
+            });
+            installAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(installTask));
+            });
           }
 
           for (final CMakeResolvedExecutable application : toolchain.getApplications()) {
@@ -223,8 +281,19 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
-            taskRegistry.installTask(project.getTasks(), application, toolchain, buildConfig)
-                .configure((task) -> task.dependsOn(buildTask));
+            buildAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(buildTask));
+            });
+
+            final TaskProvider<CMakeInstall> installTask = taskRegistry.installTask(project.getTasks(), application,
+                toolchain, buildConfig);
+            installTask.configure((task) -> task.dependsOn(buildTask));
+            installAllToolchainTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(installTask));
+            });
+            installAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(installTask));
+            });
           }
 
           for (final CMakeResolvedExecutable test : toolchain.getTests()) {
@@ -245,6 +314,9 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
+            buildAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(buildTask));
+            });
 
             final TaskProvider<CMakeCheck> checkTask = taskRegistry.checkTask(project.getTasks(), test, toolchain,
                 buildConfig);
@@ -252,10 +324,15 @@ public class CMakePlugin implements Plugin<Project> {
             checkAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(checkTask));
             });
+            checkAllBuildConfigTask.ifPresent((taskProvider) -> {
+              taskProvider.configure((task) -> task.dependsOn(checkTask));
+            });
           }
         }
       }
-    } catch (Exception e) {
+    } catch (
+
+    Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
   }

@@ -41,6 +41,14 @@ public final class CMakeTasksConventions {
     return "configure-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
+  static String buildAllToolchainTaskName(final String toolchainName) {
+    return "build-all-%s".formatted(toolchainName.toLowerCase());
+  }
+
+  static String buildAllBuildConfigTaskName(final String toolchainName, final String buildConfig) {
+    return "build-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
+  }
+
   static String buildTaskName(final String projectName, final String targetName, CMakeLinkType linkType,
       final String toolchainName, final String buildConfig) {
     return ":%s:build-%s-%s-%s-%s".formatted(projectName, targetName.toLowerCase(), linkType.toLowerCase(),
@@ -57,8 +65,12 @@ public final class CMakeTasksConventions {
     return "build-%s-%s-%s".formatted(targetName.toLowerCase(), toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String buildAllTaskName(final String toolchainName) {
-    return "build-all-%s".formatted(toolchainName.toLowerCase());
+  static String checkAllToolchainTaskName(final String toolchainName) {
+    return "check-all-%s".formatted(toolchainName.toLowerCase());
+  }
+
+  static String checkAllBuildConfigTaskName(final String toolchainName, final String buildConfig) {
+    return "check-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
   static String checkTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,
@@ -71,8 +83,12 @@ public final class CMakeTasksConventions {
     return "check-%s-%s-%s".formatted(targetName.toLowerCase(), toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String checkAllTaskName(final String toolchainName) {
-    return "check-all-%s".formatted(toolchainName.toLowerCase());
+  static String installAllToolchainTaskName(final String toolchainName) {
+    return "install-all-%s".formatted(toolchainName.toLowerCase());
+  }
+
+  static String installAllBuildConfigTaskName(final String toolchainName, final String buildConfig) {
+    return "install-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
   static String installTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,

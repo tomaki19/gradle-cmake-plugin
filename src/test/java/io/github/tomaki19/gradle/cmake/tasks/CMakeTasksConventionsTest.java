@@ -68,8 +68,14 @@ class CMakeTasksConventionsTest {
   }
 
   @Test
-  void testBuildAllTaskName() {
-    assertEquals("build-all-mytoolchain", CMakeTasksConventions.buildAllTaskName("MyToolchain"));
+  void testBuildAllToolchainTaskName() {
+    assertEquals("build-all-mytoolchain", CMakeTasksConventions.buildAllToolchainTaskName("MyToolchain"));
+  }
+
+  @Test
+  void testBuildAllBuildConfigTaskName() {
+    assertEquals("build-all-mytoolchain-debug",
+        CMakeTasksConventions.buildAllBuildConfigTaskName("MyToolchain", "Debug"));
   }
 
   @Test
@@ -85,8 +91,14 @@ class CMakeTasksConventionsTest {
   }
 
   @Test
-  void testCheckAllTaskName() {
-    assertEquals("check-all-mytoolchain", CMakeTasksConventions.checkAllTaskName("MyToolchain"));
+  void testCheckAllToolchainTaskName() {
+    assertEquals("check-all-mytoolchain", CMakeTasksConventions.checkAllToolchainTaskName("MyToolchain"));
+  }
+
+  @Test
+  void testCheckBuildConfigTaskName() {
+    assertEquals("check-all-mytoolchain-debug",
+        CMakeTasksConventions.checkAllBuildConfigTaskName("MyToolchain", "Debug"));
   }
 
   @Test

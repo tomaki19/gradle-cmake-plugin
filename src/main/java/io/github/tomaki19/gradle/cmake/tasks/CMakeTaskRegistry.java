@@ -84,6 +84,17 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName, CMakeConfigure.class, toolchain, buildConfig);
   }
 
+  public TaskProvider<Task> buildAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
+    final String taskName = CMakeTasksConventions.buildAllToolchainTaskName(toolchain.getName());
+    return tasks.register(taskName);
+  }
+
+  public TaskProvider<Task> buildAllBuildConfigTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    final String taskName = CMakeTasksConventions.buildAllBuildConfigTaskName(toolchain.getName(), buildConfig);
+    return tasks.register(taskName);
+  }
+
   public TaskProvider<CMakeBuildLibrary> buildTask(final TaskContainer tasks, final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.buildTaskName(library.getName(), library.getLinkType(),
@@ -98,6 +109,17 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName, CMakeBuildExecutable.class, binary, toolchain, buildConfig);
   }
 
+  public TaskProvider<Task> checkAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
+    final String taskName = CMakeTasksConventions.checkAllToolchainTaskName(toolchain.getName());
+    return tasks.register(taskName);
+  }
+
+  public TaskProvider<Task> checkAllBuildConfigTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    final String taskName = CMakeTasksConventions.checkAllBuildConfigTaskName(toolchain.getName(), buildConfig);
+    return tasks.register(taskName);
+  }
+
   public TaskProvider<CMakeCheck> checkTask(final TaskContainer tasks, final CMakeResolvedExecutable test,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.checkTaskName(test.getName(), toolchain.getName(),
@@ -105,13 +127,14 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName, CMakeCheck.class, test, toolchain, buildConfig);
   }
 
-  public TaskProvider<Task> buildAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
-    final String taskName = CMakeTasksConventions.buildAllTaskName(toolchain.getName());
+  public TaskProvider<Task> installAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
+    final String taskName = CMakeTasksConventions.installAllToolchainTaskName(toolchain.getName());
     return tasks.register(taskName);
   }
 
-  public TaskProvider<Task> checkAllToolchainTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain) {
-    final String taskName = CMakeTasksConventions.checkAllTaskName(toolchain.getName());
+  public TaskProvider<Task> installAllBuildConfigTask(final TaskContainer tasks, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    final String taskName = CMakeTasksConventions.installAllBuildConfigTaskName(toolchain.getName(), buildConfig);
     return tasks.register(taskName);
   }
 
