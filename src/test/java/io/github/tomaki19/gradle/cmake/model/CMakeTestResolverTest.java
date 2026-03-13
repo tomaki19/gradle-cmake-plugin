@@ -40,12 +40,12 @@ public class CMakeTestResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-loption")),
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
-            new CMakeExecutableDependencies("InterfaceLibrary0").linkInterface(),
+            new CMakeExecutableDependencies("InterfaceLibrary0").link(CMakeLinkType.INTERFACE),
             new CMakeExecutableDependencies("BinaryLibrary0")
-                .from(project.getName()).linkShared()));
+                .from(project.getName()).link(CMakeLinkType.SHARED)));
     TestCMakeTest.register("Test0", extension);
 
     assertEquals(1, extension.getPackages().size());
@@ -84,16 +84,20 @@ public class CMakeTestResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
-        Arrays.asList(new CMakeBuildItems(false, "-loption").setPublic()),
         Arrays.asList(
-            new CMakeExecutableDependencies("target").from("Package0").setPublic(),
-            new CMakeExecutableDependencies("InterfaceLibrary0").linkInterface().setPublic(),
-            new CMakeExecutableDependencies("BinaryLibrary0").from(project.getName()).linkShared().setPublic()));
+            new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-loption")),
+        Arrays.asList(
+            new CMakeExecutableDependencies("target").from("Package0").visibility(CMakeVisibilityType.PUBLIC),
+            new CMakeExecutableDependencies("InterfaceLibrary0").link(CMakeLinkType.INTERFACE)
+                .visibility(CMakeVisibilityType.PUBLIC),
+            new CMakeExecutableDependencies("BinaryLibrary0").from(project.getName()).link(CMakeLinkType.SHARED)
+                .visibility(CMakeVisibilityType.PUBLIC)));
     TestCMakeToolchain.registerWithTestDependencies("Toolchain1", extension,
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-loption")),
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package1"),
-            new CMakeExecutableDependencies("InterfaceLibrary1").from(project.getName()).linkInterface()));
+            new CMakeExecutableDependencies("InterfaceLibrary1").from(project.getName())
+                .link(CMakeLinkType.INTERFACE)));
     TestCMakeTest.register("Test0", extension,
         Arrays.asList("Toolchain1", "Toolchain0"));
 
@@ -190,12 +194,12 @@ public class CMakeTestResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithTestDependencies("Toolchain0", extension,
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-loption")),
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
             new CMakeExecutableDependencies("InterfaceLibrary0")
-                .from(project.getName()).linkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").linkShared()));
+                .from(project.getName()).link(CMakeLinkType.INTERFACE),
+            new CMakeExecutableDependencies("BinaryLibrary0").link(CMakeLinkType.SHARED)));
     TestCMakeTest.register("Test0", extension,
         Arrays.asList("Toolchain0"));
 
@@ -235,12 +239,12 @@ public class CMakeTestResolverTest {
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeTest.registerWithDependencies("Test0", extension,
         Arrays.asList("Toolchain0"),
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-loption")),
         Arrays.asList(
             new CMakeExecutableDependencies("target").from("Package0"),
             new CMakeExecutableDependencies("InterfaceLibrary0")
-                .from(project.getName()).linkInterface(),
-            new CMakeExecutableDependencies("BinaryLibrary0").linkShared()));
+                .from(project.getName()).link(CMakeLinkType.INTERFACE),
+            new CMakeExecutableDependencies("BinaryLibrary0").link(CMakeLinkType.SHARED)));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());

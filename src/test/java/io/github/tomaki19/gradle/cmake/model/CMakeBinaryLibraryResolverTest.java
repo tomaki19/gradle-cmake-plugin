@@ -37,10 +37,11 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-loption")),
         Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0").forStaticBuild(),
-            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).linkShared().forStaticBuild()));
+            new CMakeLibraryDependencies("target").from("Package0").build(CMakeBuildType.STATIC),
+            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).link(CMakeLinkType.SHARED)
+                .build(CMakeBuildType.STATIC)));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension);
 
     assertEquals(1, extension.getPackages().size());
@@ -140,11 +141,12 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-loption")),
         Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0").forSharedBuild(),
-            new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface().forSharedBuild(),
-            new CMakeLibraryDependencies("BinaryLibrary0").linkShared().forSharedBuild()));
+            new CMakeLibraryDependencies("target").from("Package0").build(CMakeBuildType.SHARED),
+            new CMakeLibraryDependencies("InterfaceLibrary0").link(CMakeLinkType.INTERFACE)
+                .build(CMakeBuildType.SHARED),
+            new CMakeLibraryDependencies("BinaryLibrary0").link(CMakeLinkType.SHARED).build(CMakeBuildType.SHARED)));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"));
 
@@ -183,11 +185,11 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeBinaryLibrary.registerWithDependencies("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"),
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-loption")),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0"),
-            new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()));
+            new CMakeLibraryDependencies("InterfaceLibrary0").link(CMakeLinkType.INTERFACE),
+            new CMakeLibraryDependencies("BinaryLibrary0").link(CMakeLinkType.SHARED)));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());
@@ -224,11 +226,11 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeBinaryLibrary.registerWithDependencies("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"),
-        Arrays.asList(new CMakeBuildItems(true, "-loption")),
+        Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-loption")),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0"),
-            new CMakeLibraryDependencies("InterfaceLibrary0").from(project.getName()).linkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()));
+            new CMakeLibraryDependencies("InterfaceLibrary0").from(project.getName()).link(CMakeLinkType.INTERFACE),
+            new CMakeLibraryDependencies("BinaryLibrary0").link(CMakeLinkType.SHARED)));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());

@@ -11,17 +11,17 @@ import org.junit.jupiter.api.Test;
 
 class CMakeLinkTypeTest {
 
-    @Test
-    void testLinkageValues() {
-        assertNotNull(CMakeLinkType.STATIC);
-        assertNotNull(CMakeLinkType.SHARED);
-        assertNotNull(CMakeLinkType.INTERFACE);
-    }
+  @Test
+  void testLinkageValues() {
+    assertNotNull(CMakeLinkType.STATIC);
+    assertNotNull(CMakeLinkType.SHARED);
+    assertNotNull(CMakeLinkType.INTERFACE);
+  }
 
-    @Test
-    void testLinkageToString() {
-        assertEquals("static", CMakeLinkType.STATIC.toString());
-        assertEquals("shared", CMakeLinkType.SHARED.toString());
-        assertEquals("interface", CMakeLinkType.INTERFACE.toString());
-    }
+  @Test
+  void testLinkageToString() {
+    assertEquals("static", CMakeLinkType.STATIC.toLowerCase());
+    assertEquals("shared", CMakeLinkType.SHARED.toLowerCase());
+    assertEquals("interface", CMakeLinkType.INTERFACE.toLowerCase());
+  }
 }

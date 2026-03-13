@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-import java.util.Optional;
 import java.util.Objects;
 
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
@@ -13,10 +12,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
   private final CMakeLinkType linkType;
 
   CMakeResolvedProjectDependency(final String name, final CMakeResolvedProject resolvedProject,
-      final Optional<CMakeLinkType> linkage) {
+      final CMakeLinkType linkType) {
     super(name);
     this.resolvedProject = resolvedProject;
-    this.linkType = linkage.orElse(CMakeLinkType.SHARED);
+    this.linkType = linkType;
   }
 
   public CMakeResolvedProject getResolvedProject() {

@@ -8,14 +8,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+
 abstract class CMakeCompiling {
 
   private final Collection<CMakeBuildItems> defines = new HashSet<>();
   private final Collection<CMakeBuildItems> options = new HashSet<>();
-  private boolean visibilityPrivate;
+  private CMakeVisibilityType defaultVisibilityType;
 
-  CMakeCompiling(final boolean defaultPrivate) {
-    this.visibilityPrivate = defaultPrivate;
+  CMakeCompiling(final CMakeVisibilityType defaultVisibilityType) {
+    this.defaultVisibilityType = defaultVisibilityType;
   }
 
   public Collection<CMakeBuildItems> getDefines() {
@@ -23,7 +25,7 @@ abstract class CMakeCompiling {
   }
 
   public CMakeBuildItems defines(CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(visibilityPrivate, values);
+    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
     defines.add(entry);
     return entry;
   }
@@ -33,7 +35,7 @@ abstract class CMakeCompiling {
   }
 
   public CMakeBuildItems options(CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(visibilityPrivate, values);
+    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
     options.add(entry);
     return entry;
   }

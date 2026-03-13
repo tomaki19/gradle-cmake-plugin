@@ -5,11 +5,12 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 public class CMakeExecutableDependencies extends CMakeBinaryDependencies {
 
   public CMakeExecutableDependencies(final CharSequence... names) {
-    super(true, names);
+    super(CMakeLinkType.SHARED, CMakeVisibilityType.PRIVATE, names);
   }
 
   public CMakeExecutableDependencies from(final CharSequence value) {
@@ -17,28 +18,13 @@ public class CMakeExecutableDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeExecutableDependencies linkStatic() {
-    setLinkType(CMakeLinkType.STATIC);
+  public CMakeExecutableDependencies link(final CMakeLinkType type) {
+    setLinkType(type);
     return this;
   }
 
-  public CMakeExecutableDependencies linkShared() {
-    setLinkType(CMakeLinkType.SHARED);
-    return this;
-  }
-
-  public CMakeExecutableDependencies linkInterface() {
-    setLinkType(CMakeLinkType.INTERFACE);
-    return this;
-  }
-
-  public CMakeExecutableDependencies setPrivate() {
-    setVisibilityPrivate(true);
-    return this;
-  }
-
-  public CMakeExecutableDependencies setPublic() {
-    setVisibilityPrivate(false);
+  public CMakeExecutableDependencies visibility(final CMakeVisibilityType type) {
+    setVisibilityType(type);
     return this;
   }
 

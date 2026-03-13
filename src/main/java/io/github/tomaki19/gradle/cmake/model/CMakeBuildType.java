@@ -7,8 +7,7 @@ package io.github.tomaki19.gradle.cmake.model;
 public enum CMakeBuildType {
   STATIC, SHARED, MODULE;
 
-  @Override
-  public String toString() {
+  public String toLowerCase() {
     return name().toLowerCase();
   }
 }

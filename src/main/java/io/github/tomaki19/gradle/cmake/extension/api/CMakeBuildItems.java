@@ -10,13 +10,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+
 public class CMakeBuildItems {
 
   private final Set<String> names = new HashSet<>();
-  private boolean visibilityPrivate;
+  private CMakeVisibilityType visibilityType;
 
-  public CMakeBuildItems(final boolean defaultPrivate, final CharSequence... names) {
-    this.visibilityPrivate = defaultPrivate;
+  public CMakeBuildItems(final CMakeVisibilityType defaultVisibilityType, final CharSequence... names) {
+    this.visibilityType = defaultVisibilityType;
     this.names.addAll(Arrays.asList(names).stream().map((name) -> name.toString()).toList());
   }
 
@@ -24,18 +26,13 @@ public class CMakeBuildItems {
     return Collections.unmodifiableCollection(names);
   }
 
-  public boolean isPrivate() {
-    return visibilityPrivate;
+  protected CMakeVisibilityType visibility(final CMakeVisibilityType type) {
+    this.visibilityType = type;
+    return type;
   }
 
-  public CMakeBuildItems setPrivate() {
-    this.visibilityPrivate = true;
-    return this;
-  }
-
-  public CMakeBuildItems setPublic() {
-    this.visibilityPrivate = false;
-    return this;
+  public CMakeVisibilityType getVisibilityType() {
+    return visibilityType;
   }
 
   @Override
@@ -43,7 +40,7 @@ public class CMakeBuildItems {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((names == null) ? 0 : names.hashCode());
-    result = prime * result + (visibilityPrivate ? 1231 : 1237);
+    result = prime * result + ((visibilityType == null) ? 0 : visibilityType.hashCode());
     return result;
   }
 
@@ -61,7 +58,7 @@ public class CMakeBuildItems {
         return false;
     } else if (!names.equals(other.names))
       return false;
-    if (visibilityPrivate != other.visibilityPrivate)
+    if (visibilityType != other.visibilityType)
       return false;
     return true;
   }

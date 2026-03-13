@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+
 class CMakeLibraryDependenciesTest {
 
   @Test
@@ -26,42 +29,42 @@ class CMakeLibraryDependenciesTest {
   @Test
   void testFrom() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.from("myproject");
-    assertEquals("myproject", deps.getFrom().get());
+    deps.from("myProject");
+    assertEquals("myProject", deps.getFrom());
   }
 
   @Test
   void testGetLinkStatic() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.linkStatic();
-    assertEquals("static", deps.getLinkType().get().toString());
+    deps.link(CMakeLinkType.STATIC);
+    assertEquals("static", deps.getLinkType().toLowerCase());
   }
 
   @Test
   void testGetLinkShared() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.linkShared();
-    assertEquals("shared", deps.getLinkType().get().toString());
+    deps.link(CMakeLinkType.SHARED);
+    assertEquals("shared", deps.getLinkType().toLowerCase());
   }
 
   @Test
   void testGetLinkInterface() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.linkInterface();
-    assertEquals("interface", deps.getLinkType().get().toString());
+    deps.link(CMakeLinkType.INTERFACE);
+    assertEquals("interface", deps.getLinkType().toLowerCase());
   }
 
   @Test
   void testGetForStaticBuild() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.forStaticBuild();
-    assertEquals("static", deps.getBuildType().get().toString());
+    deps.build(CMakeBuildType.STATIC);
+    assertEquals("static", deps.getBuildType().toLowerCase());
   }
 
   @Test
   void testGetForSharedBuild() {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.forSharedBuild();
-    assertEquals("shared", deps.getBuildType().get().toString());
+    deps.build(CMakeBuildType.SHARED);
+    assertEquals("shared", deps.getBuildType().toLowerCase());
   }
 }

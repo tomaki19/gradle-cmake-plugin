@@ -8,12 +8,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+
 public class CMakeExecutableLinking extends CMakeLinking {
 
   final Collection<CMakeExecutableDependencies> dependencies = new HashSet<>();
 
   public CMakeExecutableLinking() {
-    super(true);
+    super(CMakeVisibilityType.PRIVATE);
   }
 
   public Collection<CMakeExecutableDependencies> getDependencies() {

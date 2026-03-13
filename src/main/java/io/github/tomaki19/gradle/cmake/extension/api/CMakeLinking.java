@@ -8,13 +8,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+
 abstract class CMakeLinking {
 
-  final Collection<CMakeBuildItems> options = new HashSet<>();
-  private boolean visibilityPrivate;
+  public static final CMakeLinkType Static = CMakeLinkType.STATIC;
+  public static final CMakeLinkType Shared = CMakeLinkType.SHARED;
+  public static final CMakeLinkType Interface = CMakeLinkType.INTERFACE;
 
-  CMakeLinking(final boolean defaultPrivate) {
-    this.visibilityPrivate = defaultPrivate;
+  public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
+  public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;
+
+  private final Collection<CMakeBuildItems> options = new HashSet<>();
+  private CMakeVisibilityType defaultVisibilityType;
+
+  CMakeLinking(final CMakeVisibilityType defaultVisibilityType) {
+    this.defaultVisibilityType = defaultVisibilityType;
   }
 
   public Collection<CMakeBuildItems> getOptions() {
@@ -22,7 +32,7 @@ abstract class CMakeLinking {
   }
 
   public CMakeBuildItems options(final CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(visibilityPrivate, values);
+    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
     options.add(entry);
     return entry;
   }

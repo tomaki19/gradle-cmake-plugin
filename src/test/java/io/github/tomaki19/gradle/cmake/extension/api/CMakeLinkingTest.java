@@ -11,6 +11,8 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+
 class CMakeExecutableLinkingTest {
 
   @Test
@@ -40,7 +42,7 @@ class CMakeExecutableLinkingTest {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
     linking.options("-L/usr/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals(new CMakeBuildItems(true,"-L/usr/lib"), linking.getOptions().iterator().next());
+    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PRIVATE,"-L/usr/lib"), linking.getOptions().iterator().next());
   }
 
   @Test
@@ -48,7 +50,7 @@ class CMakeExecutableLinkingTest {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
     linking.options("-L/usr/lib", "-L/usr/local/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals(new CMakeBuildItems(true,"-L/usr/lib", "-L/usr/local/lib"), linking.getOptions().iterator().next());
+    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PRIVATE,"-L/usr/lib", "-L/usr/local/lib"), linking.getOptions().iterator().next());
   }
 
   @Test

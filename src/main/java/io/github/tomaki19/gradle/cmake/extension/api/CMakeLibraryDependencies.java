@@ -4,16 +4,17 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Optional;
-
+import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
 
-  private Optional<CMakeLinkType> buildType = Optional.empty();
+  private CMakeBuildType buildType;
 
   public CMakeLibraryDependencies(final CharSequence... names) {
-    super(false, names);
+    super(CMakeLinkType.SHARED, CMakeVisibilityType.PUBLIC, names);
+    buildType = CMakeBuildType.SHARED;
   }
 
   public CMakeLibraryDependencies from(final CharSequence value) {
@@ -21,42 +22,22 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeLibraryDependencies linkStatic() {
-    setLinkType(CMakeLinkType.STATIC);
+  public CMakeLibraryDependencies link(final CMakeLinkType type) {
+    setLinkType(type);
     return this;
   }
 
-  public CMakeLibraryDependencies linkShared() {
-    setLinkType(CMakeLinkType.SHARED);
+  public CMakeLibraryDependencies visibility(final CMakeVisibilityType type) {
+    setVisibilityType(type);
     return this;
   }
 
-  public CMakeLibraryDependencies linkInterface() {
-    setLinkType(CMakeLinkType.INTERFACE);
-    return this;
-  }
-
-  public Optional<CMakeLinkType> getBuildType() {
+  public CMakeBuildType getBuildType() {
     return buildType;
   }
 
-  public CMakeLibraryDependencies forStaticBuild() {
-    this.buildType = Optional.of(CMakeLinkType.STATIC);
-    return this;
-  }
-
-  public CMakeLibraryDependencies forSharedBuild() {
-    this.buildType = Optional.of(CMakeLinkType.SHARED);
-    return this;
-  }
-
-  public CMakeLibraryDependencies setPrivate() {
-    setVisibilityPrivate(true);
-    return this;
-  }
-
-  public CMakeLibraryDependencies setPublic() {
-    setVisibilityPrivate(false);
+  public CMakeLibraryDependencies build(final CMakeBuildType type) {
+    this.buildType = type;
     return this;
   }
 

@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+
 class CMakeBinaryDependenciesTest {
 
   @Test
@@ -29,14 +32,14 @@ class CMakeBinaryDependenciesTest {
   void testFrom() {
     CMakeBinaryDependencies deps = new TestCMakeBinaryDependencies("mylib");
     deps.setFrom("myproject");
-    assertEquals("myproject", deps.getFrom().get());
+    assertEquals("myproject", deps.getFrom());
   }
 
   @Test
   void testGetLinkage() {
     CMakeBinaryDependencies deps = new TestCMakeBinaryDependencies("mylib");
     deps.setLinkType(io.github.tomaki19.gradle.cmake.model.CMakeLinkType.STATIC);
-    assertEquals("static", deps.getLinkType().get().toString());
+    assertEquals("static", deps.getLinkType().toLowerCase());
   }
 
   @Test
@@ -90,7 +93,7 @@ class CMakeBinaryDependenciesTest {
 
   private static class TestCMakeBinaryDependencies extends CMakeBinaryDependencies {
     TestCMakeBinaryDependencies(CharSequence... names) {
-      super(true, names);
+      super(CMakeLinkType.SHARED, CMakeVisibilityType.PUBLIC, names);
     }
   }
 }
