@@ -46,12 +46,9 @@ toolchains {
         options(<List<String>>) //optional
         dependencies(<List<String>>)
           .from(<String>) //optional
-          .linkStatic() //optional
-          .linkShared() //optional
-          .linkInterface() //optional
-          .forStaticBuild() //optional
-          .forSharedBuild() //optional
-          .setPrivate() //optional
+          .build(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
+          .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
+          .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
       }
       stripDebug = boolean //optional, default: false
       buildTypes List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
@@ -65,12 +62,9 @@ toolchains {
         options(<List<String>>) //optional
         dependencies(<List<String>>)
           .from(<String>) //optional
-          .linkStatic() //optional
-          .linkShared() //optional
-          .linkInterface() //optional
-          .forStaticBuild() //optional
-          .forSharedBuild() //optional
-          .setPublic() //optional
+          .build(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
+          .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
+          .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
       }
       stripDebug = //optional: boolean, default: false
     }
@@ -83,12 +77,8 @@ toolchains {
         options(<List<String>>) //optional
         dependencies(<List<String>>)
           .from(<String>) //optional
-          .linkStatic() //optional
-          .linkShared() //optional
-          .linkInterface() //optional
-          .forStaticBuild() //optional
-          .forSharedBuild() //optional
-          .setPublic() //optional
+          .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
+          .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
       }
       stripDebug = //optional: boolean, default: false
       testResultsXmlOutput = //optional: boolean, default: false
@@ -114,19 +104,16 @@ libraries {
       srcDirs <List<String>> //optional
     }
     compiling {
-      defines <List<String>> //optional
       options <List<String>> //optional
+      defines <List<String>> //optional
     }
     linking {
       options(<List<String>>) //optional
       dependencies(<List<String>>)
         .from(<String>) //optional
-        .linkStatic() //optional
-        .linkShared() //optional
-        .linkInterface() //optional
-        .forStaticBuild() //optional
-        .forSharedBuild() //optional
-        .setPrivate() //optional
+        .build(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
+        .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
+        .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
     }
     outputName <String> //optional
     buildTypes List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
@@ -152,19 +139,15 @@ applications {
       srcDirs <List<String>> //optional
     }
     compiling {
-      defines <List<String>> //optional
       options <List<String>> //optional
+      defines <List<String>> //optional
     }
     linking {
       options(<List<String>>) //optional
       dependencies(<List<String>>)
         .from(<String>) //optional
-        .linkStatic() //optional
-        .linkShared() //optional
-        .linkInterface() //optional
-        .forStaticBuild() //optional
-        .forSharedBuild() //optional
-        .setPublic() //optional
+        .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
+        .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Private
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -189,19 +172,15 @@ tests {
       srcDirs <List<String>> //optional
     }
     compiling {
-      defines <List<String>> //optional
       options <List<String>> //optional
+      defines <List<String>> //optional
     }
     linking {
       options(<List<String>>) //optional
       dependencies(<List<String>>)
         .from(<String>) //optional
-        .linkStatic() //optional
-        .linkShared() //optional
-        .linkInterface() //optional
-        .forStaticBuild() //optional
-        .forSharedBuild() //optional
-        .setPublic() //optional
+        .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
+        .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Private
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
