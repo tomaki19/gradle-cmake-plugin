@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeSet;
 
 import org.gradle.api.file.Directory;
 
@@ -137,41 +136,26 @@ public final class CMakeListsFile extends CMakeFileContent {
           || !toolchain.getSharedLibraries().isEmpty()) {
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final CMakeResolvedLibrary component : toolchain.getInterfaceLibraries()) {
-          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
-          packageDependencies.addAll(component.getPrivatePackageDependencies());
-          packageDependencies.addAll(component.getPublicPackageDependencies());
-          writeTargetPackageDependencies(outputStream, 1, packageDependencies);
+          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
           for (final String buildConfig : toolchain.getBuildConfigs()) {
-            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
-            projectDependencies.addAll(component.getPrivateProjectDependencies());
-            projectDependencies.addAll(component.getPublicProjectDependencies());
-            writeTargetProjectDependencies(outputStream, 1, projectDependencies, toolchain, buildConfig);
+            writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
+                buildConfig);
             writeInterfaceLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
         }
         for (final CMakeResolvedLibrary component : toolchain.getStaticLibraries()) {
-          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
-          packageDependencies.addAll(component.getPrivatePackageDependencies());
-          packageDependencies.addAll(component.getPublicPackageDependencies());
-          writeTargetPackageDependencies(outputStream, 1, packageDependencies);
+          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
           for (final String buildConfig : toolchain.getBuildConfigs()) {
-            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
-            projectDependencies.addAll(component.getPrivateProjectDependencies());
-            projectDependencies.addAll(component.getPublicProjectDependencies());
-            writeTargetProjectDependencies(outputStream, 1, projectDependencies, toolchain, buildConfig);
+            writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
+                buildConfig);
             writeStaticLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
         }
         for (final CMakeResolvedLibrary component : toolchain.getSharedLibraries()) {
-          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
-          packageDependencies.addAll(component.getPrivatePackageDependencies());
-          packageDependencies.addAll(component.getPublicPackageDependencies());
-          writeTargetPackageDependencies(outputStream, 1, packageDependencies);
+          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
           for (final String buildConfig : toolchain.getBuildConfigs()) {
-            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
-            projectDependencies.addAll(component.getPrivateProjectDependencies());
-            projectDependencies.addAll(component.getPublicProjectDependencies());
-            writeTargetProjectDependencies(outputStream, 1, projectDependencies, toolchain, buildConfig);
+            writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
+                buildConfig);
             writeSharedLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
         }
@@ -186,15 +170,9 @@ public final class CMakeListsFile extends CMakeFileContent {
       if (!toolchain.getApplications().isEmpty()) {
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final CMakeResolvedExecutable component : toolchain.getApplications()) {
-          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
-          packageDependencies.addAll(component.getPrivatePackageDependencies());
-          packageDependencies.addAll(component.getPublicPackageDependencies());
-          writeTargetPackageDependencies(outputStream, 1, packageDependencies);
+          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
           for (final String buildConfig : toolchain.getBuildConfigs()) {
-            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
-            projectDependencies.addAll(component.getPrivateProjectDependencies());
-            projectDependencies.addAll(component.getPublicProjectDependencies());
-            writeTargetProjectDependencies(outputStream, 1, projectDependencies, toolchain,
+            writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
                 buildConfig);
@@ -214,15 +192,9 @@ public final class CMakeListsFile extends CMakeFileContent {
         write(outputStream, "include( CTest )");
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
         for (final CMakeResolvedExecutable component : toolchain.getTests()) {
-          final Collection<CMakeResolvedPackageDependency> packageDependencies = new TreeSet<>();
-          packageDependencies.addAll(component.getPrivatePackageDependencies());
-          packageDependencies.addAll(component.getPublicPackageDependencies());
-          writeTargetPackageDependencies(outputStream, 1, packageDependencies);
+          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
           for (final String buildConfig : toolchain.getBuildConfigs()) {
-            final Collection<CMakeResolvedProjectDependency> projectDependencies = new TreeSet<>();
-            projectDependencies.addAll(component.getPrivateProjectDependencies());
-            projectDependencies.addAll(component.getPublicProjectDependencies());
-            writeTargetProjectDependencies(outputStream, 1, projectDependencies, toolchain,
+            writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
                 buildConfig);
@@ -266,10 +238,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeTargetPrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetPublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetProperties(outputStream, indent, target, outputName, toolchain, buildConfig);
-    final Collection<CMakeResolvedProjectDependency> projectDependencies = new ArrayList<>();
-    projectDependencies.addAll(component.getPrivateProjectDependencies());
-    projectDependencies.addAll(component.getPublicProjectDependencies());
-    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, projectDependencies);
+    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, component.getAllProjectDependencies());
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, indent, target);
     }
@@ -290,10 +259,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeTargetPublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetProperties(outputStream, indent, target, component.getOutputName(), toolchain,
         buildConfig);
-    final Collection<CMakeResolvedProjectDependency> projectDependencies = new ArrayList<>();
-    projectDependencies.addAll(component.getPrivateProjectDependencies());
-    projectDependencies.addAll(component.getPublicProjectDependencies());
-    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, projectDependencies);
+    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, component.getAllProjectDependencies());
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, indent, target);
     }

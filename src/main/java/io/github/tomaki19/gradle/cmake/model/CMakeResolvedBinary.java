@@ -24,8 +24,10 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final Collection<String> publicLinkOptions = new TreeSet<>();
   private final Collection<CMakeResolvedPackageDependency> privatePackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedPackageDependency> publicPackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedPackageDependency> allPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> privateProjectDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> allProjectDependencies = new TreeSet<>();
   private final boolean stripDebug;
 
   CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
@@ -102,6 +104,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   public void addPrivatePackageDependency(final CMakeResolvedPackageDependency dependency) {
     privatePackageDependencies.add(dependency);
+    allPackageDependencies.add(dependency);
   }
 
   public Collection<CMakeResolvedPackageDependency> getPublicPackageDependencies() {
@@ -110,6 +113,11 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   public void addPublicPackageDependency(final CMakeResolvedPackageDependency dependency) {
     publicPackageDependencies.add(dependency);
+    allPackageDependencies.add(dependency);
+  }
+
+  public Collection<CMakeResolvedPackageDependency> getAllPackageDependencies() {
+    return Collections.unmodifiableCollection(allPackageDependencies);
   }
 
   public Collection<CMakeResolvedProjectDependency> getPrivateProjectDependencies() {
@@ -118,6 +126,7 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   public void addPrivateProjectDependency(final CMakeResolvedProjectDependency dependency) {
     privateProjectDependencies.add(dependency);
+    allProjectDependencies.add(dependency);
   }
 
   public Collection<CMakeResolvedProjectDependency> getPublicProjectDependencies() {
@@ -126,6 +135,11 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   public void addPublicProjectDependency(final CMakeResolvedProjectDependency dependency) {
     publicProjectDependencies.add(dependency);
+    allProjectDependencies.add(dependency);
+  }
+
+  public Collection<CMakeResolvedProjectDependency> getAllProjectDependencies() {
+    return Collections.unmodifiableCollection(allProjectDependencies);
   }
 
   public boolean isStripDebug() {

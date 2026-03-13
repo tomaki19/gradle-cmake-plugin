@@ -14,6 +14,9 @@ import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
+  public final static CMakeBuildType Static = CMakeBuildType.STATIC;
+  public final static CMakeBuildType Shared = CMakeBuildType.SHARED;
+
   public SetProperty<CMakeBuildType> getBuildTypes();
 
   public default void buildTypes(final CMakeBuildType... values) {

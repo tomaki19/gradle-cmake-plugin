@@ -10,9 +10,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
 
-  public final static CMakeBuildType Static = CMakeBuildType.STATIC;
-  public final static CMakeBuildType Shared = CMakeBuildType.SHARED;
-
   private CMakeBuildType buildType;
 
   public CMakeLibraryDependencies(final CharSequence... names) {

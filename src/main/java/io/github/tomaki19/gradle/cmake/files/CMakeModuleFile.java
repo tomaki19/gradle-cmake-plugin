@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -44,14 +43,8 @@ public final class CMakeModuleFile extends CMakeFileContent {
     final String target = CMakeFileConventions.buildTarget(getProjectName(), library.getName(),
         library.getLinkType(), toolchain.getName(), buildConfig);
     write(outputStream, 0, "if( NOT TARGET %s )", target);
-    final Collection<CMakeResolvedPackageDependency> packageDependencies = new ArrayList<>();
-    packageDependencies.addAll(library.getPrivatePackageDependencies());
-    packageDependencies.addAll(library.getPublicPackageDependencies());
-    writePackageDependencies(outputStream, 0, packageDependencies);
-    final Collection<CMakeResolvedProjectDependency> projectDependencies = new ArrayList<>();
-    projectDependencies.addAll(library.getPrivateProjectDependencies());
-    projectDependencies.addAll(library.getPublicProjectDependencies());
-    writeProjectDependencies(outputStream, 0, projectDependencies, toolchain, buildConfig);
+    writePackageDependencies(outputStream, 0, library.getAllPackageDependencies());
+    writeProjectDependencies(outputStream, 0, library.getAllProjectDependencies(), toolchain, buildConfig);
     write(outputStream, 1, "add_library( %s %s IMPORTED )", target, library.getLinkType().name());
     writeTargetProperties(outputStream, 1, library, target, buildConfig);
     write(outputStream, 0, "endif()");
