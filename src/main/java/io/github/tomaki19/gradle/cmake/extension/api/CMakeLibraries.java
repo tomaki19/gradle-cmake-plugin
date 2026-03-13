@@ -4,21 +4,29 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Arrays;
+
 import org.gradle.api.Action;
-import org.gradle.api.provider.Property;
+import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Nested;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
+  public final static CMakeBuildType Static = CMakeBuildType.STATIC;
+  public final static CMakeBuildType Shared = CMakeBuildType.SHARED;
+  public final static CMakeBuildType Module = CMakeBuildType.MODULE;
+
   @Nested
-  public abstract CMakeLibraryLinking getPrivateLinking();
+  public CMakeLibraryLinking getPrivateLinking();
 
   public default void privateLinking(Action<CMakeLibraryLinking> action) {
     action.execute(getPrivateLinking());
   }
 
-  public abstract Property<Boolean> getBuildStatic();
+  public SetProperty<CMakeBuildType> getBuildTypes();
 
-  public abstract Property<Boolean> getBuildShared();
+  public default void buildTypes(final CMakeBuildType... values) {
+    getBuildTypes().set(Arrays.asList(values));
+  }
 
 }

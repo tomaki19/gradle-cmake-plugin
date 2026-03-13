@@ -21,6 +21,7 @@ import org.gradle.internal.os.OperatingSystem;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinaryDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildType;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompile;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinking;
@@ -86,8 +87,8 @@ public final class CMakeResolver {
                 resolvedLibrary::addPublicPackageDependency, resolvedLibrary::addPublicProjectDependency);
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {
-            if (toolchain.getLibraries().getBuildStatic().getOrElse(Boolean.FALSE)
-                || component.getBuildStatic().getOrElse(Boolean.FALSE)) {
+            if (toolchain.getLibraries().getBuildTypes().get().contains(CMakeBuildType.STATIC)
+                || component.getBuildTypes().get().contains(CMakeBuildType.STATIC)) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkType.STATIC,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
               resolveCompiling(Arrays.asList(toolchain.getLibraries().getPrivateCompile(),
@@ -106,8 +107,10 @@ public final class CMakeResolver {
                   resolvedLibrary::addPublicPackageDependency, resolvedLibrary::addPublicProjectDependency);
               resolvedToolchain.addStaticLibrary(resolvedLibrary);
             }
-            if (toolchain.getLibraries().getBuildShared().getOrElse(Boolean.TRUE)
-                && component.getBuildShared().getOrElse(Boolean.TRUE)) {
+            if ((toolchain.getLibraries().getBuildTypes().get().isEmpty()
+                || toolchain.getLibraries().getBuildTypes().get().contains(CMakeBuildType.SHARED))
+                && (component.getBuildTypes().get().isEmpty()
+                    || component.getBuildTypes().get().contains(CMakeBuildType.SHARED))) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkType.SHARED,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
               resolveCompiling(Arrays.asList(toolchain.getLibraries().getPrivateCompile(),

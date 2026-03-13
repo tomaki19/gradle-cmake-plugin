@@ -11,7 +11,7 @@ import org.gradle.api.tasks.Nested;
 interface CMakeBinaries {
 
   @Nested
-  public abstract CMakeCompile getPrivateCompile();
+  public CMakeCompile getPrivateCompile();
 
   public default void privateCompile(Action<CMakeCompile> action) {
     action.execute(getPrivateCompile());

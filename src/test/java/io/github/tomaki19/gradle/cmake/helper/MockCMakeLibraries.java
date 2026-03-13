@@ -8,7 +8,9 @@ import static org.mockito.Mockito.mock;
 
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.SetProperty;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildType;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompile;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraries;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
@@ -16,13 +18,11 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
 public class MockCMakeLibraries implements CMakeLibraries {
 
   private final Property<Boolean> stripDebug;
-  private final Property<Boolean> buildStatic;
-  private final Property<Boolean> buildShared;
+  private final SetProperty<CMakeBuildType> libraryTypes;
 
   public MockCMakeLibraries(final ObjectFactory factory) {
     this.stripDebug = factory.property(Boolean.class);
-    this.buildStatic = factory.property(Boolean.class);
-    this.buildShared = factory.property(Boolean.class);
+    this.libraryTypes = factory.setProperty(CMakeBuildType.class);
   }
 
   @Override
@@ -41,12 +41,8 @@ public class MockCMakeLibraries implements CMakeLibraries {
   }
 
   @Override
-  public Property<Boolean> getBuildStatic() {
-    return buildStatic;
+  public SetProperty<CMakeBuildType> getBuildTypes() {
+    return libraryTypes;
   }
 
-  @Override
-  public Property<Boolean> getBuildShared() {
-    return buildShared;
-  }
 }
