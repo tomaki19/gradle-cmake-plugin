@@ -155,16 +155,11 @@ public final class CMakeTaskRegistry {
   }
 
   public static void configureRemote(final CMakeAssemble task, final Project project,
-      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
-    dependencies.addAll(library.getPrivateProjectDependencies());
-    dependencies.addAll(library.getPublicProjectDependencies());
+    dependencies.addAll(binary.getPrivateProjectDependencies());
+    dependencies.addAll(binary.getPublicProjectDependencies());
     configureRemote(task, project, toolchain, buildConfig, dependencies);
-  }
-
-  public static void configureRemote(final CMakeAssemble task, final Project project,
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    configureRemote(task, project, toolchain, buildConfig, executable.getPrivateProjectDependencies());
   }
 
   private static void configureRemote(final CMakeAssemble task, final Project project,
@@ -177,16 +172,11 @@ public final class CMakeTaskRegistry {
   }
 
   public static void configureRemote(final CMakeConfigure task, final Project project,
-      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
-    dependencies.addAll(library.getPrivateProjectDependencies());
-    dependencies.addAll(library.getPublicProjectDependencies());
+    dependencies.addAll(binary.getPrivateProjectDependencies());
+    dependencies.addAll(binary.getPublicProjectDependencies());
     configureRemote(task, project, toolchain, buildConfig, dependencies);
-  }
-
-  public static void configureRemote(final CMakeConfigure task, final Project project,
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    configureRemote(task, project, toolchain, buildConfig, executable.getPrivateProjectDependencies());
   }
 
   private static void configureRemote(final CMakeConfigure task, final Project project,
@@ -198,17 +188,12 @@ public final class CMakeTaskRegistry {
             toolchain.getName(), buildConfig)));
   }
 
-  public static void configureRemote(final CMakeBuild task, final CMakeResolvedLibrary library,
+  public static void configureRemote(final CMakeBuild task, final CMakeResolvedBinary<?> binary,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
-    dependencies.addAll(library.getPrivateProjectDependencies());
-    dependencies.addAll(library.getPublicProjectDependencies());
+    dependencies.addAll(binary.getPrivateProjectDependencies());
+    dependencies.addAll(binary.getPublicProjectDependencies());
     configureRemote(task, toolchain, buildConfig, dependencies);
-  }
-
-  public static void configureRemote(final CMakeBuild task, final CMakeResolvedExecutable executable,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    configureRemote(task, toolchain, buildConfig, executable.getPrivateProjectDependencies());
   }
 
   private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,

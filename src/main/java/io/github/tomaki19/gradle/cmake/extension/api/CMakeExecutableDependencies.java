@@ -9,7 +9,7 @@ import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 public class CMakeExecutableDependencies extends CMakeBinaryDependencies {
 
   public CMakeExecutableDependencies(final CharSequence... names) {
-    super(names);
+    super(true, names);
   }
 
   public CMakeExecutableDependencies from(final CharSequence value) {
@@ -18,17 +18,27 @@ public class CMakeExecutableDependencies extends CMakeBinaryDependencies {
   }
 
   public CMakeExecutableDependencies linkStatic() {
-    setLinkage(CMakeLinkType.STATIC);
+    setLinkType(CMakeLinkType.STATIC);
     return this;
   }
 
   public CMakeExecutableDependencies linkShared() {
-    setLinkage(CMakeLinkType.SHARED);
+    setLinkType(CMakeLinkType.SHARED);
     return this;
   }
 
   public CMakeExecutableDependencies linkInterface() {
-    setLinkage(CMakeLinkType.INTERFACE);
+    setLinkType(CMakeLinkType.INTERFACE);
+    return this;
+  }
+
+  public CMakeExecutableDependencies setPrivate() {
+    setVisibilityPrivate(true);
+    return this;
+  }
+
+  public CMakeExecutableDependencies setPublic() {
+    setVisibilityPrivate(false);
     return this;
   }
 

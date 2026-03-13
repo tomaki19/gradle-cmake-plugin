@@ -32,23 +32,64 @@ The `toolchains` configuration block lets you specify build toolchains that can 
 toolchains {
   '<name>' {
     operatingSystem = //optional: enum [Linux, Windows, MacOS], default: auto detect
-    generator = //optional: String, default: cmake defaults for operating system
-    buildConfigs = //optional: List<String>, default: ['debug','release']
-    environment = //optional: Map<String,String>, default: none
-    environmentFile = //optional: File, default: none
-    toolchainFile = //optional: File, default: none
+    generator = String //optional, default: cmake defaults for operating system
+    buildConfigs List<String> //optional, default: ['debug','release']
+    environment Map<String,String> //optional default: none
+    environmentFile = File //optional, default: none
+    toolchainFile = File //optional, default: none
     libraries {
-      privateLinkDependencies = //optional: List<String>, default: none
-      buildStatic = //optional: boolean, default: false
-      buildShared = //optional: boolean, default: true
-      stripDebug = //optional: boolean, default: false
+      compiling {
+        defines <List<String>> //optional
+        options <List<String>> //optional
+      }
+      linking {
+        options(<List<String>>) //optional
+        dependencies(<List<String>>)
+          .from(<String>) //optional
+          .linkStatic() //optional
+          .linkShared() //optional
+          .linkInterface() //optional
+          .forStaticBuild() //optional
+          .forSharedBuild() //optional
+          .setPrivate() //optional
+      }
+      stripDebug = boolean //optional, default: false
+      buildTypes List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
     }
     applications {
-      privateLinkDependencies = //optional: List<String>, default: none
+      compiling {
+        defines <List<String>> //optional
+        options <List<String>> //optional
+      }
+      linking {
+        options(<List<String>>) //optional
+        dependencies(<List<String>>)
+          .from(<String>) //optional
+          .linkStatic() //optional
+          .linkShared() //optional
+          .linkInterface() //optional
+          .forStaticBuild() //optional
+          .forSharedBuild() //optional
+          .setPublic() //optional
+      }
       stripDebug = //optional: boolean, default: false
     }
     tests {
-      privateLinkDependencies = //optional: List<String>, default: none
+      compiling {
+        defines <List<String>> //optional
+        options <List<String>> //optional
+      }
+      linking {
+        options(<List<String>>) //optional
+        dependencies(<List<String>>)
+          .from(<String>) //optional
+          .linkStatic() //optional
+          .linkShared() //optional
+          .linkInterface() //optional
+          .forStaticBuild() //optional
+          .forSharedBuild() //optional
+          .setPublic() //optional
+      }
       stripDebug = //optional: boolean, default: false
       testResultsXmlOutput = //optional: boolean, default: false
     }
@@ -72,33 +113,23 @@ libraries {
       srcDir <String> //optional
       srcDirs <List<String>> //optional
     }
-    privateCompile {
-      define <String> //optional
+    compiling {
       defines <List<String>> //optional
-      option <String> //optional
       options <List<String>> //optional
     }
-    publicCompile {
-      define <String> //optional
-      defines <List<String>> //optional
-      option <String> //optional
-      options <List<String>> //optional
-    }
-    privateLinking {
-      option(<String>) //optional
+    linking {
       options(<List<String>>) //optional
-      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
-      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
-    }
-    publicLinking {
-      option(<String>) //optional
-      options(<List<String>>) //optional
-      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
-      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface().forStaticBuild()|.forSharedBuild()//optional
+      dependencies(<List<String>>)
+        .from(<String>) //optional
+        .linkStatic() //optional
+        .linkShared() //optional
+        .linkInterface() //optional
+        .forStaticBuild() //optional
+        .forSharedBuild() //optional
+        .setPrivate() //optional
     }
     outputName <String> //optional
-    buildShared = <boolean> //optional, default: true
-    buildStatic = <boolean> //optional, default: false
+    buildTypes List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
     stripDebug = <boolean> //optional, default: false
   }
 }
@@ -120,17 +151,20 @@ applications {
       srcDir <String> //optional
       srcDirs <List<String>> //optional
     }
-    privateCompile {
-      define <String> //optional
+    compiling {
       defines <List<String>> //optional
-      option <String> //optional
       options <List<String>> //optional
     }
-    privateLinking {
-      option(<String>) //optional
+    linking {
       options(<List<String>>) //optional
-      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
-      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
+      dependencies(<List<String>>)
+        .from(<String>) //optional
+        .linkStatic() //optional
+        .linkShared() //optional
+        .linkInterface() //optional
+        .forStaticBuild() //optional
+        .forSharedBuild() //optional
+        .setPublic() //optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -154,17 +188,20 @@ tests {
       srcDir <String> //optional
       srcDirs <List<String>> //optional
     }
-    privateCompile {
-      define <String> //optional
+    compiling {
       defines <List<String>> //optional
-      option <String> //optional
       options <List<String>> //optional
     }
-    privateLinking{
-      option(<String>) //optional
+    linking {
       options(<List<String>>) //optional
-      dependency(<String>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
-      dependencies(<List<String>>).from(<String>).linkStatic()|.linkShared()|.linkInterface() //optional
+      dependencies(<List<String>>)
+        .from(<String>) //optional
+        .linkStatic() //optional
+        .linkShared() //optional
+        .linkInterface() //optional
+        .forStaticBuild() //optional
+        .forSharedBuild() //optional
+        .setPublic() //optional
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false

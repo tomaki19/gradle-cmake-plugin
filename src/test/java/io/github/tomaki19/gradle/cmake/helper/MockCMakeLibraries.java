@@ -10,10 +10,10 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.SetProperty;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildType;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompile;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraries;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryCompiling;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
+import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
 
 public class MockCMakeLibraries implements CMakeLibraries {
 
@@ -26,12 +26,12 @@ public class MockCMakeLibraries implements CMakeLibraries {
   }
 
   @Override
-  public CMakeCompile getPrivateCompile() {
-    return mock(CMakeCompile.class);
+  public CMakeLibraryCompiling getCompiling() {
+    return mock(CMakeLibraryCompiling.class);
   }
 
   @Override
-  public CMakeLibraryLinking getPrivateLinking() {
+  public CMakeLibraryLinking getLinking() {
     return mock(CMakeLibraryLinking.class);
   }
 

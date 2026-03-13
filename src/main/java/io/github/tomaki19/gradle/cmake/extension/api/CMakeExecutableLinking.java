@@ -12,6 +12,10 @@ public class CMakeExecutableLinking extends CMakeLinking {
 
   final Collection<CMakeExecutableDependencies> dependencies = new HashSet<>();
 
+  public CMakeExecutableLinking() {
+    super(true);
+  }
+
   public Collection<CMakeExecutableDependencies> getDependencies() {
     return Collections.unmodifiableCollection(dependencies);
   }

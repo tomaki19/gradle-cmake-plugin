@@ -4,10 +4,10 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import org.gradle.api.provider.Property;
+public class CMakeLibraryCompiling extends CMakeCompiling {
 
-interface CMakeBinaries {
-
-  public Property<Boolean> getStripDebug();
+  public CMakeLibraryCompiling() {
+    super(false);
+  }
 
 }

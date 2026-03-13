@@ -22,7 +22,7 @@ class CMakeExecutableLinkingTest {
   @Test
   void testGetOptions() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    Collection<String> options = linking.getOptions();
+    Collection<CMakeBuildItems> options = linking.getOptions();
     assertNotNull(options);
     assertEquals(0, options.size());
   }
@@ -38,23 +38,17 @@ class CMakeExecutableLinkingTest {
   @Test
   void testOption() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    linking.option("-L/usr/lib");
+    linking.options("-L/usr/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals("-L/usr/lib", linking.getOptions().iterator().next());
+    assertEquals(new CMakeBuildItems(true,"-L/usr/lib"), linking.getOptions().iterator().next());
   }
 
   @Test
   void testOptionsVarargs() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
     linking.options("-L/usr/lib", "-L/usr/local/lib");
-    assertEquals(2, linking.getOptions().size());
-  }
-
-  @Test
-  void testOptionsCollection() {
-    CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    linking.options(java.util.Arrays.asList("-L/usr/lib", "-L/usr/local/lib"));
-    assertEquals(2, linking.getOptions().size());
+    assertEquals(1, linking.getOptions().size());
+    assertEquals(new CMakeBuildItems(true,"-L/usr/lib", "-L/usr/local/lib"), linking.getOptions().iterator().next());
   }
 
   @Test

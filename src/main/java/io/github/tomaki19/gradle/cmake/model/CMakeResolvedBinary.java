@@ -17,10 +17,15 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final Collection<File> headers;
   private final Collection<File> sources;
   private final Collection<String> privateCompileDefinitions = new TreeSet<>();
+  private final Collection<String> publicCompileDefinitions = new TreeSet<>();
   private final Collection<String> privateCompileOptions = new TreeSet<>();
+  private final Collection<String> publicCompileOptions = new TreeSet<>();
   private final Collection<String> privateLinkOptions = new TreeSet<>();
+  private final Collection<String> publicLinkOptions = new TreeSet<>();
   private final Collection<CMakeResolvedPackageDependency> privatePackageDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedPackageDependency> publicPackageDependencies = new TreeSet<>();
   private final Collection<CMakeResolvedProjectDependency> privateProjectDependencies = new TreeSet<>();
+  private final Collection<CMakeResolvedProjectDependency> publicProjectDependencies = new TreeSet<>();
   private final boolean stripDebug;
 
   CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
@@ -47,40 +52,80 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
     return Collections.unmodifiableCollection(privateCompileDefinitions);
   }
 
-  void addPrivateCompileDefinitions(final String definition) {
+  public void addPrivateCompileDefinitions(final String definition) {
     privateCompileDefinitions.add(definition);
+  }
+
+  public Collection<String> getPublicCompileDefinitions() {
+    return Collections.unmodifiableCollection(publicCompileDefinitions);
+  }
+
+  public void addPublicCompileDefinitions(final String definition) {
+    publicCompileDefinitions.add(definition);
   }
 
   public Collection<String> getPrivateCompileOptions() {
     return Collections.unmodifiableCollection(privateCompileOptions);
   }
 
-  void addPrivateCompileOptions(final String option) {
+  public void addPrivateCompileOptions(final String option) {
     privateCompileOptions.add(option);
+  }
+
+  public Collection<String> getPublicCompileOptions() {
+    return Collections.unmodifiableCollection(publicCompileOptions);
+  }
+
+  public void addPublicCompileOptions(final String option) {
+    publicCompileOptions.add(option);
   }
 
   public Collection<String> getPrivateLinkOptions() {
     return Collections.unmodifiableCollection(privateLinkOptions);
   }
 
-  void addPrivateLinkOption(final String option) {
+  public void addPrivateLinkOption(final String option) {
     privateLinkOptions.add(option);
+  }
+
+  public Collection<String> getPublicLinkOptions() {
+    return Collections.unmodifiableCollection(publicLinkOptions);
+  }
+
+  public void addPublicLinkOption(final String option) {
+    publicLinkOptions.add(option);
   }
 
   public Collection<CMakeResolvedPackageDependency> getPrivatePackageDependencies() {
     return Collections.unmodifiableCollection(privatePackageDependencies);
   }
 
-  void addPrivatePackageDependency(final CMakeResolvedPackageDependency dependency) {
+  public void addPrivatePackageDependency(final CMakeResolvedPackageDependency dependency) {
     privatePackageDependencies.add(dependency);
+  }
+
+  public Collection<CMakeResolvedPackageDependency> getPublicPackageDependencies() {
+    return Collections.unmodifiableCollection(publicPackageDependencies);
+  }
+
+  public void addPublicPackageDependency(final CMakeResolvedPackageDependency dependency) {
+    publicPackageDependencies.add(dependency);
   }
 
   public Collection<CMakeResolvedProjectDependency> getPrivateProjectDependencies() {
     return Collections.unmodifiableCollection(privateProjectDependencies);
   }
 
-  void addPrivateProjectDependency(final CMakeResolvedProjectDependency dependency) {
+  public void addPrivateProjectDependency(final CMakeResolvedProjectDependency dependency) {
     privateProjectDependencies.add(dependency);
+  }
+
+  public Collection<CMakeResolvedProjectDependency> getPublicProjectDependencies() {
+    return Collections.unmodifiableCollection(publicProjectDependencies);
+  }
+
+  public void addPublicProjectDependency(final CMakeResolvedProjectDependency dependency) {
+    publicProjectDependencies.add(dependency);
   }
 
   public boolean isStripDebug() {

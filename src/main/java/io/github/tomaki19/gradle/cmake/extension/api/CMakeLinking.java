@@ -8,26 +8,27 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-public abstract class CMakeLinking {
+abstract class CMakeLinking {
 
-  final Collection<String> options = new HashSet<>();
+  final Collection<CMakeBuildItems> options = new HashSet<>();
+  private boolean visibilityPrivate;
 
-  public Collection<String> getOptions() {
+  CMakeLinking(final boolean defaultPrivate) {
+    this.visibilityPrivate = defaultPrivate;
+  }
+
+  public Collection<CMakeBuildItems> getOptions() {
     return Collections.unmodifiableCollection(options);
   }
 
-  public void option(final CharSequence value) {
-    options.add(value.toString());
+  public CMakeBuildItems options(final CharSequence... values) {
+    final CMakeBuildItems entry = new CMakeBuildItems(visibilityPrivate, values);
+    options.add(entry);
+    return entry;
   }
 
-  public void options(final CharSequence... values) {
-    for (CharSequence value : values) {
-      options.add(value.toString());
-    }
-  }
-
-  public void options(final Collection<String> values) {
-    options.addAll(values);
+  public void options(final Collection<CMakeBuildItems> entries) {
+    options.addAll(entries);
   }
 
 }

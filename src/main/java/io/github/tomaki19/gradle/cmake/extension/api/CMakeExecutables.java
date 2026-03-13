@@ -10,10 +10,17 @@ import org.gradle.api.tasks.Nested;
 interface CMakeExecutables {
 
   @Nested
-  public abstract CMakeExecutableLinking getPrivateLinking();
+  public CMakeExecutableCompiling getCompiling();
 
-  public default void privateLinking(Action<CMakeExecutableLinking> action) {
-    action.execute(getPrivateLinking());
+  public default void compiling(Action<CMakeExecutableCompiling> action) {
+    action.execute(getCompiling());
+  }
+
+  @Nested
+  public abstract CMakeExecutableLinking getLinking();
+
+  public default void linking(Action<CMakeExecutableLinking> action) {
+    action.execute(getLinking());
   }
 
 }

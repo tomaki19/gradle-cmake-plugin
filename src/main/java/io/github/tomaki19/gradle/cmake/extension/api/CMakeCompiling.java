@@ -1,0 +1,41 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Thomas Killer
+ * SPDX-License-Identifier: MIT
+ */
+package io.github.tomaki19.gradle.cmake.extension.api;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
+abstract class CMakeCompiling {
+
+  private final Collection<CMakeBuildItems> defines = new HashSet<>();
+  private final Collection<CMakeBuildItems> options = new HashSet<>();
+  private boolean visibilityPrivate;
+
+  CMakeCompiling(final boolean defaultPrivate) {
+    this.visibilityPrivate = defaultPrivate;
+  }
+
+  public Collection<CMakeBuildItems> getDefines() {
+    return Collections.unmodifiableCollection(defines);
+  }
+
+  public CMakeBuildItems defines(CharSequence... values) {
+    final CMakeBuildItems entry = new CMakeBuildItems(visibilityPrivate, values);
+    defines.add(entry);
+    return entry;
+  }
+
+  public Collection<CMakeBuildItems> getOptions() {
+    return Collections.unmodifiableCollection(options);
+  }
+
+  public CMakeBuildItems options(CharSequence... values) {
+    final CMakeBuildItems entry = new CMakeBuildItems(visibilityPrivate, values);
+    options.add(entry);
+    return entry;
+  }
+
+}

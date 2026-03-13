@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.gradle.api.NamedDomainObjectProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 
@@ -36,14 +37,14 @@ public final class TestCMakeTest {
     return provider;
   }
 
-  public static NamedDomainObjectProvider<CMakeTest> registerWithPrivateDependencies(final String name,
-      final CMakeExtension extension, final Collection<String> toolchains,
-      final Collection<CMakeExecutableDependencies> dependencies, Collection<String> options)
+  public static NamedDomainObjectProvider<CMakeTest> registerWithDependencies(final String name,
+      final CMakeExtension extension, final Collection<String> toolchains, final Collection<CMakeBuildItems> options,
+      final Collection<CMakeExecutableDependencies> dependencies)
       throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getPrivateLinking().dependencies(dependencies);
-      object.getPrivateLinking().options(options);
+      object.getLinking().options(options);
+      object.getLinking().dependencies(dependencies);
     });
     return provider;
   }

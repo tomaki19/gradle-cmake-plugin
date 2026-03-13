@@ -12,18 +12,12 @@ public class CMakeLibraryLinking extends CMakeLinking {
 
   final Collection<CMakeLibraryDependencies> dependencies = new HashSet<>();
 
+  public CMakeLibraryLinking() {
+    super(false);
+  }
+
   public Collection<CMakeLibraryDependencies> getDependencies() {
     return Collections.unmodifiableCollection(dependencies);
-  }
-
-  public CMakeLibraryDependencies dependency(final CharSequence name) {
-    final CMakeLibraryDependencies entry = new CMakeLibraryDependencies(name);
-    dependencies.add(entry);
-    return entry;
-  }
-
-  public void dependency(final CMakeLibraryDependencies entry) {
-    dependencies.add(entry);
   }
 
   public CMakeLibraryDependencies dependencies(final CharSequence... names) {

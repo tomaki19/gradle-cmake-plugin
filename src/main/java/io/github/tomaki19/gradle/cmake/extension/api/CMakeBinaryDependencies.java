@@ -7,18 +7,22 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
 
 public abstract class CMakeBinaryDependencies {
 
-  private final Collection<String> names;
+  private final Set<String> names = new HashSet<>();
   private Optional<String> from = Optional.empty();
   private Optional<CMakeLinkType> linkType = Optional.empty();
+  private boolean visibilityPrivate;
 
-  protected CMakeBinaryDependencies(final CharSequence... names) {
-    this.names = Arrays.asList(names).stream().map((name) -> name.toString()).toList();
+  protected CMakeBinaryDependencies(final boolean defaultPrivate, final CharSequence... names) {
+    this.visibilityPrivate = defaultPrivate;
+    this.names.addAll(Arrays.asList(names).stream().map((name) -> name.toString()).toList());
   }
 
   public Collection<String> getNames() {
@@ -33,12 +37,20 @@ public abstract class CMakeBinaryDependencies {
     return from;
   }
 
-  protected void setLinkage(final CMakeLinkType value) {
+  protected void setLinkType(final CMakeLinkType value) {
     this.linkType = Optional.of(value);
   }
 
   public Optional<CMakeLinkType> getLinkType() {
     return linkType;
+  }
+
+  protected void setVisibilityPrivate(final boolean value) {
+    this.visibilityPrivate = value;
+  }
+
+  public boolean isPrivate() {
+    return visibilityPrivate;
   }
 
   @Override
@@ -48,6 +60,7 @@ public abstract class CMakeBinaryDependencies {
     result = prime * result + ((names == null) ? 0 : names.hashCode());
     result = prime * result + ((from == null) ? 0 : from.hashCode());
     result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
+    result = prime * result + (visibilityPrivate ? 1231 : 1237);
     return result;
   }
 
@@ -74,6 +87,8 @@ public abstract class CMakeBinaryDependencies {
       if (other.linkType != null)
         return false;
     } else if (!linkType.equals(other.linkType))
+      return false;
+    if (visibilityPrivate != other.visibilityPrivate)
       return false;
     return true;
   }

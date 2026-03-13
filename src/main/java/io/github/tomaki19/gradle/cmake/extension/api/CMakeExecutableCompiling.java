@@ -4,6 +4,10 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-public enum CMakeBuildType {
-  STATIC, SHARED, MODULE
+public class CMakeExecutableCompiling extends CMakeCompiling {
+
+  public CMakeExecutableCompiling() {
+    super(true);
+  }
+
 }

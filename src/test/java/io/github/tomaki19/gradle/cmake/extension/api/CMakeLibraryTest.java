@@ -22,57 +22,23 @@ class CMakeLibraryTest {
   }
 
   @Test
-  void testPublicCompile() {
+  void testCompile() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-    // Test public compile action
-    library.publicCompile(compile -> {
-      compile.define("TEST_DEFINE");
+    library.compiling(compile -> {
+      compile.defines("TEST_DEFINE");
     });
   }
 
   @Test
-  void testPublicLinking() {
+  void testLinking() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
-    // Test public linking action
-    library.publicLinking(linking -> {
-      linking.option("-Wl,--no-undefined");
+    library.linking(linking -> {
+      linking.options("-Wl,--no-undefined");
     });
   }
 
-  @Test
-  void testPublicInterfaceLinking() {
-    final Project project = ProjectBuilder.builder().build();
-    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
-
-    // Test public interface linking action
-    library.publicLinking(linking -> {
-      linking.option("-Wl,--no-undefined");
-    });
-  }
-
-  @Test
-  void testPublicStaticLinking() {
-    final Project project = ProjectBuilder.builder().build();
-    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
-
-    // Test public static linking action
-    library.publicLinking(linking -> {
-      linking.option("-static");
-    });
-  }
-
-  @Test
-  void testPublicSharedLinking() {
-    final Project project = ProjectBuilder.builder().build();
-    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
-
-    // Test public shared linking action
-    library.publicLinking(linking -> {
-      linking.option("-shared");
-    });
-  }
 }

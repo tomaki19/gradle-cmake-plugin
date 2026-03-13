@@ -13,55 +13,51 @@ import org.junit.jupiter.api.Test;
 
 class CMakeCompileTest {
 
-    @Test
-    void testConstructor() {
-        CMakeCompile compile = new CMakeCompile();
-        assertNotNull(compile);
-    }
+  @Test
+  void testGetDefines() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    Collection<CMakeBuildItems> defines = compile.getDefines();
+    assertNotNull(defines);
+    assertEquals(0, defines.size());
+  }
 
-    @Test
-    void testGetDefines() {
-        CMakeCompile compile = new CMakeCompile();
-        Collection<String> defines = compile.getDefines();
-        assertNotNull(defines);
-        assertEquals(0, defines.size());
-    }
+  @Test
+  void testGetOptions() {
+    CMakeExecutableCompiling compile = new CMakeExecutableCompiling();
+    Collection<CMakeBuildItems> options = compile.getOptions();
+    assertNotNull(options);
+    assertEquals(0, options.size());
+  }
 
-    @Test
-    void testGetOptions() {
-        CMakeCompile compile = new CMakeCompile();
-        Collection<String> options = compile.getOptions();
-        assertNotNull(options);
-        assertEquals(0, options.size());
-    }
+  @Test
+  void testDefine() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    compile.defines("DEBUG");
+    assertEquals(1, compile.getDefines().size());
+    assertEquals(new CMakeBuildItems(false, "DEBUG"), compile.getDefines().iterator().next());
+  }
 
-    @Test
-    void testDefine() {
-        CMakeCompile compile = new CMakeCompile();
-        compile.define("DEBUG");
-        assertEquals(1, compile.getDefines().size());
-        assertEquals("DEBUG", compile.getDefines().iterator().next());
-    }
+  @Test
+  void testDefinesVarargs() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    compile.defines("DEBUG", "VERBOSE");
+    assertEquals(1, compile.getDefines().size());
+    assertEquals(new CMakeBuildItems(false, "DEBUG", "VERBOSE"), compile.getDefines().iterator().next());
+  }
 
-    @Test
-    void testDefinesVarargs() {
-        CMakeCompile compile = new CMakeCompile();
-        compile.defines("DEBUG", "VERBOSE");
-        assertEquals(2, compile.getDefines().size());
-    }
+  @Test
+  void testOption() {
+    CMakeExecutableCompiling compile = new CMakeExecutableCompiling();
+    compile.options("-Wall");
+    assertEquals(1, compile.getOptions().size());
+    assertEquals(new CMakeBuildItems(true, "-Wall"), compile.getOptions().iterator().next());
+  }
 
-    @Test
-    void testOption() {
-        CMakeCompile compile = new CMakeCompile();
-        compile.option("-Wall");
-        assertEquals(1, compile.getOptions().size());
-        assertEquals("-Wall", compile.getOptions().iterator().next());
-    }
-
-    @Test
-    void testOptionsVarargs() {
-        CMakeCompile compile = new CMakeCompile();
-        compile.options("-Wall", "-Wextra");
-        assertEquals(2, compile.getOptions().size());
-    }
+  @Test
+  void testOptionsVarargs() {
+    CMakeExecutableCompiling compile = new CMakeExecutableCompiling();
+    compile.options("-Wall", "-Wextra");
+    assertEquals(1, compile.getOptions().size());
+    assertEquals(new CMakeBuildItems(true, "-Wall", "-Wextra"), compile.getOptions().iterator().next());
+  }
 }

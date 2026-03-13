@@ -35,7 +35,7 @@ class CMakeBinaryDependenciesTest {
   @Test
   void testGetLinkage() {
     CMakeBinaryDependencies deps = new TestCMakeBinaryDependencies("mylib");
-    deps.setLinkage(io.github.tomaki19.gradle.cmake.model.CMakeLinkType.STATIC);
+    deps.setLinkType(io.github.tomaki19.gradle.cmake.model.CMakeLinkType.STATIC);
     assertEquals("static", deps.getLinkType().get().toString());
   }
 
@@ -90,7 +90,7 @@ class CMakeBinaryDependenciesTest {
 
   private static class TestCMakeBinaryDependencies extends CMakeBinaryDependencies {
     TestCMakeBinaryDependencies(CharSequence... names) {
-      super(names);
+      super(true, names);
     }
   }
 }

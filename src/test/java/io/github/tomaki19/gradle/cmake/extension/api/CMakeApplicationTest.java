@@ -33,14 +33,14 @@ class CMakeApplicationTest {
   void testGetPrivateCompile() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
-    assertNotNull(application.getPrivateCompile());
+    assertNotNull(application.getCompiling());
   }
 
   @Test
   void testGetPrivateLinking() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
-    assertNotNull(application.getPrivateLinking());
+    assertNotNull(application.getLinking());
   }
 
   @Test

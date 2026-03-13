@@ -17,6 +17,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryDependencies;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
@@ -36,10 +37,10 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension);
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
+        Arrays.asList(new CMakeBuildItems(true, "-loption")),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0").forStaticBuild(),
-            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).linkShared().forStaticBuild()),
-        Arrays.asList("-loption"));
+            new CMakeLibraryDependencies("BinaryLibrary0").from(project.getName()).linkShared().forStaticBuild()));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension);
 
     assertEquals(1, extension.getPackages().size());
@@ -139,11 +140,11 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.registerWithLibraryDependencies("Toolchain0", extension,
+        Arrays.asList(new CMakeBuildItems(true, "-loption")),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0").forSharedBuild(),
             new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface().forSharedBuild(),
-            new CMakeLibraryDependencies("BinaryLibrary0").linkShared().forSharedBuild()),
-        Arrays.asList("-loption"));
+            new CMakeLibraryDependencies("BinaryLibrary0").linkShared().forSharedBuild()));
     TestCMakeBinaryLibrary.register("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"));
 
@@ -180,13 +181,13 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.register("Toolchain0", extension);
-    TestCMakeBinaryLibrary.registerWithPrivateDependencies("BinaryLibrary1", extension,
+    TestCMakeBinaryLibrary.registerWithDependencies("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"),
+        Arrays.asList(new CMakeBuildItems(true, "-loption")),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0"),
             new CMakeLibraryDependencies("InterfaceLibrary0").linkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()),
-        Arrays.asList("-loption"));
+            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());
@@ -221,13 +222,13 @@ public class CMakeBinaryLibraryResolverTest {
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
         Arrays.asList("Toolchain0"));
     TestCMakeToolchain.register("Toolchain0", extension);
-    TestCMakeBinaryLibrary.registerWithPublicDependencies("BinaryLibrary1", extension,
+    TestCMakeBinaryLibrary.registerWithDependencies("BinaryLibrary1", extension,
         Arrays.asList("Toolchain0"),
+        Arrays.asList(new CMakeBuildItems(true, "-loption")),
         Arrays.asList(
             new CMakeLibraryDependencies("target").from("Package0"),
             new CMakeLibraryDependencies("InterfaceLibrary0").from(project.getName()).linkInterface(),
-            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()),
-        Arrays.asList("-loption"));
+            new CMakeLibraryDependencies("BinaryLibrary0").linkShared()));
 
     assertEquals(1, extension.getPackages().size());
     assertEquals(1, extension.getToolchains().size());

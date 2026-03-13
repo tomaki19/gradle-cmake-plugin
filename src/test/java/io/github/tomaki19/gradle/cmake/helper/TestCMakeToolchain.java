@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.gradle.api.NamedDomainObjectProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
@@ -23,34 +24,34 @@ public final class TestCMakeToolchain {
   }
 
   public static NamedDomainObjectProvider<CMakeToolchain> registerWithLibraryDependencies(final String name,
-      final CMakeExtension extension, final Collection<CMakeLibraryDependencies> dependencies,
-      Collection<String> options) {
+      final CMakeExtension extension, final Collection<CMakeBuildItems> options,
+      final Collection<CMakeLibraryDependencies> dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraries().getPrivateLinking().dependencies(dependencies);
-      object.getLibraries().getPrivateLinking().options(options);
+      object.getLibraries().getLinking().options(options);
+      object.getLibraries().getLinking().dependencies(dependencies);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeToolchain> registerWithApplicationDependencies(final String name,
-      final CMakeExtension extension, final Collection<CMakeExecutableDependencies> dependencies,
-      Collection<String> options) {
+      final CMakeExtension extension, final Collection<CMakeBuildItems> options,
+      final Collection<CMakeExecutableDependencies> dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getApplications().getPrivateLinking().dependencies(dependencies);
-      object.getApplications().getPrivateLinking().options(options);
+      object.getApplications().getLinking().options(options);
+      object.getApplications().getLinking().dependencies(dependencies);
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeToolchain> registerWithTestDependencies(final String name,
-      final CMakeExtension extension, final Collection<CMakeExecutableDependencies> dependencies,
-      Collection<String> options) {
+      final CMakeExtension extension, final Collection<CMakeBuildItems> options,
+      final Collection<CMakeExecutableDependencies> dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getTests().getPrivateLinking().dependencies(dependencies);
-      object.getTests().getPrivateLinking().options(options);
+      object.getTests().getLinking().options(options);
+      object.getTests().getLinking().dependencies(dependencies);
     });
     return provider;
   }

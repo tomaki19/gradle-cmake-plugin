@@ -13,7 +13,7 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
   private Optional<CMakeLinkType> buildType = Optional.empty();
 
   public CMakeLibraryDependencies(final CharSequence... names) {
-    super(names);
+    super(false, names);
   }
 
   public CMakeLibraryDependencies from(final CharSequence value) {
@@ -22,17 +22,17 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
   }
 
   public CMakeLibraryDependencies linkStatic() {
-    setLinkage(CMakeLinkType.STATIC);
+    setLinkType(CMakeLinkType.STATIC);
     return this;
   }
 
   public CMakeLibraryDependencies linkShared() {
-    setLinkage(CMakeLinkType.SHARED);
+    setLinkType(CMakeLinkType.SHARED);
     return this;
   }
 
   public CMakeLibraryDependencies linkInterface() {
-    setLinkage(CMakeLinkType.INTERFACE);
+    setLinkType(CMakeLinkType.INTERFACE);
     return this;
   }
 
@@ -48,6 +48,43 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
   public CMakeLibraryDependencies forSharedBuild() {
     this.buildType = Optional.of(CMakeLinkType.SHARED);
     return this;
+  }
+
+  public CMakeLibraryDependencies setPrivate() {
+    setVisibilityPrivate(true);
+    return this;
+  }
+
+  public CMakeLibraryDependencies setPublic() {
+    setVisibilityPrivate(false);
+    return this;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((buildType == null) ? 0 : buildType.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    CMakeLibraryDependencies other = (CMakeLibraryDependencies) obj;
+    if (buildType == null) {
+      if (other.buildType != null)
+        return false;
+    } else if (!buildType.equals(other.buildType))
+      return false;
+    return true;
   }
 
 }

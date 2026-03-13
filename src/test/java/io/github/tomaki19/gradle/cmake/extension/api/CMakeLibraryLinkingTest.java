@@ -22,7 +22,7 @@ class CMakeLibraryLinkingTest {
   @Test
   void testGetOptions() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    Collection<String> options = linking.getOptions();
+    Collection<CMakeBuildItems> options = linking.getOptions();
     assertNotNull(options);
     assertEquals(0, options.size());
   }
@@ -38,38 +38,24 @@ class CMakeLibraryLinkingTest {
   @Test
   void testOption() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    linking.option("-L/usr/lib");
+    linking.options("-L/usr/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals("-L/usr/lib", linking.getOptions().iterator().next());
+    assertEquals(new CMakeBuildItems(false, "-L/usr/lib"), linking.getOptions().iterator().next());
   }
 
   @Test
   void testOptionsVarargs() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
     linking.options("-L/usr/lib", "-L/usr/local/lib");
-    assertEquals(2, linking.getOptions().size());
-  }
-
-  @Test
-  void testOptionsCollection() {
-    CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    linking.options(java.util.Arrays.asList("-L/usr/lib", "-L/usr/local/lib"));
-    assertEquals(2, linking.getOptions().size());
+    assertEquals(1, linking.getOptions().size());
+    assertEquals(new CMakeBuildItems(false, "-L/usr/lib", "-L/usr/local/lib"), linking.getOptions().iterator().next());
   }
 
   @Test
   void testDependencyCharSequence() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep = linking.dependency("mylib");
+    CMakeLibraryDependencies dep = linking.dependencies("mylib");
     assertNotNull(dep);
-    assertEquals(1, linking.getDependencies().size());
-  }
-
-  @Test
-  void testDependencyObject() {
-    CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep = new CMakeLibraryDependencies("mylib");
-    linking.dependency(dep);
     assertEquals(1, linking.getDependencies().size());
   }
 

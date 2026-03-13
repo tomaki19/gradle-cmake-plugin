@@ -10,7 +10,7 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompile;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableCompiling;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinking;
 
 public class MockCMakeApplication extends CMakeApplication {
@@ -37,12 +37,12 @@ public class MockCMakeApplication extends CMakeApplication {
   }
 
   @Override
-  public CMakeCompile getPrivateCompile() {
-    return mock(CMakeCompile.class);
+  public CMakeExecutableCompiling getCompiling() {
+    return mock(CMakeExecutableCompiling.class);
   }
 
   @Override
-  public CMakeExecutableLinking getPrivateLinking() {
+  public CMakeExecutableLinking getLinking() {
     return mock(CMakeExecutableLinking.class);
   }
 
