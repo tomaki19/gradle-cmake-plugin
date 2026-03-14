@@ -36,7 +36,7 @@ public class CMakeInterfaceLibraryResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeToolchain.register("Toolchain0", extension);
     TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-        new HashSet<>(Arrays.asList("Toolchain0")));
+        new HashSet<>(Arrays.asList("Toolchain0")), CMakeBuildVariant.SHARED);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary1", extension);
 
     assertEquals(1, extension.getPackages().size());
@@ -70,7 +70,8 @@ public class CMakeInterfaceLibraryResolverTest {
     TestCMakePackage.register("Package0", extension);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
     TestCMakeToolchain.register("Toolchain0", extension);
-    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, new HashSet<>(Arrays.asList("Toolchain0")));
+    TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, new HashSet<>(Arrays.asList("Toolchain0")),
+        CMakeBuildVariant.SHARED);
     TestCMakeInterfaceLibrary.register("InterfaceLibrary1", extension);
 
     assertEquals(1, extension.getPackages().size());

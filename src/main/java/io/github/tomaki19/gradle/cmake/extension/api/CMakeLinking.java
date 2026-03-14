@@ -17,9 +17,6 @@ abstract class CMakeLinking {
   public static final CMakeLinkVariant Shared = CMakeLinkVariant.SHARED;
   public static final CMakeLinkVariant Interface = CMakeLinkVariant.INTERFACE;
 
-  public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
-  public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;
-
   private final Collection<CMakeBuildItems> options = new HashSet<>();
   private CMakeVisibilityType defaultVisibilityType;
 

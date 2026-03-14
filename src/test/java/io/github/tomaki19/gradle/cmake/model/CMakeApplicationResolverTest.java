@@ -38,7 +38,7 @@ public class CMakeApplicationResolverTest {
         TestCMakePackage.register("Package0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-                Arrays.asList("Toolchain0"));
+                Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
         TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
                 Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-loption")),
                 Arrays.asList(
@@ -82,7 +82,7 @@ public class CMakeApplicationResolverTest {
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary1", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-                Arrays.asList("Toolchain0"));
+                Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
         TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
                 Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-loption")),
                 Arrays.asList(
@@ -154,7 +154,7 @@ public class CMakeApplicationResolverTest {
 
         TestCMakePackage.register("Package0", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-                Arrays.asList("Toolchain0"));
+                Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
         TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
                 Arrays.asList(), Arrays.asList());
         TestCMakeToolchain.registerWithTestDependencies("Toolchain1", extension,
@@ -202,7 +202,7 @@ public class CMakeApplicationResolverTest {
         TestCMakePackage.register("Package0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-                Arrays.asList("Toolchain0"));
+                Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
         TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
                 Arrays.asList(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-loption")),
                 Arrays.asList(
@@ -252,7 +252,7 @@ public class CMakeApplicationResolverTest {
         TestCMakePackage.register("Package0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
-                Arrays.asList("Toolchain0"));
+                Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
         TestCMakeToolchain.register("Toolchain0", extension);
         TestCMakeApplication.registerWithDependencies("Application0", extension,
                 Arrays.asList("Toolchain0"),

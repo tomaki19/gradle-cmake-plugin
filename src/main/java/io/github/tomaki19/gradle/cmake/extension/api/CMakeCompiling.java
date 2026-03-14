@@ -20,16 +20,6 @@ abstract class CMakeCompiling {
     this.defaultVisibilityType = defaultVisibilityType;
   }
 
-  public Collection<CMakeBuildItems> getDefines() {
-    return Collections.unmodifiableCollection(defines);
-  }
-
-  public CMakeBuildItems defines(CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
-    defines.add(entry);
-    return entry;
-  }
-
   public Collection<CMakeBuildItems> getOptions() {
     return Collections.unmodifiableCollection(options);
   }
@@ -37,6 +27,16 @@ abstract class CMakeCompiling {
   public CMakeBuildItems options(CharSequence... values) {
     final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
     options.add(entry);
+    return entry;
+  }
+
+  public Collection<CMakeBuildItems> getDefines() {
+    return Collections.unmodifiableCollection(defines);
+  }
+
+  public CMakeBuildItems defines(CharSequence... values) {
+    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
+    defines.add(entry);
     return entry;
   }
 

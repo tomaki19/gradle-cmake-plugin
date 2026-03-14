@@ -135,25 +135,21 @@ public final class CMakeListsFile extends CMakeFileContent {
           || !toolchain.getStaticLibraries().isEmpty()
           || !toolchain.getSharedLibraries().isEmpty()) {
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedLibrary component : toolchain.getInterfaceLibraries()) {
-          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedLibrary component : toolchain.getInterfaceLibraries()) {
+            writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
             writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             writeInterfaceLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
-        }
-        for (final CMakeResolvedLibrary component : toolchain.getStaticLibraries()) {
-          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedLibrary component : toolchain.getStaticLibraries()) {
+            writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
             writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             writeStaticLibrary(outputStream, 1, component, toolchain, buildConfig);
           }
-        }
-        for (final CMakeResolvedLibrary component : toolchain.getSharedLibraries()) {
-          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedLibrary component : toolchain.getSharedLibraries()) {
+            writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
             writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             writeSharedLibrary(outputStream, 1, component, toolchain, buildConfig);
@@ -169,9 +165,9 @@ public final class CMakeListsFile extends CMakeFileContent {
     for (final CMakeResolvedToolchain toolchain : toolchains) {
       if (!toolchain.getApplications().isEmpty()) {
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedExecutable component : toolchain.getApplications()) {
-          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedExecutable component : toolchain.getApplications()) {
+            writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
             writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
@@ -191,9 +187,9 @@ public final class CMakeListsFile extends CMakeFileContent {
         write(outputStream, "enable_testing()");
         write(outputStream, "include( CTest )");
         write(outputStream, "if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL \"%s\" )", toolchain.getName());
-        for (final CMakeResolvedExecutable component : toolchain.getTests()) {
-          writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
-          for (final String buildConfig : toolchain.getBuildConfigs()) {
+        for (final String buildConfig : toolchain.getBuildConfigs()) {
+          for (final CMakeResolvedExecutable component : toolchain.getTests()) {
+            writeTargetPackageDependencies(outputStream, 1, component.getAllPackageDependencies());
             writeTargetProjectDependencies(outputStream, 1, component.getAllProjectDependencies(), toolchain,
                 buildConfig);
             final String target = CMakeFileConventions.buildTarget(component.getName(), toolchain.getName(),
@@ -403,9 +399,11 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeTargetPublicLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
+    System.out.println("Public linking for target " + target);
     if (!binary.getPublicProjectDependencies().isEmpty() ||
         !binary.getPublicPackageDependencies().isEmpty() ||
         !binary.getPublicLinkOptions().isEmpty()) {
+      System.out.println("Target has linking " + target);
       writeTargetLinkLibraries(outputStream, indent, target, "PUBLIC", toolchain, buildConfig,
           binary.getPublicLinkOptions(),
           binary.getPublicProjectDependencies(),
@@ -419,15 +417,15 @@ public final class CMakeListsFile extends CMakeFileContent {
       final Collection<CMakeResolvedPackageDependency> packageDependencies)
       throws IOException {
     write(outputStream, indent, "target_link_libraries( %s %s", target, access);
+    for (final String option : options) {
+      write(outputStream, indent + 1, option);
+    }
     for (final CMakeResolvedProjectDependency projectModule : projectDependencies) {
       write(outputStream, indent + 1, "%s", CMakeFileConventions.buildTarget(projectModule.getProjectName(),
           projectModule.getName(), projectModule.getLinkType(), toolchain.getName(), buildConfig));
     }
     for (final CMakeResolvedPackageDependency packageDependency : packageDependencies) {
       write(outputStream, indent + 1, "%s::%s", packageDependency.getTargetPrefix(), packageDependency.getName());
-    }
-    for (final String option : options) {
-      write(outputStream, indent + 1, option);
     }
     write(outputStream, indent, ")");
   }
