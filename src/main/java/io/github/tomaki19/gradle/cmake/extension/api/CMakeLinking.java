@@ -8,14 +8,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 abstract class CMakeLinking {
 
-  public static final CMakeLinkType Static = CMakeLinkType.STATIC;
-  public static final CMakeLinkType Shared = CMakeLinkType.SHARED;
-  public static final CMakeLinkType Interface = CMakeLinkType.INTERFACE;
+  public static final CMakeLinkVariant Static = CMakeLinkVariant.STATIC;
+  public static final CMakeLinkVariant Shared = CMakeLinkVariant.SHARED;
+  public static final CMakeLinkVariant Interface = CMakeLinkVariant.INTERFACE;
 
   public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
   public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;

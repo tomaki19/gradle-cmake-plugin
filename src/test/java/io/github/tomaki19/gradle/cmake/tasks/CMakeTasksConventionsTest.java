@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 
 class CMakeTasksConventionsTest {
 
@@ -21,13 +21,13 @@ class CMakeTasksConventionsTest {
   @Test
   void testAssembleFindTaskNameToolchain() {
     assertEquals("assemble-mylib-shared-mytoolchain-debug-module",
-        CMakeTasksConventions.assembleModuleTaskName("MyLib", CMakeLinkType.SHARED, "MyToolchain", "Debug"));
+        CMakeTasksConventions.assembleModuleTaskName("MyLib", CMakeLinkVariant.SHARED, "MyToolchain", "Debug"));
   }
 
   @Test
   void testAssembleFindTaskNameProjectToolchain() {
     assertEquals(":MyProject:assemble-mylib-shared-mytoolchain-debug-module",
-        CMakeTasksConventions.assembleModuleTaskName("MyProject", "MyLib", CMakeLinkType.SHARED, "MyToolchain",
+        CMakeTasksConventions.assembleModuleTaskName("MyProject", "MyLib", CMakeLinkVariant.SHARED, "MyToolchain",
             "Debug"));
   }
 
@@ -52,13 +52,13 @@ class CMakeTasksConventionsTest {
   @Test
   void testBuildTaskNameProjectTargetToolchainLinkageBuildConfig() {
     assertEquals(":MyProject:build-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName("MyProject", "MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+        CMakeTasksConventions.buildTaskName("MyProject", "MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test
   void testBuildTaskNameTargetToolchainLinkageBuildConfig() {
     assertEquals("build-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName("MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+        CMakeTasksConventions.buildTaskName("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test
@@ -81,7 +81,7 @@ class CMakeTasksConventionsTest {
   @Test
   void testCheckTaskNameTargetToolchainLinkageBuildConfig() {
     assertEquals("check-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.checkTaskName("MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+        CMakeTasksConventions.checkTaskName("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test
@@ -104,7 +104,7 @@ class CMakeTasksConventionsTest {
   @Test
   void testPackageTaskNameTargetToolchainLinkageBuildConfig() {
     assertEquals("install-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.installTaskName("MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+        CMakeTasksConventions.installTaskName("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test

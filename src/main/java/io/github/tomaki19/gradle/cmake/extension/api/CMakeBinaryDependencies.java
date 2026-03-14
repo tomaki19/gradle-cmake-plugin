@@ -10,19 +10,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 public abstract class CMakeBinaryDependencies {
 
   private final Set<String> names = new HashSet<>();
   private String from = "";
-  private CMakeLinkType linkType;
+  private CMakeLinkVariant linkVariant;
   private CMakeVisibilityType visibilityType;
 
-  protected CMakeBinaryDependencies(final CMakeLinkType defaultLinkType,
+  protected CMakeBinaryDependencies(final CMakeLinkVariant defaultLinkVariant,
       final CMakeVisibilityType defaultVisibilityType, final CharSequence... names) {
-    this.linkType = defaultLinkType;
+    this.linkVariant = defaultLinkVariant;
     this.visibilityType = defaultVisibilityType;
     this.names.addAll(Arrays.asList(names).stream().map((name) -> name.toString()).toList());
   }
@@ -39,12 +39,12 @@ public abstract class CMakeBinaryDependencies {
     return from;
   }
 
-  protected void setLinkType(final CMakeLinkType type) {
-    this.linkType = type;
+  protected void setLinkVariant(final CMakeLinkVariant variant) {
+    this.linkVariant = variant;
   }
 
-  public CMakeLinkType getLinkType() {
-    return linkType;
+  public CMakeLinkVariant getLinkVariant() {
+    return linkVariant;
   }
 
   protected void setVisibilityType(final CMakeVisibilityType type) {
@@ -61,7 +61,7 @@ public abstract class CMakeBinaryDependencies {
     int result = 1;
     result = prime * result + ((names == null) ? 0 : names.hashCode());
     result = prime * result + ((from == null) ? 0 : from.hashCode());
-    result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
+    result = prime * result + ((linkVariant == null) ? 0 : linkVariant.hashCode());
     result = prime * result + ((visibilityType == null) ? 0 : visibilityType.hashCode());
     return result;
   }
@@ -85,7 +85,7 @@ public abstract class CMakeBinaryDependencies {
         return false;
     } else if (!from.equals(other.from))
       return false;
-    if (linkType != other.linkType)
+    if (linkVariant != other.linkVariant)
       return false;
     if (visibilityType != other.visibilityType)
       return false;

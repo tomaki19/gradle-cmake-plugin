@@ -10,17 +10,17 @@ import org.gradle.api.Action;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Nested;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
+import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
-  public final static CMakeBuildType Static = CMakeBuildType.STATIC;
-  public final static CMakeBuildType Shared = CMakeBuildType.SHARED;
+  public final static CMakeBuildVariant Static = CMakeBuildVariant.STATIC;
+  public final static CMakeBuildVariant Shared = CMakeBuildVariant.SHARED;
 
-  public SetProperty<CMakeBuildType> getBuildTypes();
+  public SetProperty<CMakeBuildVariant> getBuildVariants();
 
-  public default void buildTypes(final CMakeBuildType... values) {
-    getBuildTypes().set(Arrays.asList(values));
+  public default void buildVariants(final CMakeBuildVariant... values) {
+    getBuildVariants().set(Arrays.asList(values));
   }
 
   @Nested

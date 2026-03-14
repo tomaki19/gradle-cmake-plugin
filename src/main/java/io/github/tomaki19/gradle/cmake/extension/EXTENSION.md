@@ -19,7 +19,10 @@ The `packages` configuration block lets you specify system libraries that can be
 ```groovy
 packages {
   '<name>' {
-    properties = //optional: Map<String,String>
+    moduleMode = <boolean> // optional, default: false
+    targetPrefix = <String> // optional
+    components = <List<String>> // optional
+    properties = <Map<String,String>> // optional
   }
 }
 ```
@@ -38,6 +41,7 @@ toolchains {
     environmentFile = File //optional, default: none
     toolchainFile = File //optional, default: none
     libraries {
+      buildVariants List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
       compiling {
         defines <List<String>> //optional
         options <List<String>> //optional
@@ -51,7 +55,6 @@ toolchains {
           .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
       }
       stripDebug = boolean //optional, default: false
-      buildTypes List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
     }
     applications {
       compiling {
@@ -95,6 +98,7 @@ The `libraries` configuration block lets you specify library build items that ca
 libraries {
   <String> {
     toolchains <List<String>> //required
+    buildVariants List<CMakeBuildType> //optional, options: Shared|Static, default: Shared
     headers {
       srcDir <String> //optional
       srcDirs <List<String>> //optional
@@ -111,12 +115,11 @@ libraries {
       options(<List<String>>) //optional
       dependencies(<List<String>>)
         .from(<String>) //optional
-        .build(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
+        .forBuildVariant(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
         .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
         .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
     }
     outputName <String> //optional
-    buildTypes List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
     stripDebug = <boolean> //optional, default: false
   }
 }

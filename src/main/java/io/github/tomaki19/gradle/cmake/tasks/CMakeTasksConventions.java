@@ -4,7 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 
 public final class CMakeTasksConventions {
 
@@ -16,13 +16,13 @@ public final class CMakeTasksConventions {
     return "assemble-cmake-lists";
   }
 
-  static String assembleModuleTaskName(final String name, CMakeLinkType linkType,
+  static String assembleModuleTaskName(final String name, CMakeLinkVariant linkType,
       final String toolchainName, final String buildConfig) {
     return "assemble-%s-%s-%s-%s-module".formatted(name.toLowerCase(), linkType.toLowerCase(),
         toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String assembleModuleTaskName(final String projectName, final String name, CMakeLinkType linkType,
+  static String assembleModuleTaskName(final String projectName, final String name, CMakeLinkVariant linkType,
       final String toolchainName, final String buildConfig) {
     return ":%s:assemble-%s-%s-%s-%s-module".formatted(projectName, name.toLowerCase(), linkType.toLowerCase(),
         toolchainName.toLowerCase(), buildConfig.toLowerCase());
@@ -49,13 +49,13 @@ public final class CMakeTasksConventions {
     return "build-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String buildTaskName(final String projectName, final String targetName, CMakeLinkType linkType,
+  static String buildTaskName(final String projectName, final String targetName, CMakeLinkVariant linkType,
       final String toolchainName, final String buildConfig) {
     return ":%s:build-%s-%s-%s-%s".formatted(projectName, targetName.toLowerCase(), linkType.toLowerCase(),
         toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String buildTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,
+  static String buildTaskName(final String targetName, final CMakeLinkVariant linkType, final String toolchainName,
       final String buildConfig) {
     return "build-%s-%s-%s-%s".formatted(targetName.toLowerCase(), linkType.toLowerCase(), toolchainName.toLowerCase(),
         buildConfig.toLowerCase());
@@ -73,7 +73,7 @@ public final class CMakeTasksConventions {
     return "check-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String checkTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,
+  static String checkTaskName(final String targetName, final CMakeLinkVariant linkType, final String toolchainName,
       final String buildConfig) {
     return "check-%s-%s-%s-%s".formatted(targetName.toLowerCase(), linkType.toLowerCase(), toolchainName.toLowerCase(),
         buildConfig.toLowerCase());
@@ -91,7 +91,7 @@ public final class CMakeTasksConventions {
     return "install-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String installTaskName(final String targetName, final CMakeLinkType linkType, final String toolchainName,
+  static String installTaskName(final String targetName, final CMakeLinkVariant linkType, final String toolchainName,
       final String buildConfig) {
     return "install-%s-%s-%s-%s".formatted(targetName.toLowerCase(), linkType.toLowerCase(),
         toolchainName.toLowerCase(), buildConfig.toLowerCase());

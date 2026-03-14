@@ -13,15 +13,15 @@ class CMakeLinkTypeTest {
 
   @Test
   void testLinkageValues() {
-    assertNotNull(CMakeLinkType.STATIC);
-    assertNotNull(CMakeLinkType.SHARED);
-    assertNotNull(CMakeLinkType.INTERFACE);
+    assertNotNull(CMakeLinkVariant.STATIC);
+    assertNotNull(CMakeLinkVariant.SHARED);
+    assertNotNull(CMakeLinkVariant.INTERFACE);
   }
 
   @Test
   void testLinkageToString() {
-    assertEquals("static", CMakeLinkType.STATIC.toLowerCase());
-    assertEquals("shared", CMakeLinkType.SHARED.toLowerCase());
-    assertEquals("interface", CMakeLinkType.INTERFACE.toLowerCase());
+    assertEquals("static", CMakeLinkVariant.STATIC.toLowerCase());
+    assertEquals("shared", CMakeLinkVariant.SHARED.toLowerCase());
+    assertEquals("interface", CMakeLinkVariant.INTERFACE.toLowerCase());
   }
 }

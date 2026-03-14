@@ -8,14 +8,14 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 
 public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolvedLibrary> {
 
-  private final CMakeLinkType linkType;
+  private final CMakeLinkVariant linkType;
 
-  CMakeResolvedLibrary(final CMakeLibrary library, final CMakeLinkType linkType, final boolean stripDebug) {
+  CMakeResolvedLibrary(final CMakeLibrary library, final CMakeLinkVariant linkType, final boolean stripDebug) {
     super(library, stripDebug);
     this.linkType = linkType;
   }
 
-  public CMakeLinkType getLinkType() {
+  public CMakeLinkVariant getLinkType() {
     return linkType;
   }
 

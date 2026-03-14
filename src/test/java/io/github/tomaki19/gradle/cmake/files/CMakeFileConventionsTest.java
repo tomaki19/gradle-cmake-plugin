@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 
 class CMakeFileConventionsTest {
 
@@ -21,13 +21,13 @@ class CMakeFileConventionsTest {
   @Test
   void testModuleTargetWithLinkage() {
     assertEquals("MyProject-mytarget-static-mytoolchain-debug-module",
-        CMakeFileConventions.moduleTarget("MyProject", "MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+        CMakeFileConventions.moduleTarget("MyProject", "MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test
   void testBuildTargetWithLinkage() {
     assertEquals("mytarget-static-mytoolchain-debug",
-        CMakeFileConventions.buildTarget("MyTarget", CMakeLinkType.STATIC, "MyToolchain", "Debug"));
+        CMakeFileConventions.buildTarget("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test

@@ -18,7 +18,7 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -199,7 +199,7 @@ public final class CMakeTaskRegistry {
   private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Collection<CMakeResolvedProjectDependency> dependencies) {
     dependencies.stream()
-        .filter((dependency) -> !Objects.equals(dependency.getLinkType(), CMakeLinkType.INTERFACE))
+        .filter((dependency) -> !Objects.equals(dependency.getLinkType(), CMakeLinkVariant.INTERFACE))
         .forEach((dependency) -> task.dependsOn(CMakeTasksConventions.buildTaskName(
             dependency.getResolvedProject().getName(), dependency.getName(), dependency.getLinkType(),
             toolchain.getName(), buildConfig)));

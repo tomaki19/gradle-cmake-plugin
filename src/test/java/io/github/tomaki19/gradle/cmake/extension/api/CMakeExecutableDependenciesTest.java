@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 
 class CMakeExecutableDependenciesTest {
 
@@ -35,21 +35,21 @@ class CMakeExecutableDependenciesTest {
   @Test
   void testGetLinkStatic() {
     CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.link(CMakeLinkType.STATIC);
-    assertEquals("static", deps.getLinkType().toLowerCase());
+    deps.link(CMakeLinkVariant.STATIC);
+    assertEquals("static", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkShared() {
     CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.link(CMakeLinkType.SHARED);
-    assertEquals("shared", deps.getLinkType().toLowerCase());
+    deps.link(CMakeLinkVariant.SHARED);
+    assertEquals("shared", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkInterface() {
     CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.link(CMakeLinkType.INTERFACE);
-    assertEquals("interface", deps.getLinkType().toLowerCase());
+    deps.link(CMakeLinkVariant.INTERFACE);
+    assertEquals("interface", deps.getLinkVariant().toLowerCase());
   }
 }

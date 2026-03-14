@@ -4,11 +4,10 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-public enum CMakeLinkType {
-  STATIC, SHARED, INTERFACE;
+public enum CMakeBuildVariant {
+  STATIC, SHARED, MODULE;
 
   public String toLowerCase() {
     return name().toLowerCase();
   }
-
 }

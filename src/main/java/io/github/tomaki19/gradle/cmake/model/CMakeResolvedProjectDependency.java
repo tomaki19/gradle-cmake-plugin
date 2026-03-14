@@ -9,10 +9,10 @@ import java.util.Objects;
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
   private final CMakeResolvedProject resolvedProject;
-  private final CMakeLinkType linkType;
+  private final CMakeLinkVariant linkType;
 
   CMakeResolvedProjectDependency(final String name, final CMakeResolvedProject resolvedProject,
-      final CMakeLinkType linkType) {
+      final CMakeLinkVariant linkType) {
     super(name);
     this.resolvedProject = resolvedProject;
     this.linkType = linkType;
@@ -22,7 +22,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     return resolvedProject;
   }
 
-  public CMakeLinkType getLinkType() {
+  public CMakeLinkVariant getLinkType() {
     return linkType;
   }
 

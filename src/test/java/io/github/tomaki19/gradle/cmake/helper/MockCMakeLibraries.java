@@ -13,16 +13,16 @@ import org.gradle.api.provider.SetProperty;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraries;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryCompiling;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
-import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
+import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
 
 public class MockCMakeLibraries implements CMakeLibraries {
 
   private final Property<Boolean> stripDebug;
-  private final SetProperty<CMakeBuildType> libraryTypes;
+  private final SetProperty<CMakeBuildVariant> libraryTypes;
 
   public MockCMakeLibraries(final ObjectFactory factory) {
     this.stripDebug = factory.property(Boolean.class);
-    this.libraryTypes = factory.setProperty(CMakeBuildType.class);
+    this.libraryTypes = factory.setProperty(CMakeBuildVariant.class);
   }
 
   @Override
@@ -41,7 +41,7 @@ public class MockCMakeLibraries implements CMakeLibraries {
   }
 
   @Override
-  public SetProperty<CMakeBuildType> getBuildTypes() {
+  public SetProperty<CMakeBuildVariant> getBuildVariants() {
     return libraryTypes;
   }
 

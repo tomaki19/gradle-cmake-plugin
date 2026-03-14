@@ -4,17 +4,17 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeBuildType;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
 
-  private CMakeBuildType buildType;
+  private CMakeBuildVariant buildVariant;
 
   public CMakeLibraryDependencies(final CharSequence... names) {
-    super(CMakeLinkType.SHARED, CMakeVisibilityType.PUBLIC, names);
-    buildType = CMakeBuildType.SHARED;
+    super(CMakeLinkVariant.SHARED, CMakeVisibilityType.PUBLIC, names);
+    buildVariant = CMakeBuildVariant.SHARED;
   }
 
   public CMakeLibraryDependencies from(final CharSequence value) {
@@ -22,8 +22,8 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeLibraryDependencies link(final CMakeLinkType type) {
-    setLinkType(type);
+  public CMakeLibraryDependencies link(final CMakeLinkVariant variant) {
+    setLinkVariant(variant);
     return this;
   }
 
@@ -32,12 +32,12 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeBuildType getBuildType() {
-    return buildType;
+  public CMakeBuildVariant getBuildVariant() {
+    return buildVariant;
   }
 
-  public CMakeLibraryDependencies build(final CMakeBuildType type) {
-    this.buildType = type;
+  public CMakeLibraryDependencies forBuildVariant(final CMakeBuildVariant variant) {
+    this.buildVariant = variant;
     return this;
   }
 
@@ -45,7 +45,7 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((buildType == null) ? 0 : buildType.hashCode());
+    result = prime * result + ((buildVariant == null) ? 0 : buildVariant.hashCode());
     return result;
   }
 
@@ -60,10 +60,10 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
     if (getClass() != obj.getClass())
       return false;
     CMakeLibraryDependencies other = (CMakeLibraryDependencies) obj;
-    if (buildType == null) {
-      if (other.buildType != null)
+    if (buildVariant == null) {
+      if (other.buildVariant != null)
         return false;
-    } else if (!buildType.equals(other.buildType))
+    } else if (!buildVariant.equals(other.buildVariant))
       return false;
     return true;
   }

@@ -15,7 +15,7 @@ import java.util.Objects;
 
 import org.gradle.api.file.Directory;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkType;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -210,7 +210,7 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeInterfaceLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkType.INTERFACE,
+    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkVariant.INTERFACE,
         toolchain.getName(), buildConfig);
     write(outputStream, indent, "add_library( %s INTERFACE )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
@@ -226,7 +226,7 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeStaticLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkType.STATIC,
+    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkVariant.STATIC,
         toolchain.getName(), buildConfig);
     final String outputName = component.getOutputName();
     write(outputStream, indent, "add_library( %s STATIC )", target);
@@ -247,7 +247,7 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeSharedLibrary(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary component, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkType.SHARED,
+    final String target = CMakeFileConventions.buildTarget(component.getName(), CMakeLinkVariant.SHARED,
         toolchain.getName(), buildConfig);
     write(outputStream, indent, "add_library( %s SHARED )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
@@ -468,7 +468,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     write(outputStream, indent, ")");
     for (final CMakeResolvedProjectDependency dependency : dependencies) {
       if (Objects.equals(getProjectName(), dependency.getProjectName())
-          && Objects.equals(CMakeLinkType.SHARED, dependency.getLinkType())) {
+          && Objects.equals(CMakeLinkVariant.SHARED, dependency.getLinkType())) {
         final String buildTarget = CMakeFileConventions.buildTarget(
             dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig);
         write(outputStream, indent, "install( TARGETS %s", buildTarget);

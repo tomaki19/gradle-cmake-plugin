@@ -22,7 +22,7 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
     assertNotNull(dependency);
     assertEquals("test-lib", dependency.getName());
   }
@@ -33,10 +33,10 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
     assertNotNull(dependency);
     assertEquals("test-lib", dependency.getName());
-    assertEquals(CMakeLinkType.STATIC, dependency.getLinkType());
+    assertEquals(CMakeLinkVariant.STATIC, dependency.getLinkType());
   }
 
   @Test
@@ -45,7 +45,7 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
     assertNotNull(dependency.getResolvedProject());
     assertEquals("test-project", dependency.getResolvedProject().getName());
   }
@@ -57,11 +57,11 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject1 = new CMakeResolvedProject(project1);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", resolvedProject1,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     CMakeResolvedProject resolvedProject2 = new CMakeResolvedProject(project2);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", resolvedProject2,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertEquals(dependency1.hashCode(), dependency2.hashCode());
   }
@@ -73,11 +73,11 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject1 = new CMakeResolvedProject(project1);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", resolvedProject1,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     CMakeResolvedProject resolvedProject2 = new CMakeResolvedProject(project2);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", resolvedProject2,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertEquals(dependency1, dependency2);
   }
@@ -89,11 +89,11 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject1 = new CMakeResolvedProject(project1);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", resolvedProject1,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     CMakeResolvedProject resolvedProject2 = new CMakeResolvedProject(project2);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", resolvedProject2,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertNotEquals(dependency1, dependency2);
   }
@@ -104,9 +104,9 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib1", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib2", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertNotEquals(dependency1, dependency2);
   }
@@ -117,9 +117,9 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.SHARED);
+        CMakeLinkVariant.SHARED);
 
     assertNotEquals(dependency1, dependency2);
   }
@@ -130,7 +130,7 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertFalse(dependency.equals(null));
   }
@@ -141,7 +141,7 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", resolvedProject,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertFalse(dependency.equals("not a dependency"));
   }
@@ -153,11 +153,11 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject1 = new CMakeResolvedProject(project1);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", resolvedProject1,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     CMakeResolvedProject resolvedProject2 = new CMakeResolvedProject(project2);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", resolvedProject2,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     // "test-project1" < "test-project2" alphabetically
     assertTrue(dependency1.compareTo(dependency2) < 0);
@@ -169,11 +169,11 @@ class CMakeResolvedProjectDependencyTest {
 
     CMakeResolvedProject resolvedProject1 = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", resolvedProject1,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     CMakeResolvedProject resolvedProject2 = new CMakeResolvedProject(project);
     CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", resolvedProject2,
-        CMakeLinkType.STATIC);
+        CMakeLinkVariant.STATIC);
 
     assertEquals(0, dependency1.compareTo(dependency2));
   }

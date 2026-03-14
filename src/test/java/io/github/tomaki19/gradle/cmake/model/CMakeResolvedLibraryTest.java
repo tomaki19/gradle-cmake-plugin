@@ -27,7 +27,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.INTERFACE, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false);
     assertNotNull(resolvedLibrary);
     assertEquals("test-library", resolvedLibrary.getName());
   }
@@ -37,7 +37,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.STATIC, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
     assertNotNull(resolvedLibrary);
 
     // Test default values
@@ -59,7 +59,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     resolvedLibrary.addPrivateCompileDefinitions("TEST_DEFINE");
@@ -72,7 +72,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     resolvedLibrary.addPrivateCompileOptions("-O2");
@@ -85,7 +85,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     resolvedLibrary.addPublicCompileDefinitions("PUBLIC_DEFINE");
@@ -98,7 +98,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     resolvedLibrary.addPublicCompileOptions("-Wall");
@@ -111,7 +111,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     resolvedLibrary.addPrivateLinkOption("-ltest");
@@ -124,7 +124,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     resolvedLibrary.addPublicLinkOption("-lpublic");
@@ -138,7 +138,7 @@ class CMakeResolvedLibraryTest {
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
     final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
@@ -155,7 +155,7 @@ class CMakeResolvedLibraryTest {
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
     final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
@@ -171,7 +171,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     // This would require a CMakeResolvedProjectDependency object, so we'll just
@@ -185,7 +185,7 @@ class CMakeResolvedLibraryTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
 
-    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkType.SHARED, false);
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
     // This would require a CMakeResolvedProjectDependency object, so we'll just

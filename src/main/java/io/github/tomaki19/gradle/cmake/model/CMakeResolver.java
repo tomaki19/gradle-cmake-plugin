@@ -69,23 +69,23 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           validateLibrary(component);
           if (component.getSources().isEmpty()) {
-            final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkType.INTERFACE,
+            final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.INTERFACE,
                 toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
             resolveLibrary(component, resolvedLibrary, toolchain, resolvedToolchain);
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {
-            if (toolchain.getLibraries().getBuildTypes().get().contains(CMakeBuildType.STATIC)
-                || component.getBuildTypes().get().contains(CMakeBuildType.STATIC)) {
-              final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkType.STATIC,
+            if (toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.STATIC)
+                || component.getBuildVariants().get().contains(CMakeBuildVariant.STATIC)) {
+              final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.STATIC,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
               resolveLibrary(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addStaticLibrary(resolvedLibrary);
             }
-            if ((toolchain.getLibraries().getBuildTypes().get().isEmpty()
-                || toolchain.getLibraries().getBuildTypes().get().contains(CMakeBuildType.SHARED))
-                && (component.getBuildTypes().get().isEmpty()
-                    || component.getBuildTypes().get().contains(CMakeBuildType.SHARED))) {
-              final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkType.SHARED,
+            if ((toolchain.getLibraries().getBuildVariants().get().isEmpty()
+                || toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.SHARED))
+                && (component.getBuildVariants().get().isEmpty()
+                    || component.getBuildVariants().get().contains(CMakeBuildVariant.SHARED))) {
+              final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.SHARED,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
               resolveLibrary(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addSharedLibrary(resolvedLibrary);
@@ -216,7 +216,7 @@ public final class CMakeResolver {
   }
 
   private void resolveLibraryLinking(final Collection<CMakeLibraryLinking> linkDefinitions,
-      final CMakeResolvedToolchain toolchain, final CMakeLinkType type,
+      final CMakeResolvedToolchain toolchain, final CMakeLinkVariant type,
       final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer,
       final Consumer<CMakeResolvedPackageDependency> privatePackageDependencyConsumer,
       final Consumer<CMakeResolvedPackageDependency> publicPackageDependencyConsumer,
@@ -225,8 +225,8 @@ public final class CMakeResolver {
     for (final CMakeLibraryLinking linkDefinition : linkDefinitions) {
       resolveLinkingOptions(linkDefinition.getOptions(), toolchain, privateOptionConsumer, publicOptionConsumer);
       for (final CMakeLibraryDependencies dependency : linkDefinition.getDependencies()) {
-        if (Objects.equals(CMakeLinkType.INTERFACE, dependency.getLinkType())
-            || Objects.equals(type, dependency.getLinkType())) {
+        if (Objects.equals(CMakeLinkVariant.INTERFACE, dependency.getLinkVariant())
+            || Objects.equals(type, dependency.getLinkVariant())) {
           resolveLinkingDependencies(dependency, toolchain, privatePackageDependencyConsumer,
               publicPackageDependencyConsumer, privateProjectDependencyConsumer, publicProjectDependencyConsumer);
         }
@@ -255,7 +255,7 @@ public final class CMakeResolver {
     for (final String name : dependency.getNames()) {
       if (!resolvePackageReference(name, dependency.getFrom(), dependency.getVisibilityType(),
           privatePackageDependencyConsumer, publicPackageDependencyConsumer)
-          && !resolveProjectReference(name, dependency.getFrom(), dependency.getLinkType(),
+          && !resolveProjectReference(name, dependency.getFrom(), dependency.getLinkVariant(),
               dependency.getVisibilityType(), privateProjectDependencyConsumer, publicProjectDependencyConsumer)) {
         throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(name));
       }
@@ -282,7 +282,7 @@ public final class CMakeResolver {
     return false;
   }
 
-  private boolean resolveProjectReference(final String name, final String from, final CMakeLinkType linkage,
+  private boolean resolveProjectReference(final String name, final String from, final CMakeLinkVariant linkage,
       final CMakeVisibilityType visibilityType,
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer)
