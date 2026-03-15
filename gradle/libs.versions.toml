@@ -1,7 +1,7 @@
 [versions]
 publish = "2.1.0"
 spotless = "8.3.0"
-shadow = "9.3.2"
+shadow = "9.4.0"
 versions = "0.53.0"
 jacocolog = "4.0.1"
 spotbugs = "6.4.8"
