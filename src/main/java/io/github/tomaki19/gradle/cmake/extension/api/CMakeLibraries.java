@@ -11,15 +11,11 @@ import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.Nested;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
   public final static CMakeBuildVariant Static = CMakeBuildVariant.STATIC;
   public final static CMakeBuildVariant Shared = CMakeBuildVariant.SHARED;
-
-  public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
-  public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;
 
   public SetProperty<CMakeBuildVariant> getBuildVariants();
 

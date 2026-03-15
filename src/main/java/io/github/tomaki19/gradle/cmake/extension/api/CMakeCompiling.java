@@ -12,6 +12,9 @@ import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 abstract class CMakeCompiling {
 
+  public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
+  public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;
+
   private final Collection<CMakeBuildItems> defines = new HashSet<>();
   private final Collection<CMakeBuildItems> options = new HashSet<>();
   private CMakeVisibilityType defaultVisibilityType;
