@@ -85,7 +85,8 @@ public final class CMakeModuleFile extends CMakeFileContent {
 
   private void writeTargetProperties(final FileOutputStream outputStream, final int indent,
       final CMakeResolvedLibrary library, final String target, final String buildConfig) throws IOException {
-    final Path targetPath = Paths.get(toolchain.getName(), buildConfig);
+    final Path targetPath = Paths.get(toolchain.getName(), buildConfig,
+        CMakeFileConventions.buildTarget(library.getName(), library.getLinkType(), toolchain.getName(), buildConfig));
     switch (library.getLinkType()) {
       case SHARED: {
         write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
@@ -98,7 +99,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
               OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
         } else if (OperatingSystem.current().isWindows()) {
           write(outputStream, indent + 1,
-              "IMPORTED_IMPLIB_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/lib/%s\"", buildConfig.toUpperCase(), targetPath,
+              "IMPORTED_IMPLIB_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s/lib\"", buildConfig.toUpperCase(), targetPath,
               OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
         }
         write(outputStream, indent, ")");
@@ -107,8 +108,8 @@ public final class CMakeModuleFile extends CMakeFileContent {
       case STATIC: {
         write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
         write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s", buildConfig.toUpperCase());
-        write(outputStream, indent + 1,
-            "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/bin/%s\"", buildConfig.toUpperCase(), targetPath,
+        write(outputStream, indent + 1, "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s/lib\"",
+            buildConfig.toUpperCase(), targetPath,
             OperatingSystem.current().getStaticLibraryName(library.getOutputName()));
         write(outputStream, indent, ")");
         break;

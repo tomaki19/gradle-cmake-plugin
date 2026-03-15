@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -72,56 +71,51 @@ public final class CMakeListsFile extends CMakeFileContent {
 
     write(outputStream,
         """
-            function( resolve_real_path target location_list )
+            function( get_target_directory directory target )
                 if( TARGET "${target}" )
                     get_target_property( _type ${target} TYPE )
                     if( "${_type}" STREQUAL "SHARED_LIBRARY" )
                         get_target_property( _location ${target} LOCATION )
-                        if( WIN32 )
-                            # On Windows, the location points to the 'lib' file.
-                            get_filename_component( _extension ${_location} EXT )
-                            if( "${_extension}" STREQUAL ".lib" )
-                                get_filename_component( _directory ${_location} DIRECTORY )
-                                get_filename_component( _lib_root ${_directory} DIRECTORY )
-                                get_filename_component( _no_ext_path ${_location} NAME_WE )
-                                if( EXISTS "${_directory}/${_no_ext_path}.dll" )
-                                    list( APPEND location_list "${_directory}/${_no_ext_path}.dll" )
-                                elseif( EXISTS "${_lib_root}/bin/${_no_ext_path}.dll" )
-                                    list( APPEND location_list "${_lib_root}/bin/${_no_ext_path}.dll" )
-                                endif()
-                            endif()
-                        else()
-                            get_filename_component( _realpath ${_location} REALPATH )
-                            list( APPEND location_list ${_realpath} )
-                        endif()
+                        get_filename_component( _realpath ${_location} REALPATH )
+                        get_filename_component( _directory ${_realpath} DIRECTORY )
+                        set( ${directory} "${_directory}" )
                     endif()
                 endif()
-                set( ${location_list} "${${location_list}}" PARENT_SCOPE )
+                set( ${directory} "${${directory}}" PARENT_SCOPE )
             endfunction()
             function( install_imported_dependency )
-                set(options "")
-                set( oneValueArgs TARGET COMPONENT )
+                set( options "" )
+                set( oneValueArgs TARGET DESTINATION COMPONENT )
                 set( multiValueArgs "" )
                 cmake_parse_arguments( INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-                set( _link_library_locations "" )
-                resolve_real_path( ${INPUT_TARGET} _link_library_locations )
-                install( FILES ${_link_library_locations}
-                    DESTINATION lib
+                get_target_directory( _link_library_directory ${INPUT_TARGET} )
+                install( DIRECTORY ${_link_library_directory}
+                    DESTINATION ${INPUT_DESTINATION}
                     COMPONENT ${INPUT_COMPONENT}
                 )
             endfunction()
             function( install_transitive_dependencies )
-                set(options "")
-                set( oneValueArgs TARGET COMPONENT )
+                set( options "" )
+                set( oneValueArgs TARGET DESTINATION COMPONENT )
                 set( multiValueArgs "" )
                 cmake_parse_arguments( INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-                set( _link_library_locations "" )
                 get_target_property( _interface_link_libraries ${INPUT_TARGET} INTERFACE_LINK_LIBRARIES )
                 foreach( _interface_link_library ${_interface_link_libraries})
-                    resolve_real_path( ${_interface_link_library} _link_library_locations )
+                    get_target_directory( _link_library_directory ${_interface_link_library} )
+                    install( DIRECTORY ${_link_library_directory}
+                        DESTINATION ${INPUT_DESTINATION}
+                        COMPONENT ${INPUT_COMPONENT}
+                    )
                 endforeach( _interface_link_library )
-                install( FILES ${_link_library_locations}
-                    DESTINATION lib
+            endfunction()
+            function( install_project_directory )
+                set( options "" )
+                set( oneValueArgs DIRECTORY DESTINATION COMPONENT )
+                set( multiValueArgs "" )
+                cmake_parse_arguments( INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+                set( _project_files "" )
+                install( DIRECTORY ${INPUT_DIRECTORY}
+                    DESTINATION ${INPUT_DESTINATION}
                     COMPONENT ${INPUT_COMPONENT}
                 )
             endfunction()
@@ -211,12 +205,10 @@ public final class CMakeListsFile extends CMakeFileContent {
     write(outputStream, indent, "add_library( %s INTERFACE )", target);
     write(outputStream, indent, "add_library( %s::%s ALIAS %s)", getProjectName(), target, target);
     writeTargetIncludeDirectories(outputStream, indent, target, "INTERFACE", component.getHeaders());
-    writeTargetPublicCompiling(outputStream, indent, target, component);
-    writeTargetPublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
-    final Collection<CMakeResolvedProjectDependency> projectDependencies = new ArrayList<>();
-    projectDependencies.addAll(component.getPrivateProjectDependencies());
-    projectDependencies.addAll(component.getPublicProjectDependencies());
-    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, projectDependencies);
+    writeTargetInterfaceCompiling(outputStream, indent, target, component);
+    writeTargetInterfaceLinking(outputStream, indent, target, component, toolchain, buildConfig);
+    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, "lib",
+        component.getAllProjectDependencies());
   }
 
   private void writeStaticLibrary(final FileOutputStream outputStream, final int indent,
@@ -234,7 +226,8 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeTargetPrivateLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetPublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetProperties(outputStream, indent, target, outputName, toolchain, buildConfig);
-    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, component.getAllProjectDependencies());
+    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, "lib",
+        component.getAllProjectDependencies());
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, indent, target);
     }
@@ -255,7 +248,8 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeTargetPublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetProperties(outputStream, indent, target, component.getOutputName(), toolchain,
         buildConfig);
-    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, component.getAllProjectDependencies());
+    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, "lib",
+        component.getAllProjectDependencies());
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, indent, target);
     }
@@ -273,7 +267,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     writeTargetPublicLinking(outputStream, indent, target, component, toolchain, buildConfig);
     writeTargetProperties(outputStream, indent, target, component.getOutputName(), toolchain,
         buildConfig);
-    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig,
+    writeTargetInstall(outputStream, indent, target, toolchain, buildConfig, "bin",
         component.getPrivateProjectDependencies());
     if (component.isStripDebug()) {
       writeStripDebugCommand(outputStream, 1, target);
@@ -383,6 +377,16 @@ public final class CMakeListsFile extends CMakeFileContent {
     }
   }
 
+  private void writeTargetInterfaceCompiling(final FileOutputStream outputStream, final int indent, final String target,
+      final CMakeResolvedBinary<?> binary) throws IOException {
+    if (!binary.getPublicCompileOptions().isEmpty()) {
+      writeTargetCompileOptions(outputStream, indent, target, "INTERFACE", binary.getPublicCompileOptions());
+    }
+    if (!binary.getPublicCompileDefinitions().isEmpty()) {
+      writeTargetCompileDefinitions(outputStream, indent, target, "INTERFACE", binary.getPublicCompileDefinitions());
+    }
+  }
+
   private void writeTargetPrivateLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
@@ -399,12 +403,23 @@ public final class CMakeListsFile extends CMakeFileContent {
   private void writeTargetPublicLinking(final FileOutputStream outputStream, final int indent, final String target,
       final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig)
       throws IOException {
-    System.out.println("Public linking for target " + target);
     if (!binary.getPublicProjectDependencies().isEmpty() ||
         !binary.getPublicPackageDependencies().isEmpty() ||
         !binary.getPublicLinkOptions().isEmpty()) {
-      System.out.println("Target has linking " + target);
       writeTargetLinkLibraries(outputStream, indent, target, "PUBLIC", toolchain, buildConfig,
+          binary.getPublicLinkOptions(),
+          binary.getPublicProjectDependencies(),
+          binary.getPublicPackageDependencies());
+    }
+  }
+
+  private void writeTargetInterfaceLinking(final FileOutputStream outputStream, final int indent, final String target,
+      final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig)
+      throws IOException {
+    if (!binary.getPublicProjectDependencies().isEmpty() ||
+        !binary.getPublicPackageDependencies().isEmpty() ||
+        !binary.getPublicLinkOptions().isEmpty()) {
+      writeTargetLinkLibraries(outputStream, indent, target, "INTERFACE", toolchain, buildConfig,
           binary.getPublicLinkOptions(),
           binary.getPublicProjectDependencies(),
           binary.getPublicPackageDependencies());
@@ -434,13 +449,13 @@ public final class CMakeListsFile extends CMakeFileContent {
       final String outputName, final CMakeResolvedToolchain toolchain, final String buildConfig) throws IOException {
     final Path projectPath = getProjectDirectory().getAsFile().toPath();
     final Path configPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).dir(toolchain.getName())
-        .dir(buildConfig).getAsFile().toPath();
+        .dir(buildConfig).dir(target).getAsFile().toPath();
     write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
     write(outputStream, indent + 1, "OUTPUT_NAME \"%s\"", outputName);
-    write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s/bin\"",
+    write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s/lib\"",
         projectPath.relativize(configPath));
     for (final String config : toolchain.getBuildConfigs()) {
-      write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s/bin\"",
+      write(outputStream, indent + 1, "ARCHIVE_OUTPUT_DIRECTORY_%s \"${CMAKE_CURRENT_SOURCE_DIR}/%s/lib\"",
           config.toUpperCase(), projectPath.relativize(configPath));
     }
     write(outputStream, indent + 1, "LIBRARY_OUTPUT_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/%s/lib\"",
@@ -459,29 +474,40 @@ public final class CMakeListsFile extends CMakeFileContent {
   }
 
   private void writeTargetInstall(final FileOutputStream outputStream, final int indent, final String target,
-      final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final CMakeResolvedToolchain toolchain, final String buildConfig, final String typePath,
       final Collection<CMakeResolvedProjectDependency> dependencies) throws IOException {
-    write(outputStream, indent, "install( TARGETS %s", target);
+    final Path projectPath = getProjectDirectory().getAsFile().toPath();
+    final Path configPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).dir(toolchain.getName())
+        .dir(buildConfig).dir(target).dir(typePath).getAsFile().toPath();
+    // write(outputStream, indent, "install( TARGETS %s", target);
+    write(outputStream, indent, "install_project_directory( DIRECTORY %s",
+        projectPath.relativize(configPath));
+    write(outputStream, indent + 1, "DESTINATION \".\"");
     write(outputStream, indent + 1, "COMPONENT %s", target);
     write(outputStream, indent, ")");
     for (final CMakeResolvedProjectDependency dependency : dependencies) {
       if (Objects.equals(getProjectName(), dependency.getProjectName())
           && Objects.equals(CMakeLinkVariant.SHARED, dependency.getLinkType())) {
-        final String buildTarget = CMakeFileConventions.buildTarget(
-            dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig);
-        write(outputStream, indent, "install( TARGETS %s", buildTarget);
+        final String buildTarget = CMakeFileConventions.buildTarget(dependency.getName(), dependency.getLinkType(),
+            toolchain.getName(), buildConfig);
+        // write(outputStream, indent, "install( TARGETS %s", buildTarget);
+        write(outputStream, indent, "install_project_directory( DIRECTORY %s/lib", projectPath.relativize(configPath));
+        write(outputStream, indent + 1, "DESTINATION \".\"");
         write(outputStream, indent + 1, "COMPONENT %s", target);
         write(outputStream, indent, ")");
         write(outputStream, indent, "install_transitive_dependencies( TARGET %s", buildTarget);
+        write(outputStream, indent + 1, "DESTINATION \".\"");
         write(outputStream, indent + 1, "COMPONENT %s", target);
         write(outputStream, indent, ")");
       } else {
         final String buildTarget = CMakeFileConventions.buildTarget(dependency.getProjectName(), dependency.getName(),
             dependency.getLinkType(), toolchain.getName(), buildConfig);
         write(outputStream, indent, "install_imported_dependency( TARGET %s", buildTarget);
+        write(outputStream, indent + 1, "DESTINATION \".\"");
         write(outputStream, indent + 1, "COMPONENT %s", target);
         write(outputStream, indent, ")");
         write(outputStream, indent, "install_transitive_dependencies( TARGET %s", buildTarget);
+        write(outputStream, indent + 1, "DESTINATION \".\"");
         write(outputStream, indent + 1, "COMPONENT %s", target);
         write(outputStream, indent, ")");
       }
