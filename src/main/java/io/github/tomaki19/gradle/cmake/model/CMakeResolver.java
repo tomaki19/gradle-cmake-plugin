@@ -71,14 +71,14 @@ public final class CMakeResolver {
           if (component.getSources().isEmpty()) {
             final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.INTERFACE,
                 toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
-            resolveLibrary(component, resolvedLibrary, toolchain, resolvedToolchain);
+            resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {
             if (toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.STATIC)
                 || component.getBuildVariants().get().contains(CMakeBuildVariant.STATIC)) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.STATIC,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
-              resolveLibrary(component, resolvedLibrary, toolchain, resolvedToolchain);
+              resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addStaticLibrary(resolvedLibrary);
             }
             if ((toolchain.getLibraries().getBuildVariants().get().isEmpty()
@@ -87,14 +87,14 @@ public final class CMakeResolver {
                     || component.getBuildVariants().get().contains(CMakeBuildVariant.SHARED))) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.SHARED,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
-              resolveLibrary(component, resolvedLibrary, toolchain, resolvedToolchain);
+              resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addSharedLibrary(resolvedLibrary);
             }
           }
         }));
   }
 
-  private void resolveLibrary(final CMakeLibrary component, final CMakeResolvedLibrary resolvedLibrary,
+  private void resolveCompilingLinking(final CMakeLibrary component, final CMakeResolvedLibrary resolvedLibrary,
       final CMakeToolchain toolchain, final CMakeResolvedToolchain resolvedToolchain) {
     resolveLibraryCompiling(Arrays.asList(toolchain.getLibraries().getCompiling(),
         component.getCompiling()), resolvedLibrary::addPrivateCompileDefinitions,
