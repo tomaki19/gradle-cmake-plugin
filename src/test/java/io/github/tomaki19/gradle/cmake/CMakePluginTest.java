@@ -25,7 +25,7 @@ class CMakePluginTest {
         project.getPluginManager().apply(CMakePlugin.class);
         assertNotNull(project.getExtensions().getByName("cmake"));
     }
-    
+
     @Test
     void testPluginConstructor() {
         // Test that we can create an instance (this tests the constructor)
