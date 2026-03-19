@@ -5,12 +5,14 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
 
 class CMakeLibraryDependenciesTest {
 
@@ -66,5 +68,74 @@ class CMakeLibraryDependenciesTest {
     CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
     deps.forBuildVariant(CMakeBuildVariant.SHARED);
     assertEquals("shared", deps.getBuildVariant().toLowerCase());
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
+    deps1.forBuildVariant(CMakeBuildVariant.SHARED);
+    deps1.link(CMakeLinkVariant.STATIC);
+    deps1.visibility(CMakeVisibilityType.PUBLIC);
+
+    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
+    deps2.forBuildVariant(CMakeBuildVariant.SHARED);
+    deps2.link(CMakeLinkVariant.STATIC);
+    deps2.visibility(CMakeVisibilityType.PUBLIC);
+
+    assertEquals(deps1, deps2);
+    assertEquals(deps1.hashCode(), deps2.hashCode());
+  }
+
+  @Test
+  void testEqualsAndHashCodeWithDifferentBuildVariant() {
+    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
+    deps1.forBuildVariant(CMakeBuildVariant.SHARED);
+
+    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
+    deps2.forBuildVariant(CMakeBuildVariant.STATIC);
+
+    assertNotEquals(deps1, deps2);
+  }
+
+  @Test
+  void testEqualsAndHashCodeWithDifferentLinkVariant() {
+    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
+    deps1.link(CMakeLinkVariant.STATIC);
+
+    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
+    deps2.link(CMakeLinkVariant.SHARED);
+
+    assertNotEquals(deps1, deps2);
+  }
+
+  @Test
+  void testEqualsAndHashCodeWithDifferentVisibility() {
+    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
+    deps1.visibility(CMakeVisibilityType.PUBLIC);
+
+    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
+    deps2.visibility(CMakeVisibilityType.PRIVATE);
+
+    assertNotEquals(deps1, deps2);
+  }
+
+  @Test
+  void testEqualsAndHashCodeWithDifferentNames() {
+    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib1");
+    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib2");
+
+    assertNotEquals(deps1, deps2);
+  }
+
+  @Test
+  void testEqualsWithNull() {
+    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
+    assertNotEquals(null, deps);
+  }
+
+  @Test
+  void testEqualsWithDifferentClass() {
+    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
+    assertNotEquals(new Object(), deps);
   }
 }
