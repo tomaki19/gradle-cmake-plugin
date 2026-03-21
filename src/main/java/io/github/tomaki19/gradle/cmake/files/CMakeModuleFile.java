@@ -9,14 +9,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.file.Directory;
 import org.gradle.internal.os.OperatingSystem;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackage;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackageDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -40,118 +42,72 @@ public final class CMakeModuleFile extends CMakeFileContent {
 
   @Override
   public void writeTo(final FileOutputStream outputStream) throws IOException {
+    processTemplate("module-file.ftl", buildModel(), outputStream);
+  }
+
+  private Map<String, Object> buildModel() {
+    final Map<String, Object> model = new HashMap<>();
+
     final String target = CMakeFileConventions.buildTarget(getProjectName(), library.getName(),
         library.getLinkType(), toolchain.getName(), buildConfig);
-    write(outputStream, 0, "if( NOT TARGET %s )", target);
-    writePackageDependencies(outputStream, 0, library.getAllPackageDependencies());
-    writeProjectDependencies(outputStream, 0, library.getAllProjectDependencies(), toolchain, buildConfig);
-    write(outputStream, 1, "add_library( %s %s IMPORTED )", target, library.getLinkType().name());
-    writeTargetProperties(outputStream, 1, library, target, buildConfig);
-    write(outputStream, 0, "endif()");
-  }
+    model.put("target", target);
+    model.put("linkType", library.getLinkType().name());
+    model.put("buildConfigUpper", buildConfig.toUpperCase());
+    model.put("packageDependencies", library.getAllPackageDependencies());
 
-  protected void writePackageDependencies(final FileOutputStream outputStream, final int indent,
-      final Collection<CMakeResolvedPackageDependency> dependencies) throws IOException {
-    for (final CMakeResolvedPackageDependency dependency : dependencies) {
-      final CMakeResolvedPackage resolvedPackage = dependency.getResolvedPackage();
-      write(outputStream, indent, "find_package( %s REQUIRED", resolvedPackage.getName());
-      if (resolvedPackage.isModuleMode()) {
-        write(outputStream, indent + 1, "MODULE");
-      } else {
-        write(outputStream, indent + 1, "CONFIG");
-      }
-      if (!resolvedPackage.getComponents().isEmpty()) {
-        write(outputStream, indent + 1, "COMPONENTS");
-        for (final String component : resolvedPackage.getComponents()) {
-          write(outputStream, indent + 2, component);
-        }
-      }
-      write(outputStream, indent, ")");
-      for (final Map.Entry<String, String> property : resolvedPackage.getProperties().entrySet()) {
-        write(outputStream, indent, "set( %s_%s %s )", resolvedPackage.getName(), property.getKey().toUpperCase(),
-            property.getValue().toUpperCase());
-      }
+    final List<String> projectIncludes = new ArrayList<>();
+    for (final CMakeResolvedProjectDependency dep : library.getAllProjectDependencies()) {
+      projectIncludes.add(CMakeFileConventions.moduleTarget(dep.getProjectName(), dep.getName(),
+          dep.getLinkType(), toolchain.getName(), buildConfig));
     }
-  }
+    model.put("projectIncludes", projectIncludes);
 
-  protected void writeProjectDependencies(final FileOutputStream outputStream, final int indent,
-      final Collection<CMakeResolvedProjectDependency> dependencies, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) throws IOException {
-    for (final CMakeResolvedProjectDependency dependency : dependencies) {
-      write(outputStream, indent, "include( %s )", CMakeFileConventions.moduleTarget(dependency.getProjectName(),
-          dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig));
-    }
-  }
-
-  private void writeTargetProperties(final FileOutputStream outputStream, final int indent,
-      final CMakeResolvedLibrary library, final String target, final String buildConfig) throws IOException {
     final Path targetPath = Paths.get(toolchain.getName(), buildConfig,
         CMakeFileConventions.buildTarget(library.getName(), library.getLinkType(), toolchain.getName(), buildConfig));
-    switch (library.getLinkType()) {
-      case SHARED: {
-        write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
-        write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s", buildConfig.toUpperCase());
-        write(outputStream, indent + 1, "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/lib/%s\"",
-            buildConfig.toUpperCase(), targetPath,
-            OperatingSystem.current().getSharedLibraryName(library.getOutputName()));
-        if (OperatingSystem.current().isLinux()) {
-          write(outputStream, indent + 1, "IMPORTED_SONAME_%s \"%s\"", buildConfig.toUpperCase(),
-              OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
-        } else if (OperatingSystem.current().isWindows()) {
-          write(outputStream, indent + 1,
-              "IMPORTED_IMPLIB_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s/lib\"", buildConfig.toUpperCase(), targetPath,
-              OperatingSystem.current().getLinkLibraryName(library.getOutputName()));
-        }
-        write(outputStream, indent, ")");
-        break;
+    model.put("targetPath", targetPath.toString());
+
+    final OperatingSystem os = OperatingSystem.current();
+    model.put("isLinux", os.isLinux());
+    model.put("isWindows", os.isWindows());
+
+    if (library.getLinkType() == CMakeLinkVariant.SHARED) {
+      model.put("sharedLibName", os.getSharedLibraryName(library.getOutputName()));
+      if (os.isLinux()) {
+        model.put("soname", os.getLinkLibraryName(library.getOutputName()));
       }
-      case STATIC: {
-        write(outputStream, indent, "set_target_properties( %s PROPERTIES", target);
-        write(outputStream, indent + 1, "IMPORTED_CONFIGURATIONS %s", buildConfig.toUpperCase());
-        write(outputStream, indent + 1, "IMPORTED_LOCATION_%s \"${CMAKE_CURRENT_LIST_DIR}/%s/%s/lib\"",
-            buildConfig.toUpperCase(), targetPath,
-            OperatingSystem.current().getStaticLibraryName(library.getOutputName()));
-        write(outputStream, indent, ")");
-        break;
+      if (os.isWindows()) {
+        model.put("implibName", os.getLinkLibraryName(library.getOutputName()));
       }
-      default:
-        break;
+    } else if (library.getLinkType() == CMakeLinkVariant.STATIC) {
+      model.put("staticLibName", os.getStaticLibraryName(library.getOutputName()));
     }
+
+    final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath();
+    final List<String> headerRelPaths = new ArrayList<>();
     for (final File headerDir : library.getHeaders()) {
-      final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath();
-      write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_INCLUDE_DIRECTORIES \"${CMAKE_CURRENT_LIST_DIR}/%s\"",
-          exportPath.relativize(headerDir.toPath()));
-      write(outputStream, indent, ")");
+      headerRelPaths.add(exportPath.relativize(headerDir.toPath()).toString());
     }
-    for (final String compileOption : library.getPublicCompileOptions()) {
-      write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_COMPILE_OPTIONS %s", compileOption);
-      write(outputStream, indent, ")");
+    model.put("headerRelPaths", headerRelPaths);
+
+    model.put("publicCompileOptions", library.getPublicCompileOptions());
+    model.put("privateCompileDefinitions", library.getPrivateCompileDefinitions());
+
+    final List<String> publicProjectDepTargets = new ArrayList<>();
+    for (final CMakeResolvedProjectDependency dep : library.getPublicProjectDependencies()) {
+      publicProjectDepTargets.add(CMakeFileConventions.buildTarget(dep.getProjectName(), dep.getName(),
+          dep.getLinkType(), toolchain.getName(), buildConfig));
     }
-    for (final String compileDefinition : library.getPrivateCompileDefinitions()) {
-      write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_COMPILE_DEFINITIONS %s", compileDefinition);
-      write(outputStream, indent, ")");
+    model.put("publicProjectDepTargets", publicProjectDepTargets);
+
+    final List<String> publicPackageLinkLibraries = new ArrayList<>();
+    for (final CMakeResolvedPackageDependency dep : library.getPublicPackageDependencies()) {
+      publicPackageLinkLibraries.add(dep.getTargetPrefix() + "::" + dep.getName());
     }
-    for (final CMakeResolvedProjectDependency dependency : library.getPublicProjectDependencies()) {
-      write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES %s",
-          CMakeFileConventions.buildTarget(dependency.getProjectName(), dependency.getName(), dependency.getLinkType(),
-              toolchain.getName(), buildConfig));
-      write(outputStream, indent, ")");
-    }
-    for (final CMakeResolvedPackageDependency dependency : library.getPublicPackageDependencies()) {
-      write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES %s::%s", dependency.getTargetPrefix(),
-          dependency.getName());
-      write(outputStream, indent, ")");
-    }
-    for (final String option : library.getPublicLinkOptions()) {
-      write(outputStream, indent, "set_property( TARGET %s APPEND PROPERTY", target);
-      write(outputStream, indent + 1, "INTERFACE_LINK_LIBRARIES %s", option);
-      write(outputStream, indent, ")");
-    }
+    model.put("publicPackageLinkLibraries", publicPackageLinkLibraries);
+
+    model.put("publicLinkOptions", library.getPublicLinkOptions());
+
+    return model;
   }
 
 }

@@ -6,15 +6,12 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.gradle.api.Project;
-import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 class CMakeExecutablesTest {
 
   @Test
   void testGetCompiling() {
-    final Project project = ProjectBuilder.builder().build();
     final CMakeExecutables executables = new CMakeExecutables() {
       @Override
       public CMakeExecutableCompiling getCompiling() {
@@ -31,7 +28,6 @@ class CMakeExecutablesTest {
 
   @Test
   void testGetLinking() {
-    final Project project = ProjectBuilder.builder().build();
     final CMakeExecutables executables = new CMakeExecutables() {
       @Override
       public CMakeExecutableCompiling getCompiling() {
@@ -48,7 +44,6 @@ class CMakeExecutablesTest {
 
   @Test
   void testCompilingAction() {
-    final Project project = ProjectBuilder.builder().build();
     final CMakeExecutables executables = new CMakeExecutables() {
       @Override
       public CMakeExecutableCompiling getCompiling() {
@@ -65,7 +60,6 @@ class CMakeExecutablesTest {
 
   @Test
   void testLinkingAction() {
-    final Project project = ProjectBuilder.builder().build();
     final CMakeExecutables executables = new CMakeExecutables() {
       @Override
       public CMakeExecutableCompiling getCompiling() {
