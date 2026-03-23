@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.helper;
 
-import static org.mockito.Mockito.mock;
 
 
 import org.gradle.api.file.RegularFileProperty;
@@ -26,6 +25,9 @@ public class MockCMakeToolchain extends CMakeToolchain {
   private final MapProperty<String, String> environment;
   private final RegularFileProperty environmentFile;
   private final RegularFileProperty toolchainFile;
+  private final CMakeLibraries libraries;
+  private final CMakeApplications applications;
+  private final CMakeTests tests;
 
   public MockCMakeToolchain(final String name, final ObjectFactory factory) {
     this.name = name;
@@ -33,7 +35,10 @@ public class MockCMakeToolchain extends CMakeToolchain {
     this.generator = factory.property(String.class);
     this.environment = factory.mapProperty(String.class, String.class);
     this.environmentFile = factory.fileProperty();
-    toolchainFile = factory.fileProperty();
+    this.toolchainFile = factory.fileProperty();
+    this.libraries = new MockCMakeLibraries(factory);
+    this.applications = new MockCMakeApplications(factory);
+    this.tests = new MockCMakeTests(factory);
   }
 
   @Override
@@ -68,16 +73,16 @@ public class MockCMakeToolchain extends CMakeToolchain {
 
   @Override
   public CMakeLibraries getLibraries() {
-    return mock(CMakeLibraries.class);
+    return libraries;
   }
 
   @Override
   public CMakeApplications getApplications() {
-    return mock(CMakeApplications.class);
+    return applications;
   }
 
   @Override
   public CMakeTests getTests() {
-    return mock(CMakeTests.class);
+    return tests;
   }
 }

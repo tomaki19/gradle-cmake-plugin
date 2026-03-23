@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +23,10 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeTest;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 
 class CMakeResolverTest {
 
@@ -154,8 +157,7 @@ class CMakeResolverTest {
         Set<CMakePackage> packages = Collections.emptySet();
 
         // Create a mock toolchain
-        CMakeToolchain toolchain = mock(CMakeToolchain.class);
-        when(toolchain.getName()).thenReturn("test-toolchain");
+        CMakeToolchain toolchain = new MockCMakeToolchain("toolchain", project.getObjects());
 
         Set<CMakeToolchain> toolchains = Set.of(toolchain);
         Set<CMakeLibrary> libraries = Collections.emptySet();
@@ -166,6 +168,137 @@ class CMakeResolverTest {
         assertNotNull(resolver);
 
         // This should not throw any exception
+        var result = resolver.process(libraries, applications, tests);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testProcessWithMultipleToolchains() {
+        Project project = ProjectBuilder.builder().build();
+        Set<CMakePackage> packages = Collections.emptySet();
+
+        // Create mock toolchains
+        CMakeToolchain toolchain1 = new MockCMakeToolchain("toolchain1", project.getObjects());
+        CMakeToolchain toolchain2 = new MockCMakeToolchain("toolchain2", project.getObjects());
+
+        Set<CMakeToolchain> toolchains = Set.of(toolchain1, toolchain2);
+        Set<CMakeLibrary> libraries = Collections.emptySet();
+        Set<CMakeApplication> applications = Collections.emptySet();
+        Set<CMakeTest> tests = Collections.emptySet();
+
+        CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+        assertNotNull(resolver);
+
+        var result = resolver.process(libraries, applications, tests);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testProcessWithLibraryWithSources() {
+        Project project = ProjectBuilder.builder().build();
+        Set<CMakePackage> packages = Collections.emptySet();
+        Set<CMakeToolchain> toolchains = Collections.emptySet();
+
+        CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+
+        // Create a library with sources
+        CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+
+        Set<CMakeLibrary> libraries = Set.of(library);
+        Set<CMakeApplication> applications = Collections.emptySet();
+        Set<CMakeTest> tests = Collections.emptySet();
+
+        // Should not throw any exception
+        var result = resolver.process(libraries, applications, tests);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testProcessWithApplicationWithSources() {
+        Project project = ProjectBuilder.builder().build();
+        Set<CMakePackage> packages = Collections.emptySet();
+        Set<CMakeToolchain> toolchains = Collections.emptySet();
+
+        CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+
+        // Create an application with sources
+        CMakeApplication application = new MockCMakeApplication("test-application", project.getObjects());
+
+        Set<CMakeLibrary> libraries = Collections.emptySet();
+        Set<CMakeApplication> applications = Set.of(application);
+        Set<CMakeTest> tests = Collections.emptySet();
+
+        // Should not throw any exception
+        var result = resolver.process(libraries, applications, tests);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testProcessWithTestWithSources() {
+        Project project = ProjectBuilder.builder().build();
+        Set<CMakePackage> packages = Collections.emptySet();
+        Set<CMakeToolchain> toolchains = Collections.emptySet();
+
+        CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+
+        // Create a test with sources
+        CMakeTest test = new MockCMakeTest("test-test", project.getObjects());
+
+        Set<CMakeLibrary> libraries = Collections.emptySet();
+        Set<CMakeApplication> applications = Collections.emptySet();
+        Set<CMakeTest> tests = Set.of(test);
+
+        // Should not throw any exception
+        var result = resolver.process(libraries, applications, tests);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testProcessWithToolchainsThatMatchBinary() {
+        Project project = ProjectBuilder.builder().build();
+        Set<CMakePackage> packages = Collections.emptySet();
+
+        // Create a mock toolchain
+        CMakeToolchain toolchain = new MockCMakeToolchain("test-toolchain", project.getObjects());
+
+        Set<CMakeToolchain> toolchains = Set.of(toolchain);
+
+        // Create a library with matching toolchain
+        CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+        library.toolchains("test-toolchain");
+        library.getHeaders().srcDirs("src/test.h");
+
+        Set<CMakeLibrary> libraries = Set.of(library);
+        Set<CMakeApplication> applications = Collections.emptySet();
+        Set<CMakeTest> tests = Collections.emptySet();
+
+        CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+
+        var result = resolver.process(libraries, applications, tests);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testProcessWithEmptyToolchains() {
+        Project project = ProjectBuilder.builder().build();
+        Set<CMakePackage> packages = Collections.emptySet();
+        Set<CMakeToolchain> toolchains = Collections.emptySet();
+
+        CMakeResolver resolver = new CMakeResolver(project, packages, toolchains);
+
+        // Create a library with no toolchains specified
+        CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+
+        Set<CMakeLibrary> libraries = Set.of(library);
+        Set<CMakeApplication> applications = Collections.emptySet();
+        Set<CMakeTest> tests = Collections.emptySet();
+
         var result = resolver.process(libraries, applications, tests);
         assertNotNull(result);
         assertEquals(0, result.size());

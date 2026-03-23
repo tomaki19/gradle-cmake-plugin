@@ -19,7 +19,7 @@ public class MockCMakeApplications implements CMakeApplications {
 
   public MockCMakeApplications(final ObjectFactory factory) {
     this.stripDebug = factory.property(Boolean.class);
-  }
+ }
 
   @Override
   public CMakeExecutableCompiling getCompiling() {

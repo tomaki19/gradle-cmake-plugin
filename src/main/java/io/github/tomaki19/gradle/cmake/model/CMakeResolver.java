@@ -67,7 +67,6 @@ public final class CMakeResolver {
       final Map<String, CMakeToolchain> availableToolchains, final Set<CMakeLibrary> libraries) {
     libraries.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          validateLibrary(component);
           if (component.getSources().isEmpty()) {
             final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.INTERFACE,
                 toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
@@ -112,7 +111,6 @@ public final class CMakeResolver {
       final Map<String, CMakeToolchain> availableToolchains, final Set<CMakeApplication> applications) {
     applications.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          validateExecutable(component);
           final CMakeResolvedExecutable resolvedApplication = new CMakeResolvedExecutable(component,
               toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
           resolveExecutableCompiling(Arrays.asList(toolchain.getApplications().getCompiling(),
@@ -132,7 +130,6 @@ public final class CMakeResolver {
       final Map<String, CMakeToolchain> availableToolchains, final Set<CMakeTest> tests) {
     tests.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          validateExecutable(component);
           final CMakeResolvedExecutable resolvedTest = new CMakeResolvedExecutable(component,
               toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
           resolveExecutableCompiling(Arrays.asList(toolchain.getTests().getCompiling(), component.getCompiling()),
@@ -304,20 +301,6 @@ public final class CMakeResolver {
       return false;
     }
     return true;
-  }
-
-  private void validateLibrary(final CMakeLibrary component) {
-    if (component.getHeaders().isEmpty()) {
-      throw new IllegalArgumentException(
-          "Library '%s' does not have any valid headers configured!".formatted(component.getName()));
-    }
-  }
-
-  private void validateExecutable(final CMakeBinary component) {
-    if (component.getSources().isEmpty()) {
-      throw new IllegalArgumentException(
-          "Executable '%s' does not have any valid sources configured!".formatted(component.getName()));
-    }
   }
 
 }
