@@ -11,13 +11,13 @@ import org.gradle.api.file.RegularFile;
 public final class CMakeCustomTaskProto {
 
   private final String name;
-  private final String toolchainName;
+  private final CMakeToolchain toolchain;
   private final String buildConfig;
   private final Optional<RegularFile> environmentFile;
 
   public CMakeCustomTaskProto(final String name, final CMakeToolchain toolchain, final String buildConfig) {
     this.name = name;
-    this.toolchainName = toolchain.getName();
+    this.toolchain = toolchain;
     this.buildConfig = buildConfig;
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());
   }
@@ -26,8 +26,8 @@ public final class CMakeCustomTaskProto {
     return name;
   }
 
-  public String getToolchainName() {
-    return toolchainName;
+  public CMakeToolchain getToolchain() {
+    return toolchain;
   }
 
   public String getBuildConfig() {
@@ -43,7 +43,7 @@ public final class CMakeCustomTaskProto {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((toolchainName == null) ? 0 : toolchainName.hashCode());
+    result = prime * result + ((toolchain == null) ? 0 : toolchain.hashCode());
     result = prime * result + ((buildConfig == null) ? 0 : buildConfig.hashCode());
     return result;
   }
@@ -62,10 +62,10 @@ public final class CMakeCustomTaskProto {
         return false;
     } else if (!name.equals(other.name))
       return false;
-    if (toolchainName == null) {
-      if (other.toolchainName != null)
+    if (toolchain == null) {
+      if (other.toolchain != null)
         return false;
-    } else if (!toolchainName.equals(other.toolchainName))
+    } else if (!toolchain.equals(other.toolchain))
       return false;
     if (buildConfig == null) {
       if (other.buildConfig != null)

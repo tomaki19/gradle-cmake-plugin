@@ -60,49 +60,22 @@
 </#list>
     )
 </#macro>
-<#macro targetProperties target outputName configRelPath buildConfigs>
+<#macro targetProperties target outputName targetRelPath buildConfigs>
     set_target_properties( [=target] PROPERTIES
         OUTPUT_NAME "[=outputName]"
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=configRelPath]/lib"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 <#list buildConfigs as cfg>
-        ARCHIVE_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=configRelPath]/lib"
+        ARCHIVE_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 </#list>
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=configRelPath]/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 <#list buildConfigs as cfg>
-        LIBRARY_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=configRelPath]/lib"
+        LIBRARY_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 </#list>
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=configRelPath]/bin"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 <#list buildConfigs as cfg>
-        RUNTIME_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=configRelPath]/bin"
+        RUNTIME_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 </#list>
     )
-</#macro>
-<#macro targetInstall target installDir installDependencies>
-    install_project_directory( DIRECTORY [=installDir]
-        DESTINATION "."
-        COMPONENT [=target]
-    )
-<#list installDependencies as dep>
-<#if dep.type == "local_shared">
-    install_project_directory( DIRECTORY [=dep.configLibPath]
-        DESTINATION "."
-        COMPONENT [=dep.componentTarget]
-    )
-    install_transitive_dependencies( TARGET [=dep.buildTarget]
-        DESTINATION "."
-        COMPONENT [=dep.componentTarget]
-    )
-<#else>
-    install_imported_dependency( TARGET [=dep.buildTarget]
-        DESTINATION "."
-        COMPONENT [=dep.componentTarget]
-    )
-    install_transitive_dependencies( TARGET [=dep.buildTarget]
-        DESTINATION "."
-        COMPONENT [=dep.componentTarget]
-    )
-</#if>
-</#list>
 </#macro>
 <#macro stripDebugCmd target>
     add_custom_command( TARGET [=target] POST_BUILD
@@ -122,60 +95,6 @@ cmake_print_variables(CMAKE_BUILD_TYPE)
 cmake_print_variables(CMAKE_TOOLCHAIN_FILE)
 cmake_print_variables(CMAKE_TOOLCHAIN_NAME)
 cmake_print_variables(CMAKE_MODULE_PATH)
-cmake_print_variables(CMAKE_PREFIX_PATH)
-cmake_print_variables(CMAKE_FIND_ROOT_PATH)
-cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
-cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY)
-cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE)
-cmake_print_variables(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE)
-function( get_target_directory directory target )
-    if( TARGET "${target}" )
-        get_target_property( _type ${target} TYPE )
-        if( "${_type}" STREQUAL "SHARED_LIBRARY" )
-            get_target_property( _location ${target} LOCATION )
-            get_filename_component( _realpath ${_location} REALPATH )
-            get_filename_component( _directory ${_realpath} DIRECTORY )
-            set( ${directory} "${_directory}" )
-        endif()
-    endif()
-    set( ${directory} "${${directory}}" PARENT_SCOPE )
-endfunction()
-function( install_imported_dependency )
-    set( options "" )
-    set( oneValueArgs TARGET DESTINATION COMPONENT )
-    set( multiValueArgs "" )
-    cmake_parse_arguments( INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-    get_target_directory( _link_library_directory ${INPUT_TARGET} )
-    install( DIRECTORY ${_link_library_directory}
-        DESTINATION ${INPUT_DESTINATION}
-        COMPONENT ${INPUT_COMPONENT}
-    )
-endfunction()
-function( install_transitive_dependencies )
-    set( options "" )
-    set( oneValueArgs TARGET DESTINATION COMPONENT )
-    set( multiValueArgs "" )
-    cmake_parse_arguments( INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-    get_target_property( _interface_link_libraries ${INPUT_TARGET} INTERFACE_LINK_LIBRARIES )
-    foreach( _interface_link_library ${_interface_link_libraries})
-        get_target_directory( _link_library_directory ${_interface_link_library} )
-        install( DIRECTORY ${_link_library_directory}
-            DESTINATION ${INPUT_DESTINATION}
-            COMPONENT ${INPUT_COMPONENT}
-        )
-    endforeach( _interface_link_library )
-endfunction()
-function( install_project_directory )
-    set( options "" )
-    set( oneValueArgs DIRECTORY DESTINATION COMPONENT )
-    set( multiValueArgs "" )
-    cmake_parse_arguments( INPUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-    set( _project_files "" )
-    install( DIRECTORY ${INPUT_DIRECTORY}
-        DESTINATION ${INPUT_DESTINATION}
-        COMPONENT ${INPUT_COMPONENT}
-    )
-endfunction()
 <#list toolchains as tc>
 <#if tc.hasLibraries>
 if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
@@ -194,7 +113,6 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if lib.hasInterfaceLinking>
 <@targetLinkLibraries lib.target "INTERFACE" lib.interfaceLinkLibraries/>
 </#if>
-<@targetInstall lib.target lib.installDir lib.installDependencies/>
 </#list>
 <#list tc.staticLibraries as lib>
 <@packageDeps lib.packageDependencies/>
@@ -221,8 +139,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if lib.hasPublicLinking>
 <@targetLinkLibraries lib.target "PUBLIC" lib.publicLinkLibraries/>
 </#if>
-<@targetProperties lib.target lib.outputName lib.configRelPath lib.buildConfigs/>
-<@targetInstall lib.target lib.installDir lib.installDependencies/>
+<@targetProperties lib.target lib.outputName lib.targetRelPath lib.buildConfigs/>
 <#if lib.stripDebug>
 <@stripDebugCmd lib.target/>
 </#if>
@@ -252,8 +169,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if lib.hasPublicLinking>
 <@targetLinkLibraries lib.target "PUBLIC" lib.publicLinkLibraries/>
 </#if>
-<@targetProperties lib.target lib.outputName lib.configRelPath lib.buildConfigs/>
-<@targetInstall lib.target lib.installDir lib.installDependencies/>
+<@targetProperties lib.target lib.outputName lib.targetRelPath lib.buildConfigs/>
 <#if lib.stripDebug>
 <@stripDebugCmd lib.target/>
 </#if>
@@ -286,8 +202,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if exec.hasPublicLinking>
 <@targetLinkLibraries exec.target "PUBLIC" exec.publicLinkLibraries/>
 </#if>
-<@targetProperties exec.target exec.outputName exec.configRelPath exec.buildConfigs/>
-<@targetInstall exec.target exec.installDir exec.installDependencies/>
+<@targetProperties exec.target exec.outputName exec.targetRelPath exec.buildConfigs/>
 <#if exec.stripDebug>
 <@stripDebugCmd exec.target/>
 </#if>
@@ -322,8 +237,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if exec.hasPublicLinking>
 <@targetLinkLibraries exec.target "PUBLIC" exec.publicLinkLibraries/>
 </#if>
-<@targetProperties exec.target exec.outputName exec.configRelPath exec.buildConfigs/>
-<@targetInstall exec.target exec.installDir exec.installDependencies/>
+<@targetProperties exec.target exec.outputName exec.targetRelPath exec.buildConfigs/>
 <#if exec.stripDebug>
 <@stripDebugCmd exec.target/>
 </#if>

@@ -34,7 +34,7 @@ class CMakeResolvedToolchainTest {
 
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
     assertNotNull(resolvedToolchain);
-    assertEquals(2, resolvedToolchain.getBuildConfigs().size());
+    assertEquals(4, resolvedToolchain.getBuildConfigs().size());
   }
 
   @Test

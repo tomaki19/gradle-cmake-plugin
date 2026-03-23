@@ -25,7 +25,8 @@ public abstract class CMakeExtension {
   private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks;
 
   @javax.inject.Inject
-  public CMakeExtension(final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
+  public CMakeExtension(
+      final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
     this.customTasks = customTasks;
   }
 
@@ -71,12 +72,12 @@ public abstract class CMakeExtension {
     }
   }
 
-  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto,
-      final Action<CMakeCustomTaskProto> action) {
-    if (!customTasks.containsKey(proto.getToolchainName())) {
-      customTasks.put(proto.getToolchainName(), new HashMap<>());
+  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto, final Action<CMakeCustomTaskProto> action) {
+    final String toolchainName = proto.getToolchain().getName();
+    if (!customTasks.containsKey(toolchainName)) {
+      customTasks.put(toolchainName, new HashMap<>());
     }
-    customTasks.get(proto.getToolchainName()).put(proto, action);
+    customTasks.get(toolchainName).put(proto, action);
   }
 
 }

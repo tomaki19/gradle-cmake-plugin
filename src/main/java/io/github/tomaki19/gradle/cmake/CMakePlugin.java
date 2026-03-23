@@ -207,7 +207,7 @@ public class CMakePlugin implements Plugin<Project> {
                 toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
-              CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
+              CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, library.getAllProjectDependencies());
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
@@ -243,7 +243,7 @@ public class CMakePlugin implements Plugin<Project> {
                 toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
-              CMakeTaskRegistry.configureRemote(task, library, toolchain, buildConfig);
+              CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, library.getAllProjectDependencies());
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
@@ -276,7 +276,7 @@ public class CMakePlugin implements Plugin<Project> {
                 toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
-              CMakeTaskRegistry.configureRemote(task, application, toolchain, buildConfig);
+              CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, application.getAllProjectDependencies());
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
@@ -308,7 +308,7 @@ public class CMakePlugin implements Plugin<Project> {
             final TaskProvider<CMakeBuildExecutable> buildTask = taskRegistry.buildTask(project.getTasks(), test,
                 toolchain, buildConfig);
             buildTask.configure((task) -> {
-              CMakeTaskRegistry.configureRemote(task, test, toolchain, buildConfig);
+              CMakeTaskRegistry.configureRemote(task, toolchain, buildConfig, test.getAllProjectDependencies());
               task.dependsOn(configureTask);
             });
             buildAllToolchainTask.ifPresent((taskProvider) -> {

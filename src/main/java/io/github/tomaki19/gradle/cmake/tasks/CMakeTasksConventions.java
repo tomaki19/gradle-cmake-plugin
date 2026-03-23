@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 
 public final class CMakeTasksConventions {
@@ -28,8 +29,8 @@ public final class CMakeTasksConventions {
         toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String customExecTaskName(final String name, final String toolchainName, final String buildConfig) {
-    return "%s-%s-%s".formatted(name.toLowerCase(), toolchainName.toLowerCase(), buildConfig.toLowerCase());
+  static String customExecTaskName(final String name, final CMakeToolchain toolchain, final String buildConfig) {
+    return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
   static String configureTaskName(final String projectName, final String toolchainName, final String buildConfig) {
@@ -47,12 +48,6 @@ public final class CMakeTasksConventions {
 
   static String buildAllBuildConfigTaskName(final String toolchainName, final String buildConfig) {
     return "build-all-%s-%s".formatted(toolchainName.toLowerCase(), buildConfig.toLowerCase());
-  }
-
-  static String buildTaskName(final String projectName, final String targetName, CMakeLinkVariant linkType,
-      final String toolchainName, final String buildConfig) {
-    return ":%s:build-%s-%s-%s-%s".formatted(projectName, targetName.toLowerCase(), linkType.toLowerCase(),
-        toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
   static String buildTaskName(final String targetName, final CMakeLinkVariant linkType, final String toolchainName,

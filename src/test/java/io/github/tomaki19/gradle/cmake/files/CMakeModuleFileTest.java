@@ -52,7 +52,7 @@ class CMakeModuleFileTest {
       assertNotNull(toolchains);
       assertEquals(1, toolchains.length);
       assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-      assertEquals(2, toolchains[0].getBuildConfigs().size());
+      assertEquals(4, toolchains[0].getBuildConfigs().size());
 
       for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
         for (final String buildConfig : toolchains[0].getBuildConfigs()) {
@@ -89,7 +89,7 @@ class CMakeModuleFileTest {
       assertNotNull(toolchains);
       assertEquals(1, toolchains.length);
       assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-      assertEquals(2, toolchains[0].getBuildConfigs().size());
+      assertEquals(4, toolchains[0].getBuildConfigs().size());
 
       for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
         for (final String buildConfig : toolchains[0].getBuildConfigs()) {
@@ -135,7 +135,7 @@ class CMakeModuleFileTest {
       assertNotNull(toolchains);
       assertEquals(1, toolchains.length);
       assertEquals(1, toolchains[0].getInterfaceLibraries().size());
-      assertEquals(2, toolchains[0].getBuildConfigs().size());
+      assertEquals(4, toolchains[0].getBuildConfigs().size());
 
       for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
         for (final String buildConfig : toolchains[0].getBuildConfigs()) {

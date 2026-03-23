@@ -97,100 +97,86 @@ public final class CMakeListsFile extends CMakeFileContent {
     return model;
   }
 
-  private Map<String, Object> buildInterfaceLibraryModel(final CMakeResolvedLibrary lib,
+  private Map<String, Object> buildInterfaceLibraryModel(final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Map<String, Object> model = new HashMap<>();
-    final String target = CMakeFileConventions.buildTarget(lib.getName(), CMakeLinkVariant.INTERFACE,
+    final String target = CMakeFileConventions.buildTarget(library.getName(), CMakeLinkVariant.INTERFACE,
         toolchain.getName(), buildConfig);
     model.put("target", target);
     model.put("projectAliasTarget", "%s::%s".formatted(getProjectName(), target));
-    model.put("packageDependencies", lib.getAllPackageDependencies());
-    model.put("projectIncludes", buildFilteredProjectIncludes(lib.getAllProjectDependencies(), toolchain, buildConfig));
+    model.put("packageDependencies", library.getAllPackageDependencies());
+    model.put("projectIncludes",
+        buildFilteredProjectIncludes(library.getAllProjectDependencies(), toolchain, buildConfig));
 
     final Path projectPath = getProjectDirectory().getAsFile().toPath();
-    model.put("headerDirs", buildRelativePaths(lib.getHeaders(), projectPath));
+    model.put("headerDirs", buildRelativePaths(library.getHeaders(), projectPath));
 
-    model.put("hasInterfaceCompileOptions", !lib.getPublicCompileOptions().isEmpty());
-    model.put("interfaceCompileOptions", lib.getPublicCompileOptions());
-    model.put("hasInterfaceCompileDefinitions", !lib.getPublicCompileDefinitions().isEmpty());
-    model.put("interfaceCompileDefinitions", lib.getPublicCompileDefinitions());
+    model.put("hasInterfaceCompileOptions", !library.getPublicCompileOptions().isEmpty());
+    model.put("interfaceCompileOptions", library.getPublicCompileOptions());
+    model.put("hasInterfaceCompileDefinitions", !library.getPublicCompileDefinitions().isEmpty());
+    model.put("interfaceCompileDefinitions", library.getPublicCompileDefinitions());
 
-    final boolean hasInterfaceLinking = !lib.getPublicProjectDependencies().isEmpty()
-        || !lib.getPublicPackageDependencies().isEmpty()
-        || !lib.getPublicLinkOptions().isEmpty();
+    final boolean hasInterfaceLinking = !library.getPublicProjectDependencies().isEmpty()
+        || !library.getPublicPackageDependencies().isEmpty()
+        || !library.getPublicLinkOptions().isEmpty();
     model.put("hasInterfaceLinking", hasInterfaceLinking);
-    model.put("interfaceLinkLibraries", buildLinkLibraries(lib.getPublicLinkOptions(),
-        lib.getPublicProjectDependencies(), lib.getPublicPackageDependencies(), toolchain, buildConfig));
+    model.put("interfaceLinkLibraries", buildLinkLibraries(library.getPublicLinkOptions(),
+        library.getPublicProjectDependencies(), library.getPublicPackageDependencies(), toolchain, buildConfig));
 
-    final Path installConfigPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH)
-        .dir(toolchain.getName()).dir(buildConfig).dir(target).dir("lib").getAsFile().toPath();
-    model.put("installDir", projectPath.relativize(installConfigPath).toString());
-    model.put("installDependencies",
-        buildInstallDependencies(lib.getAllProjectDependencies(), toolchain, buildConfig, projectPath,
-            installConfigPath, target));
     return model;
   }
 
-  private Map<String, Object> buildBinaryLibraryModel(final CMakeResolvedLibrary lib,
+  private Map<String, Object> buildBinaryLibraryModel(final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig, final CMakeLinkVariant linkVariant) {
     final Map<String, Object> model = new HashMap<>();
-    final String target = CMakeFileConventions.buildTarget(lib.getName(), linkVariant, toolchain.getName(), buildConfig);
+    final String target = CMakeFileConventions.buildTarget(library.getName(), linkVariant, toolchain.getName(),
+        buildConfig);
     model.put("target", target);
     model.put("projectAliasTarget", "%s::%s".formatted(getProjectName(), target));
-    model.put("packageDependencies", lib.getAllPackageDependencies());
-    model.put("projectIncludes", buildFilteredProjectIncludes(lib.getAllProjectDependencies(), toolchain, buildConfig));
+    model.put("packageDependencies", library.getAllPackageDependencies());
+    model.put("projectIncludes",
+        buildFilteredProjectIncludes(library.getAllProjectDependencies(), toolchain, buildConfig));
 
     final Path projectPath = getProjectDirectory().getAsFile().toPath();
-    model.put("headerDirs", buildRelativePaths(lib.getHeaders(), projectPath));
-    model.put("sourcePaths", buildRelativeFilePaths(lib.getSources(), projectPath));
+    model.put("headerDirs", buildRelativePaths(library.getHeaders(), projectPath));
+    model.put("sourcePaths", buildRelativeFilePaths(library.getSources(), projectPath));
 
-    populateCompileModel(model, lib);
-    populateLinkModel(model, lib, toolchain, buildConfig, false);
+    populateCompileModel(model, library);
+    populateLinkModel(model, library, toolchain, buildConfig, false);
 
-    model.put("outputName", lib.getOutputName());
+    model.put("outputName", library.getOutputName());
 
-    final Path configPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH)
-        .dir(toolchain.getName()).dir(buildConfig).dir(target).getAsFile().toPath();
-    model.put("configRelPath", projectPath.relativize(configPath).toString());
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), target,
+        toolchain, buildConfig).getAsFile().toPath();
+    model.put("targetRelPath", projectPath.relativize(targetPath));
     model.put("buildConfigs", toolchain.getBuildConfigs());
-
-    final Path installConfigPath = configPath.resolve("lib");
-    model.put("installDir", projectPath.relativize(installConfigPath).toString());
-    model.put("installDependencies",
-        buildInstallDependencies(lib.getAllProjectDependencies(), toolchain, buildConfig, projectPath,
-            installConfigPath, target));
-    model.put("stripDebug", lib.isStripDebug());
+    model.put("stripDebug", library.isStripDebug());
     return model;
   }
 
-  private Map<String, Object> buildExecutableModel(final CMakeResolvedExecutable exec,
+  private Map<String, Object> buildExecutableModel(final CMakeResolvedExecutable executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Map<String, Object> model = new HashMap<>();
-    final String target = CMakeFileConventions.buildTarget(exec.getName(), toolchain.getName(), buildConfig);
+    final String target = CMakeFileConventions.buildTarget(executable.getName(), toolchain.getName(), buildConfig);
     model.put("target", target);
-    model.put("packageDependencies", exec.getAllPackageDependencies());
-    model.put("projectIncludes", buildFilteredProjectIncludes(exec.getAllProjectDependencies(), toolchain, buildConfig));
+    model.put("packageDependencies", executable.getAllPackageDependencies());
+    model.put("projectIncludes",
+        buildFilteredProjectIncludes(executable.getAllProjectDependencies(), toolchain, buildConfig));
 
     final Path projectPath = getProjectDirectory().getAsFile().toPath();
-    model.put("headerDirs", buildRelativePaths(exec.getHeaders(), projectPath));
-    model.put("sourcePaths", buildRelativeFilePaths(exec.getSources(), projectPath));
+    model.put("headerDirs", buildRelativePaths(executable.getHeaders(), projectPath));
+    model.put("sourcePaths", buildRelativeFilePaths(executable.getSources(), projectPath));
 
-    populateCompileModel(model, exec);
-    populateLinkModel(model, exec, toolchain, buildConfig, false);
+    populateCompileModel(model, executable);
+    populateLinkModel(model, executable, toolchain, buildConfig, false);
 
-    model.put("outputName", exec.getOutputName());
+    model.put("outputName", executable.getOutputName());
 
-    final Path configPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH)
-        .dir(toolchain.getName()).dir(buildConfig).dir(target).getAsFile().toPath();
-    model.put("configRelPath", projectPath.relativize(configPath).toString());
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), target,
+        toolchain, buildConfig).getAsFile().toPath();
+    model.put("targetRelPath", projectPath.relativize(targetPath).toString());
     model.put("buildConfigs", toolchain.getBuildConfigs());
-
-    final Path installConfigPath = configPath.resolve("bin");
-    model.put("installDir", projectPath.relativize(installConfigPath).toString());
-    model.put("installDependencies",
-        buildInstallDependencies(exec.getPrivateProjectDependencies(), toolchain, buildConfig, projectPath,
-            installConfigPath, target));
-    model.put("stripDebug", exec.isStripDebug());
+    model.put("stripDebug", executable.isStripDebug());
     return model;
   }
 
@@ -259,36 +245,13 @@ public final class CMakeListsFile extends CMakeFileContent {
       libs.add(option);
     }
     for (final CMakeResolvedProjectDependency dep : projectDeps) {
-      libs.add(CMakeFileConventions.buildTarget(dep.getProjectName(), dep.getName(), dep.getLinkType(),
-          toolchain.getName(), buildConfig));
+      libs.add("%s::%s".formatted(dep.getProjectName(), CMakeFileConventions.buildTarget(dep.getName(),
+          dep.getLinkType(), toolchain.getName(), buildConfig)));
     }
     for (final CMakeResolvedPackageDependency dep : packageDeps) {
       libs.add(dep.getTargetPrefix() + "::" + dep.getName());
     }
     return libs;
-  }
-
-  private List<Map<String, Object>> buildInstallDependencies(final Collection<CMakeResolvedProjectDependency> deps,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final Path projectPath,
-      final Path installConfigPath, final String componentTarget) {
-    final List<Map<String, Object>> installDeps = new ArrayList<>();
-    for (final CMakeResolvedProjectDependency dep : deps) {
-      final Map<String, Object> installDep = new HashMap<>();
-      installDep.put("componentTarget", componentTarget);
-      if (Objects.equals(getProjectName(), dep.getProjectName())
-          && Objects.equals(CMakeLinkVariant.SHARED, dep.getLinkType())) {
-        installDep.put("type", "local_shared");
-        installDep.put("configLibPath", projectPath.relativize(installConfigPath).toString() + "/lib");
-        installDep.put("buildTarget",
-            CMakeFileConventions.buildTarget(dep.getName(), dep.getLinkType(), toolchain.getName(), buildConfig));
-      } else {
-        installDep.put("type", "imported");
-        installDep.put("buildTarget", CMakeFileConventions.buildTarget(dep.getProjectName(), dep.getName(),
-            dep.getLinkType(), toolchain.getName(), buildConfig));
-      }
-      installDeps.add(installDep);
-    }
-    return installDeps;
   }
 
 }

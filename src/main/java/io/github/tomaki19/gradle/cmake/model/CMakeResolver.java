@@ -292,9 +292,8 @@ public final class CMakeResolver {
           ? currentProject
           : currentProject.findProject(":%s".formatted(from));
       if (Objects.nonNull(referencedProject)) {
-        final CMakeResolvedProject resolvedProject = new CMakeResolvedProject(referencedProject);
         final CMakeResolvedProjectDependency resolvedDependency = new CMakeResolvedProjectDependency(name,
-            resolvedProject, linkVariant);
+            referencedProject, linkVariant);
         if (Objects.equals(CMakeVisibilityType.PRIVATE, visibilityType)) {
           privateProjectDependencyConsumer.accept(resolvedDependency);
         } else if (Objects.equals(CMakeVisibilityType.PUBLIC, visibilityType)) {

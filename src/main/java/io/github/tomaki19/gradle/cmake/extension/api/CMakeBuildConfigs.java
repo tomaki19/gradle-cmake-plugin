@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class CMakeBuildConfigs {
 
-  private Set<String> entries = new HashSet<>(Arrays.asList("debug", "release"));
+  private Set<String> entries = new HashSet<>(Arrays.asList("Debug", "Release", "RelWithDebInfo", "MinSizeRel"));
 
   public void set(final String... entries) {
     this.entries = new HashSet<>(Arrays.asList(entries));

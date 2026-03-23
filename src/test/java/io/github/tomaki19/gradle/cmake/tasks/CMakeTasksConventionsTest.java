@@ -6,8 +6,12 @@ package io.github.tomaki19.gradle.cmake.tasks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.gradle.api.Project;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 
 class CMakeTasksConventionsTest {
@@ -33,8 +37,9 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testCustomExecTaskName() {
-    assertEquals("mytask-mytoolchain-debug",
-        CMakeTasksConventions.customExecTaskName("mytask", "MyToolchain", "Debug"));
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    assertEquals("mytask-mytoolchain-debug", CMakeTasksConventions.customExecTaskName("mytask", toolchain, "Debug"));
   }
 
   @Test
@@ -47,12 +52,6 @@ class CMakeTasksConventionsTest {
   void testConfigureTaskNameToolchainBuildConfig() {
     assertEquals("configure-mytoolchain-debug",
         CMakeTasksConventions.configureTaskName("MyToolchain", "Debug"));
-  }
-
-  @Test
-  void testBuildTaskNameProjectTargetToolchainLinkageBuildConfig() {
-    assertEquals(":MyProject:build-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName("MyProject", "MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
   }
 
   @Test

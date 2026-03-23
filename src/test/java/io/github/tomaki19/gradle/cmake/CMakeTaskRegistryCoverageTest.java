@@ -30,7 +30,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeBuild;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildExecutable;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
@@ -327,13 +326,6 @@ class CMakeTaskRegistryCoverageTest {
     assertTrue(true);
   }
 
-  @Test
-  void testConfigureRemoteForBuild() {
-    CMakeTaskRegistry.configureRemote(
-        (CMakeBuild) null, emptyDependencyBinary(), toolchain, "Debug");
-    assertTrue(true);
-  }
-
   // -------------------------------------------------------------------------
   // Resolved model object properties
   // -------------------------------------------------------------------------
@@ -358,11 +350,10 @@ class CMakeTaskRegistryCoverageTest {
     CMakeExtension ext = project.getExtensions().getByType(CMakeExtension.class);
     ext.getToolchains().register("gcc", tc -> tc.buildConfigs("Debug"));
 
-    io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto proto =
-        new io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto(
-            "myExec",
-            ext.getToolchains().getByName("gcc"),
-            "Debug");
+    io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto proto = new io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto(
+        "myExec",
+        ext.getToolchains().getByName("gcc"),
+        "Debug");
 
     TaskProvider<?> taskProvider = registry.customExecTask(project.getTasks(), proto);
     assertNotNull(taskProvider);

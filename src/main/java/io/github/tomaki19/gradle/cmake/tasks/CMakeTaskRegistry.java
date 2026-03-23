@@ -72,9 +72,9 @@ public final class CMakeTaskRegistry {
   }
 
   public TaskProvider<CMakeCustomExec> customExecTask(final TaskContainer tasks, final CMakeCustomTaskProto taskProto) {
-    final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchainName(),
+    final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchain(),
         taskProto.getBuildConfig());
-    return tasks.register(taskName, CMakeCustomExec.class, taskProto.getToolchainName(),
+    return tasks.register(taskName, CMakeCustomExec.class, taskProto.getToolchain(),
         taskProto.getBuildConfig(), taskProto.getEnvironmentFile());
   }
 
@@ -188,21 +188,17 @@ public final class CMakeTaskRegistry {
             toolchain.getName(), buildConfig)));
   }
 
-  public static void configureRemote(final CMakeBuild task, final CMakeResolvedBinary<?> binary,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
-    dependencies.addAll(binary.getPrivateProjectDependencies());
-    dependencies.addAll(binary.getPublicProjectDependencies());
-    configureRemote(task, toolchain, buildConfig, dependencies);
-  }
-
-  private static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
+  public static void configureRemote(final CMakeBuild task, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Collection<CMakeResolvedProjectDependency> dependencies) {
     dependencies.stream()
         .filter((dependency) -> !Objects.equals(dependency.getLinkType(), CMakeLinkVariant.INTERFACE))
-        .forEach((dependency) -> task.dependsOn(CMakeTasksConventions.buildTaskName(
-            dependency.getResolvedProject().getName(), dependency.getName(), dependency.getLinkType(),
-            toolchain.getName(), buildConfig)));
+        .forEach((dependency) -> {
+          final TaskProvider<CMakeBuildLibrary> remoteTask = dependency.getProjectTaskNamed(CMakeTasksConventions
+              .buildTaskName(dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig));
+          task.dependsOn(remoteTask);
+          task.getDependencyDirectories().add(remoteTask.get().getBinaryDirectory());
+          task.getDependencyDirectories().addAll(remoteTask.get().getDependencyDirectories().get());
+        });
   }
 
 }

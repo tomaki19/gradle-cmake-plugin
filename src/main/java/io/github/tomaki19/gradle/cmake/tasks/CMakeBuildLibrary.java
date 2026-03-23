@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import org.gradle.api.file.Directory;
 import org.gradle.api.tasks.CacheableTask;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
@@ -18,6 +19,11 @@ public abstract class CMakeBuildLibrary extends CMakeBuild {
       final String buildConfig) {
     super(CMakeFileConventions.buildTarget(library.getName(), library.getLinkType(), toolchain.getName(), buildConfig),
         toolchain, buildConfig);
+  }
+
+  @org.gradle.api.tasks.OutputDirectory
+  public Directory getBinaryDirectory() {
+    return binaryDirectory;
   }
 
 }

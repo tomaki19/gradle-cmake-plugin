@@ -25,18 +25,18 @@ include( [=include] )
 <#if linkType == "SHARED">
     set_target_properties( [=target] PROPERTIES
         IMPORTED_CONFIGURATIONS [=buildConfigUpper]
-        IMPORTED_LOCATION_[=buildConfigUpper] "${CMAKE_CURRENT_LIST_DIR}/[=targetPath]/lib/[=sharedLibName]"
+        IMPORTED_LOCATION_[=buildConfigUpper] "${CMAKE_CURRENT_LIST_DIR}/[=targetRelPath]/[=sharedLibName]"
 <#if isLinux>
         IMPORTED_SONAME_[=buildConfigUpper] "[=soname]"
 </#if>
 <#if isWindows>
-        IMPORTED_IMPLIB_[=buildConfigUpper] "${CMAKE_CURRENT_LIST_DIR}/[=targetPath]/lib/[=implibName]"
+        IMPORTED_IMPLIB_[=buildConfigUpper] "${CMAKE_CURRENT_LIST_DIR}/[=targetRelPath]/[=implibName]"
 </#if>
     )
 <#elseif linkType == "STATIC">
     set_target_properties( [=target] PROPERTIES
         IMPORTED_CONFIGURATIONS [=buildConfigUpper]
-        IMPORTED_LOCATION_[=buildConfigUpper] "${CMAKE_CURRENT_LIST_DIR}/[=targetPath]/lib/[=staticLibName]"
+        IMPORTED_LOCATION_[=buildConfigUpper] "${CMAKE_CURRENT_LIST_DIR}/[=targetRelPath]/[=staticLibName]"
     )
 </#if>
 <#list headerRelPaths as headerPath>
