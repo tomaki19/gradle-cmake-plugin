@@ -85,4 +85,5 @@ public class MockCMakeToolchain extends CMakeToolchain {
   public CMakeTests getTests() {
     return tests;
   }
+
 }

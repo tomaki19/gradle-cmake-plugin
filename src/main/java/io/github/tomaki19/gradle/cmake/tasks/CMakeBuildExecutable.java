@@ -19,10 +19,4 @@ public abstract class CMakeBuildExecutable extends CMakeBuild {
     super(CMakeFileConventions.buildTarget(binary.getName(), toolchain.getName(), buildConfig), toolchain, buildConfig);
   }
 
-  @Override
-  protected void exec() {
-    super.exec();
-    getDependencyDirectories().get()
-        .forEach((dir) -> System.out.println("DEPENDENCY: %s".formatted(dir.getAsFile().getAbsolutePath())));
-  }
 }

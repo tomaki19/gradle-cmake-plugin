@@ -173,10 +173,7 @@ public final class CMakeTaskRegistry {
 
   public static void configureRemote(final CMakeConfigure task, final Project project,
       final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final Collection<CMakeResolvedProjectDependency> dependencies = new ArrayList<>();
-    dependencies.addAll(binary.getPrivateProjectDependencies());
-    dependencies.addAll(binary.getPublicProjectDependencies());
-    configureRemote(task, project, toolchain, buildConfig, dependencies);
+    configureRemote(task, project, toolchain, buildConfig, binary.getAllProjectDependencies());
   }
 
   private static void configureRemote(final CMakeConfigure task, final Project project,
@@ -193,11 +190,8 @@ public final class CMakeTaskRegistry {
     dependencies.stream()
         .filter((dependency) -> !Objects.equals(dependency.getLinkType(), CMakeLinkVariant.INTERFACE))
         .forEach((dependency) -> {
-          final TaskProvider<CMakeBuildLibrary> remoteTask = dependency.getProjectTaskNamed(CMakeTasksConventions
-              .buildTaskName(dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig));
-          task.dependsOn(remoteTask);
-          task.getDependencyDirectories().add(remoteTask.get().getBinaryDirectory());
-          task.getDependencyDirectories().addAll(remoteTask.get().getDependencyDirectories().get());
+          task.dependsOn(":%s:%s".formatted(dependency.getProjectName(), CMakeTasksConventions
+              .buildTaskName(dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig)));
         });
   }
 

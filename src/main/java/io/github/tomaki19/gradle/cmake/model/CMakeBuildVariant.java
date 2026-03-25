@@ -10,4 +10,5 @@ public enum CMakeBuildVariant {
   public String toLowerCase() {
     return name().toLowerCase();
   }
+  
 }
