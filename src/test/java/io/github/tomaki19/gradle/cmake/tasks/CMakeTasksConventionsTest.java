@@ -10,9 +10,17 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 class CMakeTasksConventionsTest {
 
@@ -24,46 +32,74 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testAssembleFindTaskNameToolchain() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
+
     assertEquals("assemble-mylib-shared-mytoolchain-debug-module",
-        CMakeTasksConventions.assembleModuleTaskName("MyLib", CMakeLinkVariant.SHARED, "MyToolchain", "Debug"));
+        CMakeTasksConventions.assembleModuleTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
   void testAssembleFindTaskNameProjectToolchain() {
+    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
     assertEquals(":MyProject:assemble-mylib-shared-mytoolchain-debug-module",
-        CMakeTasksConventions.assembleModuleTaskName(":MyProject", "MyLib", CMakeLinkVariant.SHARED, "MyToolchain",
-            "Debug"));
+        CMakeTasksConventions.assembleModuleTaskName(
+            new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
   void testCustomExecTaskName() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
     assertEquals("mytask-mytoolchain-debug", CMakeTasksConventions.customExecTaskName("mytask", toolchain, "Debug"));
   }
 
   @Test
   void testConfigureTaskNameProjectToolchainBuildConfig() {
+    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
     assertEquals(":MyProject:configure-mytoolchain-debug",
-        CMakeTasksConventions.configureTaskName(":MyProject", "MyToolchain", "Debug"));
+        CMakeTasksConventions.configureTaskName(
+            new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
   void testConfigureTaskNameToolchainBuildConfig() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
     assertEquals("configure-mytoolchain-debug",
-        CMakeTasksConventions.configureTaskName("MyToolchain", "Debug"));
+        CMakeTasksConventions.configureTaskName(new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
   void testBuildTaskNameTargetToolchainLinkageBuildConfig() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    final CMakeLibrary library = new MockCMakeLibrary("MyTarget", project.getObjects());
+
     assertEquals("build-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
+        CMakeTasksConventions.buildTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
   void testBuildTaskNameTargetToolchainBuildConfig() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
+
     assertEquals("build-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName("MyTarget", "MyToolchain", "Debug"));
+        CMakeTasksConventions.buildTaskName(new CMakeResolvedExecutable(application, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
@@ -79,14 +115,24 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testCheckTaskNameTargetToolchainLinkageBuildConfig() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    final CMakeLibrary library = new MockCMakeLibrary("MyTarget", project.getObjects());
+
     assertEquals("check-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.checkTaskName("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
+        CMakeTasksConventions.checkTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
   void testCheckTaskNameTargetToolchainBuildConfig() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
+
     assertEquals("check-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.checkTaskName("MyTarget", "MyToolchain", "Debug"));
+        CMakeTasksConventions.checkTaskName(new CMakeResolvedExecutable(application, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
   @Test
@@ -100,15 +146,4 @@ class CMakeTasksConventionsTest {
         CMakeTasksConventions.checkAllBuildConfigTaskName("MyToolchain", "Debug"));
   }
 
-  @Test
-  void testPackageTaskNameTargetToolchainLinkageBuildConfig() {
-    assertEquals("install-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.installTaskName("MyTarget", CMakeLinkVariant.STATIC, "MyToolchain", "Debug"));
-  }
-
-  @Test
-  void testPackageTaskNameTargetToolchainBuildConfig() {
-    assertEquals("install-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.installTaskName("MyTarget", "MyToolchain", "Debug"));
-  }
 }

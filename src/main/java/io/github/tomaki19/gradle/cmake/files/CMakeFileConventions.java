@@ -4,10 +4,13 @@
  */
 package io.github.tomaki19.gradle.cmake.files;
 
+import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeFileConventions {
@@ -25,31 +28,48 @@ public class CMakeFileConventions {
     return buildDirectory.dir(CMAKE_CONFIG_PATH).dir(toolchain.getName()).dir(buildConfig);
   }
 
-  public static Directory targetBinaryDirectory(final Directory buildDirectory, final String target,
+  public static Directory targetBinaryDirectory(final Directory buildDirectory, final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String target = CMakeFileConventions.buildTarget(library, toolchain, buildConfig);
     return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
   }
 
-  public static String moduleTarget(final String projectName, final String name, final CMakeLinkVariant linkType,
-      final String toolchainName, final String buildConfig) {
-    return "%s-%s-%s-%s-%s-module".formatted(projectName, name.toLowerCase(), linkType.toLowerCase(),
-        toolchainName.toLowerCase(), buildConfig.toLowerCase());
+  public static Directory targetBinaryDirectory(final Directory buildDirectory,
+      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String target = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
+    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
   }
 
-  public static String buildTarget(final String name, final CMakeLinkVariant linkType, final String toolchainName,
-      final String buildConfig) {
-    return "%s-%s-%s-%s".formatted(name.toLowerCase(), linkType.toLowerCase(), toolchainName.toLowerCase(),
+  public static String moduleTarget(final Project project, final CMakeResolvedLibrary library,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    return "%s-%s-%s-%s-%s-module".formatted(project.getName().toLowerCase(), library.getName().toLowerCase(),
+        library.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+  }
+
+  public static String moduleTarget(final CMakeResolvedProjectDependency dependency,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    return "%s-%s-%s-%s-%s-module".formatted(dependency.getProjectName().toLowerCase(),
+        dependency.getName().toLowerCase(), dependency.getLinkVariant().toLowerCase(),
+        toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
   }
 
-  public static String buildTarget(final String name, final String toolchainName, final String buildConfig) {
-    return "%s-%s-%s".formatted(name.toLowerCase(), toolchainName.toLowerCase(), buildConfig.toLowerCase());
+  public static String buildTarget(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    return "%s-%s-%s-%s".formatted(library.getName().toLowerCase(), library.getLinkVariant().toLowerCase(),
+        toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  public static String directoryDependencyTarget(final String name, final CMakeLinkVariant linkVariant,
+  public static String buildTarget(final CMakeResolvedProjectDependency dependency,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "%s-%s-%s-%s-directory".formatted(name.toLowerCase(), linkVariant.toLowerCase(),
+    return "%s-%s-%s-%s".formatted(dependency.getName().toLowerCase(), dependency.getLinkVariant().toLowerCase(),
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+  }
+
+  public static String buildTarget(final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    return "%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
+        buildConfig.toLowerCase());
   }
 
   private CMakeFileConventions() {

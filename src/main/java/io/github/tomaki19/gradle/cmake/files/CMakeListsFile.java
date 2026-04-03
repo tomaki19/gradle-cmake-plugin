@@ -17,7 +17,6 @@ import java.util.Objects;
 
 import org.gradle.api.Project;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -75,10 +74,10 @@ public final class CMakeListsFile extends CMakeFileContent {
         interfaceLibs.add(buildInterfaceLibraryModel(lib, toolchain, buildConfig));
       }
       for (final CMakeResolvedLibrary lib : toolchain.getStaticLibraries()) {
-        staticLibs.add(buildBinaryLibraryModel(lib, toolchain, buildConfig, CMakeLinkVariant.STATIC));
+        staticLibs.add(buildBinaryLibraryModel(lib, toolchain, buildConfig));
       }
       for (final CMakeResolvedLibrary lib : toolchain.getSharedLibraries()) {
-        sharedLibs.add(buildBinaryLibraryModel(lib, toolchain, buildConfig, CMakeLinkVariant.SHARED));
+        sharedLibs.add(buildBinaryLibraryModel(lib, toolchain, buildConfig));
       }
       for (final CMakeResolvedExecutable exec : toolchain.getApplications()) {
         applications.add(buildExecutableModel(exec, toolchain, buildConfig));
@@ -99,8 +98,7 @@ public final class CMakeListsFile extends CMakeFileContent {
   private Map<String, Object> buildInterfaceLibraryModel(final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Map<String, Object> model = new HashMap<>();
-    final String target = CMakeFileConventions.buildTarget(library.getName(), CMakeLinkVariant.INTERFACE,
-        toolchain.getName(), buildConfig);
+    final String target = CMakeFileConventions.buildTarget(library, toolchain, buildConfig);
     model.put("target", target);
     model.put("projectAliasTarget", "%s::%s".formatted(getProjectName(), target));
     model.put("packageDependencies", library.getAllPackageDependencies());
@@ -126,10 +124,9 @@ public final class CMakeListsFile extends CMakeFileContent {
   }
 
   private Map<String, Object> buildBinaryLibraryModel(final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final CMakeLinkVariant linkVariant) {
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Map<String, Object> model = new HashMap<>();
-    final String target = CMakeFileConventions.buildTarget(library.getName(), linkVariant, toolchain.getName(),
-        buildConfig);
+    final String target = CMakeFileConventions.buildTarget(library, toolchain, buildConfig);
     model.put("target", target);
     model.put("projectAliasTarget", "%s::%s".formatted(getProjectName(), target));
     model.put("packageDependencies", library.getAllPackageDependencies());
@@ -145,7 +142,7 @@ public final class CMakeListsFile extends CMakeFileContent {
 
     model.put("outputName", library.getOutputName());
 
-    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), target,
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), library,
         toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", projectPath.relativize(targetPath));
     model.put("buildConfigs", toolchain.getBuildConfigs());
@@ -156,7 +153,7 @@ public final class CMakeListsFile extends CMakeFileContent {
   private Map<String, Object> buildExecutableModel(final CMakeResolvedExecutable executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Map<String, Object> model = new HashMap<>();
-    final String target = CMakeFileConventions.buildTarget(executable.getName(), toolchain.getName(), buildConfig);
+    final String target = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
     model.put("target", target);
     model.put("packageDependencies", executable.getAllPackageDependencies());
     model.put("projectIncludes",
@@ -171,7 +168,7 @@ public final class CMakeListsFile extends CMakeFileContent {
 
     model.put("outputName", executable.getOutputName());
 
-    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), target,
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), executable,
         toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", projectPath.relativize(targetPath).toString());
     model.put("buildConfigs", toolchain.getBuildConfigs());
@@ -207,22 +204,21 @@ public final class CMakeListsFile extends CMakeFileContent {
         binary.getPublicProjectDependencies(), binary.getPublicPackageDependencies(), toolchain, buildConfig));
   }
 
-  private List<String> buildFilteredProjectIncludes(final Collection<CMakeResolvedProjectDependency> deps,
+  private List<String> buildFilteredProjectIncludes(final Collection<CMakeResolvedProjectDependency> dependencies,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final List<String> includes = new ArrayList<>();
-    for (final CMakeResolvedProjectDependency dep : deps) {
-      if (!Objects.equals(getProjectName(), dep.getProjectName())) {
-        includes.add(CMakeFileConventions.moduleTarget(dep.getProjectName(), dep.getName(), dep.getLinkType(),
-            toolchain.getName(), buildConfig));
+    for (final CMakeResolvedProjectDependency dependency : dependencies) {
+      if (!Objects.equals(getProjectName(), dependency.getProjectName())) {
+        includes.add(CMakeFileConventions.moduleTarget(dependency, toolchain, buildConfig));
       }
     }
     return includes;
   }
 
-  private List<String> buildRelativePaths(final Collection<File> dirs, final Path base) {
+  private List<String> buildRelativePaths(final Collection<File> directories, final Path base) {
     final List<String> paths = new ArrayList<>();
-    for (final File dir : dirs) {
-      paths.add(base.relativize(dir.toPath()).toString());
+    for (final File directory : directories) {
+      paths.add(base.relativize(directory.toPath()).toString());
     }
     return paths;
   }
@@ -236,19 +232,19 @@ public final class CMakeListsFile extends CMakeFileContent {
   }
 
   private List<String> buildLinkLibraries(final Collection<String> options,
-      final Collection<CMakeResolvedProjectDependency> projectDeps,
-      final Collection<CMakeResolvedPackageDependency> packageDeps, final CMakeResolvedToolchain toolchain,
+      final Collection<CMakeResolvedProjectDependency> projectDependencies,
+      final Collection<CMakeResolvedPackageDependency> packageDependencies, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     final List<String> libs = new ArrayList<>();
     for (final String option : options) {
       libs.add(option);
     }
-    for (final CMakeResolvedProjectDependency dep : projectDeps) {
-      libs.add("%s::%s".formatted(dep.getProjectName(), CMakeFileConventions.buildTarget(dep.getName(),
-          dep.getLinkType(), toolchain.getName(), buildConfig)));
+    for (final CMakeResolvedProjectDependency dependency : projectDependencies) {
+      libs.add("%s::%s".formatted(dependency.getProjectName(),
+          CMakeFileConventions.buildTarget(dependency, toolchain, buildConfig)));
     }
-    for (final CMakeResolvedPackageDependency dep : packageDeps) {
-      libs.add(dep.getTargetPrefix() + "::" + dep.getName());
+    for (final CMakeResolvedPackageDependency dependency : packageDependencies) {
+      libs.add(dependency.getTargetPrefix() + "::" + dependency.getName());
     }
     return libs;
   }

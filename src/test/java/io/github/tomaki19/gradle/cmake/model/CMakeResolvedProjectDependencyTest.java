@@ -19,8 +19,8 @@ class CMakeResolvedProjectDependencyTest {
   @Test
   void testConstructor() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
     assertNotNull(dependency);
     assertEquals("test-lib", dependency.getName());
   }
@@ -28,21 +28,21 @@ class CMakeResolvedProjectDependencyTest {
   @Test
   void testGetters() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
     assertNotNull(dependency);
-    assertEquals(":", dependency.getProjectPath());
-    assertEquals(CMakeLinkVariant.STATIC, dependency.getLinkType());
+    assertEquals("test-project", dependency.getProjectName());
+    assertEquals(CMakeLinkVariant.STATIC, dependency.getLinkVariant());
   }
 
   @Test
   void testGetProject() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
-    assertEquals(":", dependency.getProjectPath());
-    assertEquals(CMakeLinkVariant.STATIC, dependency.getLinkType());
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    assertEquals("test-project", dependency.getProjectName());
+    assertEquals(CMakeLinkVariant.STATIC, dependency.getLinkVariant());
   }
 
   @Test
@@ -51,10 +51,9 @@ class CMakeResolvedProjectDependencyTest {
     final Project project2 = ProjectBuilder.builder().withName("test-project").build();
 
     final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib",
-        project1, CMakeLinkVariant.STATIC, false);
-
+        CMakeLinkVariant.STATIC, project1, false);
     final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib",
-        project2, CMakeLinkVariant.STATIC, false);
+        CMakeLinkVariant.STATIC, project2, false);
 
     assertEquals(dependency1.hashCode(), dependency2.hashCode());
   }
@@ -65,10 +64,9 @@ class CMakeResolvedProjectDependencyTest {
     final Project project2 = ProjectBuilder.builder().withName("test-project").build();
 
     final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib",
-        project1, CMakeLinkVariant.STATIC, false);
-
+        CMakeLinkVariant.STATIC, project1, false);
     final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib",
-        project2, CMakeLinkVariant.STATIC, false);
+        CMakeLinkVariant.STATIC, project2, false);
 
     assertEquals(dependency1, dependency2);
   }
@@ -79,10 +77,9 @@ class CMakeResolvedProjectDependencyTest {
     final Project project2 = ProjectBuilder.builder().withName("test-project2").build();
 
     final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib",
-        project1, CMakeLinkVariant.STATIC, false);
-
+        CMakeLinkVariant.STATIC, project1, false);
     final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib",
-        project2, CMakeLinkVariant.STATIC, false);
+        CMakeLinkVariant.STATIC, project2, false);
 
     assertNotEquals(dependency1, dependency2);
   }
@@ -92,11 +89,9 @@ class CMakeResolvedProjectDependencyTest {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 
     final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib1",
-        project,
-        CMakeLinkVariant.STATIC, false);
+        CMakeLinkVariant.STATIC, project, false);
     final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib2",
-        project,
-        CMakeLinkVariant.STATIC, false);
+        CMakeLinkVariant.STATIC, project, false);
 
     assertNotEquals(dependency1, dependency2);
   }
@@ -105,10 +100,10 @@ class CMakeResolvedProjectDependencyTest {
   void testEqualsWithDifferentLinkage() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 
-    final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
-    final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.SHARED, false);
+    final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.SHARED, project, false);
 
     assertNotEquals(dependency1, dependency2);
   }
@@ -117,8 +112,8 @@ class CMakeResolvedProjectDependencyTest {
   void testEqualsWithNull() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
 
     assertFalse(dependency.equals(null));
   }
@@ -127,8 +122,8 @@ class CMakeResolvedProjectDependencyTest {
   void testEqualsWithDifferentClass() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
 
     assertFalse(dependency.equals("not a dependency"));
   }
@@ -139,10 +134,9 @@ class CMakeResolvedProjectDependencyTest {
     final Project project2 = ProjectBuilder.builder().withName("test-project2").build();
 
     final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib",
-        project1, CMakeLinkVariant.STATIC, false);
-
+        CMakeLinkVariant.STATIC, project1, false);
     final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib",
-        project2, CMakeLinkVariant.STATIC, false);
+        CMakeLinkVariant.STATIC, project2, false);
 
     // "test-project1" < "test-project2" alphabetically
     assertTrue(dependency1.compareTo(dependency2) < 0);
@@ -152,11 +146,10 @@ class CMakeResolvedProjectDependencyTest {
   void testCompareToSame() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 
-    final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
-
-    final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib", project,
-        CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedProjectDependency dependency1 = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    final CMakeResolvedProjectDependency dependency2 = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
 
     assertEquals(0, dependency1.compareTo(dependency2));
   }

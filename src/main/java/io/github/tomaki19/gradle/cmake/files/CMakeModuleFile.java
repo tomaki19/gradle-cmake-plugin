@@ -30,8 +30,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
 
   public CMakeModuleFile(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
       final String buildConfig, final Project project) {
-    super("%s.cmake".formatted(CMakeFileConventions.moduleTarget(project.getName(), library.getName(),
-        library.getLinkType(), toolchain.getName(), buildConfig)), project);
+    super("%s.cmake".formatted(CMakeFileConventions.moduleTarget(project, library, toolchain, buildConfig)), project);
     this.library = library;
     this.toolchain = toolchain;
     this.buildConfig = buildConfig;
@@ -45,30 +44,28 @@ public final class CMakeModuleFile extends CMakeFileContent {
   private Map<String, Object> buildModel() {
     final Map<String, Object> model = new HashMap<>();
 
-    final String target = CMakeFileConventions.buildTarget(library.getName(),
-        library.getLinkType(), toolchain.getName(), buildConfig);
+    final String target = CMakeFileConventions.buildTarget(library, toolchain, buildConfig);
     model.put("target", "%s::%s".formatted(getProjectName(), target));
-    model.put("linkType", library.getLinkType().name());
+    model.put("linkType", library.getLinkVariant().name());
     model.put("buildConfigUpper", buildConfig.toUpperCase());
     model.put("packageDependencies", library.getAllPackageDependencies());
 
     final List<String> projectIncludes = new ArrayList<>();
     for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
-      projectIncludes.add(CMakeFileConventions.moduleTarget(dependency.getProjectName(), dependency.getName(),
-          dependency.getLinkType(), toolchain.getName(), buildConfig));
+      projectIncludes.add(CMakeFileConventions.moduleTarget(dependency, toolchain, buildConfig));
     }
     model.put("projectIncludes", projectIncludes);
 
     final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath();
-    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(),
-        target, toolchain, buildConfig).getAsFile().toPath();
+    final Path targetPath = CMakeFileConventions
+        .targetBinaryDirectory(getBuildDirectory(), library, toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", exportPath.relativize(targetPath));
 
     final OperatingSystem operatingSystem = OperatingSystem.current();
     model.put("isLinux", operatingSystem.isLinux());
     model.put("isWindows", operatingSystem.isWindows());
 
-    if (library.getLinkType() == CMakeLinkVariant.SHARED) {
+    if (library.getLinkVariant() == CMakeLinkVariant.SHARED) {
       model.put("sharedLibName", operatingSystem.getSharedLibraryName(library.getOutputName()));
       if (operatingSystem.isLinux()) {
         model.put("soname", operatingSystem.getLinkLibraryName(library.getOutputName()));
@@ -76,7 +73,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
       if (operatingSystem.isWindows()) {
         model.put("implibName", operatingSystem.getLinkLibraryName(library.getOutputName()));
       }
-    } else if (library.getLinkType() == CMakeLinkVariant.STATIC) {
+    } else if (library.getLinkVariant() == CMakeLinkVariant.STATIC) {
       model.put("staticLibName", operatingSystem.getStaticLibraryName(library.getOutputName()));
     }
 
@@ -92,8 +89,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
     final List<String> publicProjectDepTargets = new ArrayList<>();
     for (final CMakeResolvedProjectDependency dependency : library.getPublicProjectDependencies()) {
       publicProjectDepTargets.add("%s::%s".formatted(dependency.getProjectName(),
-          CMakeFileConventions.buildTarget(dependency.getName(), dependency.getLinkType(), toolchain.getName(),
-              buildConfig)));
+          CMakeFileConventions.buildTarget(dependency, toolchain, buildConfig)));
     }
     model.put("publicProjectDepTargets", publicProjectDepTargets);
 

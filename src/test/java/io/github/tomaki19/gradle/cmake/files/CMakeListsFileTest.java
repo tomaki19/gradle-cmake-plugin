@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +44,7 @@ class CMakeListsFileTest {
       throw new IOException("Failed to create directory: " + tempDir.getAbsolutePath());
     }
     try {
-      org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
+      Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       CMakeListsFile file = new CMakeListsFile(java.util.Collections.emptyList(), project);
 
       File outputFile = new File(tempDir, "CMakeLists.txt");

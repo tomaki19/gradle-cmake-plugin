@@ -33,11 +33,15 @@ public abstract class CMakeFileContent {
   }
 
   private final String name;
-  private final Project project;
+  private final String projectName;
+  private final Directory projectDirectory;
+  private final Directory buildDirectory;
 
   public CMakeFileContent(final String name, final Project project) {
     this.name = name;
-    this.project = project;
+    this.projectName = project.getName();
+    this.projectDirectory = project.getLayout().getProjectDirectory();
+    this.buildDirectory = project.getLayout().getBuildDirectory().get();
   }
 
   public String getName() {
@@ -45,15 +49,15 @@ public abstract class CMakeFileContent {
   }
 
   protected String getProjectName() {
-    return project.getName();
+    return projectName;
   }
 
   protected Directory getProjectDirectory() {
-    return project.getLayout().getProjectDirectory();
+    return projectDirectory;
   }
 
   protected Directory getBuildDirectory() {
-    return project.getLayout().getBuildDirectory().get();
+    return buildDirectory;
   }
 
   public abstract void writeTo(final FileOutputStream outputStream) throws IOException;

@@ -8,7 +8,7 @@ import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 @CacheableTask
@@ -17,10 +17,10 @@ public abstract class CMakeCheck extends CMakeExec {
   protected final String checkTarget;
 
   @javax.inject.Inject
-  public CMakeCheck(final CMakeResolvedBinary<?> binary, final CMakeResolvedToolchain toolchain,
+  public CMakeCheck(final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
-    this.checkTarget = CMakeFileConventions.buildTarget(binary.getName(), toolchain.getName(), buildConfig);
+    this.checkTarget = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
     getBaseCommand().set(OperatingSystem.current().getExecutableName("ctest"));
     getBaseArguments().add("-T");
     getBaseArguments().add("Test");

@@ -8,22 +8,23 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 
 public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolvedLibrary> {
 
-  private final CMakeLinkVariant linkType;
+  private final CMakeLinkVariant linkVariant;
 
-  CMakeResolvedLibrary(final CMakeLibrary library, final CMakeLinkVariant linkType, final boolean stripDebug) {
+  public CMakeResolvedLibrary(final CMakeLibrary library, final CMakeLinkVariant linkVariant,
+      final boolean stripDebug) {
     super(library, stripDebug);
-    this.linkType = linkType;
+    this.linkVariant = linkVariant;
   }
 
-  public CMakeLinkVariant getLinkType() {
-    return linkType;
+  public CMakeLinkVariant getLinkVariant() {
+    return linkVariant;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
+    result = prime * result + ((linkVariant == null) ? 0 : linkVariant.hashCode());
     return result;
   }
 
@@ -38,7 +39,7 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedLibrary other = (CMakeResolvedLibrary) obj;
-    if (linkType != other.linkType)
+    if (linkVariant != other.linkVariant)
       return false;
     return true;
   }
