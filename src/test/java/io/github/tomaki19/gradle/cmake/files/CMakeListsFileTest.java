@@ -29,8 +29,7 @@ class CMakeListsFileTest {
     }
     try {
       org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
-      CMakeListsFile file = new CMakeListsFile(java.util.Collections.emptyList(), project.getName(),
-          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+      CMakeListsFile file = new CMakeListsFile(java.util.Collections.emptyList(), project);
       assertNotNull(file);
     } finally {
       deleteRecursively(tempDir);
@@ -45,8 +44,7 @@ class CMakeListsFileTest {
     }
     try {
       org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
-      CMakeListsFile file = new CMakeListsFile(java.util.Collections.emptyList(), project.getName(),
-          project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+      CMakeListsFile file = new CMakeListsFile(java.util.Collections.emptyList(), project);
 
       File outputFile = new File(tempDir, "CMakeLists.txt");
       try (FileOutputStream fos = new FileOutputStream(outputFile)) {

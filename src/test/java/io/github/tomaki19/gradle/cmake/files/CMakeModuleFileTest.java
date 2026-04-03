@@ -56,8 +56,7 @@ class CMakeModuleFileTest {
 
       for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
         for (final String buildConfig : toolchains[0].getBuildConfigs()) {
-          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project.getName(),
-              project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project);
           assertNotNull(file);
         }
       }
@@ -93,8 +92,7 @@ class CMakeModuleFileTest {
 
       for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
         for (final String buildConfig : toolchains[0].getBuildConfigs()) {
-          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project.getName(),
-              project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project);
           assertNotNull(file);
 
           File outputFile = new File(tempDir, "config-%s-%s.cmake".formatted(toolchains[0].getName(), buildConfig));
@@ -139,8 +137,7 @@ class CMakeModuleFileTest {
 
       for (final CMakeResolvedLibrary library : toolchains[0].getInterfaceLibraries()) {
         for (final String buildConfig : toolchains[0].getBuildConfigs()) {
-          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project.getName(),
-              project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+          final CMakeModuleFile file = new CMakeModuleFile(library, toolchains[0], buildConfig, project);
           assertNotNull(file);
 
           File outputFile = new File(tempDir, "config-%s-%s.cmake".formatted(toolchains[0].getName(), buildConfig));

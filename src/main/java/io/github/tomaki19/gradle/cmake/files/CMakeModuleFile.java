@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gradle.api.file.Directory;
+import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
@@ -29,11 +29,9 @@ public final class CMakeModuleFile extends CMakeFileContent {
   private final String buildConfig;
 
   public CMakeModuleFile(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
-      final String buildConfig, final String projectName, final Directory projectDirectory,
-      final Directory buildDirectory) {
-    super("%s.cmake".formatted(CMakeFileConventions.moduleTarget(projectName, library.getName(),
-        library.getLinkType(), toolchain.getName(), buildConfig)), projectName, projectDirectory,
-        buildDirectory);
+      final String buildConfig, final Project project) {
+    super("%s.cmake".formatted(CMakeFileConventions.moduleTarget(project.getName(), library.getName(),
+        library.getLinkType(), toolchain.getName(), buildConfig)), project);
     this.library = library;
     this.toolchain = toolchain;
     this.buildConfig = buildConfig;

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.gradle.api.file.Directory;
+import org.gradle.api.Project;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
@@ -31,9 +31,8 @@ public final class CMakeListsFile extends CMakeFileContent {
 
   private final Collection<CMakeResolvedToolchain> toolchains;
 
-  public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final String projectName,
-      final Directory projectDirectory, final Directory buildDirectory) {
-    super(NAME, projectName, projectDirectory, buildDirectory);
+  public CMakeListsFile(final Collection<CMakeResolvedToolchain> toolchains, final Project project) {
+    super(NAME, project);
     this.toolchains = toolchains;
   }
 

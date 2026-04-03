@@ -8,19 +8,29 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.artifacts.dsl.ArtifactHandler;
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
+import org.gradle.api.attributes.Category;
+import org.gradle.api.file.Directory;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
+
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
+import io.github.tomaki19.gradle.cmake.model.CMakeArtifactAttributes;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -30,6 +40,12 @@ public final class CMakeTaskRegistry {
   public static final String GROUP_BUILD = "cmake build";
   public static final String GROUP_CHECK = "cmake test";
   public static final String GROUP_INSTALL = "cmake install";
+  public static final String GROUP_PACKAGE = "cmake package";
+
+  // public static final String CONFIGURATION_OUTPUT_DIRECTORIES =
+  // "outputDirectories";
+  // public static final String CONFIGURATION_ARTIFACT_DIRECTORIES =
+  // "artifactDirectories";
 
   public TaskProvider<Task> assembleTask(final TaskContainer tasks) {
     return tasks.named("assemble");
@@ -55,8 +71,7 @@ public final class CMakeTaskRegistry {
   public TaskProvider<CMakeAssemble> assembleListsTask(final TaskContainer tasks,
       final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project.getName(),
-        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get()),
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project),
         project.getLayout().getProjectDirectory());
   }
 
@@ -65,8 +80,7 @@ public final class CMakeTaskRegistry {
       throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleModuleTaskName(library.getName(), library.getLinkType(),
         toolchain.getName(), buildConfig);
-    final CMakeModuleFile moduleFile = new CMakeModuleFile(library, toolchain, buildConfig, project.getName(),
-        project.getLayout().getProjectDirectory(), project.getLayout().getBuildDirectory().get());
+    final CMakeModuleFile moduleFile = new CMakeModuleFile(library, toolchain, buildConfig, project);
     return tasks.register(taskName, CMakeAssemble.class, moduleFile,
         project.getLayout().getBuildDirectory().get().dir(CMakeFileConventions.CMAKE_CONFIG_PATH));
   }
@@ -166,8 +180,8 @@ public final class CMakeTaskRegistry {
       final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Collection<CMakeResolvedProjectDependency> dependencies) {
     dependencies.stream()
-        .filter(dependency -> !Objects.equals(project.getName(), dependency.getProjectName()))
-        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.assembleModuleTaskName(dependency.getProjectName(),
+        .filter(dependency -> !Objects.equals(project.getPath(), dependency.getProjectPath()))
+        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.assembleModuleTaskName(dependency.getProjectPath(),
             dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig)));
   }
 
@@ -180,8 +194,8 @@ public final class CMakeTaskRegistry {
       final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Collection<CMakeResolvedProjectDependency> dependencies) {
     dependencies.stream()
-        .filter(dependency -> !Objects.equals(project.getName(), dependency.getProjectName()))
-        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.configureTaskName(dependency.getProjectName(),
+        .filter(dependency -> !Objects.equals(project.getPath(), dependency.getProjectPath()))
+        .forEach(dependency -> task.dependsOn(CMakeTasksConventions.configureTaskName(dependency.getProjectPath(),
             toolchain.getName(), buildConfig)));
   }
 
@@ -190,9 +204,140 @@ public final class CMakeTaskRegistry {
     dependencies.stream()
         .filter((dependency) -> !Objects.equals(dependency.getLinkType(), CMakeLinkVariant.INTERFACE))
         .forEach((dependency) -> {
-          task.dependsOn(":%s:%s".formatted(dependency.getProjectName(), CMakeTasksConventions
+          task.dependsOn("%s:%s".formatted(dependency.getProjectPath(), CMakeTasksConventions
               .buildTaskName(dependency.getName(), dependency.getLinkType(), toolchain.getName(), buildConfig)));
         });
   }
 
+  public static Configuration createDirectoryDependencyConfiguration(final ConfigurationContainer configurations,
+      final ObjectFactory objects, final String target, final CMakeResolvedProjectDependency dependency,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String name = "%s-dependency".formatted(target);
+    System.out.println("in  : " + name);
+    final Optional<Configuration> oldConfiguration = Optional.ofNullable(configurations.findByName(name));
+    if (oldConfiguration.isPresent()) {
+      return oldConfiguration.get();
+    }
+    return configurations.create(name, (newConfiguration) -> {
+      newConfiguration.setCanBeDeclared(true);
+      newConfiguration.setCanBeResolved(true);
+      newConfiguration.setCanBeConsumed(false);
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.LIBRARY_ATTRIBUTE,
+          dependency.getName().toLowerCase());
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.LINK_TYPE_ATTRIBUTE,
+          dependency.getLinkType().toLowerCase());
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.TOOLCHAIN_ATTRIBUTE,
+          toolchain.getName().toLowerCase());
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.BUILD_CONFIG_ATTRIBUTE,
+          buildConfig.toLowerCase());
+      newConfiguration.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
+          objects.named(Category.class, CMakeArtifactAttributes.CATEGORY));
+    });
+  }
+
+  public static Configuration createOutputDirectoryConfiguration(final ConfigurationContainer configurations,
+      final ObjectFactory objects, final String target, final CMakeResolvedLibrary library,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String name = "%s-directory".formatted(target);
+    System.out.println("out : " + name);
+    return configurations.create(name, (newConfiguration) -> {
+      newConfiguration.setCanBeDeclared(true);
+      newConfiguration.setCanBeResolved(false);
+      newConfiguration.setCanBeConsumed(true);
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.LIBRARY_ATTRIBUTE,
+          library.getName().toLowerCase());
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.LINK_TYPE_ATTRIBUTE,
+          library.getLinkType().toLowerCase());
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.TOOLCHAIN_ATTRIBUTE,
+          toolchain.getName().toLowerCase());
+      newConfiguration.getAttributes().attribute(CMakeArtifactAttributes.BUILD_CONFIG_ATTRIBUTE,
+          buildConfig.toLowerCase());
+      newConfiguration.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
+          objects.named(Category.class, CMakeArtifactAttributes.CATEGORY));
+    });
+  }
+
+  public static void addOutputDirectoryArtifact(final ArtifactHandler artifacts,
+      final Configuration configuration, final Directory outputDirectory,
+      final TaskProvider<? extends CMakeBuild> buildTask) {
+    artifacts.add(configuration.getName(), outputDirectory, (artifact) -> {
+      artifact.builtBy(buildTask);
+      artifact.setType(ArtifactTypeDefinition.DIRECTORY_TYPE);
+    });
+  }
+
+  // public TaskProvider<Zip> packageTask(final TaskContainer tasks, final Project
+  // project,
+  // final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
+  // final String buildConfig) {
+  // final String taskName =
+  // CMakeTasksConventions.packageTaskName(library.getName(),
+  // library.getLinkType(),
+  // toolchain.getName(), buildConfig);
+  // final TaskProvider<Zip> taskProvider = tasks.register(taskName, Zip.class);
+  // taskProvider.configure(task -> {
+  // task.setGroup(GROUP_PACKAGE);
+  // task.setDescription("Packages dependency artifacts for %s (%s, %s)"
+  // .formatted(library.getName(), toolchain.getName(), buildConfig));
+
+  // final String configName =
+  // CMakeTasksConventions.artifactDirsConfigurationName(
+  // toolchain.getName(), buildConfig);
+  // task.from(project.getConfigurations().getByName(configName).getIncoming().getFiles());
+
+  // task.getArchiveFileName().set("%s-%s-%s-%s.zip".formatted(
+  // library.getName().toLowerCase(), library.getLinkType().toLowerCase(),
+  // toolchain.getName().toLowerCase(), buildConfig.toLowerCase()));
+  // final String target = CMakeFileConventions.buildTarget(library.getName(),
+  // library.getLinkType(),
+  // toolchain.getName(), buildConfig);
+  // task.getDestinationDirectory()
+  // .set(CMakeFileConventions.targetBinaryDirectory(project.getLayout().getBuildDirectory().get(),
+  // target, toolchain, buildConfig));
+  // });
+  // return taskProvider;
+  // }
+
+  // public TaskProvider<Zip> packageTask(final TaskContainer tasks, final Project
+  // project,
+  // final CMakeResolvedExecutable executable, final CMakeResolvedToolchain
+  // toolchain, final String buildConfig) {
+  // final String taskName =
+  // CMakeTasksConventions.packageTaskName(executable.getName(),
+  // toolchain.getName(), buildConfig);
+  // final TaskProvider<Zip> taskProvider = tasks.register(taskName, Zip.class);
+  // taskProvider.configure(task -> {
+  // task.setGroup(GROUP_PACKAGE);
+  // task.setDescription("Packages dependency artifacts for %s (%s, %s)"
+  // .formatted(executable.getName(), toolchain.getName(), buildConfig));
+
+  // final String configName =
+  // CMakeTasksConventions.artifactDirsConfigurationName(
+  // toolchain.getName(), buildConfig);
+  // task.from(project.getConfigurations().getByName(configName).getIncoming().getFiles());
+
+  // task.getArchiveFileName().set("%s-%s-%s.zip".formatted(
+  // executable.getName().toLowerCase(),
+  // toolchain.getName().toLowerCase(), buildConfig.toLowerCase()));
+  // final String target = CMakeFileConventions.buildTarget(executable.getName(),
+  // toolchain.getName(), buildConfig);
+  // task.getDestinationDirectory()
+  // .set(CMakeFileConventions.targetBinaryDirectory(project.getLayout().getBuildDirectory().get(),
+  // target, toolchain, buildConfig));
+  // });
+  // return taskProvider;
+  // }
+
+  // public static void dependencyArtifactDirectories(final Project project, final
+  // CMakeResolvedBinary<?> binary) {
+  // project.getConfigurations().named(CONFIGURATION_ARTIFACT_DIRECTORIES).configure((configuration)
+  // -> {
+  // configuration.getIncoming().beforeResolve((dependencies)-> {
+  // binary.getAllProjectDependencies().forEach((remoteProject)->{
+  // final ProjectDependency projectDependency = project.getDependencies().pro
+  // dependencies.getDependencies().add(null)
+  // });
+  // });
+  // });
+  // }
 }

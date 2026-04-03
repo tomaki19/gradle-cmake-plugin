@@ -4,42 +4,60 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-import org.gradle.api.Project;
-import org.gradle.api.tasks.TaskContainer;
-import org.gradle.api.tasks.TaskProvider;
+import java.util.Objects;
 
-import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
+import org.gradle.api.Project;
+import org.gradle.api.artifacts.ProjectDependency;
+import org.gradle.api.artifacts.dsl.DependencyFactory;
 
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
-  private final String projectName;
-  private final TaskContainer projectTasks;
+  private final Project project;
   private final CMakeLinkVariant linkType;
+  private final boolean remote;
 
-  CMakeResolvedProjectDependency(final String name, final Project project, final CMakeLinkVariant linkType) {
+  CMakeResolvedProjectDependency(final String name, final Project project, final CMakeLinkVariant linkType,
+      final boolean remote) {
     super(name);
-    this.projectName = project.getName();
-    this.projectTasks = project.getTasks();
+    this.project = project;
     this.linkType = linkType;
+    this.remote = remote;
   }
 
   public String getProjectName() {
-    return projectName;
+    return project.getName();
   }
 
-  public TaskProvider<CMakeBuildLibrary> getProjectTaskNamed(final String taskName) {
-    return projectTasks.named(taskName, CMakeBuildLibrary.class);
+  public String getProjectPath() {
+    return project.getPath();
   }
 
   public CMakeLinkVariant getLinkType() {
     return linkType;
   }
 
+  public boolean isRemote() {
+    return remote;
+  }
+
+  public boolean equals(final Project other) {
+    if (other == null)
+      return false;
+    return Objects.equals(project.getName(), other.getName());
+  }
+
+  public ProjectDependency createProjectDependency(final DependencyFactory factory,
+      final String targetConfiguration) {
+    final ProjectDependency projectDependency = factory.create(project);
+    // projectDependency.setTargetConfiguration(targetConfiguration);
+    return projectDependency;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+    result = prime * result + ((project == null) ? 0 : project.getName().hashCode());
     result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
     return result;
   }
@@ -55,10 +73,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectDependency other = (CMakeResolvedProjectDependency) obj;
-    if (projectName == null) {
-      if (other.projectName != null)
+    if (project == null) {
+      if (other.project != null)
         return false;
-    } else if (!projectName.equals(other.projectName))
+    } else if (!project.getName().equals(other.project.getName()))
       return false;
     if (linkType != other.linkType)
       return false;

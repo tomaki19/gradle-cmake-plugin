@@ -14,15 +14,21 @@ import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.SoftwareComponentFactory;
+import org.gradle.api.file.Directory;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
+import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
+import io.github.tomaki19.gradle.cmake.model.CMakeArtifactAttributes;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble;
@@ -59,34 +65,43 @@ public class CMakePlugin implements Plugin<Project> {
       final AdhocComponentWithVariants adhocComponent = softwareComponentFactory.adhoc("cmake");
       project.getComponents().add(adhocComponent);
 
-      // final Configuration cmakeCompile = project.getConfigurations()
-      // .create(CMakeConfigurations.CMAKE_COMPILE.toString(),
-      // CMakeConfigurations.CMAKE_COMPILE.configure());
+      project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.LIBRARY_ATTRIBUTE);
+      project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.LINK_TYPE_ATTRIBUTE);
+      project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.TOOLCHAIN_ATTRIBUTE);
+      project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.BUILD_CONFIG_ATTRIBUTE);
 
-      // final Configuration cmakeCompileClasspath =
-      // project.getConfigurations().create(
-      // CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.toString(),
-      // CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.configure());
-      // cmakeCompileClasspath.extendsFrom(cmakeCompile);
-      // cmakeCompileClasspath.getAttributes().attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-      // project.getObjects().named(LibraryElements.class, "cmake-compile"));
-
-      // final Configuration cmakeCompileElements = project.getConfigurations()
-      // .create(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.toString(),
-      // CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.configure());
-      // cmakeCompileElements.extendsFrom(cmakeCompile);
-      // cmakeCompileElements.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
-      // project.getObjects().named(Category.class, Category.LIBRARY));
-      // cmakeCompileElements.getAttributes().attribute(Bundling.BUNDLING_ATTRIBUTE,
-      // project.getObjects().named(Bundling.class, Bundling.EXTERNAL));
-      // cmakeCompileElements.getAttributes().attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-      // project.getObjects().named(LibraryElements.class, "cmake-compile"));
-
-      // adhocComponent.addVariantsFromConfiguration(cmakeCompileElements, (variant)
+      // final Configuration artifactDirectory = project.getConfigurations()
+      // .create(CMakeTaskRegistry.CONFIGURATION_ARTIFACT_DIRECTORIES, (configuration)
       // -> {
-      // variant.mapToMavenScope("compile");
-      // variant.mapToOptional();
+      // configuration.setCanBeResolved(true);
+      // configuration.setDescription("Declares dependencies to collect cmake artifact
+      // directories from.");
+      // configuration.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
+      // project.getObjects().named(Category.class,
+      // CMakeArtifactAttributes.CATEGORY));
       // });
+      // final Configuration outputDirectories = project.getConfigurations()
+      // .create(CMakeTaskRegistry.CONFIGURATION_OUTPUT_DIRECTORIES, (configuration)
+      // -> {
+      // configuration.setCanBeConsumed(true);
+      // configuration.extendsFrom(artifactDirectory);
+      // configuration
+      // .setDescription("Provides cmake library output directories for consumption by
+      // dependent projects.");
+      // configuration.getAttributes().attribute(Category.CATEGORY_ATTRIBUTE,
+      // project.getObjects().named(Category.class,
+      // CMakeArtifactAttributes.CATEGORY));
+      // });
+      // adhocComponent.addVariantsFromConfiguration(outputDirectories, (details) -> {
+      // details.mapToMavenScope("compile");
+      // details.mapToOptional();
+      // });
+
+      // project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.LIBRARY_ATTRIBUTE);
+      // project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.LINK_TYPE_ATTRIBUTE);
+      // project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.TOOLCHAIN_ATTRIBUTE);
+      // project.getDependencies().getAttributesSchema().attribute(CMakeArtifactAttributes.BUILD_CONFIG_ATTRIBUTE);
+
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
@@ -96,13 +111,13 @@ public class CMakePlugin implements Plugin<Project> {
     try {
       final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
 
-      /* Resolve */
+      /* ============ Resolve ============ */
 
       final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
       final Collection<CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
           extension.getApplications(), extension.getTests());
 
-      /* Tasks */
+      /* ============ Tasks ============== */
 
       final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry();
 
@@ -189,6 +204,25 @@ public class CMakePlugin implements Plugin<Project> {
             final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModuleTask(project.getTasks(),
                 library, toolchain, buildConfig, project);
             taskRegistry.assembleTask(project.getTasks()).configure((task) -> task.dependsOn(assembleModulesTask));
+
+            final String buildTarget = CMakeFileConventions.buildTarget(library.getName(), library.getLinkType(),
+                toolchain.getName(), buildConfig);
+            final Configuration outputDirectoryConfiguration = CMakeTaskRegistry
+                .createOutputDirectoryConfiguration(project.getConfigurations(), project.getObjects(), buildTarget,
+                    library, toolchain, buildConfig);
+            for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
+              if (dependency.isRemote()) {
+                final Configuration directoryDependencyConfiguration = CMakeTaskRegistry
+                    .createDirectoryDependencyConfiguration(project.getConfigurations(), project.getObjects(),
+                        buildTarget, dependency, toolchain, buildConfig);
+                final String dependencyTarget = CMakeFileConventions.directoryDependencyTarget(dependency.getName(),
+                    dependency.getLinkType(), toolchain, buildConfig);
+                final ProjectDependency projectDependency = dependency
+                    .createProjectDependency(project.getDependencyFactory(), dependencyTarget);
+                directoryDependencyConfiguration.getDependencies().add(projectDependency);
+                outputDirectoryConfiguration.extendsFrom(directoryDependencyConfiguration);
+              }
+            }
           }
           for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
             final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModuleTask(project.getTasks(),
@@ -215,6 +249,34 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
+
+            final String buildTarget = CMakeFileConventions.buildTarget(
+                library.getName(), library.getLinkType(), toolchain.getName(), buildConfig);
+            final Configuration outputDirectoryConfiguration = CMakeTaskRegistry
+                .createOutputDirectoryConfiguration(project.getConfigurations(), project.getObjects(), buildTarget,
+                    library, toolchain, buildConfig);
+            final Directory outputDirectory = CMakeFileConventions.targetBinaryDirectory(
+                project.getLayout().getBuildDirectory().get(), buildTarget, toolchain, buildConfig);
+            CMakeTaskRegistry.addOutputDirectoryArtifact(project.getArtifacts(), outputDirectoryConfiguration,
+                outputDirectory, buildTask);
+            for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
+              if (dependency.isRemote()) {
+                final Configuration directoryDependencyConfiguration = CMakeTaskRegistry
+                    .createDirectoryDependencyConfiguration(project.getConfigurations(), project.getObjects(),
+                        buildTarget, dependency, toolchain, buildConfig);
+                final String dependencyTarget = CMakeFileConventions.directoryDependencyTarget(
+                    dependency.getName(), dependency.getLinkType(), toolchain, buildConfig);
+                final ProjectDependency projectDependency = dependency.createProjectDependency(
+                    project.getDependencyFactory(), dependencyTarget);
+                directoryDependencyConfiguration.getDependencies().add(projectDependency);
+                outputDirectoryConfiguration.extendsFrom(directoryDependencyConfiguration);
+              }
+            }
+
+            // final TaskProvider<Zip> packageTask =
+            // taskRegistry.packageTask(project.getTasks(), project, library,
+            // toolchain, buildConfig);
+            // packageTask.configure((task) -> task.dependsOn(buildTask));
 
             final TaskProvider<CMakeInstall> installTask = taskRegistry.installTask(project.getTasks(), library,
                 toolchain, buildConfig);
@@ -252,6 +314,34 @@ public class CMakePlugin implements Plugin<Project> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
+            final String buildTarget = CMakeFileConventions.buildTarget(
+                library.getName(), library.getLinkType(), toolchain.getName(), buildConfig);
+            final Configuration outputDirectoryConfiguration = CMakeTaskRegistry
+                .createOutputDirectoryConfiguration(project.getConfigurations(), project.getObjects(), buildTarget,
+                    library, toolchain, buildConfig);
+            final Directory outputDirectory = CMakeFileConventions.targetBinaryDirectory(
+                project.getLayout().getBuildDirectory().get(), buildTarget, toolchain, buildConfig);
+            CMakeTaskRegistry.addOutputDirectoryArtifact(project.getArtifacts(), outputDirectoryConfiguration,
+                outputDirectory, buildTask);
+            for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
+              if (dependency.isRemote()) {
+                final Configuration directoryDependencyConfiguration = CMakeTaskRegistry
+                    .createDirectoryDependencyConfiguration(project.getConfigurations(), project.getObjects(),
+                        buildTarget, dependency, toolchain, buildConfig);
+                final String dependencyTarget = CMakeFileConventions.directoryDependencyTarget(
+                    dependency.getName(), dependency.getLinkType(), toolchain, buildConfig);
+                final ProjectDependency projectDependency = dependency.createProjectDependency(
+                    project.getDependencyFactory(), dependencyTarget);
+                directoryDependencyConfiguration.getDependencies().add(projectDependency);
+                outputDirectoryConfiguration.extendsFrom(directoryDependencyConfiguration);
+              }
+            }
+
+            // final TaskProvider<Zip> packageTask =
+            // taskRegistry.packageTask(project.getTasks(), project, library,
+            // toolchain, buildConfig);
+            // packageTask.configure((task) -> task.dependsOn(buildTask));
+
             final TaskProvider<CMakeInstall> installTask = taskRegistry.installTask(project.getTasks(), library,
                 toolchain, buildConfig);
             installTask.configure((task) -> task.dependsOn(buildTask));
@@ -284,6 +374,25 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
+
+            final String buildTarget = CMakeFileConventions.buildTarget(
+                application.getName(), toolchain.getName(), buildConfig);
+            for (final CMakeResolvedProjectDependency dependency : application.getAllProjectDependencies()) {
+              if (dependency.isRemote()) {
+                final Configuration directoryDependencyConfiguration = CMakeTaskRegistry
+                    .createDirectoryDependencyConfiguration(project.getConfigurations(), project.getObjects(),
+                        buildTarget, dependency, toolchain, buildConfig);
+                final String dependencyTarget = CMakeFileConventions.directoryDependencyTarget(
+                    dependency.getName(), dependency.getLinkType(), toolchain, buildConfig);
+                final ProjectDependency projectDependency = dependency.createProjectDependency(
+                    project.getDependencyFactory(), dependencyTarget);
+                directoryDependencyConfiguration.getDependencies().add(projectDependency);
+              }
+            }
+            // final TaskProvider<Zip> packageTask =
+            // taskRegistry.packageTask(project.getTasks(), project, application,
+            // toolchain, buildConfig);
+            // packageTask.configure((task) -> task.dependsOn(buildTask));
 
             final TaskProvider<CMakeInstall> installTask = taskRegistry.installTask(project.getTasks(), application,
                 toolchain, buildConfig);
@@ -318,6 +427,26 @@ public class CMakePlugin implements Plugin<Project> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
+            final String buildTarget = CMakeFileConventions.buildTarget(
+                test.getName(), toolchain.getName(), buildConfig);
+            for (final CMakeResolvedProjectDependency dependency : test.getAllProjectDependencies()) {
+              if (dependency.isRemote()) {
+                final Configuration directoryDependencyConfiguration = CMakeTaskRegistry
+                    .createDirectoryDependencyConfiguration(project.getConfigurations(), project.getObjects(),
+                        buildTarget, dependency, toolchain, buildConfig);
+                final String dependencyTarget = CMakeFileConventions.directoryDependencyTarget(
+                    dependency.getName(), dependency.getLinkType(), toolchain, buildConfig);
+                final ProjectDependency projectDependency = dependency.createProjectDependency(
+                    project.getDependencyFactory(), dependencyTarget);
+                directoryDependencyConfiguration.getDependencies().add(projectDependency);
+              }
+            }
+
+            // final TaskProvider<Zip> packageTask =
+            // taskRegistry.packageTask(project.getTasks(), project, test,
+            // toolchain, buildConfig);
+            // packageTask.configure((task) -> task.dependsOn(buildTask));
+
             final TaskProvider<CMakeCheck> checkTask = taskRegistry.checkTask(project.getTasks(), test, toolchain,
                 buildConfig);
             checkTask.configure((task) -> task.dependsOn(buildTask));
@@ -330,9 +459,19 @@ public class CMakePlugin implements Plugin<Project> {
           }
         }
       }
-    } catch (
 
-    Exception e) {
+      System.out.println("==== Incoming beforeResolve ====");
+      project.getConfigurations().forEach((configuration) -> {
+        if (configuration.isCanBeResolved()) {
+          System.out.println(configuration.getName());
+          configuration.getResolvedConfiguration().getResolvedArtifacts().forEach((artifact) -> {
+            System.out.println(" -> " + artifact.getName() + " @ " + artifact.getFile());
+          });
+        }
+      });
+      System.out.println("================================");
+
+    } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
   }

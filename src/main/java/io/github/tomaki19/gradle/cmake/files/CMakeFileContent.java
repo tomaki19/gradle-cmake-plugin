@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 
 import freemarker.template.Configuration;
@@ -32,16 +33,11 @@ public abstract class CMakeFileContent {
   }
 
   private final String name;
-  private final String projectName;
-  private final Directory projectDirectory;
-  private final Directory buildDirectory;
+  private final Project project;
 
-  public CMakeFileContent(final String name, final String projectName, final Directory projectDirectory,
-      final Directory buildDirectory) {
+  public CMakeFileContent(final String name, final Project project) {
     this.name = name;
-    this.projectName = projectName;
-    this.projectDirectory = projectDirectory;
-    this.buildDirectory = buildDirectory;
+    this.project = project;
   }
 
   public String getName() {
@@ -49,15 +45,15 @@ public abstract class CMakeFileContent {
   }
 
   protected String getProjectName() {
-    return projectName;
+    return project.getName();
   }
 
   protected Directory getProjectDirectory() {
-    return projectDirectory;
+    return project.getLayout().getProjectDirectory();
   }
 
   protected Directory getBuildDirectory() {
-    return buildDirectory;
+    return project.getLayout().getBuildDirectory().get();
   }
 
   public abstract void writeTo(final FileOutputStream outputStream) throws IOException;

@@ -31,7 +31,7 @@ class CMakeTasksConventionsTest {
   @Test
   void testAssembleFindTaskNameProjectToolchain() {
     assertEquals(":MyProject:assemble-mylib-shared-mytoolchain-debug-module",
-        CMakeTasksConventions.assembleModuleTaskName("MyProject", "MyLib", CMakeLinkVariant.SHARED, "MyToolchain",
+        CMakeTasksConventions.assembleModuleTaskName(":MyProject", "MyLib", CMakeLinkVariant.SHARED, "MyToolchain",
             "Debug"));
   }
 
@@ -45,7 +45,7 @@ class CMakeTasksConventionsTest {
   @Test
   void testConfigureTaskNameProjectToolchainBuildConfig() {
     assertEquals(":MyProject:configure-mytoolchain-debug",
-        CMakeTasksConventions.configureTaskName("MyProject", "MyToolchain", "Debug"));
+        CMakeTasksConventions.configureTaskName(":MyProject", "MyToolchain", "Debug"));
   }
 
   @Test

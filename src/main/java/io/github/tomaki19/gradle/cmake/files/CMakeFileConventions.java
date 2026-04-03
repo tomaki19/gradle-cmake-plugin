@@ -46,6 +46,12 @@ public class CMakeFileConventions {
     return "%s-%s-%s".formatted(name.toLowerCase(), toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
+  public static String directoryDependencyTarget(final String name, final CMakeLinkVariant linkVariant,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    return "%s-%s-%s-%s-directory".formatted(name.toLowerCase(), linkVariant.toLowerCase(),
+        toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+  }
+
   private CMakeFileConventions() {
   }
 }
