@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake.model;
 import java.util.Objects;
 
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.ProjectDependency;
 
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
@@ -39,6 +40,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
       return false;
     }
     return Objects.equals(projectName, other.getName());
+  }
+
+  public ProjectDependency createProjectDependency(final Project project) {
+    return project.getDependencyFactory().create(project.findProject(":%s".formatted(projectName)));
   }
 
   @Override
