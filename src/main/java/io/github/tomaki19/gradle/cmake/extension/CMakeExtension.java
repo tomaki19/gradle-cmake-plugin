@@ -25,8 +25,7 @@ public abstract class CMakeExtension {
   private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks;
 
   @javax.inject.Inject
-  public CMakeExtension(
-      final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
+  public CMakeExtension(final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
     this.customTasks = customTasks;
   }
 

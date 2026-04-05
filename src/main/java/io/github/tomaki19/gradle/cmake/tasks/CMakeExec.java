@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.provider.Property;
-import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.AbstractExecTask;
 import org.gradle.internal.os.OperatingSystem;
 
@@ -29,17 +27,6 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
     this.environmentFile = environmentFile;
   }
 
-  @org.gradle.api.tasks.Input
-  protected abstract Property<String> getBaseCommand();
-
-  @org.gradle.api.tasks.Optional
-  @org.gradle.api.tasks.Input
-  protected abstract SetProperty<String> getBaseArguments();
-
-  @org.gradle.api.tasks.Optional
-  @org.gradle.api.tasks.Input
-  protected abstract SetProperty<String> getAdditionalArguments();
-
   @Override
   protected void exec() {
     final List<String> commandLine = new ArrayList<>();
@@ -48,9 +35,8 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
       commandLine.add(file.getAsFile().getAbsolutePath());
       commandLine.add("&&");
     });
-    commandLine.add(getBaseCommand().get());
-    commandLine.addAll(getBaseArguments().get());
-    commandLine.addAll(getAdditionalArguments().get());
+    commandLine.add(getExecutable());
+    commandLine.addAll(getArgs());
     if (OperatingSystem.current().isUnix()) {
       setCommandLine("sh", "-c", String.join(" ", commandLine));
     } else {

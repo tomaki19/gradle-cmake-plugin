@@ -21,16 +21,16 @@ public abstract class CMakeCheck extends CMakeExec {
       final String buildConfig) {
     super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
     this.checkTarget = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
-    getBaseCommand().set(OperatingSystem.current().getExecutableName("ctest"));
-    getBaseArguments().add("-T");
-    getBaseArguments().add("Test");
-    getBaseArguments().add("--test-dir");
-    getBaseArguments().add(CMakeFileConventions.targetConfigDirectory(getProject().getLayout()
+    setExecutable(OperatingSystem.current().getExecutableName("ctest"));
+    args("-T");
+    args("Test");
+    args("--test-dir");
+    args(CMakeFileConventions.targetConfigDirectory(getProject().getLayout()
         .getBuildDirectory().get(), toolchain, buildConfig).getAsFile().getAbsolutePath());
-    getBaseArguments().add("--tests-regex");
-    getBaseArguments().add(checkTarget);
-    getBaseArguments().add("--build-config");
-    getBaseArguments().add(buildConfig);
+    args("--tests-regex");
+    args(checkTarget);
+    args("--build-config");
+    args(buildConfig);
     setWorkingDir(getProject().getProjectDir());
     setGroup(CMakeTaskRegistry.GROUP_CHECK);
   }

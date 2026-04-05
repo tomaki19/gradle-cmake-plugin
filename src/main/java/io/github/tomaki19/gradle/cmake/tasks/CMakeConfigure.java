@@ -4,9 +4,10 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
+import java.io.File;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
@@ -17,6 +18,8 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 @CacheableTask
 public abstract class CMakeConfigure extends CMakeExec {
 
+  private final Set<File> dependencies = new HashSet<>();
+
   @javax.inject.Inject
   public CMakeConfigure(final CMakeResolvedToolchain toolchain, final String buildConfig) {
     super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
@@ -24,26 +27,28 @@ public abstract class CMakeConfigure extends CMakeExec {
     setWorkingDir(getProject().getProjectDir());
     // if gradle build file changes, configure needs to be run
     getInputs().file(getProject().getBuildFile());
-    getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
-    getBaseArguments().add("-S \"%s\"".formatted(getProject().getLayout().getProjectDirectory()
+    setExecutable(OperatingSystem.current().getExecutableName("cmake"));
+    args("-S \"%s\"".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
-    getBaseArguments().add("-B \"%s\"".formatted(CMakeFileConventions
+    args("-B \"%s\"".formatted(CMakeFileConventions
         .targetConfigDirectory(getProject().getLayout().getBuildDirectory().get(), toolchain, buildConfig)
         .getAsFile().getAbsolutePath()));
-    getBaseArguments().add("-G \"%s\"".formatted(toolchain.getGenerator()));
-    getBaseArguments().add("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
-    getBaseArguments().add("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
-    final Set<String> exportPaths = new HashSet<>();
-    getProject().getRootProject().getAllprojects().forEach((subproject) -> {
-      if (!Objects.equals(subproject.getName(), getProject().getName())
-          && !Objects.equals(subproject.getName(), getProject().getRootProject().getName())) {
-        exportPaths.add(subproject.getLayout().getBuildDirectory().get()
-            .dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath().toString());
-      }
-    });
-    getBaseArguments().add("-DCMAKE_MODULE_PATH=\"%s\"".formatted(String.join(";", exportPaths)));
+    args("-G \"%s\"".formatted(toolchain.getGenerator()));
+    args("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
+    args("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
     toolchain.getToolchainFile().ifPresent((toolchainFile) -> {
-      getBaseArguments().add("--toolchain \"%s\"".formatted(toolchainFile.getAsFile().getAbsolutePath()));
+      args("--toolchain \"%s\"".formatted(toolchainFile.getAsFile().getAbsolutePath()));
     });
+  }
+
+  public void addModuleDependencies(final Set<File> moduleDependencies) {
+    dependencies.addAll(moduleDependencies);
+  }
+
+  @Override
+  protected void exec() {
+    args("-DCMAKE_MODULE_PATH=\"%s\"".formatted(dependencies.stream().map((file) -> file.getAbsolutePath())
+        .collect(Collectors.joining(";"))));
+    super.exec();
   }
 }

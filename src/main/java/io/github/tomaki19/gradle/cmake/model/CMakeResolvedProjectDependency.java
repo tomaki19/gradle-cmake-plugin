@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ProjectDependency;
 
+
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
   private final CMakeLinkVariant linkType;
@@ -42,8 +43,22 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     return Objects.equals(projectName, other.getName());
   }
 
-  public ProjectDependency createProjectDependency(final Project project) {
-    return project.getDependencyFactory().create(project.findProject(":%s".formatted(projectName)));
+  public ProjectDependency createModuleDirectoriesDependency(final Project project,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final ProjectDependency projectDependency = project.getDependencyFactory()
+        .create(project.findProject(":%s".formatted(projectName)));
+    projectDependency.setTargetConfiguration(CMakeConfigurationConventions
+        .createModulesDirectoriesName(this, toolchain, buildConfig));
+    return projectDependency;
+  }
+
+  public ProjectDependency createOutputDirectoriesDependency(final Project project,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final ProjectDependency projectDependency = project.getDependencyFactory()
+        .create(project.findProject(":%s".formatted(projectName)));
+    projectDependency.setTargetConfiguration(CMakeConfigurationConventions
+        .createOutputDirectoriesName(this, toolchain, buildConfig));
+    return projectDependency;
   }
 
   @Override

@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import org.gradle.api.provider.SetProperty;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
 
@@ -17,24 +16,20 @@ public abstract class CMakeBuild extends CMakeExec {
   protected final String buildTarget;
 
   @javax.inject.Inject
-  CMakeBuild(final String target, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+  CMakeBuild(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
-    this.buildTarget = target;
-    getBaseCommand().set(OperatingSystem.current().getExecutableName("cmake"));
-    getBaseArguments().add("--build");
-    getBaseArguments().add(CMakeFileConventions
-        .targetConfigDirectory(getProject().getLayout().getBuildDirectory().get(), toolchain, buildConfig)
-        .getAsFile().getAbsolutePath());
-    getBaseArguments().add("--target");
-    getBaseArguments().add(buildTarget);
-    getBaseArguments().add("--config");
-    getBaseArguments().add(buildConfig);
+    setExecutable(OperatingSystem.current().getExecutableName("cmake"));
+    args("--build");
+    args(CMakeFileConventions.targetConfigDirectory(getProject().getLayout().getBuildDirectory().get(),
+        toolchain, buildConfig).getAsFile().getAbsolutePath());
+    args("--target");
+    args(buildTarget);
+    args("--config");
+    args(buildConfig);
     setWorkingDir(getProject().getProjectDir());
     setGroup(CMakeTaskRegistry.GROUP_BUILD);
     getInputs().files(getProject().fileTree(getProject().getLayout().getProjectDirectory()).getFiles());
+    this.buildTarget = buildTarget;
   }
-
-  @org.gradle.api.tasks.Input
-  protected abstract SetProperty<String> getAdditionalArguments();
 
 }
