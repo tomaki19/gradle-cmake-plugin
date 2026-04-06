@@ -4,14 +4,12 @@
  */
 package io.github.tomaki19.gradle.cmake.helper;
 
-
-
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.internal.os.OperatingSystem;
 
+import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplications;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraries;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTests;
@@ -20,7 +18,7 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 public class MockCMakeToolchain extends CMakeToolchain {
 
   private final String name;
-  private final Property<OperatingSystem> operatingSystem;
+  private final Property<org.gradle.internal.os.OperatingSystem> operatingSystem;
   private final Property<String> generator;
   private final MapProperty<String, String> environment;
   private final RegularFileProperty environmentFile;
@@ -31,7 +29,7 @@ public class MockCMakeToolchain extends CMakeToolchain {
 
   public MockCMakeToolchain(final String name, final ObjectFactory factory) {
     this.name = name;
-    this.operatingSystem = factory.property(OperatingSystem.class);
+    this.operatingSystem = factory.property(org.gradle.internal.os.OperatingSystem.class);
     this.generator = factory.property(String.class);
     this.environment = factory.mapProperty(String.class, String.class);
     this.environmentFile = factory.fileProperty();
@@ -47,7 +45,7 @@ public class MockCMakeToolchain extends CMakeToolchain {
   }
 
   @Override
-  public Property<OperatingSystem> getOperatingSystem() {
+  public Property<org.gradle.internal.os.OperatingSystem> getOperatingSystem() {
     return operatingSystem;
   }
 
@@ -84,6 +82,19 @@ public class MockCMakeToolchain extends CMakeToolchain {
   @Override
   public CMakeTests getTests() {
     return tests;
+  }
+
+  public static void registerWithBuildConfigs(final String name, final CMakeExtension extension,
+      final String... buildConfigs) {
+    extension.getToolchains().register(name, t -> {
+      t.getOperatingSystem().set(org.gradle.internal.os.OperatingSystem.current());
+      t.getGenerator().set("Unix Makefiles");
+      t.buildConfigs(buildConfigs);
+    });
+  }
+
+  public static void register(final String name, final CMakeExtension extension) {
+    extension.getToolchains().register(name);
   }
 
 }
