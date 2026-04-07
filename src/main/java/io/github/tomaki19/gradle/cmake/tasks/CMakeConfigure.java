@@ -4,9 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gradle.api.tasks.CacheableTask;
@@ -17,8 +14,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 @CacheableTask
 public abstract class CMakeConfigure extends CMakeExec {
-
-  private final Set<File> dependencies = new HashSet<>();
 
   @javax.inject.Inject
   public CMakeConfigure(final CMakeResolvedToolchain toolchain, final String buildConfig) {
@@ -41,14 +36,10 @@ public abstract class CMakeConfigure extends CMakeExec {
     });
   }
 
-  public void addModuleDependencies(final Set<File> moduleDependencies) {
-    dependencies.addAll(moduleDependencies);
-  }
-
   @Override
   protected void exec() {
-    args("-DCMAKE_MODULE_PATH=\"%s\"".formatted(dependencies.stream().map((file) -> file.getAbsolutePath())
-        .collect(Collectors.joining(";"))));
+    args("-DCMAKE_MODULE_PATH=\"%s\"".formatted(getInputs().getFiles().getFiles()
+        .stream().map((file) -> file.getAbsolutePath()).collect(Collectors.joining(";"))));
     super.exec();
   }
 }

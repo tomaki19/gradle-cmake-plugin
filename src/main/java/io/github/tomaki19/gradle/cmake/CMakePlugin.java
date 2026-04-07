@@ -56,7 +56,6 @@ public class CMakePlugin implements Plugin<Project> {
   public void apply(Project project) {
     project.getPluginManager().apply(BasePlugin.class);
     project.allprojects(this::allProjects);
-    project.beforeEvaluate(this::beforeEvaluate);
     project.afterEvaluate(this::afterEvaluate);
   }
 
@@ -70,9 +69,6 @@ public class CMakePlugin implements Plugin<Project> {
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e.getCause());
     }
-  }
-
-  private void beforeEvaluate(final Project project) {
   }
 
   private void afterEvaluate(final Project project) {
@@ -177,7 +173,7 @@ public class CMakePlugin implements Plugin<Project> {
             taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleModulesTask));
 
             configureTask.configure((task) -> {
-              task.addModuleDependencies(moduleDirectoriesConfiguration.getFiles());
+              task.getInputs().files(moduleDirectoriesConfiguration);
             });
 
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), moduleDirectoriesConfiguration,
@@ -186,8 +182,8 @@ public class CMakePlugin implements Plugin<Project> {
             final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
                 library, toolchain, buildConfig);
             packageTask.configure((task) -> {
+              task.getInputs().files(outputDirectoriesConfiguration);
               task.from(localOutputDirectories);
-              task.from(outputDirectoriesConfiguration.getFiles());
             });
           }
 
@@ -202,6 +198,7 @@ public class CMakePlugin implements Plugin<Project> {
                 project.getLayout().getBuildDirectory().get(), library, toolchain, buildConfig);
 
             final Set<File> localOutputDirectories = new HashSet<>();
+            localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
                 moduleDirectoriesConfiguration.getDependencies()
@@ -223,7 +220,7 @@ public class CMakePlugin implements Plugin<Project> {
             });
 
             configureTask.configure((task) -> {
-              task.addModuleDependencies(moduleDirectoriesConfiguration.getFiles());
+              task.getInputs().files(moduleDirectoriesConfiguration);
               CMakeTaskRegistry.configureRemote(task, project, library, toolchain, buildConfig);
             });
 
@@ -250,9 +247,8 @@ public class CMakePlugin implements Plugin<Project> {
                 library, toolchain, buildConfig);
             packageTask.configure((task) -> {
               task.dependsOn(buildTask);
+              task.getInputs().files(outputDirectoriesConfiguration);
               task.from(localOutputDirectories);
-              task.from(outputDirectoriesConfiguration.getFiles());
-              task.from(outputDirectory.getAsFile());
             });
           }
 
@@ -267,6 +263,7 @@ public class CMakePlugin implements Plugin<Project> {
                 project.getLayout().getBuildDirectory().get(), library, toolchain, buildConfig);
 
             final Set<File> localOutputDirectories = new HashSet<>();
+            localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
                 moduleDirectoriesConfiguration.getDependencies()
@@ -288,7 +285,7 @@ public class CMakePlugin implements Plugin<Project> {
             });
 
             configureTask.configure((task) -> {
-              task.addModuleDependencies(moduleDirectoriesConfiguration.getFiles());
+              task.getInputs().files(moduleDirectoriesConfiguration);
               CMakeTaskRegistry.configureRemote(task, project, library, toolchain, buildConfig);
             });
 
@@ -315,9 +312,8 @@ public class CMakePlugin implements Plugin<Project> {
                 library, toolchain, buildConfig);
             packageTask.configure((task) -> {
               task.dependsOn(buildTask);
+              task.getInputs().files(outputDirectoriesConfiguration);
               task.from(localOutputDirectories);
-              task.from(outputDirectoriesConfiguration.getFiles());
-              task.from(outputDirectory.getAsFile());
             });
           }
 
@@ -330,6 +326,7 @@ public class CMakePlugin implements Plugin<Project> {
                 project.getLayout().getBuildDirectory().get(), application, toolchain, buildConfig);
 
             final Set<File> localOutputDirectories = new HashSet<>();
+            localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : application.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
                 moduleDirectoriesConfiguration.getDependencies()
@@ -347,7 +344,7 @@ public class CMakePlugin implements Plugin<Project> {
             });
 
             configureTask.configure((task) -> {
-              task.addModuleDependencies(moduleDirectoriesConfiguration.getFiles());
+              task.getInputs().files(moduleDirectoriesConfiguration);
               CMakeTaskRegistry.configureRemote(task, project, application, toolchain, buildConfig);
             });
 
@@ -368,9 +365,8 @@ public class CMakePlugin implements Plugin<Project> {
                 application, toolchain, buildConfig);
             packageTask.configure((task) -> {
               task.dependsOn(buildTask);
+              task.getInputs().files(outputDirectoriesConfiguration);
               task.from(localOutputDirectories);
-              task.from(outputDirectoriesConfiguration.getFiles());
-              task.from(outputDirectory.getAsFile());
             });
           }
 
@@ -383,6 +379,7 @@ public class CMakePlugin implements Plugin<Project> {
                 project.getLayout().getBuildDirectory().get(), test, toolchain, buildConfig);
 
             final Set<File> localOutputDirectories = new HashSet<>();
+            localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : test.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
                 moduleDirectoriesConfiguration.getDependencies()
@@ -400,7 +397,7 @@ public class CMakePlugin implements Plugin<Project> {
             });
 
             configureTask.configure((task) -> {
-              task.addModuleDependencies(moduleDirectoriesConfiguration.getFiles());
+              task.getInputs().files(moduleDirectoriesConfiguration);
               CMakeTaskRegistry.configureRemote(task, project, test, toolchain, buildConfig);
             });
 
@@ -431,9 +428,8 @@ public class CMakePlugin implements Plugin<Project> {
                 test, toolchain, buildConfig);
             packageTask.configure((task) -> {
               task.dependsOn(buildTask);
+              task.getInputs().files(outputDirectoriesConfiguration);
               task.from(localOutputDirectories);
-              task.from(outputDirectoriesConfiguration.getFiles());
-              task.from(outputDirectory.getAsFile());
             });
           }
         }
