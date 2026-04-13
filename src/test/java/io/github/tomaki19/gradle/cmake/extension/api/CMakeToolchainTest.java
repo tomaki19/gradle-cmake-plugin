@@ -30,7 +30,7 @@ class CMakeToolchainTest {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain1 = new MockCMakeToolchain("test1", project.getObjects());
     CMakeToolchain toolchain2 = new MockCMakeToolchain("test2", project.getObjects());
-    
+
     int result = toolchain1.compareTo(toolchain2);
     assertTrue(result < 0);
   }
@@ -39,7 +39,7 @@ class CMakeToolchainTest {
   void testSetOperatingSystem() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     toolchain.getOperatingSystem().set(org.gradle.internal.os.OperatingSystem.MAC_OS);
     assertEquals(org.gradle.internal.os.OperatingSystem.MAC_OS, toolchain.getOperatingSystem().get());
   }
@@ -48,7 +48,7 @@ class CMakeToolchainTest {
   void testSetBuildConfigs() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     toolchain.buildConfigs("debug", "release", "custom");
     assertEquals(3, toolchain.getBuildConfigs().size());
   }
@@ -57,7 +57,7 @@ class CMakeToolchainTest {
   void testSetEnvironment() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     toolchain.getEnvironment().put("key", "value");
     assertEquals(1, toolchain.getEnvironment().get().size());
   }
@@ -66,7 +66,7 @@ class CMakeToolchainTest {
   void testSetEnvironmentFile() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     org.gradle.api.file.RegularFile testFile = project.getLayout().getProjectDirectory().file("test.txt");
     toolchain.getEnvironmentFile().set(testFile);
     assertEquals(testFile, toolchain.getEnvironmentFile().get());
@@ -76,7 +76,7 @@ class CMakeToolchainTest {
   void testSetToolchainFile() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     org.gradle.api.file.RegularFile testFile = project.getLayout().getProjectDirectory().file("test.txt");
     toolchain.getToolchainFile().set(testFile);
     assertEquals(testFile, toolchain.getToolchainFile().get());
@@ -86,7 +86,7 @@ class CMakeToolchainTest {
   void testLibrariesAction() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     // Test that the libraries action can be executed
     toolchain.libraries(libs -> {
       // This should not throw any exceptions
@@ -98,7 +98,7 @@ class CMakeToolchainTest {
   void testApplicationsAction() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     // Test that the applications action can be executed
     toolchain.applications(apps -> {
       // This should not throw any exceptions
@@ -110,7 +110,7 @@ class CMakeToolchainTest {
   void testTestsAction() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     // Test that the tests action can be executed
     toolchain.tests(tests -> {
       // This should not throw any exceptions
@@ -123,7 +123,7 @@ class CMakeToolchainTest {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain1 = new MockCMakeToolchain("test", project.getObjects());
     CMakeToolchain toolchain2 = new MockCMakeToolchain("test", project.getObjects());
-    
+
     assertEquals(toolchain1.hashCode(), toolchain2.hashCode());
   }
 
@@ -132,7 +132,7 @@ class CMakeToolchainTest {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain1 = new MockCMakeToolchain("test", project.getObjects());
     CMakeToolchain toolchain2 = new MockCMakeToolchain("test", project.getObjects());
-    
+
     assertEquals(toolchain1, toolchain2);
   }
 
@@ -141,7 +141,7 @@ class CMakeToolchainTest {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain1 = new MockCMakeToolchain("test1", project.getObjects());
     CMakeToolchain toolchain2 = new MockCMakeToolchain("test2", project.getObjects());
-    
+
     assertNotEquals(toolchain1, toolchain2);
   }
 
@@ -149,7 +149,7 @@ class CMakeToolchainTest {
   void testEqualsWithNull() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     assertFalse(toolchain.equals(null));
   }
 
@@ -157,7 +157,7 @@ class CMakeToolchainTest {
   void testEqualsWithDifferentClass() {
     final Project project = ProjectBuilder.builder().build();
     CMakeToolchain toolchain = new MockCMakeToolchain("test", project.getObjects());
-    
+
     assertFalse(toolchain.equals("not a toolchain"));
   }
 }
