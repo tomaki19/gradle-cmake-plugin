@@ -5,8 +5,6 @@
 package io.github.tomaki19.gradle.cmake.model;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -35,20 +33,8 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
     super(binary.getName());
     this.outputName = binary.getOutputName().getOrElse(binary.getName());
-    this.headers = new TreeSet<>(binary.getHeaders().getFiles());
-    if (headers.isEmpty()) {
-      final Path defaultPath = Paths.get("src", getName(), "headers");
-      if (defaultPath.toFile().exists()) {
-        headers.add(defaultPath.toFile());
-      }
-    }
-    this.sources = new TreeSet<>(binary.getSources().getFiles());
-    if (headers.isEmpty()) {
-      final Path defaultPath = Paths.get("src", getName(), "sources");
-      if (defaultPath.toFile().exists()) {
-        headers.add(defaultPath.toFile());
-      }
-    }
+    this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs().stream().filter((p) -> p.exists()).toList());
+    this.sources = new TreeSet<>(binary.getSources().getFiles().stream().filter((p) -> p.exists()).toList());
     this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);
   }
 

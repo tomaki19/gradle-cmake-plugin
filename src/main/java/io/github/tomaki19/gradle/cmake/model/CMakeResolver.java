@@ -54,8 +54,8 @@ public final class CMakeResolver {
 
   }
 
-  public Collection<CMakeResolvedToolchain> process(
-      final Set<CMakeLibrary> libraries, final Set<CMakeApplication> applications, final Set<CMakeTest> tests) {
+  public Collection<CMakeResolvedToolchain> process(final Set<CMakeLibrary> libraries,
+      final Set<CMakeApplication> applications, final Set<CMakeTest> tests) {
     final Map<String, CMakeResolvedToolchain> resolvedToolchains = new HashMap<>();
     resolveLibraries(resolvedToolchains, availableToolchains, libraries);
     resolveApplications(resolvedToolchains, availableToolchains, applications);
@@ -80,10 +80,10 @@ public final class CMakeResolver {
               resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addStaticLibrary(resolvedLibrary);
             }
-            if ((toolchain.getLibraries().getBuildVariants().get().isEmpty()
-                || toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.SHARED))
-                && (component.getBuildVariants().get().isEmpty()
-                    || component.getBuildVariants().get().contains(CMakeBuildVariant.SHARED))) {
+            if (toolchain.getLibraries().getBuildVariants().get().isEmpty()
+                && component.getBuildVariants().get().isEmpty()
+                || toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.SHARED)
+                || component.getBuildVariants().get().contains(CMakeBuildVariant.SHARED)) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.SHARED,
                   toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
               resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);

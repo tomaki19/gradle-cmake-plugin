@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,8 +25,8 @@ public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinar
 
   @Inject
   public CMakeBinary(ObjectFactory objectFactory) {
-    this.headers = objectFactory.sourceDirectorySet("headers", "CMake headers");
-    this.sources = objectFactory.sourceDirectorySet("sources", "CMake sources");
+    this.headers = objectFactory.sourceDirectorySet("headers", "");
+    this.sources = objectFactory.sourceDirectorySet("sources", "");
   }
 
   public abstract Property<String> getOutputName();
@@ -43,7 +44,7 @@ public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinar
   }
 
   public SourceDirectorySet getHeaders() {
-    return headers;
+    return headers.isEmpty() ? headers.srcDir(Paths.get("src", getName(), "headers")) : headers;
   }
 
   public void headers(Action<? super SourceDirectorySet> action) {
@@ -51,7 +52,7 @@ public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinar
   }
 
   public SourceDirectorySet getSources() {
-    return sources;
+    return sources.isEmpty() ? sources.srcDir(Paths.get("src", getName(), "sources")) : sources;
   }
 
   public void sources(Action<? super SourceDirectorySet> action) {
