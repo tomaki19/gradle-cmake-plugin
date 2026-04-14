@@ -17,6 +17,27 @@ import org.junit.jupiter.api.Test;
 class CMakeFileContentTest {
 
   @Test
+  void testGetName() throws IOException {
+    File tempDir = new File(System.getProperty("java.io.tmpdir"), "cmake-test-" + System.currentTimeMillis());
+    if (!tempDir.mkdirs()) {
+      throw new IOException("Failed to create directory: " + tempDir.getAbsolutePath());
+    }
+    try {
+      org.gradle.api.Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
+      CMakeFileContent content = new CMakeFileContent("TestName", project) {
+
+        @Override
+        public void writeTo(FileOutputStream outputStream) throws IOException {
+          // No-op for testing
+        }
+      };
+      assertEquals("TestName", content.getName());
+    } finally {
+      deleteRecursively(tempDir);
+    }
+  }
+
+  @Test
   void testGetProjectName() throws IOException {
     File tempDir = new File(System.getProperty("java.io.tmpdir"), "cmake-test-" + System.currentTimeMillis());
     if (!tempDir.mkdirs()) {
