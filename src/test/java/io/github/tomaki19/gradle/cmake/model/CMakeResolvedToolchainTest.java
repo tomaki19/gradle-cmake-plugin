@@ -81,4 +81,51 @@ class CMakeResolvedToolchainTest {
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
     assertFalse(resolvedToolchain.hasBinaryLibraries());
   }
+
+  @Test
+  void testGetEnvironment() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("TestToolchain", project.getObjects());
+
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+    assertNotNull(resolvedToolchain.getEnvironment());
+  }
+
+  @Test
+  void testGetOperatingSystem() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("TestToolchain", project.getObjects());
+
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+    assertNotNull(resolvedToolchain.getOperatingSystem());
+  }
+
+  @Test
+  void testGetGenerator() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("TestToolchain", project.getObjects());
+
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+    assertNotNull(resolvedToolchain.getGenerator());
+  }
+
+  @Test
+  void testGetEnvironmentFile() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("TestToolchain", project.getObjects());
+
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+    assertNotNull(resolvedToolchain.getEnvironmentFile());
+    assertFalse(resolvedToolchain.getEnvironmentFile().isPresent());
+  }
+
+  @Test
+  void testGetToolchainFile() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("TestToolchain", project.getObjects());
+
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+    assertNotNull(resolvedToolchain.getToolchainFile());
+    assertFalse(resolvedToolchain.getToolchainFile().isPresent());
+  }
 }

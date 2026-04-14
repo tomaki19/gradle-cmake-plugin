@@ -188,9 +188,62 @@ class CMakeResolvedLibraryTest {
     CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertNotNull(resolvedLibrary);
 
-    // This would require a CMakeResolvedProjectDependency object, so we'll just
-    // test that it doesn't throw
-    // The actual implementation would be tested in integration tests
-    assertTrue(true); // Placeholder test
+    CMakeResolvedProjectDependency projectDep = new CMakeResolvedProjectDependency("dep-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    resolvedLibrary.addPublicProjectDependency(projectDep);
+    assertFalse(resolvedLibrary.getPublicProjectDependencies().isEmpty());
+  }
+
+  @Test
+  void testAddPrivateProjectDependency() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
+    CMakeResolvedProjectDependency projectDep = new CMakeResolvedProjectDependency("dep-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    resolvedLibrary.addPrivateProjectDependency(projectDep);
+    assertFalse(resolvedLibrary.getPrivateProjectDependencies().isEmpty());
+  }
+
+  @Test
+  void testGetLinkVariant() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+
+    CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
+    assertEquals(CMakeLinkVariant.STATIC, resolvedLibrary.getLinkVariant());
+  }
+
+  @Test
+  void testHashCode() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library1 = new MockCMakeLibrary("test-library", project.getObjects());
+    final CMakeLibrary library2 = new MockCMakeLibrary("test-library", project.getObjects());
+
+    CMakeResolvedLibrary resolved1 = new CMakeResolvedLibrary(library1, CMakeLinkVariant.STATIC, false);
+    CMakeResolvedLibrary resolved2 = new CMakeResolvedLibrary(library2, CMakeLinkVariant.STATIC, false);
+    assertEquals(resolved1.hashCode(), resolved2.hashCode());
+  }
+
+  @Test
+  void testEquals() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library1 = new MockCMakeLibrary("test-library", project.getObjects());
+    final CMakeLibrary library2 = new MockCMakeLibrary("test-library", project.getObjects());
+
+    CMakeResolvedLibrary resolved1 = new CMakeResolvedLibrary(library1, CMakeLinkVariant.STATIC, false);
+    CMakeResolvedLibrary resolved2 = new CMakeResolvedLibrary(library2, CMakeLinkVariant.STATIC, false);
+    assertEquals(resolved1, resolved2);
+  }
+
+  @Test
+  void testEqualsWithDifferentLinkVariant() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+
+    CMakeResolvedLibrary resolved1 = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
+    CMakeResolvedLibrary resolved2 = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
+    assertFalse(resolved1.equals(resolved2));
   }
 }

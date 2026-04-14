@@ -49,4 +49,22 @@ class CMakeApplicationTest {
     final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
     assertNotNull(application.getStripDebug());
   }
+
+  @Test
+  void testHeadersAction() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    application.headers(headers -> {
+      assertNotNull(headers);
+    });
+  }
+
+  @Test
+  void testSourcesAction() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    application.sources(sources -> {
+      assertNotNull(sources);
+    });
+  }
 }

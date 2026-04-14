@@ -24,4 +24,23 @@ class CMakeLinkTypeTest {
     assertEquals("shared", CMakeLinkVariant.SHARED.toLowerCase());
     assertEquals("interface", CMakeLinkVariant.INTERFACE.toLowerCase());
   }
+
+  @Test
+  void testVisibilityTypeValues() {
+    assertNotNull(CMakeVisibilityType.PUBLIC);
+    assertNotNull(CMakeVisibilityType.PRIVATE);
+  }
+
+  @Test
+  void testVisibilityTypeToLowerCase() {
+    assertEquals("public", CMakeVisibilityType.PUBLIC.toLowerCase());
+    assertEquals("private", CMakeVisibilityType.PRIVATE.toLowerCase());
+  }
+
+  @Test
+  void testBuildVariantToLowerCase() {
+    assertEquals("static", CMakeBuildVariant.STATIC.toLowerCase());
+    assertEquals("shared", CMakeBuildVariant.SHARED.toLowerCase());
+    assertEquals("module", CMakeBuildVariant.MODULE.toLowerCase());
+  }
 }

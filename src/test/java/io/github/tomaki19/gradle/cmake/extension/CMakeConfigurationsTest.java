@@ -8,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.gradle.api.Action;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 
@@ -16,7 +18,6 @@ class CMakeConfigurationsTest {
 
     @Test
     void testConfigurationsValues() {
-        // Test that we can access the enum values
         assertNotNull(CMakeConfigurations.CMAKE_COMPILE);
         assertNotNull(CMakeConfigurations.CMAKE_COMPILE_ELEMENTS);
         assertNotNull(CMakeConfigurations.CMAKE_RUNTIME);
@@ -35,44 +36,17 @@ class CMakeConfigurationsTest {
 
     @Test
     void testConfigureAction() {
-        // Test that configure() returns a non-null action
         Action<Configuration> action = CMakeConfigurations.CMAKE_COMPILE.configure();
         assertNotNull(action);
     }
 
     @Test
-    void testConfigureActionCmakeCompile() {
-        Action<Configuration> action = CMakeConfigurations.CMAKE_COMPILE.configure();
-        assertNotNull(action);
-    }
-
-    @Test
-    void testConfigureActionCmakeCompileClasspath() {
-        Action<Configuration> action = CMakeConfigurations.CMAKE_COMPILE_CLASSPATH.configure();
-        assertNotNull(action);
-    }
-
-    @Test
-    void testConfigureActionCmakeCompileElements() {
-        Action<Configuration> action = CMakeConfigurations.CMAKE_COMPILE_ELEMENTS.configure();
-        assertNotNull(action);
-    }
-
-    @Test
-    void testConfigureActionCmakeRuntime() {
-        Action<Configuration> action = CMakeConfigurations.CMAKE_RUNTIME.configure();
-        assertNotNull(action);
-    }
-
-    @Test
-    void testConfigureActionCmakeRuntimeClasspath() {
-        Action<Configuration> action = CMakeConfigurations.CMAKE_RUNTIME_CLASSPATH.configure();
-        assertNotNull(action);
-    }
-
-    @Test
-    void testConfigureActionCmakeRuntimeElements() {
-        Action<Configuration> action = CMakeConfigurations.CMAKE_RUNTIME_ELEMENTS.configure();
-        assertNotNull(action);
+    void testExecuteConfigureActions() {
+        final Project project = ProjectBuilder.builder().build();
+        for (CMakeConfigurations config : CMakeConfigurations.values()) {
+            Configuration configuration = project.getConfigurations().create(config.toString());
+            config.configure().execute(configuration);
+            assertNotNull(configuration.getDescription());
+        }
     }
 }
