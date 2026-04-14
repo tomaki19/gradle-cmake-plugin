@@ -38,8 +38,9 @@ public abstract class CMakeConfigure extends CMakeExec {
 
   @Override
   protected void exec() {
-    args("-DCMAKE_MODULE_PATH=\"%s\"".formatted(getInputs().getFiles().getFiles()
-        .stream().map((file) -> file.getAbsolutePath()).collect(Collectors.joining(";"))));
+    args("-DCMAKE_MODULE_PATH=\"%s\"".formatted(getInputs().getFiles().getFiles().stream()
+        .filter((file) -> file.isDirectory()).map((file) -> file.getAbsolutePath())
+        .collect(Collectors.joining(";"))));
     super.exec();
   }
 }
