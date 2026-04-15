@@ -11,6 +11,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 import org.gradle.api.file.Directory;
@@ -193,9 +194,9 @@ public final class CMakeTaskRegistry {
     });
   }
 
-  public static void addDirectoryArtifact(final ArtifactHandler artifacts, final Configuration configuration,
+  public static PublishArtifact addDirectoryArtifact(final ArtifactHandler artifacts, final Configuration configuration,
       final Directory outputDirectory, final Object... builtBy) {
-    artifacts.add(configuration.getName(), outputDirectory, (artifact) -> {
+    return artifacts.add(configuration.getName(), outputDirectory, (artifact) -> {
       artifact.builtBy(builtBy);
       artifact.setType(ArtifactTypeDefinition.DIRECTORY_TYPE);
     });

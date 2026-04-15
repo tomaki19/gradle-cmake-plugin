@@ -138,6 +138,8 @@ public class CMakePlugin implements Plugin<Project> {
           configureTask.configure((task) -> {
             task.dependsOn(assembleListsTask);
           });
+          final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
+              project.getLayout().getBuildDirectory().get());
 
           if (customTaskProtos.containsKey(toolchain.getName())) {
             customTaskProtos.get(toolchain.getName()).forEach((taskProto, taskAction) -> {
@@ -175,8 +177,6 @@ public class CMakePlugin implements Plugin<Project> {
               task.getInputs().files(moduleDirectoriesConfiguration);
             });
 
-            final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
-                project.getLayout().getBuildDirectory().get());
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), moduleDirectoriesConfiguration,
                 moduleDirectory);
 
@@ -230,13 +230,10 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
-
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), outputDirectoriesConfiguration,
-            outputDirectory, buildTask);
-            final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
-                project.getLayout().getBuildDirectory().get());
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), moduleDirectoriesConfiguration,
                 moduleDirectory, buildTask);
+            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), outputDirectoriesConfiguration,
+                outputDirectory, buildTask);
 
             final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
                 library, toolchain, buildConfig);
@@ -289,13 +286,10 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
-
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), outputDirectoriesConfiguration,
-                outputDirectory, buildTask);
-            final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
-                project.getLayout().getBuildDirectory().get());
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), moduleDirectoriesConfiguration,
                 moduleDirectory, buildTask);
+            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), outputDirectoriesConfiguration,
+                outputDirectory, buildTask);
 
             final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
                 library, toolchain, buildConfig);
@@ -342,6 +336,8 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
+            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), moduleDirectoriesConfiguration,
+                moduleDirectory, buildTask);
 
             final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
                 application, toolchain, buildConfig);
@@ -388,6 +384,8 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
+            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), moduleDirectoriesConfiguration,
+                moduleDirectory, buildTask);
 
             final TaskProvider<CMakeCheck> checkTask = taskRegistry.checkTask(test, toolchain,
                 buildConfig);
