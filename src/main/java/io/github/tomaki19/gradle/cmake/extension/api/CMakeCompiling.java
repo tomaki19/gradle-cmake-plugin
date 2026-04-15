@@ -12,8 +12,8 @@ import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 abstract class CMakeCompiling {
 
-  public static final CMakeVisibility Public = CMakeVisibility.PUBLIC;
-  public static final CMakeVisibility Private = CMakeVisibility.PRIVATE;
+  public static final CMakeVisibility PUBLIC = CMakeVisibility.PUBLIC;
+  public static final CMakeVisibility PRIVATE = CMakeVisibility.PRIVATE;
 
   private final Collection<CMakeBuildItems> defines = new HashSet<>();
   private final Collection<CMakeBuildItems> options = new HashSet<>();

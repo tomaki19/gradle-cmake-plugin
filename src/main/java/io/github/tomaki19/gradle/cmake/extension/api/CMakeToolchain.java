@@ -15,9 +15,9 @@ import org.gradle.internal.os.OperatingSystem;
 
 public abstract class CMakeToolchain extends CMakeNamedObject {
 
-  public static final OperatingSystem Linux = OperatingSystem.LINUX;
-  public static final OperatingSystem MacOS = OperatingSystem.MAC_OS;
-  public static final OperatingSystem Windows = OperatingSystem.WINDOWS;
+  public static final OperatingSystem LINUX = OperatingSystem.LINUX;
+  public static final OperatingSystem MAC_OS = OperatingSystem.MAC_OS;
+  public static final OperatingSystem WINDOWS = OperatingSystem.WINDOWS;
 
   private final CMakeBuildConfigs buildConfigs = new CMakeBuildConfigs();
 
@@ -60,5 +60,4 @@ public abstract class CMakeToolchain extends CMakeNamedObject {
     action.execute(getTests());
   }
 
-  
 }

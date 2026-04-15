@@ -14,8 +14,8 @@ import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
 
 public interface CMakeLibraries extends CMakeBinaries {
 
-  public final static CMakeBuildVariant Static = CMakeBuildVariant.STATIC;
-  public final static CMakeBuildVariant Shared = CMakeBuildVariant.SHARED;
+  public static final CMakeBuildVariant STATIC = CMakeBuildVariant.STATIC;
+  public static final CMakeBuildVariant SHARED = CMakeBuildVariant.SHARED;
 
   public SetProperty<CMakeBuildVariant> getBuildVariants();
 

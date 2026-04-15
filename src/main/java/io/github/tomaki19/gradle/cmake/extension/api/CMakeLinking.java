@@ -13,12 +13,12 @@ import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 abstract class CMakeLinking {
 
-  public static final CMakeLinkVariant Static = CMakeLinkVariant.STATIC;
-  public static final CMakeLinkVariant Shared = CMakeLinkVariant.SHARED;
-  public static final CMakeLinkVariant Interface = CMakeLinkVariant.INTERFACE;
+  public static final CMakeLinkVariant STATIC = CMakeLinkVariant.STATIC;
+  public static final CMakeLinkVariant SHARED = CMakeLinkVariant.SHARED;
+  public static final CMakeLinkVariant INTERFACE = CMakeLinkVariant.INTERFACE;
 
-  public static final CMakeVisibility Public = CMakeVisibility.PUBLIC;
-  public static final CMakeVisibility Private = CMakeVisibility.PRIVATE;
+  public static final CMakeVisibility PUBLIC = CMakeVisibility.PUBLIC;
+  public static final CMakeVisibility PRIVATE = CMakeVisibility.PRIVATE;
 
   private final Collection<CMakeBuildItems> options = new HashSet<>();
   private CMakeVisibility defaultVisibilityType;
