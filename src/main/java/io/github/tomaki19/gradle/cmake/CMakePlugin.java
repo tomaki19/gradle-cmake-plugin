@@ -49,7 +49,7 @@ public class CMakePlugin implements Plugin<Project> {
 
   @javax.inject.Inject
   CMakePlugin(final SoftwareComponentFactory softwareComponentFactory) {
-    this.cmakeComponent = softwareComponentFactory.adhoc("cmake");
+    this.cmakeComponent = softwareComponentFactory.adhoc(CMakeExtension.NAME);
   }
 
   @Override
