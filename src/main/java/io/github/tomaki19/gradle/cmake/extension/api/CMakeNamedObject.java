@@ -4,9 +4,9 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import org.gradle.api.Named;
+public abstract class CMakeNamedObject implements Comparable<CMakeNamedObject> {
 
-public abstract class CMakeNamedObject implements Named, Comparable<CMakeNamedObject> {
+  public abstract String getName();
 
   @Override
   public int hashCode() {
@@ -34,12 +34,9 @@ public abstract class CMakeNamedObject implements Named, Comparable<CMakeNamedOb
   }
 
   @Override
-  public int compareTo(CMakeNamedObject other) {
-    int comparator = 0;
-    if ((comparator = getName().compareTo(other.getName())) != 0) {
-      return comparator;
-    }
-    return comparator;
+  public int compareTo(final CMakeNamedObject other) {
+    assert (other != null);
+    return getName().compareToIgnoreCase(other.getName());
   }
 
 }

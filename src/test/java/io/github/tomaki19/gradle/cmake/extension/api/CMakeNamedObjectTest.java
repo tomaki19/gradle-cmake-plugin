@@ -80,8 +80,8 @@ class CMakeNamedObjectTest {
   void testCompareToNull() {
     CMakeNamedObject obj = new TestCMakeNamedObject("test");
 
-    // compareTo should throw NullPointerException when comparing with null
-    assertThrows(NullPointerException.class, () -> obj.compareTo(null));
+    // compareTo should throw AssertionError when comparing with null
+    assertThrows(AssertionError.class, () -> obj.compareTo(null));
   }
 
   private static class TestCMakeNamedObject extends CMakeNamedObject {
