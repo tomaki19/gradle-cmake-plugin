@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -309,9 +310,4 @@ class CMakeModuleFileTest {
     assertTrue(file.delete() || !file.exists());
   }
 
-  private void assertTrue(boolean condition) {
-    if (!condition) {
-      throw new AssertionError("Expected true but was false");
-    }
-  }
 }
