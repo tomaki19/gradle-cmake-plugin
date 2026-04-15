@@ -4,6 +4,7 @@ plugins {
   id('jacoco')
   // id('signing')
   alias(libs.plugins.publish)
+  alias(libs.plugins.shadow)
   alias(libs.plugins.spotless)
   alias(libs.plugins.versions)
   alias(libs.plugins.jacocolog)
@@ -103,10 +104,14 @@ testing {
   }
 }
 
-tasks.check {
+check {
     dependsOn(testing.suites.integrationTest)
 }
 
 tasks.withType(AbstractPublishToMaven) {
   dependsOn(tasks.check)
+}
+
+shadowJar {
+  archiveClassifier = ''
 }
