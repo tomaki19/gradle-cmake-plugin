@@ -23,8 +23,8 @@ public class CMakeExecutableDependencies extends CMakeBinaryDependencies {
     return this;
   }
 
-  public CMakeExecutableDependencies visibility(final CMakeVisibility variant) {
-    setVisibility(variant);
+  public CMakeExecutableDependencies visibility(final CMakeVisibility visibility) {
+    setVisibility(visibility);
     return this;
   }
 
