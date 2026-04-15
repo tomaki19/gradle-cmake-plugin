@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.Project;
-import org.gradle.internal.os.OperatingSystem;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -61,20 +60,19 @@ public final class CMakeModuleFile extends CMakeFileContent {
         .targetBinaryDirectory(getBuildDirectory(), library, toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", exportPath.relativize(targetPath));
 
-    final OperatingSystem operatingSystem = OperatingSystem.current();
-    model.put("isLinux", operatingSystem.isLinux());
-    model.put("isWindows", operatingSystem.isWindows());
+    model.put("isLinux", toolchain.getOperatingSystem().isLinux());
+    model.put("isWindows", toolchain.getOperatingSystem().isWindows());
 
     if (library.getLinkVariant() == CMakeLinkVariant.SHARED) {
-      model.put("sharedLibName", operatingSystem.getSharedLibraryName(library.getOutputName()));
-      if (operatingSystem.isLinux()) {
-        model.put("soname", operatingSystem.getLinkLibraryName(library.getOutputName()));
+      model.put("sharedLibName", toolchain.getOperatingSystem().getSharedLibraryName(library.getOutputName()));
+      if (toolchain.getOperatingSystem().isLinux()) {
+        model.put("soname", toolchain.getOperatingSystem().getLinkLibraryName(library.getOutputName()));
       }
-      if (operatingSystem.isWindows()) {
-        model.put("implibName", operatingSystem.getLinkLibraryName(library.getOutputName()));
+      if (toolchain.getOperatingSystem().isWindows()) {
+        model.put("implibName", toolchain.getOperatingSystem().getLinkLibraryName(library.getOutputName()));
       }
     } else if (library.getLinkVariant() == CMakeLinkVariant.STATIC) {
-      model.put("staticLibName", operatingSystem.getStaticLibraryName(library.getOutputName()));
+      model.put("staticLibName", toolchain.getOperatingSystem().getStaticLibraryName(library.getOutputName()));
     }
 
     final List<String> headerRelPaths = new ArrayList<>();
