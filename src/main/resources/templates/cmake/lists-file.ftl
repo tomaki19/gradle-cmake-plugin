@@ -91,6 +91,7 @@ set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON CACHE INTERNAL "" )
 include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_TOOLCHAIN_FILE)
 cmake_print_variables(CMAKE_TOOLCHAIN_NAME)
+cmake_print_variables(CMAKE_CONFIGURATION_TYPES)
 cmake_print_variables(CMAKE_MODULE_PATH)
 <#list toolchains as tc>
 <#if tc.hasLibraries>
