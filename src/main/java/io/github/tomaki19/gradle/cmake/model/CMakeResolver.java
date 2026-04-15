@@ -252,7 +252,7 @@ public final class CMakeResolver {
           privatePackageDependencyConsumer, publicPackageDependencyConsumer)
           && !resolveProjectReference(componentName, name, dependency.getFrom(), dependency.getLinkVariant(),
               dependency.getVisibility(), privateProjectDependencyConsumer, publicProjectDependencyConsumer)) {
-        throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(name));
+        throw new IllegalArgumentException("Invalid link dependency '%s'!".formatted(name));
       }
     }
   }
