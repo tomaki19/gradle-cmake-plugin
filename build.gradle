@@ -62,6 +62,10 @@ tasks.withType(Javadoc).configureEach {
   options.addStringOption('Xdoclint:-missing', '-quiet')
 }
 
+dependencyUpdates {
+  group 'build'
+}
+
 jacoco {
   toolVersion = '0.8.14'
 }
