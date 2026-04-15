@@ -75,9 +75,9 @@ public final class CMakeModuleFile extends CMakeFileContent {
       model.put("staticLibName", toolchain.getOperatingSystem().getStaticLibraryName(library.getOutputName()));
     }
 
-    final List<String> headerRelPaths = new ArrayList<>();
+    final List<Path> headerRelPaths = new ArrayList<>();
     for (final File headerDir : library.getHeaders()) {
-      headerRelPaths.add(exportPath.relativize(headerDir.toPath()).toString());
+      headerRelPaths.add(exportPath.relativize(headerDir.toPath()));
     }
     model.put("headerRelPaths", headerRelPaths);
 

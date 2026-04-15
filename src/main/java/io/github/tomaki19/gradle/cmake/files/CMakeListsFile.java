@@ -170,7 +170,7 @@ public final class CMakeListsFile extends CMakeFileContent {
 
     final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), executable,
         toolchain, buildConfig).getAsFile().toPath();
-    model.put("targetRelPath", projectPath.relativize(targetPath).toString());
+    model.put("targetRelPath", projectPath.relativize(targetPath));
     model.put("buildConfigs", toolchain.getBuildConfigs());
     model.put("stripDebug", executable.isStripDebug());
     return model;
@@ -215,18 +215,18 @@ public final class CMakeListsFile extends CMakeFileContent {
     return includes;
   }
 
-  private List<String> buildRelativePaths(final Collection<File> directories, final Path base) {
-    final List<String> paths = new ArrayList<>();
+  private List<Path> buildRelativePaths(final Collection<File> directories, final Path base) {
+    final List<Path> paths = new ArrayList<>();
     for (final File directory : directories) {
-      paths.add(base.relativize(directory.toPath()).toString());
+      paths.add(base.relativize(directory.toPath()));
     }
     return paths;
   }
 
-  private List<String> buildRelativeFilePaths(final Collection<File> files, final Path base) {
-    final List<String> paths = new ArrayList<>();
+  private List<Path> buildRelativeFilePaths(final Collection<File> files, final Path base) {
+    final List<Path> paths = new ArrayList<>();
     for (final File file : files) {
-      paths.add(base.relativize(file.toPath()).toString());
+      paths.add(base.relativize(file.toPath()));
     }
     return paths;
   }
