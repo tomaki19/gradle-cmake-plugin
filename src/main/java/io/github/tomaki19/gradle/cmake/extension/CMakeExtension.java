@@ -17,16 +17,17 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 
 public abstract class CMakeExtension {
 
   public static final String NAME = "cmake";
 
-  private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks;
+  private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomExec>>> customTaskProtos;
 
   @javax.inject.Inject
-  public CMakeExtension(final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>>> customTasks) {
-    this.customTasks = customTasks;
+  public CMakeExtension(final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomExec>>> customTaskProtos) {
+    this.customTaskProtos = customTaskProtos;
   }
 
   public abstract NamedDomainObjectContainer<CMakeToolchain> getToolchains();
@@ -39,7 +40,7 @@ public abstract class CMakeExtension {
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
 
-  public void register(final String taskName, final Action<CMakeCustomTaskProto> taskAction) {
+  public void register(final String taskName, final Action<CMakeCustomExec> taskAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       for (final String buildConfig : toolchain.getBuildConfigs()) {
         putCMakeCustomTaskProto(new CMakeCustomTaskProto(taskName, toolchain, buildConfig), taskAction);
@@ -48,7 +49,7 @@ public abstract class CMakeExtension {
   }
 
   public void register(final String taskName, final Collection<String> toolChainNames,
-      final Action<CMakeCustomTaskProto> taskAction) {
+      final Action<CMakeCustomExec> taskAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
@@ -59,7 +60,7 @@ public abstract class CMakeExtension {
   }
 
   public void register(final String taskName, final Collection<String> toolChainNames,
-      final Collection<String> buildConfigs, final Action<CMakeCustomTaskProto> taskAction) {
+      final Collection<String> buildConfigs, final Action<CMakeCustomExec> taskAction) {
     for (final CMakeToolchain toolchain : getToolchains()) {
       if (toolChainNames.contains(toolchain.getName())) {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
@@ -71,12 +72,12 @@ public abstract class CMakeExtension {
     }
   }
 
-  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto, final Action<CMakeCustomTaskProto> action) {
+  private void putCMakeCustomTaskProto(final CMakeCustomTaskProto proto, final Action<CMakeCustomExec> action) {
     final String toolchainName = proto.getToolchain().getName();
-    if (!customTasks.containsKey(toolchainName)) {
-      customTasks.put(toolchainName, new HashMap<>());
+    if (!customTaskProtos.containsKey(toolchainName)) {
+      customTaskProtos.put(toolchainName, new HashMap<>());
     }
-    customTasks.get(toolchainName).put(proto, action);
+    customTaskProtos.get(toolchainName).put(proto, action);
   }
 
 }
