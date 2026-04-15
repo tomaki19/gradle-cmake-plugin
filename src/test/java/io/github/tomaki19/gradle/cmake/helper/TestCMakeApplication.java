@@ -44,7 +44,7 @@ public final class TestCMakeApplication {
     final NamedDomainObjectProvider<CMakeApplication> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
       object.getLinking().options(options);
-      object.getLinking().dependencies(dependencies);
+      object.getLinking().link(dependencies);
     });
     return provider;
   }

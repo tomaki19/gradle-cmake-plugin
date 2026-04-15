@@ -6,29 +6,19 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
 
   private CMakeBuildVariant buildVariant;
 
   public CMakeLibraryDependencies(final CharSequence... names) {
-    super(CMakeLinkVariant.SHARED, CMakeVisibilityType.PUBLIC, names);
+    super(CMakeLinkVariant.SHARED, CMakeVisibility.PUBLIC, names);
     buildVariant = CMakeBuildVariant.SHARED;
   }
 
   public CMakeLibraryDependencies from(final CharSequence value) {
     setFrom(value.toString());
-    return this;
-  }
-
-  public CMakeLibraryDependencies link(final CMakeLinkVariant variant) {
-    setLinkVariant(variant);
-    return this;
-  }
-
-  public CMakeLibraryDependencies visibility(final CMakeVisibilityType type) {
-    setVisibilityType(type);
     return this;
   }
 
@@ -38,6 +28,16 @@ public class CMakeLibraryDependencies extends CMakeBinaryDependencies {
 
   public CMakeLibraryDependencies forBuildVariant(final CMakeBuildVariant variant) {
     this.buildVariant = variant;
+    return this;
+  }
+
+  public CMakeLibraryDependencies variant(final CMakeLinkVariant variant) {
+    setLinkVariant(variant);
+    return this;
+  }
+
+  public CMakeLibraryDependencies visibility(final CMakeVisibility visibility) {
+    setVisibility(visibility);
     return this;
   }
 

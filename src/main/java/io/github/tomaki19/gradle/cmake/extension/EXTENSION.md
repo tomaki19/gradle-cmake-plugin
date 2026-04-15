@@ -41,7 +41,7 @@ toolchains {
     environmentFile = File //optional, default: none
     toolchainFile = File //optional, default: none
     libraries {
-      buildVariants List<CMakeBuildType> //optional, options: Shared, Static, default: Shared
+      buildVariants List<CMakeBuildVariant> //optional, options: Shared, Static, default: Shared
       compiling {
         defines <List<String>> //optional
         options <List<String>> //optional
@@ -50,9 +50,9 @@ toolchains {
         options(<List<String>>) //optional
         dependencies(<List<String>>)
           .from(<String>) //optional
-          .build(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
-          .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
-          .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
+          .build(<CMakeBuildVariant>) //optional, options: Shared|Static, default: Shared
+          .link(<CMakeLinkVariant>) //optional, options: Shared|Static|Interface, default: Shared
+          .visibility(<CMakeVisibility>) //optional, options: Public|Private, default: Public
       }
       stripDebug = boolean //optional, default: false
     }
@@ -65,9 +65,9 @@ toolchains {
         options(<List<String>>) //optional
         dependencies(<List<String>>)
           .from(<String>) //optional
-          .build(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
-          .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
-          .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
+          .build(<CMakeBuildVariant>) //optional, options: Shared|Static, default: Shared
+          .link(<CMakeLinkVariant>) //optional, options: Shared|Static|Interface, default: Shared
+          .visibility(<CMakeVisibility>) //optional, options: Public|Private, default: Public
       }
       stripDebug = //optional: boolean, default: false
     }
@@ -80,8 +80,8 @@ toolchains {
         options(<List<String>>) //optional
         dependencies(<List<String>>)
           .from(<String>) //optional
-          .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
-          .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
+          .link(<CMakeLinkVariant>) //optional, options: Shared|Static|Interface, default: Shared
+          .visibility(<CMakeVisibility>) //optional, options: Public|Private, default: Public
       }
       stripDebug = //optional: boolean, default: false
       testResultsXmlOutput = //optional: boolean, default: false
@@ -98,7 +98,7 @@ The `libraries` configuration block lets you specify library build items that ca
 libraries {
   <String> {
     toolchains <List<String>> //required
-    buildVariants List<CMakeBuildType> //optional, options: Shared|Static, default: Shared
+    buildVariants List<CMakeBuildVariant> //optional, options: Shared|Static, default: Shared
     headers {
       srcDir <String> //optional
       srcDirs <List<String>> //optional
@@ -113,11 +113,11 @@ libraries {
     }
     linking {
       options(<List<String>>) //optional
-      dependencies(<List<String>>)
+      link(<List<String>>)
         .from(<String>) //optional
-        .forBuildVariant(<CMakeBuildType>) //optional, options: Shared|Static, default: Shared
-        .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
-        .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Public
+        .forBuildVariant(<CMakeBuildVariant>) //optional, options: Shared|Static, default: Shared
+        .variant(<CMakeLinkVariant>) //optional, options: Shared|Static|Interface, default: Shared
+        .visibility(<CMakeVisibility>) //optional, options: Public|Private, default: Public
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -147,10 +147,10 @@ applications {
     }
     linking {
       options(<List<String>>) //optional
-      dependencies(<List<String>>)
+      link(<List<String>>)
         .from(<String>) //optional
-        .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
-        .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Private
+        .variant(<CMakeLinkVariant>) //optional, options: Shared|Static|Interface, default: Shared
+        .visibility(<CMakeVisibility>) //optional, options: Public|Private, default: Private
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false
@@ -180,10 +180,10 @@ tests {
     }
     linking {
       options(<List<String>>) //optional
-      dependencies(<List<String>>)
+      link(<List<String>>)
         .from(<String>) //optional
-        .link(<CMakeLinkType>) //optional, options: Shared|Static|Interface, default: Shared
-        .visibility(<CMakeVisibilityType>) //optional, options: Public|Private, default: Private
+        .variant(<CMakeLinkVariant>) //optional, options: Shared|Static|Interface, default: Shared
+        .visibility(<CMakeVisibility>) //optional, options: Public|Private, default: Private
     }
     outputName <String> //optional
     stripDebug = <boolean> //optional, default: false

@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 abstract class CMakeLinking {
 
@@ -17,13 +17,13 @@ abstract class CMakeLinking {
   public static final CMakeLinkVariant Shared = CMakeLinkVariant.SHARED;
   public static final CMakeLinkVariant Interface = CMakeLinkVariant.INTERFACE;
 
-  public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
-  public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;
+  public static final CMakeVisibility Public = CMakeVisibility.PUBLIC;
+  public static final CMakeVisibility Private = CMakeVisibility.PRIVATE;
 
   private final Collection<CMakeBuildItems> options = new HashSet<>();
-  private CMakeVisibilityType defaultVisibilityType;
+  private CMakeVisibility defaultVisibilityType;
 
-  CMakeLinking(final CMakeVisibilityType defaultVisibilityType) {
+  CMakeLinking(final CMakeVisibility defaultVisibilityType) {
     this.defaultVisibilityType = defaultVisibilityType;
   }
 

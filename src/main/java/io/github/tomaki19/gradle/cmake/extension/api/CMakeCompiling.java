@@ -8,18 +8,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 abstract class CMakeCompiling {
 
-  public static final CMakeVisibilityType Public = CMakeVisibilityType.PUBLIC;
-  public static final CMakeVisibilityType Private = CMakeVisibilityType.PRIVATE;
+  public static final CMakeVisibility Public = CMakeVisibility.PUBLIC;
+  public static final CMakeVisibility Private = CMakeVisibility.PRIVATE;
 
   private final Collection<CMakeBuildItems> defines = new HashSet<>();
   private final Collection<CMakeBuildItems> options = new HashSet<>();
-  private CMakeVisibilityType defaultVisibilityType;
+  private CMakeVisibility defaultVisibilityType;
 
-  CMakeCompiling(final CMakeVisibilityType defaultVisibilityType) {
+  CMakeCompiling(final CMakeVisibility defaultVisibilityType) {
     this.defaultVisibilityType = defaultVisibilityType;
   }
 

@@ -4,7 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-public enum CMakeVisibilityType {
+public enum CMakeVisibility {
   PUBLIC, PRIVATE;
 
   public String toLowerCase() {

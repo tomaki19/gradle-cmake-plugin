@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeCompileTest {
 
@@ -36,7 +36,7 @@ class CMakeCompileTest {
     CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
     compile.defines("DEBUG");
     assertEquals(1, compile.getDefines().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "DEBUG"), compile.getDefines().iterator().next());
+    assertEquals(new CMakeBuildItems(CMakeVisibility.PUBLIC, "DEBUG"), compile.getDefines().iterator().next());
   }
 
   @Test
@@ -44,7 +44,7 @@ class CMakeCompileTest {
     CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
     compile.defines("DEBUG", "VERBOSE");
     assertEquals(1, compile.getDefines().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "DEBUG", "VERBOSE"),
+    assertEquals(new CMakeBuildItems(CMakeVisibility.PUBLIC, "DEBUG", "VERBOSE"),
         compile.getDefines().iterator().next());
   }
 
@@ -53,7 +53,7 @@ class CMakeCompileTest {
     CMakeExecutableCompiling compile = new CMakeExecutableCompiling();
     compile.options("-Wall");
     assertEquals(1, compile.getOptions().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-Wall"), compile.getOptions().iterator().next());
+    assertEquals(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-Wall"), compile.getOptions().iterator().next());
   }
 
   @Test
@@ -61,7 +61,7 @@ class CMakeCompileTest {
     CMakeExecutableCompiling compile = new CMakeExecutableCompiling();
     compile.options("-Wall", "-Wextra");
     assertEquals(1, compile.getOptions().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PRIVATE, "-Wall", "-Wextra"),
+    assertEquals(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-Wall", "-Wextra"),
         compile.getOptions().iterator().next());
   }
 }

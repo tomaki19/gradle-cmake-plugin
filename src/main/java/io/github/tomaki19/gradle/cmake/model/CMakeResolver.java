@@ -182,16 +182,16 @@ public final class CMakeResolver {
       final Consumer<String> privateDefinitionConsumer, final Consumer<String> publicDefinitionConsumer,
       final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer) {
     for (final CMakeBuildItems items : defines) {
-      if (Objects.equals(CMakeVisibilityType.PRIVATE, items.getVisibilityType())) {
+      if (Objects.equals(CMakeVisibility.PRIVATE, items.getVisibilityType())) {
         items.getNames().forEach(privateDefinitionConsumer);
-      } else if (Objects.equals(CMakeVisibilityType.PUBLIC, items.getVisibilityType())) {
+      } else if (Objects.equals(CMakeVisibility.PUBLIC, items.getVisibilityType())) {
         items.getNames().forEach(publicDefinitionConsumer);
       }
     }
     for (final CMakeBuildItems items : options) {
-      if (Objects.equals(CMakeVisibilityType.PRIVATE, items.getVisibilityType())) {
+      if (Objects.equals(CMakeVisibility.PRIVATE, items.getVisibilityType())) {
         items.getNames().forEach(privateOptionConsumer);
-      } else if (Objects.equals(CMakeVisibilityType.PUBLIC, items.getVisibilityType())) {
+      } else if (Objects.equals(CMakeVisibility.PUBLIC, items.getVisibilityType())) {
         items.getNames().forEach(publicOptionConsumer);
       }
     }
@@ -233,9 +233,9 @@ public final class CMakeResolver {
       final CMakeResolvedToolchain toolchain, final Consumer<String> privateOptionConsumer,
       final Consumer<String> publicOptionConsumer) {
     for (final CMakeBuildItems options : linkOptions) {
-      if (Objects.equals(CMakeVisibilityType.PRIVATE, options.getVisibilityType())) {
+      if (Objects.equals(CMakeVisibility.PRIVATE, options.getVisibilityType())) {
         options.getNames().forEach(privateOptionConsumer);
-      } else if (Objects.equals(CMakeVisibilityType.PUBLIC, options.getVisibilityType())) {
+      } else if (Objects.equals(CMakeVisibility.PUBLIC, options.getVisibilityType())) {
         options.getNames().forEach(publicOptionConsumer);
       }
     }
@@ -248,17 +248,17 @@ public final class CMakeResolver {
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer) {
     for (final String name : dependency.getNames()) {
-      if (!resolvePackageReference(name, dependency.getFrom(), dependency.getVisibilityType(),
+      if (!resolvePackageReference(name, dependency.getFrom(), dependency.getVisibility(),
           privatePackageDependencyConsumer, publicPackageDependencyConsumer)
           && !resolveProjectReference(componentName, name, dependency.getFrom(), dependency.getLinkVariant(),
-              dependency.getVisibilityType(), privateProjectDependencyConsumer, publicProjectDependencyConsumer)) {
+              dependency.getVisibility(), privateProjectDependencyConsumer, publicProjectDependencyConsumer)) {
         throw new IllegalArgumentException("Invalid dependency '%s'!".formatted(name));
       }
     }
   }
 
   private boolean resolvePackageReference(final String name, final String from,
-      final CMakeVisibilityType visibilityType,
+      final CMakeVisibility visibilityType,
       final Consumer<CMakeResolvedPackageDependency> privatePackageDependencyConsumer,
       final Consumer<CMakeResolvedPackageDependency> publicPackageDependencyConsumer) {
     if (availablePackages.containsKey(from)) {
@@ -267,9 +267,9 @@ public final class CMakeResolver {
       final CMakeResolvedPackageDependency resolvedDependency = new CMakeResolvedPackageDependency(name,
           resolvedPackage,
           Optional.ofNullable(availablePackage.getTargetPrefix().getOrNull()));
-      if (Objects.equals(CMakeVisibilityType.PRIVATE, visibilityType)) {
+      if (Objects.equals(CMakeVisibility.PRIVATE, visibilityType)) {
         privatePackageDependencyConsumer.accept(resolvedDependency);
-      } else if (Objects.equals(CMakeVisibilityType.PUBLIC, visibilityType)) {
+      } else if (Objects.equals(CMakeVisibility.PUBLIC, visibilityType)) {
         publicPackageDependencyConsumer.accept(resolvedDependency);
       }
       return true;
@@ -278,7 +278,7 @@ public final class CMakeResolver {
   }
 
   private boolean resolveProjectReference(final String componentName, final String name, final String from,
-      final CMakeLinkVariant linkVariant, final CMakeVisibilityType visibilityType,
+      final CMakeLinkVariant linkVariant, final CMakeVisibility visibilityType,
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer)
       throws IllegalArgumentException {
@@ -291,9 +291,9 @@ public final class CMakeResolver {
       if (Objects.nonNull(referencedProject)) {
         final CMakeResolvedProjectDependency resolvedDependency = new CMakeResolvedProjectDependency(name, linkVariant,
             referencedProject, !isCurrentProjectReferenced);
-        if (Objects.equals(CMakeVisibilityType.PRIVATE, visibilityType)) {
+        if (Objects.equals(CMakeVisibility.PRIVATE, visibilityType)) {
           privateProjectDependencyConsumer.accept(resolvedDependency);
-        } else if (Objects.equals(CMakeVisibilityType.PUBLIC, visibilityType)) {
+        } else if (Objects.equals(CMakeVisibility.PUBLIC, visibilityType)) {
           publicProjectDependencyConsumer.accept(resolvedDependency);
         }
         return true;

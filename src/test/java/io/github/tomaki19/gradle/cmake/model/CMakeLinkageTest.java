@@ -27,14 +27,14 @@ class CMakeLinkTypeTest {
 
   @Test
   void testVisibilityTypeValues() {
-    assertNotNull(CMakeVisibilityType.PUBLIC);
-    assertNotNull(CMakeVisibilityType.PRIVATE);
+    assertNotNull(CMakeVisibility.PUBLIC);
+    assertNotNull(CMakeVisibility.PRIVATE);
   }
 
   @Test
   void testVisibilityTypeToLowerCase() {
-    assertEquals("public", CMakeVisibilityType.PUBLIC.toLowerCase());
-    assertEquals("private", CMakeVisibilityType.PRIVATE.toLowerCase());
+    assertEquals("public", CMakeVisibility.PUBLIC.toLowerCase());
+    assertEquals("private", CMakeVisibility.PRIVATE.toLowerCase());
   }
 
   @Test

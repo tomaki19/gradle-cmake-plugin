@@ -29,7 +29,7 @@ public final class TestCMakeToolchain {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
       object.getLibraries().getLinking().options(options);
-      object.getLibraries().getLinking().dependencies(dependencies);
+      object.getLibraries().getLinking().link(dependencies);
     });
     return provider;
   }
@@ -40,7 +40,7 @@ public final class TestCMakeToolchain {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
       object.getApplications().getLinking().options(options);
-      object.getApplications().getLinking().dependencies(dependencies);
+      object.getApplications().getLinking().link(dependencies);
     });
     return provider;
   }
@@ -51,7 +51,7 @@ public final class TestCMakeToolchain {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
       object.getTests().getLinking().options(options);
-      object.getTests().getLinking().dependencies(dependencies);
+      object.getTests().getLinking().link(dependencies);
     });
     return provider;
   }

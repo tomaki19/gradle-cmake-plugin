@@ -11,19 +11,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 public abstract class CMakeBinaryDependencies {
 
   private final Set<String> names = new HashSet<>();
   private String from = "";
   private CMakeLinkVariant linkVariant;
-  private CMakeVisibilityType visibilityType;
+  private CMakeVisibility visibility;
 
   protected CMakeBinaryDependencies(final CMakeLinkVariant defaultLinkVariant,
-      final CMakeVisibilityType defaultVisibilityType, final CharSequence... names) {
+      final CMakeVisibility defaultVisibility, final CharSequence... names) {
     this.linkVariant = defaultLinkVariant;
-    this.visibilityType = defaultVisibilityType;
+    this.visibility = defaultVisibility;
     this.names.addAll(Arrays.asList(names).stream().map((name) -> name.toString()).toList());
   }
 
@@ -47,12 +47,12 @@ public abstract class CMakeBinaryDependencies {
     return linkVariant;
   }
 
-  protected void setVisibilityType(final CMakeVisibilityType type) {
-    this.visibilityType = type;
+  protected void setVisibility(final CMakeVisibility visibility) {
+    this.visibility = visibility;
   }
 
-  public CMakeVisibilityType getVisibilityType() {
-    return visibilityType;
+  public CMakeVisibility getVisibility() {
+    return visibility;
   }
 
   @Override
@@ -62,7 +62,7 @@ public abstract class CMakeBinaryDependencies {
     result = prime * result + ((names == null) ? 0 : names.hashCode());
     result = prime * result + ((from == null) ? 0 : from.hashCode());
     result = prime * result + ((linkVariant == null) ? 0 : linkVariant.hashCode());
-    result = prime * result + ((visibilityType == null) ? 0 : visibilityType.hashCode());
+    result = prime * result + ((visibility == null) ? 0 : visibility.hashCode());
     return result;
   }
 
@@ -87,7 +87,7 @@ public abstract class CMakeBinaryDependencies {
       return false;
     if (linkVariant != other.linkVariant)
       return false;
-    if (visibilityType != other.visibilityType)
+    if (visibility != other.visibility)
       return false;
     return true;
   }

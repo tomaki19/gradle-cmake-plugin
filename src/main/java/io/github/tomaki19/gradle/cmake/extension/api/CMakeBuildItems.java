@@ -10,14 +10,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 public class CMakeBuildItems {
 
   private final Set<String> names = new HashSet<>();
-  private CMakeVisibilityType visibilityType;
+  private CMakeVisibility visibilityType;
 
-  public CMakeBuildItems(final CMakeVisibilityType defaultVisibilityType, final CharSequence... names) {
+  public CMakeBuildItems(final CMakeVisibility defaultVisibilityType, final CharSequence... names) {
     this.visibilityType = defaultVisibilityType;
     this.names.addAll(Arrays.asList(names).stream().map((name) -> name.toString()).toList());
   }
@@ -26,12 +26,12 @@ public class CMakeBuildItems {
     return Collections.unmodifiableCollection(names);
   }
 
-  protected CMakeVisibilityType visibility(final CMakeVisibilityType type) {
+  protected CMakeVisibility visibility(final CMakeVisibility type) {
     this.visibilityType = type;
     return type;
   }
 
-  public CMakeVisibilityType getVisibilityType() {
+  public CMakeVisibility getVisibilityType() {
     return visibilityType;
   }
 

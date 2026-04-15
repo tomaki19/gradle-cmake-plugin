@@ -32,7 +32,7 @@ public final class TestCMakeInterfaceLibrary {
     final NamedDomainObjectProvider<CMakeLibrary> provider = register(name, extension);
     provider.configure((object) -> {
       object.getLinking().options(options);
-      object.getLinking().dependencies(dependencies);
+      object.getLinking().link(dependencies);
     });
     return provider;
   }

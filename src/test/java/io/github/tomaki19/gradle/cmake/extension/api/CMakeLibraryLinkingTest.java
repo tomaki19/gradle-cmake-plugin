@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeLibraryLinkingTest {
 
@@ -42,7 +42,7 @@ class CMakeLibraryLinkingTest {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
     linking.options("-L/usr/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-L/usr/lib"),
+    assertEquals(new CMakeBuildItems(CMakeVisibility.PUBLIC, "-L/usr/lib"),
         linking.getOptions().iterator().next());
   }
 
@@ -51,14 +51,14 @@ class CMakeLibraryLinkingTest {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
     linking.options("-L/usr/lib", "-L/usr/local/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibilityType.PUBLIC, "-L/usr/lib", "-L/usr/local/lib"),
+    assertEquals(new CMakeBuildItems(CMakeVisibility.PUBLIC, "-L/usr/lib", "-L/usr/local/lib"),
         linking.getOptions().iterator().next());
   }
 
   @Test
   void testDependencyCharSequence() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep = linking.dependencies("mylib");
+    CMakeLibraryDependencies dep = linking.link("mylib");
     assertNotNull(dep);
     assertEquals(1, linking.getDependencies().size());
   }
@@ -66,7 +66,7 @@ class CMakeLibraryLinkingTest {
   @Test
   void testDependenciesVarargs() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep = linking.dependencies("lib1", "lib2");
+    CMakeLibraryDependencies dep = linking.link("lib1", "lib2");
     assertNotNull(dep);
     assertEquals(1, linking.getDependencies().size());
   }
@@ -76,7 +76,7 @@ class CMakeLibraryLinkingTest {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
     CMakeLibraryDependencies dep1 = new CMakeLibraryDependencies("lib1");
     CMakeLibraryDependencies dep2 = new CMakeLibraryDependencies("lib2");
-    linking.dependencies(java.util.Arrays.asList(dep1, dep2));
+    linking.link(java.util.Arrays.asList(dep1, dep2));
     assertEquals(2, linking.getDependencies().size());
   }
 }

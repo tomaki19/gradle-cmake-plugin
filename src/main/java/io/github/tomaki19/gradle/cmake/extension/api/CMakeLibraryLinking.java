@@ -8,27 +8,27 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 public class CMakeLibraryLinking extends CMakeLinking {
 
   final Collection<CMakeLibraryDependencies> dependencies = new HashSet<>();
 
   public CMakeLibraryLinking() {
-    super(CMakeVisibilityType.PUBLIC);
+    super(CMakeVisibility.PUBLIC);
   }
 
   public Collection<CMakeLibraryDependencies> getDependencies() {
     return Collections.unmodifiableCollection(dependencies);
   }
 
-  public CMakeLibraryDependencies dependencies(final CharSequence... names) {
+  public CMakeLibraryDependencies link(final CharSequence... names) {
     final CMakeLibraryDependencies entry = new CMakeLibraryDependencies(names);
     dependencies.add(entry);
     return entry;
   }
 
-  public void dependencies(final Collection<CMakeLibraryDependencies> entries) {
+  public void link(final Collection<CMakeLibraryDependencies> entries) {
     dependencies.addAll(entries);
   }
 

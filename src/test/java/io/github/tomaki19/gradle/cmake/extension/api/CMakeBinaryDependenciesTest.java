@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibilityType;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeBinaryDependenciesTest {
 
@@ -93,7 +93,7 @@ class CMakeBinaryDependenciesTest {
 
   private static class TestCMakeBinaryDependencies extends CMakeBinaryDependencies {
     TestCMakeBinaryDependencies(CharSequence... names) {
-      super(CMakeLinkVariant.SHARED, CMakeVisibilityType.PUBLIC, names);
+      super(CMakeLinkVariant.SHARED, CMakeVisibility.PUBLIC, names);
     }
   }
 }
