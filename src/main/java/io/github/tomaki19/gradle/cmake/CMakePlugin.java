@@ -128,7 +128,7 @@ public class CMakePlugin implements Plugin<Project> {
             task.dependsOn(assembleListsTask);
           });
           final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
-              project.getLayout().getBuildDirectory().get());
+              project.getLayout().getBuildDirectory());
 
           if (customTaskProtos.containsKey(toolchain.getName())) {
             customTaskProtos.get(toolchain.getName()).forEach((taskProto, taskAction) -> {
@@ -152,7 +152,7 @@ public class CMakePlugin implements Plugin<Project> {
                     .add(dependency.createOutputDirectoriesDependency(project, toolchain, buildConfig));
               } else {
                 localOutputDirectories.add(CMakeFileConventions.targetBinaryDirectory(
-                    project.getLayout().getBuildDirectory().get(), dependency, toolchain, buildConfig).getAsFile());
+                    project.getLayout().getBuildDirectory(), dependency, toolchain, buildConfig).getAsFile());
               }
             }
 
@@ -183,7 +183,7 @@ public class CMakePlugin implements Plugin<Project> {
             final Configuration outputDirectoriesConfiguration = CMakeTaskRegistry.createOutputDirectoriesConfiguration(
                 project.getConfigurations(), library, toolchain, buildConfig);
             final Directory outputDirectory = CMakeFileConventions.targetBinaryDirectory(
-                project.getLayout().getBuildDirectory().get(), library, toolchain, buildConfig);
+                project.getLayout().getBuildDirectory(), library, toolchain, buildConfig);
             final Set<File> localOutputDirectories = new HashSet<>();
             localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
@@ -194,7 +194,7 @@ public class CMakePlugin implements Plugin<Project> {
                     .add(dependency.createOutputDirectoriesDependency(project, toolchain, buildConfig));
               } else {
                 localOutputDirectories.add(CMakeFileConventions.targetBinaryDirectory(
-                    project.getLayout().getBuildDirectory().get(), dependency, toolchain, buildConfig).getAsFile());
+                    project.getLayout().getBuildDirectory(), dependency, toolchain, buildConfig).getAsFile());
               }
             }
 
@@ -239,7 +239,7 @@ public class CMakePlugin implements Plugin<Project> {
             final Configuration outputDirectoriesConfiguration = CMakeTaskRegistry.createOutputDirectoriesConfiguration(
                 project.getConfigurations(), library, toolchain, buildConfig);
             final Directory outputDirectory = CMakeFileConventions.targetBinaryDirectory(
-                project.getLayout().getBuildDirectory().get(), library, toolchain, buildConfig);
+                project.getLayout().getBuildDirectory(), library, toolchain, buildConfig);
             final Set<File> localOutputDirectories = new HashSet<>();
             localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
@@ -250,7 +250,7 @@ public class CMakePlugin implements Plugin<Project> {
                     .add(dependency.createOutputDirectoriesDependency(project, toolchain, buildConfig));
               } else {
                 localOutputDirectories.add(CMakeFileConventions.targetBinaryDirectory(
-                    project.getLayout().getBuildDirectory().get(), dependency, toolchain, buildConfig).getAsFile());
+                    project.getLayout().getBuildDirectory(), dependency, toolchain, buildConfig).getAsFile());
               }
             }
 
@@ -295,7 +295,7 @@ public class CMakePlugin implements Plugin<Project> {
             final Configuration outputDirectoriesConfiguration = CMakeTaskRegistry.createOutputDirectoriesConfiguration(
                 project.getConfigurations(), application, toolchain, buildConfig);
             final Directory outputDirectory = CMakeFileConventions.targetBinaryDirectory(
-                project.getLayout().getBuildDirectory().get(), application, toolchain, buildConfig);
+                project.getLayout().getBuildDirectory(), application, toolchain, buildConfig);
             final Set<File> localOutputDirectories = new HashSet<>();
             localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : application.getAllProjectDependencies()) {
@@ -306,7 +306,7 @@ public class CMakePlugin implements Plugin<Project> {
                     .add(dependency.createOutputDirectoriesDependency(project, toolchain, buildConfig));
               } else {
                 localOutputDirectories.add(CMakeFileConventions.targetBinaryDirectory(
-                    project.getLayout().getBuildDirectory().get(), dependency, toolchain, buildConfig).getAsFile());
+                    project.getLayout().getBuildDirectory(), dependency, toolchain, buildConfig).getAsFile());
               }
             }
 
@@ -343,7 +343,7 @@ public class CMakePlugin implements Plugin<Project> {
             final Configuration outputDirectoriesConfiguration = CMakeTaskRegistry.createOutputDirectoriesConfiguration(
                 project.getConfigurations(), test, toolchain, buildConfig);
             final Directory outputDirectory = CMakeFileConventions.targetBinaryDirectory(
-                project.getLayout().getBuildDirectory().get(), test, toolchain, buildConfig);
+                project.getLayout().getBuildDirectory(), test, toolchain, buildConfig);
             final Set<File> localOutputDirectories = new HashSet<>();
             localOutputDirectories.add(outputDirectory.getAsFile());
             for (final CMakeResolvedProjectDependency dependency : test.getAllProjectDependencies()) {
@@ -354,7 +354,7 @@ public class CMakePlugin implements Plugin<Project> {
                     .add(dependency.createOutputDirectoriesDependency(project, toolchain, buildConfig));
               } else {
                 localOutputDirectories.add(CMakeFileConventions.targetBinaryDirectory(
-                    project.getLayout().getBuildDirectory().get(), dependency, toolchain, buildConfig).getAsFile());
+                    project.getLayout().getBuildDirectory(), dependency, toolchain, buildConfig).getAsFile());
               }
             }
 

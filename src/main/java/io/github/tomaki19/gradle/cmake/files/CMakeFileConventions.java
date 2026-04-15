@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.files;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
+import org.gradle.api.file.DirectoryProperty;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
@@ -18,33 +19,33 @@ public class CMakeFileConventions {
   public static final String CMAKE_CONFIG_PATH = "cmake/config";
   public static final String CMAKE_INSTALL_PATH = "cmake/install";
 
-  public static Directory targetConfigDirectory(final Directory buildDirectory) {
-    return buildDirectory.dir(CMAKE_CONFIG_PATH);
+  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory) {
+    return buildDirectory.get().dir(CMAKE_CONFIG_PATH);
   }
 
-  public static Directory targetConfigDirectory(final Directory buildDirectory, final CMakeToolchain toolchain,
+  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory, final CMakeToolchain toolchain,
       final String buildConfig) {
     return targetConfigDirectory(buildDirectory).dir(toolchain.getName()).dir(buildConfig);
   }
 
-  public static Directory targetConfigDirectory(final Directory buildDirectory, final CMakeResolvedToolchain toolchain,
+  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return targetConfigDirectory(buildDirectory).dir(toolchain.getName()).dir(buildConfig);
   }
 
-  public static Directory targetBinaryDirectory(final Directory buildDirectory,
+  public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
       final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String target = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
     return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
   }
 
-  public static Directory targetBinaryDirectory(final Directory buildDirectory,
+  public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
       final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String target = CMakeFileConventions.buildTarget(library, toolchain, buildConfig);
     return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
   }
 
-  public static Directory targetBinaryDirectory(final Directory buildDirectory,
+  public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
       final CMakeResolvedProjectDependency dependency, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     final String target = CMakeFileConventions.buildTarget(dependency, toolchain, buildConfig);

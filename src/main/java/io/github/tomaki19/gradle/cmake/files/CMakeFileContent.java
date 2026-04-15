@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
+import org.gradle.api.file.DirectoryProperty;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -35,13 +36,13 @@ public abstract class CMakeFileContent {
   private final String name;
   private final String projectName;
   private final Directory projectDirectory;
-  private final Directory buildDirectory;
+  private final DirectoryProperty buildDirectoryProperty;
 
   public CMakeFileContent(final String name, final Project project) {
     this.name = name;
     this.projectName = project.getName();
     this.projectDirectory = project.getLayout().getProjectDirectory();
-    this.buildDirectory = project.getLayout().getBuildDirectory().get();
+    this.buildDirectoryProperty = project.getLayout().getBuildDirectory();
   }
 
   public String getName() {
@@ -56,8 +57,8 @@ public abstract class CMakeFileContent {
     return projectDirectory;
   }
 
-  protected Directory getBuildDirectory() {
-    return buildDirectory;
+  protected DirectoryProperty getBuildDirectoryProperty() {
+    return buildDirectoryProperty;
   }
 
   public abstract void writeTo(final FileOutputStream outputStream) throws IOException;

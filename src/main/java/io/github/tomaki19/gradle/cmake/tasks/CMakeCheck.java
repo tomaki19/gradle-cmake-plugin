@@ -26,7 +26,7 @@ public abstract class CMakeCheck extends CMakeExec {
     args("Test");
     args("--test-dir");
     args(CMakeFileConventions.targetConfigDirectory(getProject().getLayout()
-        .getBuildDirectory().get(), toolchain, buildConfig).getAsFile().getAbsolutePath());
+        .getBuildDirectory(), toolchain, buildConfig).getAsFile().getAbsolutePath());
     args("--tests-regex");
     args(checkTarget);
     args("--build-config");

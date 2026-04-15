@@ -26,7 +26,7 @@ public abstract class CMakeConfigure extends CMakeExec {
     args("-S \"%s\"".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
     args("-B \"%s\"".formatted(CMakeFileConventions
-        .targetConfigDirectory(getProject().getLayout().getBuildDirectory().get(), toolchain, buildConfig)
+        .targetConfigDirectory(getProject().getLayout().getBuildDirectory(), toolchain, buildConfig)
         .getAsFile().getAbsolutePath()));
     args("-G \"%s\"".formatted(toolchain.getGenerator()));
     args("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));

@@ -24,7 +24,7 @@ public abstract class CMakeCustomExec extends CMakeExec {
       final Optional<RegularFile> environmentFile) {
     super(toolchain.getName(), buildConfig, environmentFile);
     this.compileCommands = CMakeFileConventions
-        .targetConfigDirectory(getProject().getLayout().getBuildDirectory().get(), toolchain, buildConfig)
+        .targetConfigDirectory(getProject().getLayout().getBuildDirectory(), toolchain, buildConfig)
         .file(COMPILE_COMMANDS_FILE_NAME).getAsFile().getAbsolutePath();
   }
 

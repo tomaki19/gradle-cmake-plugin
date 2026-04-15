@@ -94,7 +94,7 @@ class CMakeFileContentTest {
           // No-op for testing
         }
       };
-      assertNotNull(content.getBuildDirectory());
+      assertNotNull(content.getBuildDirectoryProperty());
     } finally {
       deleteRecursively(tempDir);
     }

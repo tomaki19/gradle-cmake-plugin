@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
@@ -68,7 +69,7 @@ class CMakeFileConventionsTest {
   @Test
   void testTargetConfigDirectoryWithToolchain() {
     final Project project = ProjectBuilder.builder().build();
-    final Directory buildDir = project.getLayout().getBuildDirectory().get();
+    final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
     final Directory result = CMakeFileConventions.targetConfigDirectory(buildDir, toolchain, "Debug");
     assertNotNull(result);
@@ -79,7 +80,7 @@ class CMakeFileConventionsTest {
   @Test
   void testTargetBinaryDirectoryWithExecutable() {
     final Project project = ProjectBuilder.builder().build();
-    final Directory buildDir = project.getLayout().getBuildDirectory().get();
+    final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
     final CMakeResolvedExecutable resolvedExec = new CMakeResolvedExecutable(application, false);
@@ -93,7 +94,7 @@ class CMakeFileConventionsTest {
   @Test
   void testTargetBinaryDirectoryWithProjectDependency() {
     final Project project = ProjectBuilder.builder().withName("DepProject").build();
-    final Directory buildDir = project.getLayout().getBuildDirectory().get();
+    final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
     final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("MyLib",
         CMakeLinkVariant.STATIC, project, false);

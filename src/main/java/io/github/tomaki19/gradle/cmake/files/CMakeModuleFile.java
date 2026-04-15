@@ -55,9 +55,10 @@ public final class CMakeModuleFile extends CMakeFileContent {
     }
     model.put("projectIncludes", projectIncludes);
 
-    final Path exportPath = getBuildDirectory().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile().toPath();
+    final Path exportPath = getBuildDirectoryProperty().get().dir(CMakeFileConventions.CMAKE_CONFIG_PATH).getAsFile()
+        .toPath();
     final Path targetPath = CMakeFileConventions
-        .targetBinaryDirectory(getBuildDirectory(), library, toolchain, buildConfig).getAsFile().toPath();
+        .targetBinaryDirectory(getBuildDirectoryProperty(), library, toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", exportPath.relativize(targetPath));
 
     model.put("isLinux", toolchain.getOperatingSystem().isLinux());

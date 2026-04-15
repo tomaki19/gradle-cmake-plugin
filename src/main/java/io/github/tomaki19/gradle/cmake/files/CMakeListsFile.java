@@ -142,7 +142,7 @@ public final class CMakeListsFile extends CMakeFileContent {
 
     model.put("outputName", library.getOutputName());
 
-    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), library,
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectoryProperty(), library,
         toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", projectPath.relativize(targetPath));
     model.put("buildConfigs", toolchain.getBuildConfigs());
@@ -168,7 +168,7 @@ public final class CMakeListsFile extends CMakeFileContent {
 
     model.put("outputName", executable.getOutputName());
 
-    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectory(), executable,
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectoryProperty(), executable,
         toolchain, buildConfig).getAsFile().toPath();
     model.put("targetRelPath", projectPath.relativize(targetPath));
     model.put("buildConfigs", toolchain.getBuildConfigs());
