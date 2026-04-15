@@ -44,31 +44,20 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
 
 public class CMakePlugin implements Plugin<Project> {
 
-  private final SoftwareComponentFactory softwareComponentFactory;
+  private final AdhocComponentWithVariants cmakeComponent;
   private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomExec>>> customTaskProtos = new HashMap<>();
 
   @javax.inject.Inject
-  CMakePlugin(SoftwareComponentFactory softwareComponentFactory) {
-    this.softwareComponentFactory = softwareComponentFactory;
+  CMakePlugin(final SoftwareComponentFactory softwareComponentFactory) {
+    this.cmakeComponent = softwareComponentFactory.adhoc("cmake");
   }
 
   @Override
   public void apply(Project project) {
     project.getPluginManager().apply(BasePlugin.class);
-    project.allprojects(this::allProjects);
+    project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, customTaskProtos);
+    project.getComponents().add(cmakeComponent);
     project.afterEvaluate(this::afterEvaluate);
-  }
-
-  private void allProjects(final Project project) {
-    try {
-      project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, customTaskProtos);
-
-      final AdhocComponentWithVariants adhocComponent = softwareComponentFactory.adhoc("cmake");
-      project.getComponents().add(adhocComponent);
-
-    } catch (Exception e) {
-      throw new GradleException(e.getMessage(), e);
-    }
   }
 
   private void afterEvaluate(final Project project) {
