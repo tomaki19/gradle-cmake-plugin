@@ -1,14 +1,16 @@
 [versions]
-publish = "2.1.1"
-spotless = "8.4.0"
-shadow = "9.4.1"
-versions = "0.53.0"
-jacocolog = "4.0.2"
-spotbugs = "6.5.0"
+publish-plugin = "2.1.1"
+spotless-plugin = "8.4.0"
+shadow-plugin = "9.4.1"
+versions-plugin = "0.53.0"
+jacocolog-plugin = "4.0.2"
+spotbugs-plugin = "6.5.0"
+spotbugs = "4.9.8"
 mockito = "5.23.0"
 freemarker = "2.3.34"
 
 [libraries]
+spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
@@ -17,9 +19,9 @@ freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" 
 mockito = ["mockito-core", "mockito-junit-jupiter"]
 
 [plugins]
-publish = { id = "com.gradle.plugin-publish", version.ref = "publish" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
-jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog" }
-spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }
+publish = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless-plugin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow-plugin" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions-plugin" }
+jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog-plugin" }
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs-plugin" }

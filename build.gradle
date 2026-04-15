@@ -20,7 +20,7 @@ repositories {
 dependencies {
     implementation libs.freemarker
     testImplementation libs.bundles.mockito
-    spotbugs("com.github.spotbugs:spotbugs:+")
+    spotbugs(libs.spotbugs)
 }
 
 java {
