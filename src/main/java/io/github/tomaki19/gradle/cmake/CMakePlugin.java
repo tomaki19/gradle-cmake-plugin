@@ -67,7 +67,7 @@ public class CMakePlugin implements Plugin<Project> {
       project.getComponents().add(adhocComponent);
 
     } catch (Exception e) {
-      throw new GradleException(e.getMessage(), e.getCause());
+      throw new GradleException(e.getMessage(), e);
     }
   }
 
@@ -409,7 +409,7 @@ public class CMakePlugin implements Plugin<Project> {
       }
 
     } catch (Exception e) {
-      throw new GradleException(e.getMessage(), e.getCause());
+      throw new GradleException(e.getMessage(), e);
     }
   }
 }
