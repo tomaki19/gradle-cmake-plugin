@@ -2,6 +2,8 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
+package io.github.tomaki19.gradle.cmake.extension;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
@@ -38,10 +40,13 @@ class CMakeExtensionTest {
     final Project project = ProjectBuilder.builder().build();
     final MockCMakeExtension extension = new MockCMakeExtension(project.getObjects());
     // No exception should be thrown for each overload
-    extension.register("myTask", t -> {});
-    extension.register("myTask", java.util.Collections.singletonList("myToolchain"), t -> {});
+    extension.register("myTask", t -> {
+    });
+    extension.register("myTask", java.util.Collections.singletonList("myToolchain"), t -> {
+    });
     extension.register("myTask", java.util.Collections.singletonList("myToolchain"),
-                       java.util.Collections.singletonList("debug"), t -> {});
+        java.util.Collections.singletonList("debug"), t -> {
+        });
   }
 
 }
