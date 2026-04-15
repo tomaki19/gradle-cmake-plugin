@@ -67,12 +67,12 @@ dependencyUpdates {
   group = 'build'
 }
 
-jacoco {
-  toolVersion = '0.8.14'
-}
-
 jacocoTestReport {
   dependsOn test
+  reports {
+    xml.required = false
+    csv.required = false
+  }
 }
 
 spotbugs {
