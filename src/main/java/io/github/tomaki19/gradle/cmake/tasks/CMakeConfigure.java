@@ -34,6 +34,8 @@ public abstract class CMakeConfigure extends CMakeExec {
     toolchain.getToolchainFile().ifPresent((toolchainFile) -> {
       args("--toolchain \"%s\"".formatted(toolchainFile.getAsFile().getAbsolutePath()));
     });
+    getOutputs().dir(CMakeFileConventions.targetConfigDirectory(getProject().getLayout().getBuildDirectory(), toolchain,
+        buildConfig));
   }
 
   @Override
