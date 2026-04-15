@@ -49,7 +49,7 @@ include( [=include] )
         INTERFACE_COMPILE_OPTIONS [=option]
     )
 </#list>
-<#list privateCompileDefinitions as definition>
+<#list publicCompileDefinitions as definition>
     set_property( TARGET [=target] APPEND PROPERTY
         INTERFACE_COMPILE_DEFINITIONS [=definition]
     )

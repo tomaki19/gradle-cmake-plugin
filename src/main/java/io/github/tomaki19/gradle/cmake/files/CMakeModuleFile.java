@@ -82,7 +82,7 @@ public final class CMakeModuleFile extends CMakeFileContent {
     model.put("headerRelPaths", headerRelPaths);
 
     model.put("publicCompileOptions", library.getPublicCompileOptions());
-    model.put("privateCompileDefinitions", library.getPrivateCompileDefinitions());
+    model.put("publicCompileDefinitions", library.getPublicCompileDefinitions());
 
     final List<String> publicProjectDepTargets = new ArrayList<>();
     for (final CMakeResolvedProjectDependency dependency : library.getPublicProjectDependencies()) {
