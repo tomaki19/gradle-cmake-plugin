@@ -20,7 +20,7 @@ import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 class CMakeConfigurationConventionsTest {
 
   @Test
-  void testCreateModulesDirectoriesNameForExecutable() {
+  void testCreateModulesNameForExecutable() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -28,12 +28,12 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedExecutable executable = new CMakeResolvedExecutable(application, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createModulesDirectoriesName(executable, resolvedToolchain, "Debug");
+    final String result = CMakeConfigurationConventions.createModulesName(executable, resolvedToolchain, "Debug");
     assertEquals("myapp-mytoolchain-debug-modules", result);
   }
 
   @Test
-  void testCreateModulesDirectoriesNameForStaticLibrary() {
+  void testCreateModulesNameForStaticLibrary() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -41,12 +41,13 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createModulesDirectoriesName(resolvedLibrary, resolvedToolchain, "Debug");
+    final String result = CMakeConfigurationConventions.createModulesName(resolvedLibrary, resolvedToolchain,
+        "Debug");
     assertEquals("mylib-static-mytoolchain-debug-modules", result);
   }
 
   @Test
-  void testCreateModulesDirectoriesNameForSharedLibrary() {
+  void testCreateModulesNameForSharedLibrary() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -54,12 +55,13 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createModulesDirectoriesName(resolvedLibrary, resolvedToolchain, "Release");
+    final String result = CMakeConfigurationConventions.createModulesName(resolvedLibrary, resolvedToolchain,
+        "Release");
     assertEquals("mylib-shared-mytoolchain-release-modules", result);
   }
 
   @Test
-  void testCreateModulesDirectoriesNameForInterfaceLibrary() {
+  void testCreateModulesNameForInterfaceLibrary() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -67,24 +69,27 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createModulesDirectoriesName(resolvedLibrary, resolvedToolchain, "Release");
+    final String result = CMakeConfigurationConventions.createModulesName(resolvedLibrary, resolvedToolchain,
+        "Release");
     assertEquals("mylib-interface-mytoolchain-release-modules", result);
   }
 
   @Test
-  void testCreateModulesDirectoriesNameForProjectDependency() {
+  void testCreateModulesNameForProjectDependency() {
     final Project project = ProjectBuilder.builder().withName("MyProject").build();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false);
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("MyLib",
+        CMakeLinkVariant.SHARED, project, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createModulesDirectoriesName(dependency, resolvedToolchain, "Debug");
+    final String result = CMakeConfigurationConventions.createModulesName(dependency, resolvedToolchain,
+        "Debug");
     assertEquals("mylib-shared-mytoolchain-debug-modules", result);
   }
 
   @Test
-  void testCreateOutputDirectoriesNameForExecutable() {
+  void testCreateRuntimeNameForExecutable() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -92,12 +97,12 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedExecutable executable = new CMakeResolvedExecutable(application, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createOutputDirectoriesName(executable, resolvedToolchain, "Debug");
-    assertEquals("myapp-mytoolchain-debug-outputs", result);
+    final String result = CMakeConfigurationConventions.createRuntimeName(executable, resolvedToolchain, "Debug");
+    assertEquals("myapp-mytoolchain-debug-runtime", result);
   }
 
   @Test
-  void testCreateOutputDirectoriesNameForStaticLibrary() {
+  void testCreateRuntimeNameForStaticLibrary() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -105,12 +110,13 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createOutputDirectoriesName(resolvedLibrary, resolvedToolchain, "Debug");
-    assertEquals("mylib-static-mytoolchain-debug-outputs", result);
+    final String result = CMakeConfigurationConventions.createRuntimeName(resolvedLibrary, resolvedToolchain,
+        "Debug");
+    assertEquals("mylib-static-mytoolchain-debug-runtime", result);
   }
 
   @Test
-  void testCreateOutputDirectoriesNameForSharedLibrary() {
+  void testCreateRuntimeNameForSharedLibrary() {
     final Project project = ProjectBuilder.builder().build();
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
@@ -118,20 +124,37 @@ class CMakeConfigurationConventionsTest {
     final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createOutputDirectoriesName(resolvedLibrary, resolvedToolchain, "Release");
-    assertEquals("mylib-shared-mytoolchain-release-outputs", result);
+    final String result = CMakeConfigurationConventions.createRuntimeName(resolvedLibrary, resolvedToolchain,
+        "Release");
+    assertEquals("mylib-shared-mytoolchain-release-runtime", result);
   }
 
   @Test
-  void testCreateOutputDirectoriesNameForProjectDependency() {
+  void testCreateRuntimeNameForInterfaceLibrary() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false);
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+
+    final String result = CMakeConfigurationConventions.createRuntimeName(resolvedLibrary, resolvedToolchain,
+        "Release");
+    assertEquals("mylib-interface-mytoolchain-release-runtime", result);
+  }
+
+  @Test
+  void testCreateRuntimeNameForProjectDependency() {
     final Project project = ProjectBuilder.builder().withName("MyProject").build();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false);
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("MyLib",
+        CMakeLinkVariant.SHARED, project, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
-    final String result = CMakeConfigurationConventions.createOutputDirectoriesName(dependency, resolvedToolchain, "Debug");
-    assertEquals("mylib-shared-mytoolchain-debug-outputs", result);
+    final String result = CMakeConfigurationConventions.createRuntimeName(dependency, resolvedToolchain,
+        "Debug");
+    assertEquals("mylib-shared-mytoolchain-debug-runtime", result);
   }
 
 }

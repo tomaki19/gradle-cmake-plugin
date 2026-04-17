@@ -85,13 +85,13 @@
 </#macro>
 cmake_minimum_required( VERSION 3.21 )
 project( [=projectName] LANGUAGES C CXX )
-include( GNUInstallDirs )
+include(CMakePrintHelpers)
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "" )
 set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON CACHE INTERNAL "" )
-message( VERBOSE "${CMAKE_TOOLCHAIN_FILE}" )
-message( VERBOSE "${CMAKE_TOOLCHAIN_NAME}" )
-message( VERBOSE "${CMAKE_CONFIGURATION_TYPES}" )
-message( VERBOSE "${CMAKE_MODULE_PATH}" )
+cmake_print_variables( CMAKE_TOOLCHAIN_FILE )
+cmake_print_variables( CMAKE_TOOLCHAIN_NAME )
+cmake_print_variables( CMAKE_CONFIGURATION_TYPES )
+cmake_print_variables( CMAKE_MODULE_PATH )
 <#list toolchains as tc>
 <#if tc.hasLibraries>
 if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )

@@ -13,7 +13,6 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
-import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 import org.gradle.api.file.Directory;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
@@ -22,7 +21,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
-import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeConfigurationConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
@@ -65,17 +63,14 @@ public final class CMakeTaskRegistry {
   public TaskProvider<CMakeAssemble> assembleListsTask(
       final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project),
-        project.getLayout().getProjectDirectory());
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project));
   }
 
   public TaskProvider<CMakeAssemble> assembleModuleTask(final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project)
       throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleModuleTaskName(library, toolchain, buildConfig);
-    final CMakeModuleFile moduleFile = new CMakeModuleFile(library, toolchain, buildConfig, project);
-    return tasks.register(taskName, CMakeAssemble.class, moduleFile,
-        project.getLayout().getBuildDirectory().get().dir(CMakeFileConventions.CMAKE_CONFIG_PATH));
+    return tasks.register(taskName, CMakeAssemble.class, new CMakeModuleFile(library, toolchain, buildConfig, project));
   }
 
   public TaskProvider<CMakeCustomExec> customExecTask(final CMakeCustomTaskProto taskProto) {
@@ -153,40 +148,44 @@ public final class CMakeTaskRegistry {
     return provider;
   }
 
-  public static Configuration createModuleDirectoriesConfiguration(final ConfigurationContainer configurations,
+  public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
       final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createModulesDirectoriesName(executable, toolchain,
+    final String target = CMakeConfigurationConventions.createModulesName(executable, toolchain,
         buildConfig);
-    return configurations.create(target, (newConfiguration) -> {
-      newConfiguration.setCanBeDeclared(true);
-      newConfiguration.setCanBeResolved(true);
-      newConfiguration.setCanBeConsumed(true);
-    });
+    return createInConfiguration(configurations, target);
   }
 
-  public static Configuration createModuleDirectoriesConfiguration(final ConfigurationContainer configurations,
+  public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
       final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createModulesDirectoriesName(library, toolchain, buildConfig);
-    return configurations.create(target, (newConfiguration) -> {
-      newConfiguration.setCanBeDeclared(true);
-      newConfiguration.setCanBeResolved(true);
-      newConfiguration.setCanBeConsumed(true);
-    });
+    final String target = CMakeConfigurationConventions.createModulesName(library, toolchain, buildConfig);
+    return createInConfiguration(configurations, target);
   }
 
-  public static Configuration createOutputDirectoriesConfiguration(final ConfigurationContainer configurations,
+  public static Configuration createRuntimeConfiguration(final ConfigurationContainer configurations,
       final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createOutputDirectoriesName(executable, toolchain, buildConfig);
-    return configurations.create(target, (newConfiguration) -> {
-      newConfiguration.setCanBeDeclared(true);
-      newConfiguration.setCanBeResolved(true);
-      newConfiguration.setCanBeConsumed(true);
-    });
+    final String target = CMakeConfigurationConventions.createRuntimeName(executable, toolchain, buildConfig);
+    return createInConfiguration(configurations, target);
   }
 
-  public static Configuration createOutputDirectoriesConfiguration(final ConfigurationContainer configurations,
+  public static Configuration createRuntimeConfiguration(final ConfigurationContainer configurations,
       final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createOutputDirectoriesName(library, toolchain, buildConfig);
+    final String target = CMakeConfigurationConventions.createRuntimeName(library, toolchain, buildConfig);
+    return createInConfiguration(configurations, target);
+  }
+
+  public static Configuration createDevelopConfiguration(final ConfigurationContainer configurations,
+      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String target = CMakeConfigurationConventions.createDevelopName(executable, toolchain, buildConfig);
+    return createInConfiguration(configurations, target);
+  }
+
+  public static Configuration createDevelopConfiguration(final ConfigurationContainer configurations,
+      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final String target = CMakeConfigurationConventions.createDevelopName(library, toolchain, buildConfig);
+    return createInConfiguration(configurations, target);
+  }
+
+  private static Configuration createInConfiguration(final ConfigurationContainer configurations, final String target) {
     return configurations.create(target, (newConfiguration) -> {
       newConfiguration.setCanBeDeclared(true);
       newConfiguration.setCanBeResolved(true);
@@ -198,7 +197,6 @@ public final class CMakeTaskRegistry {
       final Directory outputDirectory, final Object... builtBy) {
     return artifacts.add(configuration.getName(), outputDirectory, (artifact) -> {
       artifact.builtBy(builtBy);
-      artifact.setType(ArtifactTypeDefinition.DIRECTORY_TYPE);
     });
   }
 
