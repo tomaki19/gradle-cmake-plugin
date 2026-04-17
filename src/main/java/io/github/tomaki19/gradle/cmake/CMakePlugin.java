@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomPackageTaskProto;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
@@ -36,13 +38,17 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
-import io.github.tomaki19.gradle.cmake.tasks.CMakePackageZip;
+import io.github.tomaki19.gradle.cmake.tasks.CMakePackageDevelopment;
+import io.github.tomaki19.gradle.cmake.tasks.CMakePackageRuntime;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeTasksConventions;
 
 public class CMakePlugin implements Plugin<Project> {
 
   private final AdhocComponentWithVariants cmakeComponent;
   private final Map<String, Map<CMakeCustomTaskProto, Action<CMakeCustomExec>>> customTaskProtos = new HashMap<>();
+  private final Map<String, Map<CMakeCustomPackageTaskProto, Action<CMakePackageRuntime>>> customPackageRuntimeTaskProtos = new HashMap<>();
+  private final Map<String, Map<CMakeCustomPackageTaskProto, Action<CMakePackageDevelopment>>> customPackageDevelopmentTaskProtos = new HashMap<>();
 
   @javax.inject.Inject
   CMakePlugin(final SoftwareComponentFactory softwareComponentFactory) {
@@ -52,7 +58,8 @@ public class CMakePlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
     project.getPluginManager().apply(BasePlugin.class);
-    project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, customTaskProtos);
+    project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, customTaskProtos,
+        customPackageRuntimeTaskProtos, customPackageDevelopmentTaskProtos);
     project.getComponents().add(cmakeComponent);
     project.afterEvaluate(this::afterEvaluate);
   }
@@ -83,6 +90,9 @@ public class CMakePlugin implements Plugin<Project> {
         task.getOutputDirectory().set(project.getLayout().getProjectDirectory());
       });
       taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
+
+      final Map<String, TaskProvider<CMakePackageRuntime>> createdRuntimePackageTasks = new HashMap<>();
+      final Map<String, TaskProvider<CMakePackageDevelopment>> createdDevelopmentPackageTasks = new HashMap<>();
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
 
@@ -142,8 +152,6 @@ public class CMakePlugin implements Plugin<Project> {
           for (final CMakeResolvedLibrary library : toolchain.getInterfaceLibraries()) {
             final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
                 project.getConfigurations(), library, toolchain, buildConfig);
-            final Configuration runtimeConfiguration = CMakeTaskRegistry.createRuntimeConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
             final Configuration developConfiguration = CMakeTaskRegistry.createDevelopConfiguration(
                 project.getConfigurations(), library, toolchain, buildConfig);
 
@@ -152,8 +160,6 @@ public class CMakePlugin implements Plugin<Project> {
                 modulesConfiguration.getDependencies()
                     .add(dependency.createModulesDependency(project, toolchain, buildConfig));
               }
-              runtimeConfiguration.getDependencies()
-                  .add(dependency.createRuntimeDependency(project, toolchain, buildConfig));
               developConfiguration.getDependencies()
                   .add(dependency.createDevelopDependency(project, toolchain, buildConfig));
             }
@@ -173,12 +179,12 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), modulesConfiguration,
                 moduleDirectory, configureTask);
 
-            final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
-                library, toolchain, buildConfig);
-            packageTask.configure((task) -> {
-              task.dependsOn(configureTask);
-              task.from(runtimeConfiguration);
-            });
+            if (customPackageDevelopmentTaskProtos.containsKey(toolchain.getName())) {
+              configureDevelopmentPackageForLibrary(
+                  customPackageDevelopmentTaskProtos.get(toolchain.getName()),
+                  createdDevelopmentPackageTasks, taskRegistry, library, toolchain, buildConfig,
+                  developConfiguration, null, configureTask);
+            }
           }
 
           for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
@@ -230,13 +236,12 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), runtimeConfiguration,
                 libraryDirectory, buildTask);
 
-            final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
-                library, toolchain, buildConfig);
-            packageTask.configure((task) -> {
-              task.dependsOn(buildTask);
-              task.from(runtimeConfiguration);
-              task.from(libraryDirectory);
-            });
+            if (customPackageDevelopmentTaskProtos.containsKey(toolchain.getName())) {
+              configureDevelopmentPackageForLibrary(
+                  customPackageDevelopmentTaskProtos.get(toolchain.getName()),
+                  createdDevelopmentPackageTasks, taskRegistry, library, toolchain, buildConfig,
+                  developConfiguration, libraryDirectory, buildTask);
+            }
           }
 
           for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
@@ -288,13 +293,18 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), runtimeConfiguration,
                 libraryDirectory, buildTask);
 
-            final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
-                library, toolchain, buildConfig);
-            packageTask.configure((task) -> {
-              task.dependsOn(buildTask);
-              task.from(runtimeConfiguration);
-              task.from(libraryDirectory);
-            });
+            if (customPackageRuntimeTaskProtos.containsKey(toolchain.getName())) {
+              configureRuntimePackageForLibrary(
+                  customPackageRuntimeTaskProtos.get(toolchain.getName()),
+                  createdRuntimePackageTasks, taskRegistry, library, toolchain, buildConfig,
+                  runtimeConfiguration, libraryDirectory, buildTask);
+            }
+            if (customPackageDevelopmentTaskProtos.containsKey(toolchain.getName())) {
+              configureDevelopmentPackageForLibrary(
+                  customPackageDevelopmentTaskProtos.get(toolchain.getName()),
+                  createdDevelopmentPackageTasks, taskRegistry, library, toolchain, buildConfig,
+                  developConfiguration, libraryDirectory, buildTask);
+            }
           }
 
           for (final CMakeResolvedExecutable application : toolchain.getApplications()) {
@@ -332,14 +342,20 @@ public class CMakePlugin implements Plugin<Project> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
-            final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
-                application, toolchain, buildConfig);
-            packageTask.configure((task) -> {
-              task.dependsOn(buildTask);
-              task.from(runtimeConfiguration);
-              task.from(CMakeFileConventions.targetBinaryDirectory(
-                  project.getLayout().getBuildDirectory(), application, toolchain, buildConfig));
-            });
+            final Directory applicationDirectory = CMakeFileConventions.targetBinaryDirectory(
+                project.getLayout().getBuildDirectory(), application, toolchain, buildConfig);
+            if (customPackageRuntimeTaskProtos.containsKey(toolchain.getName())) {
+              configureRuntimePackageForExecutable(
+                  customPackageRuntimeTaskProtos.get(toolchain.getName()),
+                  createdRuntimePackageTasks, taskRegistry, application, toolchain, buildConfig,
+                  buildTask, runtimeConfiguration, applicationDirectory);
+            }
+            if (customPackageDevelopmentTaskProtos.containsKey(toolchain.getName())) {
+              configureDevelopmentPackageForExecutable(
+                  customPackageDevelopmentTaskProtos.get(toolchain.getName()),
+                  createdDevelopmentPackageTasks, taskRegistry, application, toolchain, buildConfig,
+                  buildTask, developConfiguration, applicationDirectory);
+            }
           }
 
           for (final CMakeResolvedExecutable test : toolchain.getTests()) {
@@ -387,40 +403,162 @@ public class CMakePlugin implements Plugin<Project> {
               taskProvider.configure((task) -> task.dependsOn(checkTask));
             });
 
-            final TaskProvider<CMakePackageZip> packageTask = taskRegistry.packageTask(
-                test, toolchain, buildConfig);
-            packageTask.configure((task) -> {
-              task.dependsOn(buildTask);
-              task.from(runtimeConfiguration);
-              task.from(CMakeFileConventions.targetBinaryDirectory(
-                  project.getLayout().getBuildDirectory(), test, toolchain, buildConfig));
-            });
+            final Directory testDirectory = CMakeFileConventions.targetBinaryDirectory(
+                project.getLayout().getBuildDirectory(), test, toolchain, buildConfig);
+            if (customPackageRuntimeTaskProtos.containsKey(toolchain.getName())) {
+              configureRuntimePackageForExecutable(
+                  customPackageRuntimeTaskProtos.get(toolchain.getName()),
+                  createdRuntimePackageTasks, taskRegistry, test, toolchain, buildConfig,
+                  buildTask, runtimeConfiguration, testDirectory);
+            }
+            if (customPackageDevelopmentTaskProtos.containsKey(toolchain.getName())) {
+              configureDevelopmentPackageForExecutable(
+                  customPackageDevelopmentTaskProtos.get(toolchain.getName()),
+                  createdDevelopmentPackageTasks, taskRegistry, test, toolchain, buildConfig,
+                  buildTask, developConfiguration, testDirectory);
+            }
           }
         }
       }
-
-      // project.getConfigurations().forEach((config) -> {
-      // if (config.isCanBeResolved()) {
-      // System.out.println("config: " + config.getName());
-      // if (config.isCanBeDeclared()) {
-      // config.getIncoming().getArtifacts().forEach((artifact) -> {
-      // System.out.println(" < name: " + artifact.getId().getDisplayName());
-      // System.out.println(" < type: " + artifact.getType());
-      // System.out.println(" < file: " + artifact.getFile());
-      // });
-      // }
-      // if (config.isCanBeConsumed()) {
-      // config.getOutgoing().getArtifacts().forEach((artifact) -> {
-      // System.out.println(" > name: " + artifact.getName());
-      // System.out.println(" > type: " + artifact.getType());
-      // System.out.println(" > file: " + artifact.getFile());
-      // });
-      // }
-      // }
-      // });
-
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e);
     }
+  }
+
+  private void configureRuntimePackageForLibrary(
+      final Map<CMakeCustomPackageTaskProto, Action<CMakePackageRuntime>> protos,
+      final Map<String, TaskProvider<CMakePackageRuntime>> createdTasks,
+      final CMakeTaskRegistry taskRegistry,
+      final CMakeResolvedLibrary library,
+      final CMakeResolvedToolchain toolchain,
+      final String buildConfig,
+      final Configuration runtimeConfiguration,
+      final Directory binaryDirectory,
+      final Object... dependencyTasks) {
+
+    protos.forEach((proto, action) -> {
+      if (!proto.getBuildConfig().equals(buildConfig))
+        return;
+      if (!proto.matchesComponent(library.getName()))
+        return;
+
+      final String taskName = CMakeTasksConventions.customPackageTaskName(proto.getName(), toolchain, buildConfig);
+
+      final TaskProvider<CMakePackageRuntime> pkgTask = createdTasks.computeIfAbsent(taskName, n -> {
+        final TaskProvider<CMakePackageRuntime> t = taskRegistry.customPackageRuntimeTask(n, proto.getName());
+        t.configure(action);
+        return t;
+      });
+
+      pkgTask.configure(task -> {
+        task.dependsOn(dependencyTasks);
+        task.from(runtimeConfiguration);
+        task.from(binaryDirectory);
+      });
+    });
+  }
+
+  private void configureDevelopmentPackageForLibrary(
+      final Map<CMakeCustomPackageTaskProto, Action<CMakePackageDevelopment>> protos,
+      final Map<String, TaskProvider<CMakePackageDevelopment>> createdTasks,
+      final CMakeTaskRegistry taskRegistry,
+      final CMakeResolvedLibrary library,
+      final CMakeResolvedToolchain toolchain,
+      final String buildConfig,
+      final Configuration developConfiguration,
+      final Directory binaryDirectory,
+      final Object... dependencyTasks) {
+
+    protos.forEach((proto, action) -> {
+      if (!proto.getBuildConfig().equals(buildConfig))
+        return;
+      if (!proto.matchesComponent(library.getName()))
+        return;
+
+      final String taskName = CMakeTasksConventions.customPackageTaskName(proto.getName(), toolchain, buildConfig);
+
+      final TaskProvider<CMakePackageDevelopment> pkgTask = createdTasks.computeIfAbsent(taskName, n -> {
+        final TaskProvider<CMakePackageDevelopment> t = taskRegistry.customPackageDevelopmentTask(n, proto.getName());
+        t.configure(action);
+        return t;
+      });
+
+      pkgTask.configure(task -> {
+        task.dependsOn(dependencyTasks);
+        task.from(developConfiguration);
+        if (binaryDirectory != null) {
+          task.from(binaryDirectory);
+        }
+        for (final File headerDir : library.getHeaders()) {
+          task.from(headerDir);
+        }
+      });
+    });
+  }
+
+  private void configureRuntimePackageForExecutable(
+      final Map<CMakeCustomPackageTaskProto, Action<CMakePackageRuntime>> protos,
+      final Map<String, TaskProvider<CMakePackageRuntime>> createdTasks,
+      final CMakeTaskRegistry taskRegistry,
+      final CMakeResolvedExecutable executable,
+      final CMakeResolvedToolchain toolchain,
+      final String buildConfig,
+      final TaskProvider<CMakeBuildExecutable> buildTask,
+      final Configuration runtimeConfiguration,
+      final Directory binaryDirectory) {
+
+    protos.forEach((proto, action) -> {
+      if (!proto.getBuildConfig().equals(buildConfig))
+        return;
+      if (!proto.matchesComponent(executable.getName()))
+        return;
+
+      final String taskName = CMakeTasksConventions.customPackageTaskName(proto.getName(), toolchain, buildConfig);
+
+      final TaskProvider<CMakePackageRuntime> pkgTask = createdTasks.computeIfAbsent(taskName, n -> {
+        final TaskProvider<CMakePackageRuntime> t = taskRegistry.customPackageRuntimeTask(n, proto.getName());
+        t.configure(action);
+        return t;
+      });
+
+      pkgTask.configure(task -> {
+        task.dependsOn(buildTask);
+        task.from(runtimeConfiguration);
+        task.from(binaryDirectory);
+      });
+    });
+  }
+
+  private void configureDevelopmentPackageForExecutable(
+      final Map<CMakeCustomPackageTaskProto, Action<CMakePackageDevelopment>> protos,
+      final Map<String, TaskProvider<CMakePackageDevelopment>> createdTasks,
+      final CMakeTaskRegistry taskRegistry,
+      final CMakeResolvedExecutable executable,
+      final CMakeResolvedToolchain toolchain,
+      final String buildConfig,
+      final TaskProvider<CMakeBuildExecutable> buildTask,
+      final Configuration developConfiguration,
+      final Directory binaryDirectory) {
+
+    protos.forEach((proto, action) -> {
+      if (!proto.getBuildConfig().equals(buildConfig))
+        return;
+      if (!proto.matchesComponent(executable.getName()))
+        return;
+
+      final String taskName = CMakeTasksConventions.customPackageTaskName(proto.getName(), toolchain, buildConfig);
+
+      final TaskProvider<CMakePackageDevelopment> pkgTask = createdTasks.computeIfAbsent(taskName, n -> {
+        final TaskProvider<CMakePackageDevelopment> t = taskRegistry.customPackageDevelopmentTask(n, proto.getName());
+        t.configure(action);
+        return t;
+      });
+
+      pkgTask.configure(task -> {
+        task.dependsOn(buildTask);
+        task.from(developConfiguration);
+        task.from(binaryDirectory);
+      });
+    });
   }
 }

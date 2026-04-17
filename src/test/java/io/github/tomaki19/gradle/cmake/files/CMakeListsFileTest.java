@@ -86,7 +86,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeInterfaceLibrary.register("InterfaceLib0", extension);
@@ -114,7 +114,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeBinaryLibrary.register("StaticLib0", extension, CMakeBuildVariant.STATIC);
@@ -142,7 +142,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeBinaryLibrary.register("SharedLib0", extension, CMakeBuildVariant.SHARED);
@@ -170,7 +170,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeApplication.register("App0", extension);
@@ -198,7 +198,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeTest.register("Test0", extension);
@@ -232,7 +232,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakePackage.register("Package0", extension);
@@ -275,7 +275,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakePackage.register("Package0", extension);
@@ -322,7 +322,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
 
@@ -367,7 +367,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
 
@@ -407,7 +407,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
 
@@ -449,7 +449,7 @@ class CMakeListsFileTest {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
       CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, customTasks);
+          CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakePackage.register("Package0", extension);

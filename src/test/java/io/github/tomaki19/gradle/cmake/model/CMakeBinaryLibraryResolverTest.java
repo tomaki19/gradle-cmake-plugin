@@ -32,7 +32,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, CMakeBuildVariant.SHARED);
@@ -66,7 +66,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakePackage.register("Package1", extension);
@@ -200,7 +200,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension, Arrays.asList("Toolchain0"),
@@ -236,7 +236,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -273,7 +273,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -320,7 +320,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -364,7 +364,7 @@ public class CMakeBinaryLibraryResolverTest {
                 final Project project = ProjectBuilder.builder().build();
                 final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                                CMakeExtension.class, customTasks);
+                                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
 
                 TestCMakePackage.register("Package0", extension);
                 TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);

@@ -73,6 +73,18 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName, CMakeAssemble.class, new CMakeModuleFile(library, toolchain, buildConfig, project));
   }
 
+  public TaskProvider<CMakePackageRuntime> customPackageRuntimeTask(final String taskName, final String baseName) {
+    final TaskProvider<CMakePackageRuntime> provider = tasks.register(taskName, CMakePackageRuntime.class);
+    provider.configure((task) -> task.getArchiveBaseName().set(baseName));
+    return provider;
+  }
+
+  public TaskProvider<CMakePackageDevelopment> customPackageDevelopmentTask(final String taskName, final String baseName) {
+    final TaskProvider<CMakePackageDevelopment> provider = tasks.register(taskName, CMakePackageDevelopment.class);
+    provider.configure((task) -> task.getArchiveBaseName().set(baseName));
+    return provider;
+  }
+
   public TaskProvider<CMakeCustomExec> customExecTask(final CMakeCustomTaskProto taskProto) {
     final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchain(),
         taskProto.getBuildConfig());
@@ -126,27 +138,6 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName, CMakeCheck.class, executable, toolchain, buildConfig);
   }
 
-  public TaskProvider<CMakePackageZip> packageTask(final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String taskName = CMakeTasksConventions.packageTaskName(library, toolchain, buildConfig);
-    final TaskProvider<CMakePackageZip> provider = tasks.register(taskName, CMakePackageZip.class);
-    provider.configure((task) -> {
-      task.getArchiveBaseName().set("%s-%s-%s-%s".formatted(library.getOutputName(),
-          library.getLinkVariant().toLowerCase(), toolchain.getName(), buildConfig));
-    });
-    return provider;
-  }
-
-  public TaskProvider<CMakePackageZip> packageTask(final CMakeResolvedExecutable executable,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String taskName = CMakeTasksConventions.packageTaskName(executable, toolchain, buildConfig);
-    final TaskProvider<CMakePackageZip> provider = tasks.register(taskName, CMakePackageZip.class);
-    provider.configure((task) -> {
-      task.getArchiveBaseName().set("%s-%s-%s".formatted(executable.getOutputName(),
-          toolchain.getName(), buildConfig));
-    });
-    return provider;
-  }
 
   public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
       final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
