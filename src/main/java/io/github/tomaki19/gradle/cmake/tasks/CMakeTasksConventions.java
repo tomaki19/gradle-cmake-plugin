@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
@@ -20,8 +19,8 @@ public final class CMakeTasksConventions {
     return "assemble-cmake-lists";
   }
 
-  static String customExecTaskName(final String name, final CMakeToolchain toolchain, final String buildConfig) {
-    return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+  static String customExecTaskName(final String name, final String toolchainName, final String buildConfig) {
+    return "%s-%s-%s".formatted(name.toLowerCase(), toolchainName.toLowerCase(), buildConfig.toLowerCase());
   }
 
   static String assembleModuleTaskName(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,

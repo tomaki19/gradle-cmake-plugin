@@ -15,7 +15,6 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomPackageTaskProto;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackageType;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeExtension;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
@@ -49,8 +48,7 @@ class CMakeExtensionCustomPackageTest {
     extension.registerPackageRuntime("myPkg", t -> {
     });
 
-    final CMakeCustomPackageTaskProto proto =
-        extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
+    final CMakeCustomZipProto proto = extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
     assertEquals(CMakePackageType.RUNTIME, proto.getPackageType());
     assertEquals("myPkg", proto.getName());
     assertFalse(proto.isComponentScoped());
@@ -65,8 +63,7 @@ class CMakeExtensionCustomPackageTest {
     extension.registerPackageDevelopment("myPkg", t -> {
     });
 
-    final CMakeCustomPackageTaskProto proto =
-        extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
+    final CMakeCustomZipProto proto = extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
     assertEquals(CMakePackageType.DEVELOPMENT, proto.getPackageType());
     assertFalse(proto.isComponentScoped());
   }
@@ -97,12 +94,11 @@ class CMakeExtensionCustomPackageTest {
         Arrays.asList("Debug", "Release"), t -> {
         });
 
-    final Map<CMakeCustomPackageTaskProto, ?> tc1Protos =
-        extension.getCustomPackageTaskProtos().get("tc1");
+    final Map<CMakeCustomZipProto, ?> tc1Protos = extension.getCustomPackageTaskProtos().get("tc1");
     assertNotNull(tc1Protos);
     assertEquals(2, tc1Protos.size());
     final List<String> configs = tc1Protos.keySet().stream()
-        .map(CMakeCustomPackageTaskProto::getBuildConfig)
+        .map(CMakeCustomZipProto::getBuildConfig)
         .sorted()
         .toList();
     assertEquals(Arrays.asList("Debug", "Release"), configs);
@@ -132,8 +128,7 @@ class CMakeExtensionCustomPackageTest {
         Collections.singletonList("Release"), t -> {
         });
 
-    final Map<CMakeCustomPackageTaskProto, ?> tc1Protos =
-        extension.getCustomPackageTaskProtos().get("tc1");
+    final Map<CMakeCustomZipProto, ?> tc1Protos = extension.getCustomPackageTaskProtos().get("tc1");
     assertNotNull(tc1Protos);
     assertEquals(1, tc1Protos.size());
     assertEquals("Release", tc1Protos.keySet().iterator().next().getBuildConfig());
@@ -149,8 +144,7 @@ class CMakeExtensionCustomPackageTest {
         Arrays.asList("libA", "appB"), t -> {
         });
 
-    final CMakeCustomPackageTaskProto proto =
-        extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
+    final CMakeCustomZipProto proto = extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
     assertTrue(proto.isComponentScoped());
     assertTrue(proto.matchesComponent("libA"));
     assertTrue(proto.matchesComponent("appB"));
@@ -168,8 +162,7 @@ class CMakeExtensionCustomPackageTest {
         Collections.singletonList("libA"), t -> {
         });
 
-    final CMakeCustomPackageTaskProto proto =
-        extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
+    final CMakeCustomZipProto proto = extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
     assertTrue(proto.isComponentScoped());
     assertTrue(proto.matchesComponent("libA"));
     assertFalse(proto.matchesComponent("libB"));
@@ -185,8 +178,7 @@ class CMakeExtensionCustomPackageTest {
     extension.registerPackageRuntime("myPkg", t -> {
     });
 
-    final CMakeCustomPackageTaskProto proto =
-        extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
+    final CMakeCustomZipProto proto = extension.getCustomPackageTaskProtos().get("tc1").keySet().iterator().next();
     assertFalse(proto.isComponentScoped());
     assertTrue(proto.matchesComponent("anything"));
     assertTrue(proto.matchesComponent("anyOtherThing"));

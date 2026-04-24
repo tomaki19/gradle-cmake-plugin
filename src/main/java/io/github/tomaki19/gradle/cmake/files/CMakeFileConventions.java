@@ -8,7 +8,6 @@ import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
@@ -23,12 +22,13 @@ public class CMakeFileConventions {
     return buildDirectory.get().dir(CMAKE_CONFIG_PATH);
   }
 
-  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory, final CMakeToolchain toolchain,
+  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory, final String toolchainName,
       final String buildConfig) {
-    return targetConfigDirectory(buildDirectory).dir(toolchain.getName()).dir(buildConfig);
+    return targetConfigDirectory(buildDirectory).dir(toolchainName).dir(buildConfig);
   }
 
-  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory, final CMakeResolvedToolchain toolchain,
+  public static Directory targetConfigDirectory(final DirectoryProperty buildDirectory,
+      final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return targetConfigDirectory(buildDirectory).dir(toolchain.getName()).dir(buildConfig);
   }

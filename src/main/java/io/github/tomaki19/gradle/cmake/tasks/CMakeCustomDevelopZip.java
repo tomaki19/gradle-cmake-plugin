@@ -8,10 +8,10 @@ import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.bundling.Zip;
 
 @CacheableTask
-public abstract class CMakePackageDevelopment extends Zip {
+public abstract class CMakeCustomDevelopZip extends Zip {
 
   @javax.inject.Inject
-  public CMakePackageDevelopment() {
+  public CMakeCustomDevelopZip() {
     setGroup(CMakeTaskRegistry.GROUP_PACKAGE);
     getArchiveBaseName().set(getProject().getName());
   }

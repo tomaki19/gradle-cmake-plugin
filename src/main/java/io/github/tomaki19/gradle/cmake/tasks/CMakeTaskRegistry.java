@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.tasks;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -14,12 +15,12 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.file.Directory;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskProto;
 import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeConfigurationConventions;
@@ -73,23 +74,23 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName, CMakeAssemble.class, new CMakeModuleFile(library, toolchain, buildConfig, project));
   }
 
-  public TaskProvider<CMakePackageRuntime> customPackageRuntimeTask(final String taskName, final String baseName) {
-    final TaskProvider<CMakePackageRuntime> provider = tasks.register(taskName, CMakePackageRuntime.class);
+  public TaskProvider<CMakeCustomRuntimeZip> customPackageRuntimeTask(final String taskName, final String baseName) {
+    final TaskProvider<CMakeCustomRuntimeZip> provider = tasks.register(taskName, CMakeCustomRuntimeZip.class);
     provider.configure((task) -> task.getArchiveBaseName().set(baseName));
     return provider;
   }
 
-  public TaskProvider<CMakePackageDevelopment> customPackageDevelopmentTask(final String taskName, final String baseName) {
-    final TaskProvider<CMakePackageDevelopment> provider = tasks.register(taskName, CMakePackageDevelopment.class);
+  public TaskProvider<CMakeCustomDevelopZip> customPackageDevelopmentTask(final String taskName,
+      final String baseName) {
+    final TaskProvider<CMakeCustomDevelopZip> provider = tasks.register(taskName, CMakeCustomDevelopZip.class);
     provider.configure((task) -> task.getArchiveBaseName().set(baseName));
     return provider;
   }
 
-  public TaskProvider<CMakeCustomExec> customExecTask(final CMakeCustomTaskProto taskProto) {
-    final String taskName = CMakeTasksConventions.customExecTaskName(taskProto.getName(), taskProto.getToolchain(),
-        taskProto.getBuildConfig());
-    return tasks.register(taskName, CMakeCustomExec.class, taskProto.getToolchain(),
-        taskProto.getBuildConfig(), taskProto.getEnvironmentFile());
+  public TaskProvider<CMakeCustomExec> customExecTask(final String name, final String toolchainName,
+      final String buildConfig, final Optional<RegularFile> environmentFile) {
+    final String taskName = CMakeTasksConventions.customExecTaskName(name, toolchainName, buildConfig);
+    return tasks.register(taskName, CMakeCustomExec.class, toolchainName, buildConfig, environmentFile);
   }
 
   public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain,
@@ -137,7 +138,6 @@ public final class CMakeTaskRegistry {
     final String taskName = CMakeTasksConventions.checkTaskName(executable, toolchain, buildConfig);
     return tasks.register(taskName, CMakeCheck.class, executable, toolchain, buildConfig);
   }
-
 
   public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
       final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
