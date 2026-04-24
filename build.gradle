@@ -1,24 +1,25 @@
 plugins {
-  id('java-gradle-plugin')
-  id('jvm-test-suite')
-  id('jacoco')
-  // id('signing')
-  alias(libs.plugins.publish)
-  alias(libs.plugins.shadow)
-  alias(libs.plugins.spotless)
-  alias(libs.plugins.versions)
-  alias(libs.plugins.jacocolog)
-  alias(libs.plugins.spotbugs)
+    id('java-gradle-plugin')
+    id('jvm-test-suite')
+    id('jacoco')
+    // id('signing')
+    alias(libs.plugins.publish)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.versions)
+    alias(libs.plugins.jacocolog)
+    alias(libs.plugins.spotbugs)
 }
 
 group = 'io.github.tomaki19'
 version = '0.9.7'
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
+    compileOnly gradleApi()
     implementation libs.freemarker
     testImplementation libs.bundles.mockito
     spotbugs(libs.spotbugs)
@@ -29,28 +30,28 @@ java {
 }
 
 gradlePlugin {
-  website = 'https://github.com/tomaki19/gradle-cmake-plugin'
-  vcsUrl = 'https://github.com/tomaki19/gradle-cmake-plugin.git'
-  plugins {
-    cmake {
-      id = "${project.group}.${project.name}"
-      displayName = 'CMake Build Plugin'
-      description = 'A Gradle plugin that uses the CMake build framework for C/C++ builds.'
-      tags.set(['cmake', 'build', 'native', 'c', 'cpp', 'c++'])
-      implementationClass = 'io.github.tomaki19.gradle.cmake.CMakePlugin'
+    website = 'https://github.com/tomaki19/gradle-cmake-plugin'
+    vcsUrl = 'https://github.com/tomaki19/gradle-cmake-plugin.git'
+    plugins {
+        cmake {
+            id = "${project.group}.${project.name}"
+            displayName = 'CMake Build Plugin'
+            description = 'A Gradle plugin that uses the CMake build framework for C/C++ builds.'
+            tags.set(['cmake', 'build', 'native', 'c', 'cpp', 'c++'])
+            implementationClass = 'io.github.tomaki19.gradle.cmake.CMakePlugin'
+        }
     }
-  }
 }
 
 spotless {
-  java {
-    licenseHeaderFile file('gradle/license-header.txt')
-    removeUnusedImports()
-  }
+    java {
+        licenseHeaderFile file('gradle/license-header.txt')
+        removeUnusedImports()
+    }
 }
 
 tasks.withType(JavaCompile) {
-  dependsOn(tasks.spotlessApply)
+    dependsOn(tasks.spotlessApply)
 }
 
 // signing {
@@ -60,19 +61,19 @@ tasks.withType(JavaCompile) {
 // }
 
 tasks.withType(Javadoc).configureEach {
-  options.addStringOption('Xdoclint:-missing', '-quiet')
+    options.addStringOption('Xdoclint:-missing', '-quiet')
 }
 
 dependencyUpdates {
-  group = 'build'
+    group = 'build'
 }
 
 jacocoTestReport {
-  dependsOn test
-  reports {
-    xml.required = false
-    csv.required = false
-  }
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+    }
 }
 
 spotbugs {
@@ -80,28 +81,28 @@ spotbugs {
 }
 
 test {
-  finalizedBy jacocoTestReport
-  jvmArgs '-XX:+EnableDynamicAgentLoading'
+    finalizedBy jacocoTestReport
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
 }
 
 testing {
-  suites {
-    test {
-      useJUnitJupiter()
-    }
-    integrationTest(JvmTestSuite) {
-      dependencies {
-        implementation project()
-      }
-      targets {
-        all {
-          testTask.configure {
-            shouldRunAfter(tasks.test)
-          }
+    suites {
+        test {
+            useJUnitJupiter()
         }
-      }
+        integrationTest(JvmTestSuite) {
+            dependencies {
+                implementation project()
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(tasks.test)
+                    }
+                }
+            }
+        }
     }
-  }
 }
 
 check {
@@ -109,9 +110,9 @@ check {
 }
 
 tasks.withType(AbstractPublishToMaven) {
-  dependsOn(tasks.check)
+    dependsOn(tasks.check)
 }
 
 shadowJar {
-  archiveClassifier = ''
+    archiveClassifier = ''
 }
