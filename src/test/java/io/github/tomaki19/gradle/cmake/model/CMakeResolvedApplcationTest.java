@@ -15,19 +15,19 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakePackage;
-import io.github.tomaki19.gradle.cmake.helper.MockCMakeTest;
 
 class CMakeResolvedExecutableTest {
 
   @Test
   void testConstructor() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
     assertEquals("test-executable", resolvedExecutable.getName());
   }
@@ -35,9 +35,9 @@ class CMakeResolvedExecutableTest {
   @Test
   void testGetters() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
 
     // Test default values
@@ -52,9 +52,9 @@ class CMakeResolvedExecutableTest {
   @Test
   void testAddPrivateCompileDefinitions() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateCompileDefinitions("TEST_DEFINE");
@@ -65,9 +65,9 @@ class CMakeResolvedExecutableTest {
   @Test
   void testAddPrivateCompileOptions() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateCompileOptions("-O2");
@@ -78,9 +78,9 @@ class CMakeResolvedExecutableTest {
   @Test
   void testAddPrivateLinkOption() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateLinkOption("-ltest");
@@ -91,10 +91,10 @@ class CMakeResolvedExecutableTest {
   @Test
   void testAddPrivateSystemPackageDependency() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
     final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
 
     CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
@@ -108,9 +108,9 @@ class CMakeResolvedExecutableTest {
   @Test
   void testAddPrivateProjectPackageDependency() {
     final Project project = ProjectBuilder.builder().build();
-    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedExecutable resolvedExecutable = new CMakeResolvedExecutable(test, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
     assertNotNull(resolvedExecutable);
 
     // This would require a CMakeResolvedProjectDependency object, so we'll just

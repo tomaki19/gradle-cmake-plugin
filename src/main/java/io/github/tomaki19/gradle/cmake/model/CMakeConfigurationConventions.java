@@ -6,7 +6,7 @@ package io.github.tomaki19.gradle.cmake.model;
 
 public class CMakeConfigurationConventions {
 
-  public static String createModulesName(final CMakeResolvedExecutable executable,
+  public static String createModulesName(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     return "%s-%s-%s-modules".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
@@ -24,7 +24,7 @@ public class CMakeConfigurationConventions {
         dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  public static String createRuntimeName(final CMakeResolvedExecutable executable,
+  public static String createRuntimeName(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     return "%s-%s-%s-runtime".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
@@ -42,7 +42,7 @@ public class CMakeConfigurationConventions {
         dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  public static String createDevelopName(final CMakeResolvedExecutable executable,
+  public static String createDevelopName(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     return "%s-%s-%s-develop".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());

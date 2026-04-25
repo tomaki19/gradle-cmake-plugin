@@ -25,7 +25,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedExecutable executable = new CMakeResolvedExecutable(application, false);
+    final CMakeResolvedApplication executable = new CMakeResolvedApplication(application, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createModulesName(executable, resolvedToolchain, "Debug");
@@ -94,7 +94,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedExecutable executable = new CMakeResolvedExecutable(application, false);
+    final CMakeResolvedApplication executable = new CMakeResolvedApplication(application, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createRuntimeName(executable, resolvedToolchain, "Debug");

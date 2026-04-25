@@ -21,12 +21,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Mockito;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskProto;
 
 class CMakePluginTestEnhanced {
 
@@ -81,22 +79,6 @@ class CMakePluginTestEnhanced {
         assertNotNull(plugin);
     }
 
-    @Test
-    void pluginRegistersCustomTasks() {
-        final Project project = ProjectBuilder.builder().build();
-        project.getPluginManager().apply(CMakePlugin.class);
-
-        final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
-
-        // Register a toolchain so the register call has something to iterate
-        MockCMakeToolchain.register("toolchain", extension);
-
-        // Register a custom task across all toolchains and configs - should not throw
-        extension.register("customTask", (proto) -> {
-        });
-
-        assertNotNull(extension);
-    }
 
     @Test
     void pluginHandlesMultipleBuildConfigs() {
@@ -150,26 +132,6 @@ class CMakePluginTestEnhanced {
         // Verify component exists
         final var components = project.getComponents();
         assertFalse(components.isEmpty());
-    }
-
-    @Test
-    void testCustomTaskProtoCreation() {
-        final Project project = ProjectBuilder.builder().build();
-        project.getPluginManager().apply(CMakePlugin.class);
-
-        final CMakeExtension extension = project.getExtensions().getByType(CMakeExtension.class);
-        MockCMakeToolchain.register("toolchain", extension);
-
-        final CMakeToolchain toolchain = extension.getToolchains().stream().findFirst().orElse(null);
-
-        assertNotNull(toolchain);
-
-        // Create custom task proto
-        final CMakeCustomTaskProto proto = new CMakeCustomTaskProto("customTask", toolchain, "Debug");
-
-        assertNotNull(proto);
-        assertEquals("customTask", proto.getName());
-        assertEquals("Debug", proto.getBuildConfig());
     }
 
     @Test

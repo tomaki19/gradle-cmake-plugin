@@ -111,7 +111,7 @@ public final class CMakeResolver {
       final Map<String, CMakeToolchain> availableToolchains, final Set<CMakeApplication> applications) {
     applications.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          final CMakeResolvedExecutable resolvedApplication = new CMakeResolvedExecutable(component,
+          final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(component,
               toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
           resolveExecutableCompiling(Arrays.asList(toolchain.getApplications().getCompiling(),
               component.getCompiling()), resolvedApplication::addPrivateCompileDefinitions,
@@ -130,7 +130,7 @@ public final class CMakeResolver {
       final Map<String, CMakeToolchain> availableToolchains, final Set<CMakeTest> tests) {
     tests.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
-          final CMakeResolvedExecutable resolvedTest = new CMakeResolvedExecutable(component,
+          final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(component,
               toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
           resolveExecutableCompiling(Arrays.asList(toolchain.getTests().getCompiling(), component.getCompiling()),
               resolvedTest::addPrivateCompileDefinitions, resolvedTest::addPublicCompileDefinitions,

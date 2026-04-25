@@ -17,7 +17,7 @@ import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -50,14 +50,6 @@ class CMakeTasksConventionsTest {
         CMakeTasksConventions.assembleModuleTaskName(
             new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false),
             new CMakeResolvedToolchain(toolchain), "Debug"));
-  }
-
-  @Test
-  void testCustomExecTaskName() {
-    final Project project = ProjectBuilder.builder().build();
-    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
-
-    assertEquals("mytask-mytoolchain-debug", CMakeTasksConventions.customExecTaskName("mytask", toolchain, "Debug"));
   }
 
   @Test
@@ -98,7 +90,7 @@ class CMakeTasksConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
 
     assertEquals("build-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName(new CMakeResolvedExecutable(application, false),
+        CMakeTasksConventions.buildTaskName(new CMakeResolvedApplication(application, false),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -131,7 +123,7 @@ class CMakeTasksConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
 
     assertEquals("check-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.checkTaskName(new CMakeResolvedExecutable(application, false),
+        CMakeTasksConventions.checkTaskName(new CMakeResolvedApplication(application, false),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 

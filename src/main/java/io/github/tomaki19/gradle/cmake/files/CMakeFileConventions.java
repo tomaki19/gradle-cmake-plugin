@@ -8,7 +8,7 @@ import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -34,7 +34,7 @@ public class CMakeFileConventions {
   }
 
   public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String target = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
     return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
   }
@@ -81,7 +81,7 @@ public class CMakeFileConventions {
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  public static String buildTarget(final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain,
+  public static String buildTarget(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return "%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());

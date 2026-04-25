@@ -19,11 +19,10 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
-
 import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeConfigurationConventions;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
@@ -117,7 +116,7 @@ public final class CMakeTaskRegistry {
   }
 
   public TaskProvider<CMakeBuildExecutable> buildTask(
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.buildTaskName(executable, toolchain, buildConfig);
     return tasks.register(taskName, CMakeBuildExecutable.class, executable, toolchain, buildConfig);
   }
@@ -133,14 +132,14 @@ public final class CMakeTaskRegistry {
     return tasks.register(taskName);
   }
 
-  public TaskProvider<CMakeCheck> checkTask(final CMakeResolvedExecutable executable,
+  public TaskProvider<CMakeCheck> checkTask(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.checkTaskName(executable, toolchain, buildConfig);
     return tasks.register(taskName, CMakeCheck.class, executable, toolchain, buildConfig);
   }
 
   public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String target = CMakeConfigurationConventions.createModulesName(executable, toolchain,
         buildConfig);
     return createInConfiguration(configurations, target);
@@ -153,7 +152,7 @@ public final class CMakeTaskRegistry {
   }
 
   public static Configuration createRuntimeConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String target = CMakeConfigurationConventions.createRuntimeName(executable, toolchain, buildConfig);
     return createInConfiguration(configurations, target);
   }
@@ -165,7 +164,7 @@ public final class CMakeTaskRegistry {
   }
 
   public static Configuration createDevelopConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String target = CMakeConfigurationConventions.createDevelopName(executable, toolchain, buildConfig);
     return createInConfiguration(configurations, target);
   }

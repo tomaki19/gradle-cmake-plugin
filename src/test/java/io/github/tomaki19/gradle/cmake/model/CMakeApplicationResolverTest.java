@@ -8,10 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
@@ -24,16 +21,15 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskProto;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskHandler;
 
 public class CMakeApplicationResolverTest {
 
     @Test
     void resolveNoToolchainTest() throws Exception {
         final Project project = ProjectBuilder.builder().build();
-        final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-        final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+        CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
 
         TestCMakePackage.register("Package0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -75,9 +71,8 @@ public class CMakeApplicationResolverTest {
     @Test
     void resolveMultipleToolchainTest() throws Exception {
         final Project project = ProjectBuilder.builder().build();
-        final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-        final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+        CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
 
         TestCMakePackage.register("Package0", extension);
         TestCMakePackage.register("Package1", extension);
@@ -127,8 +122,8 @@ public class CMakeApplicationResolverTest {
         assertEquals(1, toolchains[0].getSharedLibraries().size());
         assertEquals(1, toolchains[0].getApplications().size());
         {
-            final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
-                    .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
+            final CMakeResolvedApplication[] applications = toolchains[0].getApplications()
+                    .toArray(new CMakeResolvedApplication[toolchains[0].getApplications().size()]);
             assertEquals(1, applications[0].getPublicPackageDependencies().size());
             assertEquals(2, applications[0].getPublicProjectDependencies().size());
             assertEquals(1, applications[0].getPublicLinkOptions().size());
@@ -141,8 +136,8 @@ public class CMakeApplicationResolverTest {
         assertEquals(0, toolchains[1].getSharedLibraries().size());
         assertEquals(1, toolchains[1].getApplications().size());
         {
-            final CMakeResolvedExecutable[] applications = toolchains[1].getApplications()
-                    .toArray(new CMakeResolvedExecutable[toolchains[1].getApplications().size()]);
+            final CMakeResolvedApplication[] applications = toolchains[1].getApplications()
+                    .toArray(new CMakeResolvedApplication[toolchains[1].getApplications().size()]);
             assertEquals(1, applications[0].getPrivatePackageDependencies().size());
             assertEquals(1, applications[0].getPrivateProjectDependencies().size());
             assertEquals(1, applications[0].getPrivateLinkOptions().size());
@@ -153,9 +148,8 @@ public class CMakeApplicationResolverTest {
     @Test
     void resolveNoDependenciesTest() throws Exception {
         final Project project = ProjectBuilder.builder().build();
-        final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-        final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+        CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
 
         TestCMakePackage.register("Package0", extension);
         TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
@@ -188,8 +182,8 @@ public class CMakeApplicationResolverTest {
         assertEquals(1, toolchains[0].getSharedLibraries().size());
         assertEquals(1, toolchains[0].getApplications().size());
         {
-            final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
-                    .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
+            final CMakeResolvedApplication[] applications = toolchains[0].getApplications()
+                    .toArray(new CMakeResolvedApplication[toolchains[0].getApplications().size()]);
             assertEquals(0, applications[0].getPrivatePackageDependencies().size());
             assertEquals(0, applications[0].getPrivateProjectDependencies().size());
             assertEquals(0, applications[0].getPrivateLinkOptions().size());
@@ -200,9 +194,8 @@ public class CMakeApplicationResolverTest {
     @Test
     void resolveToolchainDependencyTest() throws Exception {
         final Project project = ProjectBuilder.builder().build();
-        final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-        final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+        CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
 
         TestCMakePackage.register("Package0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -240,8 +233,8 @@ public class CMakeApplicationResolverTest {
         assertEquals(1, toolchains[0].getSharedLibraries().size());
         assertEquals(1, toolchains[0].getApplications().size());
         {
-            final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
-                    .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
+            final CMakeResolvedApplication[] applications = toolchains[0].getApplications()
+                    .toArray(new CMakeResolvedApplication[toolchains[0].getApplications().size()]);
             assertEquals(1, applications[0].getPrivatePackageDependencies().size());
             assertEquals(2, applications[0].getPrivateProjectDependencies().size());
             assertEquals(1, applications[0].getPrivateLinkOptions().size());
@@ -252,9 +245,8 @@ public class CMakeApplicationResolverTest {
     @Test
     void resolveLinkDependenciesTest() throws Exception {
         final Project project = ProjectBuilder.builder().build();
-        final Map<CMakeCustomTaskProto, Action<CMakeCustomTaskProto>> customTasks = new HashMap<>();
-        final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-                CMakeExtension.class, customTasks, new HashMap<>(), new HashMap<>());
+    final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+        CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
 
         TestCMakePackage.register("Package0", extension);
         TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -292,8 +284,8 @@ public class CMakeApplicationResolverTest {
         assertEquals(1, toolchains[0].getSharedLibraries().size());
         assertEquals(1, toolchains[0].getApplications().size());
         {
-            final CMakeResolvedExecutable[] applications = toolchains[0].getApplications()
-                    .toArray(new CMakeResolvedExecutable[toolchains[0].getApplications().size()]);
+            final CMakeResolvedApplication[] applications = toolchains[0].getApplications()
+                    .toArray(new CMakeResolvedApplication[toolchains[0].getApplications().size()]);
             assertEquals(1, applications[0].getPrivatePackageDependencies().size());
             assertEquals(2, applications[0].getPrivateProjectDependencies().size());
             assertEquals(1, applications[0].getPrivateLinkOptions().size());

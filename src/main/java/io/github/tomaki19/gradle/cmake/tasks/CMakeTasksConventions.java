@@ -4,7 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -65,7 +65,7 @@ public final class CMakeTasksConventions {
         dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String buildTaskName(final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain,
+  static String buildTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return "build-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
@@ -85,7 +85,7 @@ public final class CMakeTasksConventions {
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String checkTaskName(final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain,
+  static String checkTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return "check-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
@@ -97,7 +97,7 @@ public final class CMakeTasksConventions {
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String packageTaskName(final CMakeResolvedExecutable executable, final CMakeResolvedToolchain toolchain,
+  static String packageTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
     return "package-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
@@ -114,7 +114,7 @@ public final class CMakeTasksConventions {
         library.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  public static String customPackageTaskName(final String name, final CMakeResolvedExecutable executable,
+  public static String customPackageTaskName(final String name, final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     return "%s-%s-%s-%s".formatted(name.toLowerCase(), executable.getName().toLowerCase(),
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());

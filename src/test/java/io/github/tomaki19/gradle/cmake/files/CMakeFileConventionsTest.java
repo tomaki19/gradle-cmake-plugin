@@ -21,7 +21,7 @@ import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
@@ -62,7 +62,7 @@ class CMakeFileConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
     assertEquals("mytarget-mytoolchain-debug",
-        CMakeFileConventions.buildTarget(new CMakeResolvedExecutable(application, false),
+        CMakeFileConventions.buildTarget(new CMakeResolvedApplication(application, false),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -70,8 +70,7 @@ class CMakeFileConventionsTest {
   void testTargetConfigDirectoryWithToolchain() {
     final Project project = ProjectBuilder.builder().build();
     final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
-    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
-    final Directory result = CMakeFileConventions.targetConfigDirectory(buildDir, toolchain, "Debug");
+    final Directory result = CMakeFileConventions.targetConfigDirectory(buildDir, "MyToolchain", "Debug");
     assertNotNull(result);
     assertTrue(result.getAsFile().getPath().contains("MyToolchain"));
     assertTrue(result.getAsFile().getPath().contains("Debug"));
@@ -83,7 +82,7 @@ class CMakeFileConventionsTest {
     final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
-    final CMakeResolvedExecutable resolvedExec = new CMakeResolvedExecutable(application, false);
+    final CMakeResolvedApplication resolvedExec = new CMakeResolvedApplication(application, false);
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
     final Directory result = CMakeFileConventions.targetBinaryDirectory(buildDir, resolvedExec, resolvedToolchain,
         "Debug");

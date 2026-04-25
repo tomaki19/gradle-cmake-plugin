@@ -29,8 +29,8 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   private final Collection<CMakeResolvedLibrary> interfaceLibraries = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> staticLibraries = new TreeSet<>();
   private final Collection<CMakeResolvedLibrary> sharedLibraries = new TreeSet<>();
-  private final Collection<CMakeResolvedExecutable> applications = new TreeSet<>();
-  private final Collection<CMakeResolvedExecutable> tests = new TreeSet<>();
+  private final Collection<CMakeResolvedApplication> applications = new TreeSet<>();
+  private final Collection<CMakeResolvedTest> tests = new TreeSet<>();
 
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
@@ -98,11 +98,11 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return !staticLibraries.isEmpty() || !sharedLibraries.isEmpty();
   }
 
-  void addApplication(final CMakeResolvedExecutable component) {
+  void addApplication(final CMakeResolvedApplication component) {
     applications.add(component);
   }
 
-  public Collection<CMakeResolvedExecutable> getApplications() {
+  public Collection<CMakeResolvedApplication> getApplications() {
     return Collections.unmodifiableCollection(applications);
   }
 
@@ -110,11 +110,11 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
     return !applications.isEmpty();
   }
 
-  void addTest(final CMakeResolvedExecutable component) {
+  void addTest(final CMakeResolvedTest component) {
     tests.add(component);
   }
 
-  public Collection<CMakeResolvedExecutable> getTests() {
+  public Collection<CMakeResolvedTest> getTests() {
     return Collections.unmodifiableCollection(tests);
   }
 

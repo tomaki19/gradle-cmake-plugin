@@ -17,11 +17,12 @@ import java.util.Objects;
 
 import org.gradle.api.Project;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
-import io.github.tomaki19.gradle.cmake.model.CMakeResolvedExecutable;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedPackageDependency;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedTest;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public final class CMakeListsFile extends CMakeFileContent {
@@ -79,10 +80,10 @@ public final class CMakeListsFile extends CMakeFileContent {
       for (final CMakeResolvedLibrary lib : toolchain.getSharedLibraries()) {
         sharedLibs.add(buildBinaryLibraryModel(lib, toolchain, buildConfig));
       }
-      for (final CMakeResolvedExecutable exec : toolchain.getApplications()) {
+      for (final CMakeResolvedApplication exec : toolchain.getApplications()) {
         applications.add(buildExecutableModel(exec, toolchain, buildConfig));
       }
-      for (final CMakeResolvedExecutable exec : toolchain.getTests()) {
+      for (final CMakeResolvedTest exec : toolchain.getTests()) {
         tests.add(buildExecutableModel(exec, toolchain, buildConfig));
       }
     }
@@ -150,7 +151,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     return model;
   }
 
-  private Map<String, Object> buildExecutableModel(final CMakeResolvedExecutable executable,
+  private Map<String, Object> buildExecutableModel(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final Map<String, Object> model = new HashMap<>();
     final String target = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);

@@ -36,6 +36,11 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskHandler"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
         <Package name="io.github.tomaki19.gradle.cmake.helper"/>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
