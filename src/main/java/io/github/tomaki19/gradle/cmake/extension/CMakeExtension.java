@@ -5,23 +5,24 @@
 package io.github.tomaki19.gradle.cmake.extension;
 
 import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.tasks.TaskContainer;
 
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskHandler;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskContainer;
 
 public abstract class CMakeExtension {
 
   public static final String NAME = "cmake";
 
-  private final CMakeCustomTaskHandler customTaskHandler;
+  private final CMakeCustomTaskContainer customTaskHandler;
 
   @javax.inject.Inject
-  public CMakeExtension(final CMakeCustomTaskHandler customTaskHandler) {
-    this.customTaskHandler = customTaskHandler;
+  public CMakeExtension(final TaskContainer taskContainer) {
+    this.customTaskHandler = new CMakeCustomTaskContainer(taskContainer);
   }
 
   public abstract NamedDomainObjectContainer<CMakeToolchain> getToolchains();
@@ -34,7 +35,7 @@ public abstract class CMakeExtension {
 
   public abstract NamedDomainObjectContainer<CMakeTest> getTests();
 
-  public CMakeCustomTaskHandler getTasks() {
+  public CMakeCustomTaskContainer getTasks() {
     return customTaskHandler;
   }
 

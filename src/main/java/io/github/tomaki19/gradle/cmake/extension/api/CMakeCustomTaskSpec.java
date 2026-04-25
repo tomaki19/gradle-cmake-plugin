@@ -6,6 +6,10 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
@@ -16,64 +20,88 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeCustomTaskSpec {
 
-  public static final String ALL = "*";
-  public static final String COMPONENTS = "*co*";
-  public static final String LIBRARIES = "*li*";
-  public static final String INTERFACES = "*in*";
-  public static final String SHARED = "*sh*";
-  public static final String STATIC = "*st*";
-  public static final String APPLICATIONS = "*ap*";
-  public static final String TESTS = "*te*";
+  private static final CharSequence ALL = "*";
+  private static final CharSequence LIBRARIES = "*library";
+  private static final CharSequence INTERFACES = "*interface";
+  private static final CharSequence SHARED = "*shared";
+  private static final CharSequence STATIC = "*static";
+  private static final CharSequence EXECUTABLES = "*executable";
+  private static final CharSequence APPLICATIONS = "*application";
+  private static final CharSequence TESTS = "*test";
 
-  public final Set<String> toolchains = new TreeSet<>();
-  public final Set<String> buildConfigs = new TreeSet<>();
-  public final Set<String> components = new TreeSet<>();
+  private static final String TOOLCHAINS = "toolchains";
+  private static final String BUILD_CONFIGS = "buildConfigs";
+  private static final String COMPONENTS = "components";
+
+  private final Map<String, Set<CharSequence>> spec = new HashMap<>();
+
+  public CMakeCustomTaskSpec(final Map<String, List<CharSequence>> entries) {
+    entries.forEach((key, value) -> spec.put(key, new HashSet<>(value)));
+  }
+
+  private Set<CharSequence> getToolchains() {
+    return spec.getOrDefault(TOOLCHAINS, new TreeSet<>());
+  }
+
+  private Set<CharSequence> getBuildConfigs() {
+    return spec.getOrDefault(BUILD_CONFIGS, new TreeSet<>());
+  }
+
+  private Set<CharSequence> getComponents() {
+    return spec.getOrDefault(COMPONENTS, new TreeSet<>());
+  }
 
   public boolean hasNoToolchains() {
-    return toolchains.isEmpty();
+    return getToolchains().isEmpty();
   }
 
   public boolean hasNoBuildConfigs() {
-    return buildConfigs.isEmpty();
+    return getBuildConfigs().isEmpty();
   }
 
   public boolean hasNoComponents() {
-    return components.isEmpty();
+    return getComponents().isEmpty();
   }
 
   public boolean matchesToolchain(final CMakeResolvedToolchain toolchain) {
-    return toolchains.contains(toolchain.getName()) || toolchains.contains(ALL);
+    return getToolchains().contains(ALL) || getToolchains().contains(toolchain.getName());
   }
 
   public boolean matchesBuildConfig(final String buildConfig) {
-    return (buildConfigs.contains(buildConfig) || buildConfigs.contains(ALL));
+    return getBuildConfigs().contains(ALL) || getBuildConfigs().contains(buildConfig);
   }
 
   public boolean matchesLibrary(final CMakeResolvedLibrary library) {
-    return ((!components.isEmpty() && (components.contains(library.getName())
-        || components.contains(ALL) || components.contains(LIBRARIES)
-        || (components.contains(INTERFACES) && Objects.equals(CMakeLinkVariant.INTERFACE, library.getLinkVariant()))
-        || (components.contains(SHARED) && Objects.equals(CMakeLinkVariant.SHARED, library.getLinkVariant()))
-        || (components.contains(STATIC) && Objects.equals(CMakeLinkVariant.STATIC, library.getLinkVariant())))));
+    return getComponents().contains(ALL)
+        || getComponents().contains(LIBRARIES)
+        || (getComponents().contains(INTERFACES)
+            && Objects.equals(CMakeLinkVariant.INTERFACE, library.getLinkVariant()))
+        || (getComponents().contains(SHARED) && Objects.equals(CMakeLinkVariant.SHARED, library.getLinkVariant()))
+        || (getComponents().contains(STATIC) && Objects.equals(CMakeLinkVariant.STATIC, library.getLinkVariant()))
+        || getComponents().contains(library.getName());
   }
 
   public boolean matchesApplication(final CMakeResolvedApplication application) {
-    return ((!components.isEmpty() && (components.contains(application.getName())
-        || components.contains(ALL) || components.contains(APPLICATIONS))));
+    return getComponents().contains(ALL)
+        || getComponents().contains(EXECUTABLES)
+        || getComponents().contains(APPLICATIONS)
+        || getComponents().contains(application.getName());
   }
 
   public boolean matchesTest(final CMakeResolvedTest test) {
-    return ((!components.isEmpty() && (components.contains(test.getName())
-        || components.contains(ALL) || components.contains(TESTS))));
+    return getComponents().contains(ALL)
+        || getComponents().contains(EXECUTABLES)
+        || getComponents().contains(TESTS)
+        || getComponents().contains(test.getName());
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((toolchains == null) ? 0 : toolchains.hashCode());
-    result = prime * result + ((buildConfigs == null) ? 0 : buildConfigs.hashCode());
-    result = prime * result + ((components == null) ? 0 : components.hashCode());
+    result = prime * result + ((getToolchains() == null) ? 0 : getToolchains().hashCode());
+    result = prime * result + ((getBuildConfigs() == null) ? 0 : getBuildConfigs().hashCode());
+    result = prime * result + ((getComponents() == null) ? 0 : getComponents().hashCode());
     return result;
   }
 
@@ -84,20 +112,20 @@ public class CMakeCustomTaskSpec {
     if (!(obj instanceof CMakeCustomTaskSpec))
       return false;
     CMakeCustomTaskSpec other = (CMakeCustomTaskSpec) obj;
-    if (toolchains == null) {
-      if (other.toolchains != null)
+    if (getToolchains() == null) {
+      if (other.getToolchains() != null)
         return false;
-    } else if (!toolchains.equals(other.toolchains))
+    } else if (!getToolchains().equals(other.getToolchains()))
       return false;
-    if (buildConfigs == null) {
-      if (other.buildConfigs != null)
+    if (getBuildConfigs() == null) {
+      if (other.getBuildConfigs() != null)
         return false;
-    } else if (!buildConfigs.equals(other.buildConfigs))
+    } else if (!getBuildConfigs().equals(other.getBuildConfigs()))
       return false;
-    if (components == null) {
-      if (other.components != null)
+    if (getComponents() == null) {
+      if (other.getComponents() != null)
         return false;
-    } else if (!components.equals(other.components))
+    } else if (!getComponents().equals(other.getComponents()))
       return false;
     return true;
   }
@@ -108,7 +136,8 @@ public class CMakeCustomTaskSpec {
  * cmake.tasks.register(
  * toolchains: ['gcc', 'vscp'],
  * buildConfigs: ['release', 'debug'],
- * componentTypes: [ALL, LIBRARIES, EXECUTABLES, APPLICATIONS, TESTS],
+ * components: ["*", "*library", "*interface", "*shared", "*static",
+ * "*executable", "*application", "*test"],
  * ) {
  * ...
  * }

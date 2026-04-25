@@ -41,7 +41,6 @@ public abstract class CMakeConfigure extends CMakeExec {
     final String paths = getInputs().getFiles().getFiles().stream()
         .filter((file) -> file.isDirectory()).map((file) -> file.getAbsolutePath())
         .collect(Collectors.joining(";"));
-    System.out.println("CMAKE_MODULE_PATH=" + paths);
     args("-DCMAKE_MODULE_PATH=\"%s\"".formatted(paths));
     super.exec();
   }

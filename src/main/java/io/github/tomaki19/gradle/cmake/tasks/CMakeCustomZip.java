@@ -5,13 +5,13 @@
 package io.github.tomaki19.gradle.cmake.tasks;
 
 import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.bundling.Tar;
+import org.gradle.api.tasks.bundling.Zip;
 
 @CacheableTask
-public abstract class CMakeCustomDevelopTar extends Tar {
+public abstract class CMakeCustomZip extends Zip {
 
   @javax.inject.Inject
-  public CMakeCustomDevelopTar() {
+  public CMakeCustomZip() {
     setGroup(CMakeTaskRegistry.GROUP_PACKAGE);
     getArchiveBaseName().set(getProject().getName());
   }

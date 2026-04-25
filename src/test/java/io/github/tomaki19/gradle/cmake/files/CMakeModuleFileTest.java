@@ -31,7 +31,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskHandler;
 
 class CMakeModuleFileTest {
 
@@ -41,7 +40,7 @@ class CMakeModuleFileTest {
     try {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
+          CMakeExtension.class, project.getTasks());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -73,7 +72,7 @@ class CMakeModuleFileTest {
     try {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
+          CMakeExtension.class, project.getTasks());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -111,7 +110,7 @@ class CMakeModuleFileTest {
     try {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
+          CMakeExtension.class, project.getTasks());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeInterfaceLibrary.register("InterfaceLibrary0", extension);
@@ -154,7 +153,7 @@ class CMakeModuleFileTest {
     try {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
+          CMakeExtension.class, project.getTasks());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeBinaryLibrary.register("SharedLib0", extension, CMakeBuildVariant.SHARED);
@@ -197,7 +196,7 @@ class CMakeModuleFileTest {
     try {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
+          CMakeExtension.class, project.getTasks());
 
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakeBinaryLibrary.register("StaticLib0", extension, CMakeBuildVariant.STATIC);
@@ -241,7 +240,7 @@ class CMakeModuleFileTest {
     try {
       Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
       final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
-          CMakeExtension.class, new CMakeCustomTaskHandler(project.getTasks()));
+          CMakeExtension.class, project.getTasks());
       TestCMakeToolchain.register("Toolchain0", extension);
       TestCMakePackage.register("Package0", extension);
 

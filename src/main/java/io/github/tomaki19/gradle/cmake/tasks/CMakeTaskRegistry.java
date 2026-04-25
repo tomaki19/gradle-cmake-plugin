@@ -6,7 +6,6 @@ package io.github.tomaki19.gradle.cmake.tasks;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
-import java.util.Optional;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -15,7 +14,6 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.file.Directory;
-import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
@@ -71,25 +69,6 @@ public final class CMakeTaskRegistry {
       throws FileNotFoundException {
     final String taskName = CMakeTasksConventions.assembleModuleTaskName(library, toolchain, buildConfig);
     return tasks.register(taskName, CMakeAssemble.class, new CMakeModuleFile(library, toolchain, buildConfig, project));
-  }
-
-  public TaskProvider<CMakeCustomRuntimeZip> customPackageRuntimeTask(final String taskName, final String baseName) {
-    final TaskProvider<CMakeCustomRuntimeZip> provider = tasks.register(taskName, CMakeCustomRuntimeZip.class);
-    provider.configure((task) -> task.getArchiveBaseName().set(baseName));
-    return provider;
-  }
-
-  public TaskProvider<CMakeCustomDevelopZip> customPackageDevelopmentTask(final String taskName,
-      final String baseName) {
-    final TaskProvider<CMakeCustomDevelopZip> provider = tasks.register(taskName, CMakeCustomDevelopZip.class);
-    provider.configure((task) -> task.getArchiveBaseName().set(baseName));
-    return provider;
-  }
-
-  public TaskProvider<CMakeCustomExec> customExecTask(final String name, final String toolchainName,
-      final String buildConfig, final Optional<RegularFile> environmentFile) {
-    final String taskName = CMakeTasksConventions.customExecTaskName(name, toolchainName, buildConfig);
-    return tasks.register(taskName, CMakeCustomExec.class, toolchainName, buildConfig, environmentFile);
   }
 
   public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain,

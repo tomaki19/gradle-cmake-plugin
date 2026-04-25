@@ -103,23 +103,6 @@ public final class CMakeTasksConventions {
         buildConfig.toLowerCase());
   }
 
-  public static String customPackageTaskName(final String name, final CMakeResolvedToolchain toolchain,
-      final String buildConfig) {
-    return "%s-%s-%s".formatted(name.toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
-  }
-
-  public static String customPackageTaskName(final String name, final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "%s-%s-%s-%s-%s".formatted(name.toLowerCase(), library.getName().toLowerCase(),
-        library.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
-  }
-
-  public static String customPackageTaskName(final String name, final CMakeResolvedBinary<?> executable,
-      final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "%s-%s-%s-%s".formatted(name.toLowerCase(), executable.getName().toLowerCase(),
-        toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
-  }
-
   private CMakeTasksConventions() {
   }
 }

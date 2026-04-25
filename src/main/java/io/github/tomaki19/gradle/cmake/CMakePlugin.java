@@ -31,7 +31,6 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskHandler;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
 
 public class CMakePlugin implements Plugin<Project> {
@@ -46,8 +45,7 @@ public class CMakePlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
     project.getPluginManager().apply(BasePlugin.class);
-    project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class,
-        new CMakeCustomTaskHandler(project.getTasks()));
+    project.getExtensions().create(CMakeExtension.NAME, CMakeExtension.class, project.getTasks());
     project.getComponents().add(cmakeComponent);
     project.afterEvaluate(this::afterEvaluate);
   }
@@ -97,7 +95,7 @@ public class CMakePlugin implements Plugin<Project> {
           });
         }
 
-        extension.getTasks().applyCustomExec(toolchain);
+        extension.getTasks().applyExecTask(toolchain);
 
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           Optional<TaskProvider<?>> buildAllBuildConfigTask = Optional.empty();
@@ -126,7 +124,9 @@ public class CMakePlugin implements Plugin<Project> {
             task.dependsOn(assembleListsTask);
           });
 
-          extension.getTasks().applyCustomExec(toolchain, buildConfig);
+          extension.getTasks().applyExecTask(toolchain, buildConfig, (task) -> {
+            task.dependsOn(configureTask);
+          });
 
           for (final CMakeResolvedLibrary library : toolchain.getInterfaceLibraries()) {
             final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
@@ -158,7 +158,9 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), modulesConfiguration,
                 moduleDirectory, configureTask);
 
-            extension.getTasks().applyCustomExec(toolchain, buildConfig, library);
+            extension.getTasks().applyExecTask(toolchain, buildConfig, library, (task) -> {
+              task.dependsOn(configureTask);
+            });
           }
 
           for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
@@ -210,14 +212,16 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), runtimeConfiguration,
                 libraryDirectory, buildTask);
 
-            extension.getTasks().applyCustomExec(toolchain, buildConfig, library);
-            extension.getTasks().applyCustomRuntimePackage(toolchain, buildConfig, library,
+            extension.getTasks().applyExecTask(toolchain, buildConfig, library, (task) -> {
+              task.dependsOn(buildTask);
+            });
+            extension.getTasks().applyRuntimePackageTask(toolchain, buildConfig, library,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(runtimeConfiguration);
                   task.from(libraryDirectory);
                 });
-            extension.getTasks().applyCustomDevelopPackage(toolchain, buildConfig, library,
+            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, library,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(developConfiguration);
@@ -274,14 +278,16 @@ public class CMakePlugin implements Plugin<Project> {
             CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), runtimeConfiguration,
                 libraryDirectory, buildTask);
 
-            extension.getTasks().applyCustomExec(toolchain, buildConfig, library);
-            extension.getTasks().applyCustomRuntimePackage(toolchain, buildConfig, library,
+            extension.getTasks().applyExecTask(toolchain, buildConfig, library, (task) -> {
+              task.dependsOn(buildTask);
+            });
+            extension.getTasks().applyRuntimePackageTask(toolchain, buildConfig, library,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(runtimeConfiguration);
                   task.from(libraryDirectory);
                 });
-            extension.getTasks().applyCustomDevelopPackage(toolchain, buildConfig, library,
+            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, library,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(developConfiguration);
@@ -326,14 +332,16 @@ public class CMakePlugin implements Plugin<Project> {
             final Directory applicationDirectory = CMakeFileConventions.targetBinaryDirectory(
                 project.getLayout().getBuildDirectory(), application, toolchain, buildConfig);
 
-            extension.getTasks().applyCustomExec(toolchain, buildConfig, application);
-            extension.getTasks().applyCustomRuntimePackage(toolchain, buildConfig, application,
+            extension.getTasks().applyExecTask(toolchain, buildConfig, application, (task) -> {
+              task.dependsOn(buildTask);
+            });
+            extension.getTasks().applyRuntimePackageTask(toolchain, buildConfig, application,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(runtimeConfiguration);
                   task.from(applicationDirectory);
                 });
-            extension.getTasks().applyCustomDevelopPackage(toolchain, buildConfig, application,
+            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, application,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(developConfiguration);
@@ -388,14 +396,16 @@ public class CMakePlugin implements Plugin<Project> {
             final Directory testDirectory = CMakeFileConventions.targetBinaryDirectory(
                 project.getLayout().getBuildDirectory(), test, toolchain, buildConfig);
 
-            extension.getTasks().applyCustomExec(toolchain, buildConfig, test);
-            extension.getTasks().applyCustomRuntimePackage(toolchain, buildConfig, test,
+            extension.getTasks().applyExecTask(toolchain, buildConfig, test, (task) -> {
+              task.dependsOn(buildTask);
+            });
+            extension.getTasks().applyRuntimePackageTask(toolchain, buildConfig, test,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(runtimeConfiguration);
                   task.from(testDirectory);
                 });
-            extension.getTasks().applyCustomDevelopPackage(toolchain, buildConfig, test,
+            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, test,
                 (task) -> {
                   task.dependsOn(buildTask);
                   task.from(developConfiguration);

@@ -6,6 +6,7 @@ package io.github.tomaki19.gradle.cmake.helper;
 
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.TaskContainer;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
@@ -13,7 +14,6 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskHandler;
 
 public class MockCMakeExtension extends CMakeExtension {
 
@@ -23,8 +23,8 @@ public class MockCMakeExtension extends CMakeExtension {
   private final NamedDomainObjectContainer<CMakeApplication> applications;
   private final NamedDomainObjectContainer<CMakeTest> tests;
 
-  public MockCMakeExtension(final ObjectFactory factory, final CMakeCustomTaskHandler customTaskHandler) {
-    super(customTaskHandler);
+  public MockCMakeExtension(final ObjectFactory factory, final TaskContainer taskContainer) {
+    super(taskContainer);
     this.toolchains = factory.domainObjectContainer(CMakeToolchain.class);
     this.packages = factory.domainObjectContainer(CMakePackage.class);
     this.libraries = factory.domainObjectContainer(CMakeLibrary.class);
