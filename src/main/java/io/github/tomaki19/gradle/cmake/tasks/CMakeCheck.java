@@ -32,6 +32,6 @@ public abstract class CMakeCheck extends CMakeExec {
     args("--build-config");
     args(buildConfig);
     setWorkingDir(getProject().getProjectDir());
-    setGroup(CMakeTaskRegistry.GROUP_CHECK);
+    setGroup(CMakeTaskContainer.GROUP_CHECK);
   }
 }

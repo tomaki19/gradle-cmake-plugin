@@ -9,22 +9,16 @@ import java.util.Collection;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ConfigurationContainer;
-import org.gradle.api.artifacts.PublishArtifact;
-import org.gradle.api.artifacts.dsl.ArtifactHandler;
-import org.gradle.api.file.Directory;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
-import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
-import io.github.tomaki19.gradle.cmake.model.CMakeConfigurationConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 
-public final class CMakeTaskRegistry {
+public final class CMakeTaskContainer {
 
   public static final String GROUP_BUILD = "cmake build";
   public static final String GROUP_CHECK = "cmake test";
@@ -33,7 +27,7 @@ public final class CMakeTaskRegistry {
 
   private final TaskContainer tasks;
 
-  public CMakeTaskRegistry(final TaskContainer tasks) {
+  public CMakeTaskContainer(final TaskContainer tasks) {
     this.tasks = tasks;
   }
 
@@ -115,58 +109,6 @@ public final class CMakeTaskRegistry {
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final String taskName = CMakeTasksConventions.checkTaskName(executable, toolchain, buildConfig);
     return tasks.register(taskName, CMakeCheck.class, executable, toolchain, buildConfig);
-  }
-
-  public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createModulesName(executable, toolchain,
-        buildConfig);
-    return createInConfiguration(configurations, target);
-  }
-
-  public static Configuration createModulesConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createModulesName(library, toolchain, buildConfig);
-    return createInConfiguration(configurations, target);
-  }
-
-  public static Configuration createRuntimeConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createRuntimeName(executable, toolchain, buildConfig);
-    return createInConfiguration(configurations, target);
-  }
-
-  public static Configuration createRuntimeConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createRuntimeName(library, toolchain, buildConfig);
-    return createInConfiguration(configurations, target);
-  }
-
-  public static Configuration createDevelopConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createDevelopName(executable, toolchain, buildConfig);
-    return createInConfiguration(configurations, target);
-  }
-
-  public static Configuration createDevelopConfiguration(final ConfigurationContainer configurations,
-      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeConfigurationConventions.createDevelopName(library, toolchain, buildConfig);
-    return createInConfiguration(configurations, target);
-  }
-
-  private static Configuration createInConfiguration(final ConfigurationContainer configurations, final String target) {
-    return configurations.create(target, (newConfiguration) -> {
-      newConfiguration.setCanBeDeclared(true);
-      newConfiguration.setCanBeResolved(true);
-      newConfiguration.setCanBeConsumed(true);
-    });
-  }
-
-  public static PublishArtifact addDirectoryArtifact(final ArtifactHandler artifacts, final Configuration configuration,
-      final Directory outputDirectory, final Object... builtBy) {
-    return artifacts.add(configuration.getName(), outputDirectory, (artifact) -> {
-      artifact.builtBy(builtBy);
-    });
   }
 
 }

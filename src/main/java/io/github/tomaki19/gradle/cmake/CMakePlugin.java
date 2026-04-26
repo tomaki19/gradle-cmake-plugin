@@ -19,6 +19,8 @@ import org.gradle.api.tasks.TaskProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
+import io.github.tomaki19.gradle.cmake.model.CMakeArtifactHandler;
+import io.github.tomaki19.gradle.cmake.model.CMakeConfigurationContainer;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
@@ -31,7 +33,7 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskContainer;
 
 public class CMakePlugin implements Plugin<Project> {
 
@@ -58,40 +60,42 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
       final Collection<CMakeResolvedToolchain> toolchains = resolver.process(extension.getLibraries(),
           extension.getApplications(), extension.getTests());
+      final CMakeConfigurationContainer configurations = new CMakeConfigurationContainer(project.getConfigurations());
+      final CMakeArtifactHandler artifacts = new CMakeArtifactHandler(project.getArtifacts());
+      final CMakeTaskContainer tasks = new CMakeTaskContainer(project.getTasks());
 
       /* ============ Tasks ============== */
-      final CMakeTaskRegistry taskRegistry = new CMakeTaskRegistry(project.getTasks());
 
-      final TaskProvider<CMakeClean> cleanListsTask = taskRegistry.cleanListsTask();
-      taskRegistry.cleanTask().configure((task) -> task.dependsOn(cleanListsTask));
+      final TaskProvider<CMakeClean> cleanListsTask = tasks.cleanListsTask();
+      tasks.cleanTask().configure((task) -> task.dependsOn(cleanListsTask));
 
       final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
           project.getLayout().getBuildDirectory());
 
-      final TaskProvider<CMakeAssemble> assembleListsTask = taskRegistry.assembleListsTask(
+      final TaskProvider<CMakeAssemble> assembleListsTask = tasks.assembleListsTask(
           toolchains, project);
       assembleListsTask.configure((task) -> {
         task.getOutputDirectory().set(project.getLayout().getProjectDirectory());
       });
-      taskRegistry.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
+      tasks.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
 
       for (final CMakeResolvedToolchain toolchain : toolchains) {
 
         Optional<TaskProvider<?>> buildAllToolchainTask = Optional.empty();
         if (toolchain.hasBinaries()) {
-          buildAllToolchainTask = Optional.of(taskRegistry.buildAllToolchainTask(toolchain));
+          buildAllToolchainTask = Optional.of(tasks.buildAllToolchainTask(toolchain));
           buildAllToolchainTask.ifPresent((taskProvider) -> {
-            taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_BUILD));
-            taskRegistry.buildTask().configure((task) -> task.dependsOn(taskProvider));
+            taskProvider.configure((task) -> task.setGroup(CMakeTaskContainer.GROUP_BUILD));
+            tasks.buildTask().configure((task) -> task.dependsOn(taskProvider));
           });
         }
 
         Optional<TaskProvider<?>> checkAllToolchainTask = Optional.empty();
         if (toolchain.hasTests()) {
-          checkAllToolchainTask = Optional.of(taskRegistry.checkAllToolchainTask(toolchain));
+          checkAllToolchainTask = Optional.of(tasks.checkAllToolchainTask(toolchain));
           checkAllToolchainTask.ifPresent((taskProvider) -> {
-            taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_CHECK));
-            taskRegistry.checkTask().configure((task) -> task.dependsOn(taskProvider));
+            taskProvider.configure((task) -> task.setGroup(CMakeTaskContainer.GROUP_CHECK));
+            tasks.checkTask().configure((task) -> task.dependsOn(taskProvider));
           });
         }
 
@@ -100,25 +104,25 @@ public class CMakePlugin implements Plugin<Project> {
         for (final String buildConfig : toolchain.getBuildConfigs()) {
           Optional<TaskProvider<?>> buildAllBuildConfigTask = Optional.empty();
           if (toolchain.hasBinaries()) {
-            buildAllBuildConfigTask = Optional.of(taskRegistry.buildAllBuildConfigTask(toolchain,
+            buildAllBuildConfigTask = Optional.of(tasks.buildAllBuildConfigTask(toolchain,
                 buildConfig));
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
-              taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_BUILD));
-              taskRegistry.buildTask().configure((task) -> task.dependsOn(taskProvider));
+              taskProvider.configure((task) -> task.setGroup(CMakeTaskContainer.GROUP_BUILD));
+              tasks.buildTask().configure((task) -> task.dependsOn(taskProvider));
             });
           }
 
           Optional<TaskProvider<?>> checkAllBuildConfigTask = Optional.empty();
           if (toolchain.hasTests()) {
-            checkAllBuildConfigTask = Optional.of(taskRegistry.checkAllBuildConfigTask(toolchain,
+            checkAllBuildConfigTask = Optional.of(tasks.checkAllBuildConfigTask(toolchain,
                 buildConfig));
             checkAllBuildConfigTask.ifPresent((taskProvider) -> {
-              taskProvider.configure((task) -> task.setGroup(CMakeTaskRegistry.GROUP_CHECK));
-              taskRegistry.checkTask().configure((task) -> task.dependsOn(taskProvider));
+              taskProvider.configure((task) -> task.setGroup(CMakeTaskContainer.GROUP_CHECK));
+              tasks.checkTask().configure((task) -> task.dependsOn(taskProvider));
             });
           }
 
-          final TaskProvider<CMakeConfigure> configureTask = taskRegistry.configureTask(toolchain,
+          final TaskProvider<CMakeConfigure> configureTask = tasks.configureTask(toolchain,
               buildConfig);
           configureTask.configure((task) -> {
             task.dependsOn(assembleListsTask);
@@ -129,10 +133,10 @@ public class CMakePlugin implements Plugin<Project> {
           });
 
           for (final CMakeResolvedLibrary library : toolchain.getInterfaceLibraries()) {
-            final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
-            final Configuration developConfiguration = CMakeTaskRegistry.createDevelopConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
+            final Configuration modulesConfiguration = configurations.createModulesConfiguration(library, toolchain,
+                buildConfig);
+            final Configuration developConfiguration = configurations.createDevelopConfiguration(library, toolchain,
+                buildConfig);
 
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
@@ -143,7 +147,7 @@ public class CMakePlugin implements Plugin<Project> {
                   .add(dependency.createDevelopDependency(project, toolchain, buildConfig));
             }
 
-            final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModuleTask(
+            final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(
                 library, toolchain, buildConfig, project);
             assembleModulesTask.configure((task) -> {
               task.getOutputDirectory().set(moduleDirectory);
@@ -155,21 +159,26 @@ public class CMakePlugin implements Plugin<Project> {
               task.getInputs().files(modulesConfiguration);
             });
 
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), modulesConfiguration,
-                moduleDirectory, configureTask);
+            artifacts.addDirectoryArtifact(modulesConfiguration, moduleDirectory, configureTask);
 
             extension.getTasks().applyExecTask(toolchain, buildConfig, library, (task) -> {
               task.dependsOn(configureTask);
             });
+            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, library,
+                (task) -> {
+                  task.dependsOn(configureTask);
+                  task.from(developConfiguration).into("lib");
+                  library.getHeaders().forEach((headers) -> task.from(headers).into("include"));
+                });
           }
 
           for (final CMakeResolvedLibrary library : toolchain.getStaticLibraries()) {
-            final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
-            final Configuration runtimeConfiguration = CMakeTaskRegistry.createRuntimeConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
-            final Configuration developConfiguration = CMakeTaskRegistry.createDevelopConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
+            final Configuration modulesConfiguration = configurations.createModulesConfiguration(library, toolchain,
+                buildConfig);
+            final Configuration runtimeConfiguration = configurations.createRuntimeConfiguration(library, toolchain,
+                buildConfig);
+            final Configuration developConfiguration = configurations.createDevelopConfiguration(library, toolchain,
+                buildConfig);
 
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
@@ -182,8 +191,8 @@ public class CMakePlugin implements Plugin<Project> {
                   .add(dependency.createDevelopDependency(project, toolchain, buildConfig));
             }
 
-            final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModuleTask(
-                library, toolchain, buildConfig, project);
+            final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(library, toolchain,
+                buildConfig, project);
             assembleModulesTask.configure((task) -> {
               task.getOutputDirectory().set(moduleDirectory);
             });
@@ -194,8 +203,7 @@ public class CMakePlugin implements Plugin<Project> {
               task.getInputs().files(modulesConfiguration);
             });
 
-            final TaskProvider<CMakeBuildLibrary> buildTask = taskRegistry.buildTask(library,
-                toolchain, buildConfig);
+            final TaskProvider<CMakeBuildLibrary> buildTask = tasks.buildTask(library, toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
             });
@@ -205,12 +213,10 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), modulesConfiguration,
-                moduleDirectory, buildTask);
+            artifacts.addDirectoryArtifact(modulesConfiguration, moduleDirectory, buildTask);
             final Directory libraryDirectory = CMakeFileConventions.targetBinaryDirectory(
                 project.getLayout().getBuildDirectory(), library, toolchain, buildConfig);
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), runtimeConfiguration,
-                libraryDirectory, buildTask);
+            artifacts.addDirectoryArtifact(runtimeConfiguration, libraryDirectory, buildTask);
 
             extension.getTasks().applyExecTask(toolchain, buildConfig, library, (task) -> {
               task.dependsOn(buildTask);
@@ -224,18 +230,19 @@ public class CMakePlugin implements Plugin<Project> {
             extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, library,
                 (task) -> {
                   task.dependsOn(buildTask);
-                  task.from(developConfiguration);
+                  task.from(developConfiguration).into("lib");
+                  library.getHeaders().forEach((headers) -> task.from(headers).into("include"));
                 });
 
           }
 
           for (final CMakeResolvedLibrary library : toolchain.getSharedLibraries()) {
-            final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
-            final Configuration runtimeConfiguration = CMakeTaskRegistry.createRuntimeConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
-            final Configuration developConfiguration = CMakeTaskRegistry.createDevelopConfiguration(
-                project.getConfigurations(), library, toolchain, buildConfig);
+            final Configuration modulesConfiguration = configurations.createModulesConfiguration(library, toolchain,
+                buildConfig);
+            final Configuration runtimeConfiguration = configurations.createRuntimeConfiguration(library, toolchain,
+                buildConfig);
+            final Configuration developConfiguration = configurations.createDevelopConfiguration(library, toolchain,
+                buildConfig);
 
             for (final CMakeResolvedProjectDependency dependency : library.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
@@ -248,8 +255,8 @@ public class CMakePlugin implements Plugin<Project> {
                   .add(dependency.createDevelopDependency(project, toolchain, buildConfig));
             }
 
-            final TaskProvider<CMakeAssemble> assembleModulesTask = taskRegistry.assembleModuleTask(
-                library, toolchain, buildConfig, project);
+            final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(library, toolchain,
+                buildConfig, project);
             assembleModulesTask.configure((task) -> {
               task.getOutputDirectory().set(moduleDirectory);
             });
@@ -260,8 +267,7 @@ public class CMakePlugin implements Plugin<Project> {
               task.getInputs().files(modulesConfiguration);
             });
 
-            final TaskProvider<CMakeBuildLibrary> buildTask = taskRegistry.buildTask(library,
-                toolchain, buildConfig);
+            final TaskProvider<CMakeBuildLibrary> buildTask = tasks.buildTask(library, toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
             });
@@ -271,12 +277,11 @@ public class CMakePlugin implements Plugin<Project> {
             buildAllBuildConfigTask.ifPresent((taskProvider) -> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), modulesConfiguration,
+            artifacts.addDirectoryArtifact(modulesConfiguration,
                 moduleDirectory, buildTask);
             final Directory libraryDirectory = CMakeFileConventions.targetBinaryDirectory(
                 project.getLayout().getBuildDirectory(), library, toolchain, buildConfig);
-            CMakeTaskRegistry.addDirectoryArtifact(project.getArtifacts(), runtimeConfiguration,
-                libraryDirectory, buildTask);
+            artifacts.addDirectoryArtifact(runtimeConfiguration, libraryDirectory, buildTask);
 
             extension.getTasks().applyExecTask(toolchain, buildConfig, library, (task) -> {
               task.dependsOn(buildTask);
@@ -290,17 +295,18 @@ public class CMakePlugin implements Plugin<Project> {
             extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, library,
                 (task) -> {
                   task.dependsOn(buildTask);
-                  task.from(developConfiguration);
+                  task.from(developConfiguration).into("lib");
+                  library.getHeaders().forEach((headers) -> task.from(headers).into("include"));
                 });
           }
 
           for (final CMakeResolvedApplication application : toolchain.getApplications()) {
-            final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
-                project.getConfigurations(), application, toolchain, buildConfig);
-            final Configuration runtimeConfiguration = CMakeTaskRegistry.createRuntimeConfiguration(
-                project.getConfigurations(), application, toolchain, buildConfig);
-            final Configuration developConfiguration = CMakeTaskRegistry.createDevelopConfiguration(
-                project.getConfigurations(), application, toolchain, buildConfig);
+            final Configuration modulesConfiguration = configurations.createModulesConfiguration(
+                application, toolchain, buildConfig);
+            final Configuration runtimeConfiguration = configurations.createRuntimeConfiguration(
+                application, toolchain, buildConfig);
+            final Configuration developConfiguration = configurations.createDevelopConfiguration(
+                application, toolchain, buildConfig);
 
             for (final CMakeResolvedProjectDependency dependency : application.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
@@ -317,8 +323,7 @@ public class CMakePlugin implements Plugin<Project> {
               task.getInputs().files(modulesConfiguration);
             });
 
-            final TaskProvider<CMakeBuildExecutable> buildTask = taskRegistry.buildTask(application,
-                toolchain, buildConfig);
+            final TaskProvider<CMakeBuildExecutable> buildTask = tasks.buildTask(application, toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
             });
@@ -341,20 +346,15 @@ public class CMakePlugin implements Plugin<Project> {
                   task.from(runtimeConfiguration);
                   task.from(applicationDirectory);
                 });
-            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, application,
-                (task) -> {
-                  task.dependsOn(buildTask);
-                  task.from(developConfiguration);
-                });
           }
 
           for (final CMakeResolvedTest test : toolchain.getTests()) {
-            final Configuration modulesConfiguration = CMakeTaskRegistry.createModulesConfiguration(
-                project.getConfigurations(), test, toolchain, buildConfig);
-            final Configuration runtimeConfiguration = CMakeTaskRegistry.createRuntimeConfiguration(
-                project.getConfigurations(), test, toolchain, buildConfig);
-            final Configuration developConfiguration = CMakeTaskRegistry.createDevelopConfiguration(
-                project.getConfigurations(), test, toolchain, buildConfig);
+            final Configuration modulesConfiguration = configurations.createModulesConfiguration(test, toolchain,
+                buildConfig);
+            final Configuration runtimeConfiguration = configurations.createRuntimeConfiguration(test, toolchain,
+                buildConfig);
+            final Configuration developConfiguration = configurations.createDevelopConfiguration(test, toolchain,
+                buildConfig);
 
             for (final CMakeResolvedProjectDependency dependency : test.getAllProjectDependencies()) {
               if (dependency.isRemote()) {
@@ -371,7 +371,7 @@ public class CMakePlugin implements Plugin<Project> {
               task.getInputs().files(modulesConfiguration);
             });
 
-            final TaskProvider<CMakeBuildExecutable> buildTask = taskRegistry.buildTask(test,
+            final TaskProvider<CMakeBuildExecutable> buildTask = tasks.buildTask(test,
                 toolchain, buildConfig);
             buildTask.configure((task) -> {
               task.dependsOn(configureTask);
@@ -383,7 +383,7 @@ public class CMakePlugin implements Plugin<Project> {
               taskProvider.configure((task) -> task.dependsOn(buildTask));
             });
 
-            final TaskProvider<CMakeCheck> checkTask = taskRegistry.checkTask(test, toolchain,
+            final TaskProvider<CMakeCheck> checkTask = tasks.checkTask(test, toolchain,
                 buildConfig);
             checkTask.configure((task) -> task.dependsOn(buildTask));
             checkAllToolchainTask.ifPresent((taskProvider) -> {
@@ -404,11 +404,6 @@ public class CMakePlugin implements Plugin<Project> {
                   task.dependsOn(buildTask);
                   task.from(runtimeConfiguration);
                   task.from(testDirectory);
-                });
-            extension.getTasks().applyDevelopPackageTask(toolchain, buildConfig, test,
-                (task) -> {
-                  task.dependsOn(buildTask);
-                  task.from(developConfiguration);
                 });
           }
         }

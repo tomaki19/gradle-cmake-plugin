@@ -12,7 +12,7 @@ public abstract class CMakeCustomTar extends Tar {
 
   @javax.inject.Inject
   public CMakeCustomTar() {
-    setGroup(CMakeTaskRegistry.GROUP_PACKAGE);
+    setGroup(CMakeTaskContainer.GROUP_PACKAGE);
     getArchiveBaseName().set(getProject().getName());
   }
 

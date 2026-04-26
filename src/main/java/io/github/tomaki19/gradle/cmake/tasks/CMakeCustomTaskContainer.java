@@ -42,9 +42,21 @@ public class CMakeCustomTaskContainer {
     customRuntimePackageTaskProtos.put(new CMakeCustomTaskSpec(entries), new CMakeCustomTaskProto<T>(type, action));
   }
 
+  public <T extends AbstractArchiveTask> void registerRuntimePackageTask(final Map<String, List<CharSequence>> entries,
+      final Class<T> type) {
+    registerRuntimePackageTask(entries, type, (task) -> {
+    });
+  }
+
   public <T extends AbstractArchiveTask> void registerDevelopPackageTask(final Map<String, List<CharSequence>> entries,
       final Class<T> type, final Action<AbstractArchiveTask> action) {
     customDevelopPackageTaskProtos.put(new CMakeCustomTaskSpec(entries), new CMakeCustomTaskProto<T>(type, action));
+  }
+
+  public <T extends AbstractArchiveTask> void registerDevelopPackageTask(final Map<String, List<CharSequence>> entries,
+      final Class<T> type) {
+    registerDevelopPackageTask(entries, type, (task) -> {
+    });
   }
 
   public void applyExecTask(final CMakeResolvedToolchain toolchain) {

@@ -133,7 +133,7 @@ public class CMakeCustomTaskSpec {
 }
 
 /*
- * cmake.tasks.register(
+ * cmake.tasks.register(<type>,
  * toolchains: ['gcc', 'vscp'],
  * buildConfigs: ['release', 'debug'],
  * components: ["*", "*library", "*interface", "*shared", "*static",

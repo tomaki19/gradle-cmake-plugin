@@ -6,26 +6,6 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskContainer"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeTaskRegistry"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.model.CMakeResolver"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
         <Class name="io.github.tomaki19.gradle.cmake.files.CMakeFileContent"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
@@ -41,7 +21,27 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.model.CMakeArtifactHandler"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.model.CMakeResolver"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
         <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskContainer"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeTaskContainer"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
@@ -49,5 +49,4 @@
         <Package name="io.github.tomaki19.gradle.cmake.helper"/>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
-
 </FindBugsFilter>

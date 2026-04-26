@@ -12,7 +12,7 @@ public abstract class CMakeCustomZip extends Zip {
 
   @javax.inject.Inject
   public CMakeCustomZip() {
-    setGroup(CMakeTaskRegistry.GROUP_PACKAGE);
+    setGroup(CMakeTaskContainer.GROUP_PACKAGE);
     getArchiveBaseName().set(getProject().getName());
   }
 

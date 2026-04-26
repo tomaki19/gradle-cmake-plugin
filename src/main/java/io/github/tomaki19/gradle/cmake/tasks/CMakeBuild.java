@@ -27,7 +27,7 @@ public abstract class CMakeBuild extends CMakeExec {
     args("--config");
     args(buildConfig);
     setWorkingDir(getProject().getProjectDir());
-    setGroup(CMakeTaskRegistry.GROUP_BUILD);
+    setGroup(CMakeTaskContainer.GROUP_BUILD);
     getInputs().files(getProject().fileTree(getProject().getLayout().getProjectDirectory()));
     this.buildTarget = buildTarget;
   }
