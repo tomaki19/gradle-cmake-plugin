@@ -305,7 +305,7 @@ class CMakeCustomTaskContainerTest {
         resolvedLibrary("myLib", CMakeLinkVariant.SHARED), t -> {
         });
 
-    assertTrue(project.getTasks().getNames().contains("package-mylib-shared-gcc-release"));
+    assertTrue(project.getTasks().getNames().contains("pkg-runtime-mylib-shared-gcc-release"));
   }
 
   @Test
@@ -320,7 +320,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyRuntimePackageTask(resolvedToolchain("gcc"), "release",
         resolvedLibrary("myLib", CMakeLinkVariant.STATIC), configureAction);
 
-    project.getTasks().named("package-mylib-static-gcc-release").get();
+    project.getTasks().named("pkg-runtime-mylib-static-gcc-release").get();
     assertTrue(configureActionCalled.get());
   }
 
@@ -336,7 +336,7 @@ class CMakeCustomTaskContainerTest {
         resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
         });
 
-    assertFalse(project.getTasks().getNames().contains("package-mylib-static-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-runtime-mylib-static-gcc-release"));
   }
 
   // --- applyRuntimePackage (application) ---
@@ -352,7 +352,7 @@ class CMakeCustomTaskContainerTest {
         resolvedApplication("myApp"), t -> {
         });
 
-    assertTrue(project.getTasks().getNames().contains("package-myapp-gcc-release"));
+    assertTrue(project.getTasks().getNames().contains("pkg-runtime-myapp-gcc-release"));
   }
 
   @Test
@@ -366,7 +366,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyRuntimePackageTask(resolvedToolchain("gcc"), "release",
         resolvedApplication("myApp"), t -> configureActionCalled.set(true));
 
-    project.getTasks().named("package-myapp-gcc-release").get();
+    project.getTasks().named("pkg-runtime-myapp-gcc-release").get();
     assertTrue(configureActionCalled.get());
   }
 
@@ -382,7 +382,7 @@ class CMakeCustomTaskContainerTest {
         resolvedApplication("myApp"), t -> {
         });
 
-    assertFalse(project.getTasks().getNames().contains("package-myapp-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-runtime-myapp-gcc-release"));
   }
 
   // --- applyRuntimePackage (test) ---
@@ -398,7 +398,7 @@ class CMakeCustomTaskContainerTest {
         resolvedTest("myTest"), t -> {
         });
 
-    assertTrue(project.getTasks().getNames().contains("package-mytest-gcc-release"));
+    assertTrue(project.getTasks().getNames().contains("pkg-runtime-mytest-gcc-release"));
   }
 
   @Test
@@ -412,7 +412,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyRuntimePackageTask(resolvedToolchain("gcc"), "release",
         resolvedTest("myTest"), t -> configureActionCalled.set(true));
 
-    project.getTasks().named("package-mytest-gcc-release").get();
+    project.getTasks().named("pkg-runtime-mytest-gcc-release").get();
     assertTrue(configureActionCalled.get());
   }
 
@@ -428,7 +428,7 @@ class CMakeCustomTaskContainerTest {
         resolvedTest("myTest"), t -> {
         });
 
-    assertFalse(project.getTasks().getNames().contains("package-mytest-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-runtime-mytest-gcc-release"));
   }
 
   // --- applyDevelopPackage (library) ---
@@ -445,7 +445,7 @@ class CMakeCustomTaskContainerTest {
         resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
         });
 
-    assertTrue(project.getTasks().getNames().contains("package-mylib-static-gcc-release"));
+    assertTrue(project.getTasks().getNames().contains("pkg-develop-mylib-static-gcc-release"));
   }
 
   @Test
@@ -459,7 +459,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyDevelopPackageTask(resolvedToolchain("gcc"), "release",
         resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> configureActionCalled.set(true));
 
-    project.getTasks().named("package-mylib-static-gcc-release").get();
+    project.getTasks().named("pkg-develop-mylib-static-gcc-release").get();
     assertTrue(configureActionCalled.get());
   }
 
@@ -475,7 +475,7 @@ class CMakeCustomTaskContainerTest {
         resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
         });
 
-    assertFalse(project.getTasks().getNames().contains("package-mylib-static-clang-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-develop-mylib-static-clang-release"));
   }
 
   // --- applyDevelopPackage (application) ---
@@ -491,7 +491,7 @@ class CMakeCustomTaskContainerTest {
         resolvedApplication("myApp"), t -> {
         });
 
-    assertTrue(project.getTasks().getNames().contains("package-myapp-gcc-debug"));
+    assertTrue(project.getTasks().getNames().contains("pkg-develop-myapp-gcc-debug"));
   }
 
   @Test
@@ -505,7 +505,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyDevelopPackageTask(resolvedToolchain("gcc"), "debug",
         resolvedApplication("myApp"), t -> configureActionCalled.set(true));
 
-    project.getTasks().named("package-myapp-gcc-debug").get();
+    project.getTasks().named("pkg-develop-myapp-gcc-debug").get();
     assertTrue(configureActionCalled.get());
   }
 
@@ -521,7 +521,7 @@ class CMakeCustomTaskContainerTest {
         resolvedApplication("myApp"), t -> {
         });
 
-    assertFalse(project.getTasks().getNames().contains("package-myapp-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-develop-myapp-gcc-release"));
   }
 
   // --- applyDevelopPackage (test) ---
@@ -537,7 +537,7 @@ class CMakeCustomTaskContainerTest {
         resolvedTest("myTest"), t -> {
         });
 
-    assertTrue(project.getTasks().getNames().contains("package-mytest-gcc-debug"));
+    assertTrue(project.getTasks().getNames().contains("pkg-develop-mytest-gcc-debug"));
   }
 
   @Test
@@ -551,7 +551,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyDevelopPackageTask(resolvedToolchain("gcc"), "debug",
         resolvedTest("myTest"), t -> configureActionCalled.set(true));
 
-    project.getTasks().named("package-mytest-gcc-debug").get();
+    project.getTasks().named("pkg-develop-mytest-gcc-debug").get();
     assertTrue(configureActionCalled.get());
   }
 
@@ -567,7 +567,7 @@ class CMakeCustomTaskContainerTest {
         resolvedTest("myTest"), t -> {
         });
 
-    assertFalse(project.getTasks().getNames().contains("package-mytest-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-develop-mytest-gcc-release"));
   }
 
   // --- proto maps are independent: registering in one does not affect the others
@@ -582,7 +582,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyExecTask(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
     });
 
-    assertFalse(project.getTasks().getNames().contains("package-mylib-static-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-runtime-mylib-static-gcc-release"));
   }
 
   @Test
@@ -594,7 +594,7 @@ class CMakeCustomTaskContainerTest {
     handler.applyExecTask(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
     });
 
-    assertFalse(project.getTasks().getNames().contains("package-mylib-static-gcc-release"));
+    assertFalse(project.getTasks().getNames().contains("pkg-develop-mylib-static-gcc-release"));
   }
 
   @Test

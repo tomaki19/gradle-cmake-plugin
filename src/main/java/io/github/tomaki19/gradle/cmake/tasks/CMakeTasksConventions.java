@@ -91,15 +91,29 @@ public final class CMakeTasksConventions {
         buildConfig.toLowerCase());
   }
 
-  static String packageTaskName(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
+  static String packageRuntimeTaskName(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    return "package-%s-%s-%s-%s".formatted(library.getName().toLowerCase(), library.getLinkVariant().toLowerCase(),
+    return "pkg-runtime-%s-%s-%s-%s".formatted(library.getName().toLowerCase(),
+        library.getLinkVariant().toLowerCase(),
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  static String packageTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
+  static String packageRuntimeTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    return "package-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
+    return "pkg-runtime-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
+        buildConfig.toLowerCase());
+  }
+
+  static String packageDevelopTaskName(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    return "pkg-develop-%s-%s-%s-%s".formatted(library.getName().toLowerCase(),
+        library.getLinkVariant().toLowerCase(),
+        toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+  }
+
+  static String packageDevelopTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    return "pkg-develop-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
   }
 

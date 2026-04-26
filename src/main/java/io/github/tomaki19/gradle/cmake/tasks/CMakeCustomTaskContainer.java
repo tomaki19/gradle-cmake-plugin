@@ -105,7 +105,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
-        final String taskName = CMakeTasksConventions.packageTaskName(library, toolchain, buildConfig);
+        final String taskName = CMakeTasksConventions.packageRuntimeTaskName(library, toolchain, buildConfig);
         final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
             entry.getValue().getType(), entry.getValue().getAction());
         provider.configure(configureAction);
@@ -121,7 +121,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
-        final String taskName = CMakeTasksConventions.packageTaskName(library, toolchain, buildConfig);
+        final String taskName = CMakeTasksConventions.packageDevelopTaskName(library, toolchain, buildConfig);
         final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
             entry.getValue().getType(), entry.getValue().getAction());
         provider.configure(configureAction);
@@ -150,7 +150,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
-        final String taskName = CMakeTasksConventions.packageTaskName(application, toolchain, buildConfig);
+        final String taskName = CMakeTasksConventions.packageRuntimeTaskName(application, toolchain, buildConfig);
         final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
             entry.getValue().getType(), entry.getValue().getAction());
         provider.configure(configureAction);
@@ -165,7 +165,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
-        final String taskName = CMakeTasksConventions.packageTaskName(application, toolchain, buildConfig);
+        final String taskName = CMakeTasksConventions.packageDevelopTaskName(application, toolchain, buildConfig);
         final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
             entry.getValue().getType(), entry.getValue().getAction());
         provider.configure(configureAction);
@@ -194,7 +194,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
-        final String taskName = CMakeTasksConventions.packageTaskName(test, toolchain, buildConfig);
+        final String taskName = CMakeTasksConventions.packageRuntimeTaskName(test, toolchain, buildConfig);
         final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
             entry.getValue().getType(), entry.getValue().getAction());
         provider.configure(configureAction);
@@ -209,7 +209,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
-        final String taskName = CMakeTasksConventions.packageTaskName(test, toolchain, buildConfig);
+        final String taskName = CMakeTasksConventions.packageDevelopTaskName(test, toolchain, buildConfig);
         final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
             entry.getValue().getType(), entry.getValue().getAction());
         provider.configure(configureAction);
