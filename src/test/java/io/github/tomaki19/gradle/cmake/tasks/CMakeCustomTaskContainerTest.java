@@ -19,6 +19,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.extension.CMakeCustomTaskContainer;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeLibrary;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeTest;
@@ -51,7 +52,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchain_registersWhenToolchainMatches() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"));
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
 
@@ -62,7 +63,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchain_registersWithAllWildcard() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"));
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
 
@@ -73,7 +74,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchain_skipsWhenToolchainNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"));
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
 
@@ -84,7 +85,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchain_skipsWhenSpecHasBuildConfigs() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -96,7 +97,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchain_skipsWhenSpecHasComponents() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "components",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "components",
         Arrays.asList("myLib"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -110,7 +111,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchainBuildConfig_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -123,7 +124,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchainBuildConfig_registersWithAllWildcards() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -136,7 +137,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchainBuildConfig_skipsWhenBuildConfigNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -149,7 +150,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_toolchainBuildConfig_skipsWhenSpecHasComponents() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("myLib"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -165,7 +166,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_library_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("myLib"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -179,7 +180,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_library_registersWithLibrariesWildcard() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*library"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -193,7 +194,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_library_skipsWhenLibraryNameNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherLib"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -209,7 +210,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_application_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("myApp"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -223,7 +224,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_application_registersWithApplicationsWildcard() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*application"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -236,7 +237,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_application_skipsWhenApplicationNameNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherApp"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -252,7 +253,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_test_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("myTest"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -266,7 +267,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_test_registersWithTestsWildcard() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*test"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
@@ -279,7 +280,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyExec_test_skipsWhenTestNameNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherTest"));
     handler.registerExecTask(spec, TASK_NAME, t -> {
@@ -295,7 +296,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_library_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("*library"));
     handler.registerRuntimePackageTask(spec, CMakeCustomTar.class, t -> {
@@ -310,7 +311,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_library_appliesConfigureAction() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*library"));
     final AtomicBoolean configureActionCalled = new AtomicBoolean(false);
     final Action<AbstractArchiveTask> configureAction = t -> configureActionCalled.set(true);
@@ -326,7 +327,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_library_skipsWhenNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherLib"));
     handler.registerRuntimePackageTask(spec, CMakeCustomTar.class, t -> {
@@ -343,7 +344,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_application_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*application"));
     handler.registerRuntimePackageTask(spec, CMakeCustomZip.class, t -> {
     });
@@ -357,7 +358,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_application_appliesConfigureAction() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*application"));
     final AtomicBoolean configureActionCalled = new AtomicBoolean(false);
     handler.registerRuntimePackageTask(spec, CMakeCustomTar.class, t -> {
@@ -372,7 +373,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_application_skipsWhenNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherApp"));
     handler.registerRuntimePackageTask(spec, CMakeCustomZip.class, t -> {
@@ -389,7 +390,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_test_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*test"));
     handler.registerRuntimePackageTask(spec, CMakeCustomTar.class, t -> {
     });
@@ -403,7 +404,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_test_appliesConfigureAction() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*test"));
     final AtomicBoolean configureActionCalled = new AtomicBoolean(false);
     handler.registerRuntimePackageTask(spec, CMakeCustomZip.class, t -> {
@@ -418,7 +419,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyRuntimePackage_test_skipsWhenNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherTest"));
     handler.registerRuntimePackageTask(spec, CMakeCustomTar.class, t -> {
@@ -435,7 +436,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_library_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("*static"));
     handler.registerDevelopPackageTask(spec, CMakeCustomZip.class, t -> {
@@ -450,7 +451,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_library_appliesConfigureAction() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*static"));
     final AtomicBoolean configureActionCalled = new AtomicBoolean(false);
     handler.registerDevelopPackageTask(spec, CMakeCustomTar.class, t -> {
@@ -465,7 +466,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_library_skipsWhenToolchainNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("*static"));
     handler.registerDevelopPackageTask(spec, CMakeCustomZip.class, t -> {
@@ -482,7 +483,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_application_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*application"));
     handler.registerDevelopPackageTask(spec, CMakeCustomTar.class, t -> {
     });
@@ -496,7 +497,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_application_appliesConfigureAction() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*application"));
     final AtomicBoolean configureActionCalled = new AtomicBoolean(false);
     handler.registerDevelopPackageTask(spec, CMakeCustomZip.class, t -> {
@@ -511,7 +512,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_application_skipsWhenNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherApp"));
     handler.registerDevelopPackageTask(spec, CMakeCustomTar.class, t -> {
@@ -528,7 +529,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_test_registersWhenMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*test"));
     handler.registerDevelopPackageTask(spec, CMakeCustomZip.class, t -> {
     });
@@ -542,7 +543,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_test_appliesConfigureAction() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("*"),
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"), "components", Arrays.asList("*test"));
     final AtomicBoolean configureActionCalled = new AtomicBoolean(false);
     handler.registerDevelopPackageTask(spec, CMakeCustomTar.class, t -> {
@@ -557,7 +558,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void applyDevelopPackage_test_skipsWhenNoMatch() {
-    final Map<String, List<CharSequence>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
+    final Map<String, List<Object>> spec = Map.of("toolchains", Arrays.asList("gcc"), "buildConfigs",
         Arrays.asList("release"),
         "components", Arrays.asList("otherTest"));
     handler.registerDevelopPackageTask(spec, CMakeCustomZip.class, t -> {
@@ -575,7 +576,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void runtimePackageSpec_doesNotTriggerExec() {
-    final Map<String, List<CharSequence>> spec = allMatchingSpec();
+    final Map<String, List<Object>> spec = allMatchingSpec();
     handler.registerRuntimePackageTask(spec, CMakeCustomTar.class, t -> {
     });
 
@@ -587,7 +588,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void developPackageSpec_doesNotTriggerExec() {
-    final Map<String, List<CharSequence>> spec = allMatchingSpec();
+    final Map<String, List<Object>> spec = allMatchingSpec();
     handler.registerDevelopPackageTask(spec, CMakeCustomZip.class, t -> {
     });
 
@@ -599,7 +600,7 @@ class CMakeCustomTaskContainerTest {
 
   @Test
   void execSpec_doesNotTriggerRuntimePackage() {
-    final Map<String, List<CharSequence>> spec = allMatchingSpec();
+    final Map<String, List<Object>> spec = allMatchingSpec();
     handler.registerExecTask(spec, TASK_NAME, t -> {
     });
 
@@ -612,7 +613,7 @@ class CMakeCustomTaskContainerTest {
 
   // --- helpers ---
 
-  private Map<String, List<CharSequence>> allMatchingSpec() {
+  private Map<String, List<Object>> allMatchingSpec() {
     return Map.of("toolchains", Arrays.asList("*"),
         "buildConfigs", Arrays.asList("*"),
         "components", Arrays.asList("*"));

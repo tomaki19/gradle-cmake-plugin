@@ -33,21 +33,21 @@ public class CMakeCustomTaskSpec {
   private static final String BUILD_CONFIGS = "buildConfigs";
   private static final String COMPONENTS = "components";
 
-  private final Map<String, Set<CharSequence>> spec = new HashMap<>();
+  private final Map<String, Set<Object>> spec = new HashMap<>();
 
-  public CMakeCustomTaskSpec(final Map<String, List<CharSequence>> entries) {
+  public CMakeCustomTaskSpec(final Map<String, List<Object>> entries) {
     entries.forEach((key, value) -> spec.put(key, new HashSet<>(value)));
   }
 
-  private Set<CharSequence> getToolchains() {
+  private Set<Object> getToolchains() {
     return spec.getOrDefault(TOOLCHAINS, new TreeSet<>());
   }
 
-  private Set<CharSequence> getBuildConfigs() {
+  private Set<Object> getBuildConfigs() {
     return spec.getOrDefault(BUILD_CONFIGS, new TreeSet<>());
   }
 
-  private Set<CharSequence> getComponents() {
+  private Set<Object> getComponents() {
     return spec.getOrDefault(COMPONENTS, new TreeSet<>());
   }
 

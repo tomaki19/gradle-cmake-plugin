@@ -17,10 +17,11 @@ import org.gradle.api.file.Directory;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskProvider;
 
+import io.github.tomaki19.gradle.cmake.extension.CMakeArtifactHandler;
+import io.github.tomaki19.gradle.cmake.extension.CMakeConfigurationContainer;
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
+import io.github.tomaki19.gradle.cmake.extension.CMakeTaskContainer;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
-import io.github.tomaki19.gradle.cmake.model.CMakeArtifactHandler;
-import io.github.tomaki19.gradle.cmake.model.CMakeConfigurationContainer;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
@@ -33,7 +34,6 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeTaskContainer;
 
 public class CMakePlugin implements Plugin<Project> {
 

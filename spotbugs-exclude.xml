@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
     <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.extension.CMakeArtifactHandler"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.extension.CMakeCustomTaskContainer"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
         <Class name="io.github.tomaki19.gradle.cmake.extension.CMakeExtension"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.github.tomaki19.gradle.cmake.extension.CMakeTaskContainer"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
@@ -20,23 +35,9 @@
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
-    <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.model.CMakeArtifactHandler"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
+
     <Match>
         <Class name="io.github.tomaki19.gradle.cmake.model.CMakeResolver"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskContainer"/>
-        <Method name="&lt;init&gt;"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="io.github.tomaki19.gradle.cmake.tasks.CMakeTaskContainer"/>
         <Method name="&lt;init&gt;"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>

@@ -7,6 +7,8 @@ package io.github.tomaki19.gradle.cmake.tasks;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.bundling.Tar;
 
+import io.github.tomaki19.gradle.cmake.extension.CMakeTaskContainer;
+
 @CacheableTask
 public abstract class CMakeCustomTar extends Tar {
 

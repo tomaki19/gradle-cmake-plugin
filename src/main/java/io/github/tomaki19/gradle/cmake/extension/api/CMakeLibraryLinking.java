@@ -33,3 +33,15 @@ public class CMakeLibraryLinking extends CMakeLinking {
   }
 
 }
+
+/*
+ * linking {
+ * link(['libA', 'libB'],
+ * from: 'projectA'
+ * build: Shared
+ * link: Shared
+ * visibility: Private
+ * )
+ * }
+ *
+ */

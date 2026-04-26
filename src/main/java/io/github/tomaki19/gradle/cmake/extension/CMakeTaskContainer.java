@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2025 Thomas Killer
  * SPDX-License-Identifier: MIT
  */
-package io.github.tomaki19.gradle.cmake.tasks;
+package io.github.tomaki19.gradle.cmake.extension;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
@@ -16,6 +16,13 @@ import io.github.tomaki19.gradle.cmake.files.CMakeModuleFile;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeAssemble;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildExecutable;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeBuildLibrary;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCheck;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeClean;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeConfigure;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeTasksConventions;
 import io.github.tomaki19.gradle.cmake.files.CMakeListsFile;
 
 public final class CMakeTaskContainer {

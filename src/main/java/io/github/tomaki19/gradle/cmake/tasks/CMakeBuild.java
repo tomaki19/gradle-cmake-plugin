@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake.tasks;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.internal.os.OperatingSystem;
 
+import io.github.tomaki19.gradle.cmake.extension.CMakeTaskContainer;
 import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
