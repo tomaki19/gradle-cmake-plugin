@@ -30,7 +30,7 @@ public final class CMakeTaskContainer {
   public static final String GROUP_BUILD = "cmake build";
   public static final String GROUP_CHECK = "cmake test";
   public static final String GROUP_INSTALL = "cmake install";
-  public static final String GROUP_PACKAGE = "cmake package";
+  public static final String GROUP_PACKAGE = "cmake archive";
 
   private final TaskContainer tasks;
 

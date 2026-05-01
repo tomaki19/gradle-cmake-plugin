@@ -6,11 +6,10 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
@@ -18,37 +17,58 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedTest;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
-public class CMakeCustomTaskSpec {
-
-  private static final CharSequence ALL = "*";
-  private static final CharSequence LIBRARIES = "*library";
-  private static final CharSequence INTERFACES = "*interface";
-  private static final CharSequence SHARED = "*shared";
-  private static final CharSequence STATIC = "*static";
-  private static final CharSequence EXECUTABLES = "*executable";
-  private static final CharSequence APPLICATIONS = "*application";
-  private static final CharSequence TESTS = "*test";
+public abstract class CMakeCustomTaskSpec<T> {
 
   private static final String TOOLCHAINS = "toolchains";
   private static final String BUILD_CONFIGS = "buildConfigs";
   private static final String COMPONENTS = "components";
 
-  private final Map<String, Set<Object>> spec = new HashMap<>();
+  private static final String ALL = "*";
+  private static final String LIBRARIES = "*library";
+  private static final String INTERFACES = "*interface";
+  private static final String SHARED = "*shared";
+  private static final String STATIC = "*static";
+  private static final String EXECUTABLES = "*executable";
+  private static final String APPLICATIONS = "*application";
+  private static final String TESTS = "*test";
 
-  public CMakeCustomTaskSpec(final Map<String, List<Object>> entries) {
-    entries.forEach((key, value) -> spec.put(key, new HashSet<>(value)));
+  protected final Map<String, Object> spec;
+
+  public CMakeCustomTaskSpec(final Map<String, Object> entries) {
+    this.spec = Collections.unmodifiableMap(entries);
   }
 
-  private Set<Object> getToolchains() {
-    return spec.getOrDefault(TOOLCHAINS, new TreeSet<>());
+  public void validateContentTypes() throws IllegalArgumentException {
+    validateType(TOOLCHAINS, Collection.class);
+    validateType(BUILD_CONFIGS, Collection.class);
+    validateType(COMPONENTS, Collection.class);
   }
 
-  private Set<Object> getBuildConfigs() {
-    return spec.getOrDefault(BUILD_CONFIGS, new TreeSet<>());
+  protected void validateType(final String name, final Class<?> type) throws IllegalArgumentException {
+    if (spec.containsKey(name) && !(type.isAssignableFrom(spec.get(name).getClass()))) {
+      throw new IllegalArgumentException("Invalid %s of type %s!".formatted(name, spec.get(name).getClass()));
+    }
   }
 
-  private Set<Object> getComponents() {
-    return spec.getOrDefault(COMPONENTS, new TreeSet<>());
+  protected void validateMandatory(final String name) throws IllegalArgumentException {
+    if (!spec.containsKey(name)) {
+      throw new IllegalArgumentException("Missing mandatory %s!".formatted(name));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Set<String> getToolchains() {
+    return new HashSet<>((Collection<String>) spec.getOrDefault(TOOLCHAINS, Collections.emptyList()));
+  }
+
+  @SuppressWarnings("unchecked")
+  private Set<String> getBuildConfigs() {
+    return new HashSet<>((Collection<String>) spec.getOrDefault(BUILD_CONFIGS, Collections.emptyList()));
+  }
+
+  @SuppressWarnings("unchecked")
+  private Set<String> getComponents() {
+    return new HashSet<>((Collection<String>) spec.getOrDefault(COMPONENTS, Collections.emptyList()));
   }
 
   public boolean hasNoToolchains() {
@@ -99,9 +119,9 @@ public class CMakeCustomTaskSpec {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((getToolchains() == null) ? 0 : getToolchains().hashCode());
-    result = prime * result + ((getBuildConfigs() == null) ? 0 : getBuildConfigs().hashCode());
-    result = prime * result + ((getComponents() == null) ? 0 : getComponents().hashCode());
+    result = prime * result + getToolchains().hashCode();
+    result = prime * result + getBuildConfigs().hashCode();
+    result = prime * result + getComponents().hashCode();
     return result;
   }
 
@@ -111,21 +131,12 @@ public class CMakeCustomTaskSpec {
       return true;
     if (!(obj instanceof CMakeCustomTaskSpec))
       return false;
-    CMakeCustomTaskSpec other = (CMakeCustomTaskSpec) obj;
-    if (getToolchains() == null) {
-      if (other.getToolchains() != null)
-        return false;
-    } else if (!getToolchains().equals(other.getToolchains()))
+    final CMakeCustomTaskSpec<?> other = (CMakeCustomTaskSpec<?>) obj;
+    if (!getToolchains().equals(other.getToolchains()))
       return false;
-    if (getBuildConfigs() == null) {
-      if (other.getBuildConfigs() != null)
-        return false;
-    } else if (!getBuildConfigs().equals(other.getBuildConfigs()))
+    if (!getBuildConfigs().equals(other.getBuildConfigs()))
       return false;
-    if (getComponents() == null) {
-      if (other.getComponents() != null)
-        return false;
-    } else if (!getComponents().equals(other.getComponents()))
+    if (!getComponents().equals(other.getComponents()))
       return false;
     return true;
   }

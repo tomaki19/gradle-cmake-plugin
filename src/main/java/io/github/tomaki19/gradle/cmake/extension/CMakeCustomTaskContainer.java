@@ -5,7 +5,6 @@
 package io.github.tomaki19.gradle.cmake.extension;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,21 +13,21 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeCustomTaskSpec;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeArchiveTaskSpec;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecTaskSpec;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedTest;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExecProto;
-import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTaskProto;
+import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomZip;
 import io.github.tomaki19.gradle.cmake.tasks.CMakeTasksConventions;
 
 public class CMakeCustomTaskContainer {
 
-  private final Map<CMakeCustomTaskSpec, CMakeCustomExecProto> customExecProtos = new HashMap<>();
-  private final Map<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> customRuntimePackageProtos = new HashMap<>();
-  private final Map<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> customDevelopPackageProtos = new HashMap<>();
+  private final Map<CMakeExecTaskSpec, Action<CMakeCustomExec>> customExecProtos = new HashMap<>();
+  private final Map<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> customRuntimeArchiveProtos = new HashMap<>();
+  private final Map<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> customDevelopArchiveProtos = new HashMap<>();
 
   private final TaskContainer taskContainer;
 
@@ -36,190 +35,166 @@ public class CMakeCustomTaskContainer {
     this.taskContainer = taskContainer;
   }
 
-  public void registerExecTask(final Map<String, List<Object>> entries, final String name,
-      Action<CMakeCustomExec> action) {
-    customExecProtos.put(new CMakeCustomTaskSpec(entries), new CMakeCustomExecProto(name, action));
+  public void registerExecTasks(final Map<String, Object> entries, Action<CMakeCustomExec> action)
+      throws IllegalArgumentException {
+    final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(entries);
+    spec.validate();
+    customExecProtos.put(spec, action);
   }
 
-  public <T extends AbstractArchiveTask> void registerRuntimePackageTask(final Map<String, List<Object>> entries,
-      final Class<T> type, final Action<AbstractArchiveTask> action) {
-    customRuntimePackageProtos.put(new CMakeCustomTaskSpec(entries),
-        new CMakeCustomTaskProto<T>(type, action));
+  public <T extends AbstractArchiveTask> void registerRuntimeArchiveTasks(final Map<String, Object> entries,
+      final Action<AbstractArchiveTask> action) throws IllegalArgumentException {
+    final CMakeArchiveTaskSpec<? extends AbstractArchiveTask> spec = new CMakeArchiveTaskSpec<>(entries,
+        CMakeCustomZip.class);
+    spec.validate();
+    customRuntimeArchiveProtos.put(spec, action);
   }
 
-  public <T extends AbstractArchiveTask> void registerRuntimePackageTask(final Map<String, List<Object>> entries,
-      final Class<T> type) {
-    registerRuntimePackageTask(entries, type, (task) -> {
+  public void registerRuntimeArchiveTasks(final Map<String, Object> entries) throws IllegalArgumentException {
+    registerRuntimeArchiveTasks(entries, (task) -> {
     });
   }
 
-  public <T extends AbstractArchiveTask> void registerDevelopPackageTask(final Map<String, List<Object>> entries,
-      final Class<T> type, final Action<AbstractArchiveTask> action) {
-    customDevelopPackageProtos.put(new CMakeCustomTaskSpec(entries), new CMakeCustomTaskProto<T>(type, action));
+  public void registerDevelopArchiveTasks(final Map<String, Object> entries, final Action<AbstractArchiveTask> action)
+      throws IllegalArgumentException {
+    final CMakeArchiveTaskSpec<? extends AbstractArchiveTask> spec = new CMakeArchiveTaskSpec<>(entries,
+        CMakeCustomZip.class);
+    spec.validate();
+    customDevelopArchiveProtos.put(spec, action);
   }
 
-  public <T extends AbstractArchiveTask> void registerDevelopPackageTask(final Map<String, List<Object>> entries,
-      final Class<T> type) {
-    registerDevelopPackageTask(entries, type, (task) -> {
+  public <T extends AbstractArchiveTask> void registerDevelopArchiveTasks(final Map<String, Object> entries)
+      throws IllegalArgumentException {
+    registerDevelopArchiveTasks(entries, (task) -> {
     });
   }
 
-  public void applyExecTask(final CMakeResolvedToolchain toolchain) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomExecProto> entry : customExecProtos
-        .entrySet()) {
+  public void applyExecTasks(final CMakeResolvedToolchain toolchain) {
+    for (final Entry<CMakeExecTaskSpec, Action<CMakeCustomExec>> entry : customExecProtos.entrySet()) {
       if (entry.getKey().matchesToolchain(toolchain)
           && entry.getKey().hasNoBuildConfigs()
           && entry.getKey().hasNoComponents()) {
-        taskContainer.register(entry.getValue().getName(), CMakeCustomExec.class, entry.getValue().getAction());
+        taskContainer.register(entry.getKey().getName(), CMakeCustomExec.class, entry.getValue());
       }
     }
   }
 
-  public void applyExecTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyExecTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final Action<CMakeCustomExec> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomExecProto> entry : customExecProtos
-        .entrySet()) {
+    for (final Entry<CMakeExecTaskSpec, Action<CMakeCustomExec>> entry : customExecProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && entry.getKey().matchesBuildConfig(buildConfig)
           && entry.getKey().hasNoComponents()) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getValue().getName(),
-            CMakeCustomExec.class, entry.getValue().getAction());
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+            CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyExecTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyExecTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedLibrary library, final Action<CMakeCustomExec> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomExecProto> entry : customExecProtos
-        .entrySet()) {
+    for (final Entry<CMakeExecTaskSpec, Action<CMakeCustomExec>> entry : customExecProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getValue().getName(),
-            CMakeCustomExec.class, entry.getValue().getAction());
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+            CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyRuntimePackageTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyRuntimeArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedLibrary library, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> entry : customRuntimePackageProtos
+    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customRuntimeArchiveProtos
         .entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
         final String taskName = CMakeTasksConventions.packageRuntimeTaskName(library, toolchain, buildConfig);
-        final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
-            entry.getValue().getType(), entry.getValue().getAction());
+        final TaskProvider<AbstractArchiveTask> provider = registerArchiveTasks(taskName, entry);
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyDevelopPackageTask(final CMakeResolvedToolchain toolchain,
+  public void applyDevelopArchiveTasks(final CMakeResolvedToolchain toolchain,
       final String buildConfig,
       final CMakeResolvedLibrary library, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> entry : customDevelopPackageProtos
+    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customDevelopArchiveProtos
         .entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
-        final String taskName = CMakeTasksConventions.packageDevelopTaskName(library, toolchain, buildConfig);
-        final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
-            entry.getValue().getType(), entry.getValue().getAction());
+        final String taskName = CMakeTasksConventions.archiveDevelopTaskName(library, toolchain, buildConfig);
+        final TaskProvider<AbstractArchiveTask> provider = registerArchiveTasks(taskName, entry);
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyExecTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyExecTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedApplication application, final Action<CMakeCustomExec> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomExecProto> entry : customExecProtos
-        .entrySet()) {
+    for (final Entry<CMakeExecTaskSpec, Action<CMakeCustomExec>> entry : customExecProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getValue().getName(),
-            CMakeCustomExec.class, entry.getValue().getAction());
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+            CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyRuntimePackageTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyRuntimeArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedApplication application, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> entry : customRuntimePackageProtos
+    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customRuntimeArchiveProtos
         .entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
         final String taskName = CMakeTasksConventions.packageRuntimeTaskName(application, toolchain, buildConfig);
-        final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
-            entry.getValue().getType(), entry.getValue().getAction());
+        final TaskProvider<AbstractArchiveTask> provider = registerArchiveTasks(taskName, entry);
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyDevelopPackageTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
-      final CMakeResolvedApplication application, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> entry : customDevelopPackageProtos
-        .entrySet()) {
-      if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
-          && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
-          && entry.getKey().matchesApplication(application)) {
-        final String taskName = CMakeTasksConventions.packageDevelopTaskName(application, toolchain, buildConfig);
-        final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
-            entry.getValue().getType(), entry.getValue().getAction());
-        provider.configure(configureAction);
-      }
-    }
-  }
-
-  public void applyExecTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyExecTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedTest test, final Action<CMakeCustomExec> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomExecProto> entry : customExecProtos
-        .entrySet()) {
+    for (final Entry<CMakeExecTaskSpec, Action<CMakeCustomExec>> entry : customExecProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getValue().getName(),
-            CMakeCustomExec.class, entry.getValue().getAction());
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+            CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyRuntimePackageTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
+  public void applyRuntimeArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedTest test, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> entry : customRuntimePackageProtos
+    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customRuntimeArchiveProtos
         .entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
         final String taskName = CMakeTasksConventions.packageRuntimeTaskName(test, toolchain, buildConfig);
-        final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
-            entry.getValue().getType(), entry.getValue().getAction());
+        final TaskProvider<AbstractArchiveTask> provider = registerArchiveTasks(taskName, entry);
         provider.configure(configureAction);
       }
     }
   }
 
-  public void applyDevelopPackageTask(final CMakeResolvedToolchain toolchain, final String buildConfig,
-      final CMakeResolvedTest test, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeCustomTaskSpec, CMakeCustomTaskProto<? extends AbstractArchiveTask>> entry : customDevelopPackageProtos
-        .entrySet()) {
-      if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
-          && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
-          && entry.getKey().matchesTest(test)) {
-        final String taskName = CMakeTasksConventions.packageDevelopTaskName(test, toolchain, buildConfig);
-        final TaskProvider<? extends AbstractArchiveTask> provider = taskContainer.register(taskName,
-            entry.getValue().getType(), entry.getValue().getAction());
-        provider.configure(configureAction);
-      }
-    }
+  @SuppressWarnings("unchecked")
+  private TaskProvider<AbstractArchiveTask> registerArchiveTasks(final String taskName,
+      final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry) {
+    final Class<AbstractArchiveTask> type = (Class<AbstractArchiveTask>) entry.getKey().getType();
+    final Action<AbstractArchiveTask> action = (Action<AbstractArchiveTask>) entry.getValue();
+    return taskContainer.register("%s-%s".formatted(type.getSuperclass().getSimpleName().toLowerCase(), taskName), type,
+        action);
   }
 
 }

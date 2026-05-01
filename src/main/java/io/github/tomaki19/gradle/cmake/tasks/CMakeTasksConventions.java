@@ -93,27 +93,25 @@ public final class CMakeTasksConventions {
 
   public static String packageRuntimeTaskName(final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "pkg-runtime-%s-%s-%s-%s".formatted(library.getName().toLowerCase(),
-        library.getLinkVariant().toLowerCase(),
+    return "runtime-%s-%s-%s-%s".formatted(library.getName().toLowerCase(), library.getLinkVariant().toLowerCase(),
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
   public static String packageRuntimeTaskName(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "pkg-runtime-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
+    return "runtime-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
   }
 
-  public static String packageDevelopTaskName(final CMakeResolvedLibrary library,
+  public static String archiveDevelopTaskName(final CMakeResolvedLibrary library,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "pkg-develop-%s-%s-%s-%s".formatted(library.getName().toLowerCase(),
-        library.getLinkVariant().toLowerCase(),
+    return "develop-%s-%s-%s-%s".formatted(library.getName().toLowerCase(), library.getLinkVariant().toLowerCase(),
         toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
   }
 
-  public static String packageDevelopTaskName(final CMakeResolvedBinary<?> executable,
+  public static String archiveDevelopTaskName(final CMakeResolvedBinary<?> executable,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return "pkg-develop-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
+    return "develop-%s-%s-%s".formatted(executable.getName().toLowerCase(), toolchain.getName().toLowerCase(),
         buildConfig.toLowerCase());
   }
 
