@@ -1,15 +1,40 @@
 # Tasks Reference
 
-The gradle-cmake-plugin automatically creates a set of Gradle tasks for managing the CMake build lifecycle. This document describes all available tasks and how to customize them.
+The gradle-cmake-plugin registers Gradle tasks that manage the full CMake build lifecycle. All task names are derived from component names, link variants, toolchain names, and build configs — always **lowercased**.
+
+---
 
 ## Task Naming Conventions
 
-Most plugin tasks follow a naming pattern based on the component name and toolchain:
+| Task type | Pattern |
+|-----------|---------|
+| Assemble CMakeLists | `assemble-cmake-lists` |
+| Assemble module file | `assemble-<name>-<linkvariant>-<toolchain>-<buildconfig>-module` |
+| Configure | `configure-<toolchain>-<buildconfig>` |
+| Build library | `build-<name>-<linkvariant>-<toolchain>-<buildconfig>` |
+| Build application or test | `build-<name>-<toolchain>-<buildconfig>` |
+| Build-all (toolchain) | `build-all-<toolchain>` |
+| Build-all (toolchain + config) | `build-all-<toolchain>-<buildconfig>` |
+| Check (test) | `check-<name>-<toolchain>-<buildconfig>` |
+| Check-all (toolchain) | `check-all-<toolchain>` |
+| Check-all (toolchain + config) | `check-all-<toolchain>-<buildconfig>` |
+| Runtime zip archive | `zip-runtime-<name>-<linkvariant>-<toolchain>-<buildconfig>` (library) |
+| Runtime zip archive | `zip-runtime-<name>-<toolchain>-<buildconfig>` (application/test) |
+| Runtime tar archive | `tar-runtime-<name>-<linkvariant>-<toolchain>-<buildconfig>` (library) |
+| Runtime tar archive | `tar-runtime-<name>-<toolchain>-<buildconfig>` (application/test) |
+| Develop zip archive | `zip-develop-<name>-<linkvariant>-<toolchain>-<buildconfig>` |
+| Develop tar archive | `tar-develop-<name>-<linkvariant>-<toolchain>-<buildconfig>` |
+| Custom exec | `<name>-<toolchain>-<buildconfig>` (when registered per buildConfig) |
+| Clean CMakeLists | `clean-cmake-lists` |
 
-- **Build tasks:** `build-<component-name>-<toolchain-name>`
-- **Check tasks:** `check-<test-name>-<toolchain-name>`
-- **Configure tasks:** `configure-<toolchain-name>`
-- **Assemble tasks:** `assemble-cmake-lists`, `assemble-<toolchain-name>-config`
+**Example names** for a library `core` (shared), toolchain `gcc`, build config `Debug`:
+
+- `build-core-shared-gcc-debug`
+- `check-core-shared-gcc-debug` (if core is a test library)
+- `assemble-core-shared-gcc-debug-module`
+- `configure-gcc-debug`
+- `zip-runtime-core-shared-gcc-debug`
+- `zip-develop-core-shared-gcc-debug`
 
 ---
 
@@ -17,31 +42,29 @@ Most plugin tasks follow a naming pattern based on the component name and toolch
 
 **Implementation:** [`CMakeAssemble.java`](CMakeAssemble.java)
 
-Assemble tasks generate the necessary CMake configuration files for the project.
+### `assemble-cmake-lists`
 
-### assemble-cmake-lists
+Generates the `CMakeLists.txt` file in the project root directory. This file defines all libraries, applications, and tests. It is re-generated whenever the Gradle build file changes.
 
-Generates the main `CMakeLists.txt` file in the project root. This is the primary CMake build file that defines all libraries, applications, and tests for the project.
-
-**Task Type:** `CMakeAssemble`  
-**Runs:** Automatically before configure tasks  
+**Depends on:** All `assemble-*-module` tasks
 **Output:** `CMakeLists.txt` in project root
 
-### assemble-<toolchain>-config
+### `assemble-<name>-<linkvariant>-<toolchain>-<buildconfig>-module`
 
-Generates CMake module configuration files that expose all project libraries for use by other CMake projects. These files allow external projects to discover and link against your project's libraries.
+Generates a CMake module configuration file that exposes a library for use by other CMake projects. Created for each library variant/toolchain/buildConfig combination.
 
-**Pattern:** `assemble-<toolchain-name>-config`  
-**Example:** `assemble-gcc-config`, `assemble-clang-config`  
-**Task Type:** `CMakeAssemble`  
-**Output:** `build/cmake/config/<project-name>-<toolchain>-config.cmake`
+**Output:** `build/cmake/config/<name>-<linkvariant>-<toolchain>-<buildconfig>-module.cmake`
 
-**Usage in Another Project:**
+**Usage in another CMake project:**
 ```cmake
 list(APPEND CMAKE_MODULE_PATH "/path/to/project/build/cmake/config")
 find_package(MyProject REQUIRED)
-target_link_libraries(myapp PRIVATE MyProject::mylib)
+target_link_libraries(myapp PRIVATE MyProject::core-shared)
 ```
+
+### `clean-cmake-lists`
+
+Deletes the generated `CMakeLists.txt` from the project root. Wired as a dependency of the standard `clean` task.
 
 ---
 
@@ -49,70 +72,59 @@ target_link_libraries(myapp PRIVATE MyProject::mylib)
 
 **Implementation:** [`CMakeConfigure.java`](CMakeConfigure.java)
 
-Configure tasks execute the CMake configuration step, generating platform-specific build files (Makefiles, Ninja files, Visual Studio projects, etc.).
+### `configure-<toolchain>-<buildconfig>`
 
-### configure-<toolchain>
+Runs `cmake -S … -B … -G …` to configure the CMake build for one toolchain/buildConfig combination. Generates platform-specific build files (Makefiles, Ninja files, Visual Studio projects, etc.).
 
-Runs CMake in the specified toolchain's build directory. This step:
-- Generates build system files (Makefiles, Ninja, etc.)
-- Processes CMakeLists.txt
-- Discovers libraries and dependencies
-- Performs compiler capability checks
+**Depends on:** `assemble-cmake-lists`
+**Output:** `build/cmake/config/<toolchain>/<buildconfig>/` (CMake build directory)
 
-**Pattern:** `configure-<toolchain-name>`  
-**Example:** `configure-gcc`, `configure-clang`, `configure-msvc`  
-**Task Type:** `CMakeConfigure`  
-**Output:** `build/cmake/build/<toolchain>/` directory with CMake cache and build files
-
-**Dependencies:** Runs after `assemble-cmake-lists`
-
-**Typical Usage:**
 ```bash
-./gradlew configure-gcc
-./gradlew configure-clang
+./gradlew configure-gcc-debug
+./gradlew configure-clang-release
 ```
 
 ---
 
 ## Build Tasks
 
-**Implementation:** [`CMakeBuild.java`](CMakeBuild.java), [`CMakeBuildLibrary.java`](CMakeBuildLibrary.java), [`CMakeBuildExecutable.java`](CMakeBuildExecutable.java)
+**Implementation:** [`CMakeBuildLibrary.java`](CMakeBuildLibrary.java), [`CMakeBuildExecutable.java`](CMakeBuildExecutable.java)
 
-Build tasks compile libraries and executables using CMake's build system.
+### `build-<name>-<linkvariant>-<toolchain>-<buildconfig>` (library)
 
-### build-<component-name>-<toolchain>
+Compiles one library variant for one toolchain/buildConfig.
 
-Compiles a specific library, application, or test for a given toolchain. Each component can be built independently or as part of a larger build.
-
-**Pattern:** `build-<name>-<toolchain>`  
-**Examples:**
-- `build-mylib-gcc` - Build library "mylib" with gcc
-- `build-myapp-clang` - Build application "myapp" with clang
-- `build-mytest-gcc` - Build test "mytest" with gcc
-
-**Task Type:** `CMakeBuild*` (specific subclass depends on component type)  
-**Output:** 
-- Libraries: `build/cmake/install/<toolchain>/lib/`
-- Applications: `build/cmake/install/<toolchain>/bin/`
-
-**Artifact Naming:** `<name>-<toolchain>-<link-type>-<build-config>`
-- Example: `mylib-gcc-shared-debug`, `mylib-gcc-static-release`
-
-**Dependencies:** Runs after `configure-<toolchain>`
-
-### build-all-<toolchain>
-
-Convenience task that builds all libraries and applications for a specific toolchain. Useful when you want to build everything but target a particular compiler.
-
-**Pattern:** `build-all-<toolchain>`  
-**Examples:** `build-all-gcc`, `build-all-clang`  
-**Effect:** Runs all `build-*-<toolchain>` tasks in dependency order
-
-**Typical Usage:**
 ```bash
-./gradlew build-all-gcc      # Build everything with gcc
-./gradlew build-all-clang    # Build everything with clang
-./gradlew build-myapp-gcc    # Build only myapp with gcc
+./gradlew build-core-shared-gcc-debug
+./gradlew build-utils-static-clang-release
+```
+
+### `build-<name>-<toolchain>-<buildconfig>` (application or test)
+
+Compiles one application or test executable.
+
+```bash
+./gradlew build-viewer-gcc-release
+./gradlew build-unit-tests-gcc-debug
+```
+
+**Depends on:** `configure-<toolchain>-<buildconfig>`
+**Output:** `build/cmake/config/<toolchain>/<buildconfig>/<name>-[<linkvariant>-]<toolchain>-<buildconfig>/`
+
+### `build-all-<toolchain>`
+
+Convenience task: builds all libraries and applications for all build configs of one toolchain.
+
+```bash
+./gradlew build-all-gcc
+```
+
+### `build-all-<toolchain>-<buildconfig>`
+
+Builds all libraries and applications for one toolchain/buildConfig.
+
+```bash
+./gradlew build-all-gcc-release
 ```
 
 ---
@@ -121,116 +133,91 @@ Convenience task that builds all libraries and applications for a specific toolc
 
 **Implementation:** [`CMakeCheck.java`](CMakeCheck.java)
 
-Check tasks execute tests using CMake's `ctest` command. Test results can optionally be exported as JUnit XML for CI/CD integration.
+Runs `ctest` to execute tests. Only created for components defined in the `tests {}` block.
 
-### check-<test-name>-<toolchain>
+### `check-<name>-<toolchain>-<buildconfig>`
 
-Executes a specific test for a given toolchain. Tests are discovered and managed by CMake.
+Runs one test executable via ctest.
 
-**Pattern:** `check-<test-name>-<toolchain>`  
-**Examples:** `check-unit_tests-gcc`, `check-integration_tests-clang`  
-**Task Type:** `CMakeCheck`  
-**Output:** Test output to console; optionally JUnit XML if configured
+```bash
+./gradlew check-unit-tests-gcc-debug
+./gradlew check-integration-tests-clang-release
+```
 
-**Dependencies:** Runs after `build-<test-name>-<toolchain>`
+**Depends on:** `build-<name>-<toolchain>-<buildconfig>`
 
-### check-all-<toolchain>
+### `check-all-<toolchain>`
 
-Executes all tests for a specific toolchain.
+Runs all tests for all build configs of one toolchain.
 
-**Pattern:** `check-all-<toolchain>`  
-**Examples:** `check-all-gcc`, `check-all-clang`  
-**Effect:** Runs all `check-*-<toolchain>` tasks
+```bash
+./gradlew check-all-gcc
+```
 
-### Customizing Check Tasks
+### `check-all-<toolchain>-<buildconfig>`
 
-You can customize test execution by configuring `CMakeCheck` task properties:
+Runs all tests for one toolchain/buildConfig.
 
-```groovy
-tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    // Add custom ctest arguments
-    additionalArguments = [
-        '--verbose',                    // Verbose output
-        '--output-on-failure',          // Show output for failed tests
-        '--parallel', '4',              // Run tests in parallel
-        '--timeout', '300'              // 5 minute timeout per test
-    ]
-}
+```bash
+./gradlew check-all-gcc-debug
 ```
 
 ### JUnit XML Output
 
-When configured in the extension, tests can export results as JUnit XML:
+Enable per-test XML output in the extension:
 
 ```groovy
 cmake {
   tests {
     unit_tests {
-      toolchains = ['gcc']
-      testResultsXmlOutput = true  // Enable JUnit XML output
+      toolchains 'gcc'
+      testResultsXmlOutput = true
     }
   }
 }
 ```
 
-Results are generated at: `build/cmake/build/<toolchain>/junit_<test-name>.xml`
+ctest writes the JUnit XML to the CMake build directory. Integrate with CI by pointing your test results parser at `build/cmake/config/<toolchain>/<buildconfig>/`.
 
-**Usage in CI/CD:**
-```groovy
-// Example: Jenkins/GitHub Actions configuration
-tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    additionalArguments = [
-        '--output-junit',
-        "${project.buildDir}/reports/tests/"
-    ]
-}
+---
+
+## Archive Tasks
+
+**Implementation:** [`CMakeCustomZip.java`](CMakeCustomZip.java)
+
+Archive tasks are **not** created automatically. They are registered via `cmake.tasks.registerRuntimeArchiveTasks(...)` or `cmake.tasks.registerDevelopArchiveTasks(...)` in `build.gradle` (see [Extension Configuration Guide](../extension/EXTENSION.md#custom-tasks)).
+
+### `zip-runtime-<name>-<linkvariant>-<toolchain>-<buildconfig>` (library)
+### `zip-runtime-<name>-<toolchain>-<buildconfig>` (application/test)
+
+Packages a component's runtime binaries and their resolved runtime dependencies into a ZIP file. Pre-configured with the build output directory; the action closure can adjust the destination or add files.
+
+```bash
+./gradlew zip-runtime-core-shared-gcc-release
 ```
 
-**Example: Customizing Tests by Toolchain**
+### `zip-develop-<name>-<linkvariant>-<toolchain>-<buildconfig>`
 
-```groovy
-tasks.named('check-unit_tests-gcc', io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    additionalArguments = ['--verbose']
-}
+Packages a library's development artifacts (the static/shared library into `lib/`, its public headers into `include/`) into a ZIP file. Only applicable to library components.
 
-tasks.named('check-unit_tests-clang', io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    additionalArguments = ['--output-on-failure']
-}
+```bash
+./gradlew zip-develop-core-static-gcc-release
 ```
+
+**Depends on:** The corresponding `build-*` task.
 
 ---
 
 ## Standard Gradle Tasks
 
-The plugin integrates with Gradle's standard task lifecycle:
+The plugin wires into the standard Gradle lifecycle:
 
-### build
-
-The `build` task compiles all libraries and applications for all toolchains and all build configurations.
-
-**Dependencies:** Depends on all `build-*-*` tasks  
-**Typical Usage:**
-```bash
-./gradlew build     # Full build for all toolchains
-```
-
-### check
-
-The `check` task runs all tests for all toolchains and all build configurations.
-
-**Dependencies:** Depends on all `check-*-*` tasks  
-**Typical Usage:**
-```bash
-./gradlew check     # Run all tests
-```
-
-### clean
-
-Cleans all build artifacts.
-
-**Removes:**
-- `build/cmake/` directory
-- All compiled binaries and artifacts
+| Task | Effect |
+|------|--------|
+| `assemble` | Depends on `assemble-cmake-lists` |
+| `build` | Depends on all `build-all-<toolchain>` tasks |
+| `check` | Depends on all `check-all-<toolchain>` tasks |
+| `clean` | Depends on `clean-cmake-lists` (deletes `CMakeLists.txt` from project root) |
 
 ---
 
@@ -238,250 +225,110 @@ Cleans all build artifacts.
 
 **Implementation:** [`CMakeCustomExec.java`](CMakeCustomExec.java)
 
-Custom exec tasks allow you to register arbitrary commands to run in the context of a CMake build. This is useful for code analysis, test coverage, benchmarking, or other toolchain-specific operations.
+Registered via `cmake.tasks.registerExecTasks(Map spec, Action<CMakeCustomExec> action)`. See [Extension Configuration Guide — Custom Tasks](../extension/EXTENSION.md#custom-tasks) for full registration options.
 
-### Registering Custom Tasks
+The action receives a `CMakeCustomExec` task with all standard `Exec` task properties plus:
 
-Use `cmake.register()` to define custom tasks. There are three registration levels:
+| Property | Type | Description |
+|----------|------|-------------|
+| `compileCommands` | String | Absolute path to `compile_commands.json` for the current toolchain/buildConfig |
 
-#### Register for All Toolchains and Build Configs
+The task is run in a shell (`sh -c` on Unix, `cmd /c` on Windows) and will source the toolchain's `environmentFile` before the command if configured.
 
-```groovy
-cmake.register('<name>') {
-    baseCommand = '<executable>'
-    baseArguments = ['<argument>', ...]      // optional
-    additionalArguments = ['<argument>', ...] // optional
-    // Available variables:
-    // - toolchainName: The toolchain name
-    // - buildConfig: The build configuration (debug, release, etc.)
-    // - compileCommands: Path to compile_commands.json
-}
-```
+### Task name
 
-Creates tasks: `<name>-<toolchain>-<config>` for each toolchain and build config.
+Custom exec tasks are registered with the `name` key from the spec. When registered **per toolchain** (no `buildConfigs` in spec), the name is used as-is. It is the caller's responsibility to ensure the name is unique across all matching combinations.
 
-#### Register for Specific Toolchains
+### Example: Static analysis with cppcheck
 
 ```groovy
-cmake.register('<name>', ['<toolchain1>', '<toolchain2>']) {
-    baseCommand = '<executable>'
-    baseArguments = ['<argument>', ...]
-}
-```
-
-Creates tasks only for the specified toolchains with all build configs.
-
-#### Register for Specific Toolchains and Build Configs
-
-```groovy
-cmake.register('<name>', ['<toolchain1>'], ['debug']) {
-    baseCommand = '<executable>'
-    baseArguments = ['<argument>', ...]
-}
-```
-
-Creates tasks only for the specified combinations.
-
-### Example: Test Coverage Analysis
-
-```groovy
-cmake {
-  // Configure toolchain with coverage flags
-  toolchains {
-    gcc {
-      libraries {
-        compiling {
-          options = ['--coverage']
-        }
-        linking {
-          options = ['--coverage']
-        }
-      }
-      tests {
-        compiling {
-          options = ['--coverage']
-        }
-        linking {
-          options = ['--coverage', '-lgcov']
-        }
-      }
+// Register for each build config individually to get unique names
+cmake.tasks.registerExecTasks(
+    [name: "cppcheck", toolchains: ['gcc'], buildConfigs: ['Debug', 'Release']],
+    { task ->
+        task.executable = 'cppcheck'
+        task.args '--enable=all', '--project', task.compileCommands
     }
-  }
-  
-  // Register coverage task that runs after tests
-  register('coverage', ['gcc'], ['debug']) {
-    dependsOn(tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck))
-    
-    baseCommand = 'ctest'
-    baseArguments = [
-        '-T', 'Coverage',
-        '--test-dir', "${project.buildDir}/cmake/build/gcc/"
-    ]
-  }
 }
 ```
 
-**Usage:**
+```bash
+./gradlew cppcheck-gcc-debug
+./gradlew cppcheck-gcc-release
+```
+
+### Example: Test coverage with gcov/lcov
+
+```groovy
+cmake.tasks.registerExecTasks(
+    [name: 'coverage-gcc-debug', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
+    { task ->
+        task.executable = 'ctest'
+        task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath
+    }
+)
+```
+
 ```bash
 ./gradlew coverage-gcc-debug
 ```
 
-### Example: Code Analysis with cppcheck
-
-```groovy
-cmake {
-  register('cppcheck', ['gcc', 'clang']) {
-    baseCommand = 'cppcheck'
-    baseArguments = [
-        '--enable=all',
-        '--inconclusive',
-        '--suppress=missingIncludeSystem'
-    ]
-    additionalArguments = ['src/']
-  }
-}
-```
-
-**Usage:**
-```bash
-./gradlew cppcheck-gcc-debug
-./gradlew cppcheck-clang-release
-```
-
-### Example: Compile Database Export
-
-```groovy
-cmake {
-  register('export-compdb', ['gcc']) {
-    baseCommand = 'cp'
-    baseArguments = [
-        "${project.buildDir}/cmake/build/gcc/compile_commands.json",
-        "${project.buildDir}/compile_commands.json"
-    ]
-  }
-}
-```
-
-### Variables Available in Custom Tasks
-
-Inside custom task blocks, the following variables are available:
-
-| Variable | Type | Description |
-|----------|------|-------------|
-| `toolchainName` | String | Name of the current toolchain (e.g., "gcc", "clang") |
-| `buildConfig` | String | Current build configuration (e.g., "debug", "release") |
-| `compileCommands` | String | Path to `compile_commands.json` file |
-
-**Example Usage:**
-
-```groovy
-cmake {
-  register('analyze', ['gcc']) {
-    baseCommand = 'clang-tidy'
-    additionalArguments = [
-        '-p', "${project.buildDir}/cmake/build/${toolchainName}/",
-        'src/**/*.cpp'
-    ]
-  }
-}
-```
-
 ---
 
-## Task Dependencies
-
-Understanding task dependencies helps optimize your build:
+## Task Dependencies Overview
 
 ```
 assemble-cmake-lists
-├── assemble-<toolchain>-config
-└── configure-<toolchain>
-    └── build-<component>-<toolchain>
-        └── check-<test>-<toolchain>
+└── assemble-<name>-<variant>-<toolchain>-<config>-module  (per library)
 
-build (standard task)
-├── build-all-<toolchain1>
-└── build-all-<toolchain2>
-    ├── build-lib1-<toolchain>
-    ├── build-lib2-<toolchain>
-    ├── build-app1-<toolchain>
-    └── ...
+configure-<toolchain>-<config>
+└── depends on: assemble-cmake-lists
 
-check (standard task)
-├── check-all-<toolchain1>
-└── check-all-<toolchain2>
-    ├── check-test1-<toolchain>
-    ├── check-test2-<toolchain>
-    └── ...
+build-<name>-[<variant>-]<toolchain>-<config>
+└── depends on: configure-<toolchain>-<config>
+
+check-<name>-<toolchain>-<config>
+└── depends on: build-<name>-<toolchain>-<config>
+
+zip-runtime-* / zip-develop-*
+└── depends on: build-*
+
+build-all-<toolchain>-<config>
+└── depends on: all build-*-<toolchain>-<config>
+
+build-all-<toolchain>
+└── depends on: build-all-<toolchain>-<config>  (all configs)
+
+check-all-<toolchain>-<config>
+└── depends on: all check-*-<toolchain>-<config>
+
+check-all-<toolchain>
+└── depends on: check-all-<toolchain>-<config>  (all configs)
+
+build (lifecycle)
+└── depends on: build-all-<toolchain>  (all toolchains)
+
+check (lifecycle)
+└── depends on: check-all-<toolchain>  (all toolchains)
+
+clean (lifecycle)
+└── depends on: clean-cmake-lists
 ```
 
 ---
 
-## Common Build Scenarios
+## Build Output Structure
 
-### Build Everything
-
-```bash
-./gradlew build
 ```
+<project root>/
+└── CMakeLists.txt                              # Generated by assemble-cmake-lists
 
-Builds all libraries and applications for all toolchains and configurations.
-
-### Build Specific Toolchain
-
-```bash
-./gradlew build-all-gcc
-./gradlew check-all-gcc
+build/cmake/
+└── config/
+    ├── <toolchain>/
+    │   └── <buildconfig>/                      # CMake build directory (configure output)
+    │       ├── CMakeCache.txt
+    │       ├── compile_commands.json
+    │       └── <name>-[<variant>-]<toolchain>-<buildconfig>/  # Build output per target
+    └── <name>-<variant>-<toolchain>-<buildconfig>-module.cmake  # Module files
 ```
-
-Build and test everything using gcc only.
-
-### Build and Test Single Component
-
-```bash
-./gradlew build-myapp-gcc check-mytest-gcc
-```
-
-Build an application and run its tests.
-
-### Run Tests with Verbose Output
-
-```groovy
-tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    additionalArguments = ['--verbose', '--output-on-failure']
-}
-```
-
-Then:
-```bash
-./gradlew check
-```
-
-### Parallel Test Execution
-
-```groovy
-tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    additionalArguments = ['--parallel', '4']
-}
-```
-
-### Export Test Results
-
-```groovy
-cmake {
-  tests {
-    unit_tests {
-      testResultsXmlOutput = true
-    }
-  }
-}
-
-tasks.withType(io.github.tomaki19.gradle.cmake.tasks.CMakeCheck) {
-    additionalArguments = [
-        '--output-junit',
-        "${project.buildDir}/reports/tests/"
-    ]
-}
-```
-
-Then parse `build/reports/tests/*.xml` in your CI/CD pipeline.

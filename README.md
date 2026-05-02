@@ -4,18 +4,17 @@ A Gradle plugin that seamlessly integrates CMake into your Gradle build workflow
 
 ## Features
 
-- **Multi-Toolchain Support** - Configure and build against multiple compilers and CMake generators
-- **CMake Integration** - Automatic CMake configuration, compilation, and testing through Gradle tasks
-- **Library & Application Management** - Define shared/static libraries and executables with fine-grained compilation and linking control
-- **Test Automation** - Built-in test execution with JUnit XML output for CI/CD integration
+- **Multi-Project Support** - Configure and build multiple projects in your workspace
 - **Dependency Management** - Link against system packages (via CMake's `find_package`) and local project libraries
-- **Multi-Configuration Builds** - Debug, Release, and custom build configurations per toolchain
-- **Custom Tasks** - Register custom CMake-related commands (code coverage, linting, analysis)
-- **Artifact Organization** - Automatic artifact management and installation to structured directories
+- **CMake Integration** - Automatic CMake configuration, compilation, and testing through Gradle tasks
+- **Multi-Toolchain/Cross-Compilation Support** - Configure and build against multiple compilers and CMake generators
+- **Multi-Configuration Builds** - Debug, Release, RelWithDebInfo, MinSizeRel, and custom build configurations per toolchain
+- **Library & Application Management** - Define shared, static and interface libraries and executables with fine-grained compilation and linking control
+- **Test Automation** - Built-in test execution via `ctest` with optional JUnit XML output for CI/CD integration
+- **Custom Tasks** - Register custom CMake-related commands (coverage, linting, analysis) and archive tasks (runtime ZIP, develop SDK ZIP)
+- **Artifact Organization** - Automatic Gradle configurations and artifacts for runtime and development distributions
 
 ## Installation
-
-### Using the Plugin Portal (Recommended)
 
 Add the plugin to your `build.gradle`:
 
@@ -25,35 +24,14 @@ plugins {
 }
 ```
 
-### Legacy Build Script
-
-```groovy
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'io.github.tomaki19:gradle-cmake-plugin:<version>'
-    }
-}
-
-apply plugin: 'io.github.tomaki19.gradle-cmake-plugin'
-```
-
 ## Requirements
 
-The plugin requires the following versions:
-
-- **Gradle** >= 8.0
-- **Java** >= 17 (JVM language, not C/C++ compilation)
+- **Gradle** >= 8
+- **Java** >= 17 (JVM, not the C/C++ compiler)
 - **CMake** >= 3.21
-- **C/C++ Compiler** (gcc, clang, MSVC, etc.) - Your platform's default or a configured toolchain
+- **C/C++ compiler** (gcc, clang, MSVC, etc.)
 
 ## Quick Start
-
-### Basic Configuration
-
-Create a simple C++ library and application (see the [Extension Configuration Guide](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md) for all available options):
 
 ```groovy
 plugins {
@@ -61,50 +39,38 @@ plugins {
 }
 
 cmake {
-  // Define the toolchain to use
   toolchains {
-    'gcc' {
-      // Uses native gcc and Unix Makefiles by default
-      buildConfigs = ['debug', 'release']
+    gcc {
+      buildConfigs 'Debug', 'Release'     // method call, not assignment
     }
   }
 
-  // Define a library
   libraries {
     mylib {
-      toolchains = ['gcc']
-      sources {
-        srcDirs = ['src/lib']
-      }
-      headers {
-        srcDirs = ['include']
-      }
+      toolchains 'gcc'                    // method call, not assignment
+      sources { srcDirs = ['src/lib'] }
+      headers { srcDirs = ['include'] }
     }
   }
 
-  // Define an executable
   applications {
     myapp {
-      toolchains = ['gcc']
-      sources {
-        srcDirs = ['src/app']
-      }
+      toolchains 'gcc'
+      sources { srcDirs = ['src/app'] }
       linking {
-        link(['mylib'])
+        link([variant: 'Shared', visibility: 'Private'], 'mylib')
       }
     }
   }
 
-  // Define tests
   tests {
     mytest {
-      toolchains = ['gcc']
-      sources {
-        srcDirs = ['src/test']
-      }
+      toolchains 'gcc'
+      sources { srcDirs = ['src/test'] }
       linking {
-        link(['mylib'])
+        link([variant: 'Shared', visibility: 'Private'], 'mylib')
       }
+      testResultsXmlOutput = true
     }
   }
 }
@@ -112,56 +78,69 @@ cmake {
 
 ### Common Build Commands
 
-See the [Tasks Reference](src/main/java/io/github/tomaki19/gradle/cmake/tasks/TASKS.md) for the full list of tasks and customization options.
+See the [Tasks Reference](src/main/java/io/github/tomaki19/gradle/cmake/tasks/TASKS.md) for the full list of tasks.
 
 ```bash
-# Build all components for all toolchains
+# Build all components for all toolchains and build configs
 ./gradlew build
 
-# Build all components for a specific toolchain
+# Build all components for a specific toolchain (all build configs)
 ./gradlew build-all-gcc
 
-# Build a specific component
-./gradlew build-myapp-gcc
+# Build all components for a specific toolchain and build config
+./gradlew build-all-gcc-debug
 
-# Run tests
+# Build a specific library (includes link variant and build config)
+./gradlew build-mylib-shared-gcc-debug
+
+# Build a specific application
+./gradlew build-myapp-gcc-release
+
+# Run all tests
 ./gradlew check
 
 # Run tests for a specific toolchain
 ./gradlew check-all-gcc
+
+# Run a specific test
+./gradlew check-mytest-gcc-debug
 ```
 
 ## Documentation
 
-- **[Extension Configuration Guide](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md)** - Detailed documentation of all configuration options for toolchains, libraries, applications, and tests
-- **[Tasks Reference](src/main/java/io/github/tomaki19/gradle/cmake/tasks/TASKS.md)** - Complete reference of all available Gradle tasks and how to customize them
+- **[Extension Configuration Guide](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md)** — All configuration options for toolchains, libraries, applications, tests, and custom tasks
+- **[Tasks Reference](src/main/java/io/github/tomaki19/gradle/cmake/tasks/TASKS.md)** — Complete reference of all generated tasks, naming conventions, and dependencies
 
 ## Examples
 
 ### Multi-Toolchain Build
 
-See [Toolchains](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md#toolchains) in the Extension Configuration Guide for all toolchain options.
+See [Toolchains](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md#toolchains) for all options.
 
 ```groovy
 cmake {
   toolchains {
     gcc {
       generator = 'Unix Makefiles'
-      buildConfigs = ['debug', 'release']
+      buildConfigs 'Debug', 'Release'
+      environment = [CC: 'gcc', CXX: 'g++']
     }
     clang {
-      generator = 'Unix Makefiles'
-      operatingSystem = 'Linux'
+      generator = 'Ninja'
+      buildConfigs 'Debug', 'Release'
+      environment = [CC: 'clang', CXX: 'clang++']
     }
   }
 
   libraries {
     core {
-      toolchains = ['gcc', 'clang']
-      buildVariants = ['shared', 'static']
+      toolchains 'gcc', 'clang'
+      buildVariants SHARED, STATIC
+      sources { srcDirs = ['src'] }
+      headers { srcDirs = ['include'] }
       compiling {
-        defines = ['VERSION_1_0', 'ENABLE_LOGGING']
-        options = ['-Wall', '-Wextra']
+        options([visibility: 'Public'], '-Wall', '-Wextra')
+        defines([visibility: 'Public'], 'CORE_VERSION_2')
       }
     }
   }
@@ -170,69 +149,89 @@ cmake {
 
 ### Linking Against System Libraries
 
-See [Packages](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md#packages) in the Extension Configuration Guide for all package options.
+See [Packages](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md#packages) for all options.
 
 ```groovy
 cmake {
   packages {
-    opengl {
-      moduleMode = true
-    }
-    boost {
-      components = ['system', 'filesystem']
-    }
+    opengl { moduleMode = true }
+    boost  { components = ['system', 'filesystem'] }
   }
 
   applications {
     renderer {
-      toolchains = ['gcc']
+      toolchains 'gcc'
+      sources { srcDirs = ['src'] }
       linking {
-        dependencies(['opengl', 'boost'])
+        link([variant: 'Shared', visibility: 'Private'], 'opengl')
+        link([variant: 'Shared', visibility: 'Private'], 'boost')
       }
     }
   }
 }
 ```
 
-### Custom Execution Tasks
+### Custom Exec Task (Code Analysis)
 
-See [Custom Exec Tasks](src/main/java/io/github/tomaki19/gradle/cmake/tasks/TASKS.md#custom-exec-tasks) in the Tasks Reference for registration options and more examples.
+See [Custom Tasks](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION.md#custom-tasks) for full registration options.
 
 ```groovy
 cmake {
-  // Register a coverage analysis task
-  register('coverage', ['gcc']) {
-    baseCommand = 'ctest'
-    baseArguments = [
-      '-T', 'Coverage',
-      '--test-dir', "${project.buildDir}/cmake/build/gcc/"
-    ]
+  // Register a cppcheck analysis task for each build config
+  ['Debug', 'Release'].each { config ->
+    tasks.registerExecTasks(
+        [name: "cppcheck-gcc-${config.toLowerCase()}", toolchains: ['gcc'], buildConfigs: [config]],
+        { task ->
+            task.executable = 'cppcheck'
+            task.args '--enable=all', '--project', task.compileCommands
+        }
+    )
   }
 }
 
-// Task runs after tests: ./gradlew coverage-gcc
+// Run: ./gradlew cppcheck-gcc-debug
+```
+
+### Runtime and Develop Archives
+
+```groovy
+cmake {
+  // ZIP runtime binaries for distribution
+  tasks.registerRuntimeArchiveTasks(
+      [toolchains: ['gcc'], buildConfigs: ['Release'], components: ['*shared']],
+      { task -> task.destinationDirectory.set(layout.buildDirectory.dir('dist')) }
+  )
+
+  // ZIP development SDK (library + headers)
+  tasks.registerDevelopArchiveTasks(
+      [toolchains: ['gcc'], buildConfigs: ['Release'], components: ['*static']],
+      { task -> task.destinationDirectory.set(layout.buildDirectory.dir('sdk')) }
+  )
+}
+
+// Run: ./gradlew zip-runtime-core-shared-gcc-release
+//      ./gradlew zip-develop-core-static-gcc-release
 ```
 
 ## Build Output Structure
 
 ```
+<project root>/
+└── CMakeLists.txt                  # Generated; deleted by clean
+
 build/cmake/
-├── CMakeLists.txt              # Generated main build file
-├── build/
-│   └── <toolchain>/            # CMake build directories
-│       ├── CMakeCache.txt
-│       └── compile_commands.json
-├── install/
-│   └── <toolchain>/            # Compiled artifacts
-│       ├── lib/                # Libraries
-│       └── bin/                # Executables
 └── config/
-    └── <name>-<toolchain>-config.cmake  # CMake module files
+    ├── <toolchain>/
+    │   └── <buildconfig>/          # CMake build directory
+    │       ├── CMakeCache.txt
+    │       ├── compile_commands.json
+    │       └── <target>/           # Per-component build output
+    └── <name>-<variant>-<toolchain>-<buildconfig>-module.cmake
 ```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for bug reports and feature requests.
+Contributions are welcome. Please submit pull requests or open issues for bug reports and feature requests.
 
 ## License
 

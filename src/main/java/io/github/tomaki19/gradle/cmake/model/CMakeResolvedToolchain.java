@@ -18,8 +18,6 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 
 public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolvedToolchain> {
 
-  public static final String DEFAULT_GENERATOR = "Unix Makefiles";
-
   private final OperatingSystem operatingSystem;
   private final String generator;
   private final Collection<String> buildConfigs;
@@ -35,7 +33,7 @@ public final class CMakeResolvedToolchain extends CMakeResolvedName<CMakeResolve
   public CMakeResolvedToolchain(final CMakeToolchain toolchain) {
     super(toolchain.getName());
     this.operatingSystem = toolchain.getOperatingSystem().getOrElse(OperatingSystem.current());
-    this.generator = toolchain.getGenerator().getOrElse(DEFAULT_GENERATOR);
+    this.generator = toolchain.getGenerator().getOrElse("");
     this.buildConfigs = new TreeSet<>(toolchain.getBuildConfigs());
     this.environment = new TreeMap<>(toolchain.getEnvironment().get());
     this.environmentFile = Optional.ofNullable(toolchain.getEnvironmentFile().getOrNull());

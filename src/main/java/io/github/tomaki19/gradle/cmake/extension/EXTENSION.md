@@ -6,32 +6,27 @@ The `cmake` extension is the root configuration block for the gradle-cmake-plugi
 cmake {
   packages {...}      // System/external packages (find_package)
   toolchains {...}    // Build toolchains and compiler settings
-  libraries {...}     // Shared/static libraries to build
-  applications {...}  // Executable applications
-  tests {...}         // Test executables
+  libraries {...}     // Libraries (shared,static,interface) to build
+  applications {...}  // Executable applications to build
+  tests {...}         // Test executables to build
+  tasks {...}         // Custom exec and archive tasks
 }
 ```
-
-## Overview
-
-This document describes all available configuration options for the `cmake` extension. Configuration blocks can be deeply nested to provide fine-grained control over compilation and linking settings per toolchain, build type, and component type.
 
 ---
 
 ## Packages
 
-Define system libraries and external packages that will be discovered using CMake's `find_package()` mechanism.
-
-**Use Case:** Link against system-installed libraries like OpenGL, Boost, Qt, etc.
+Define system libraries and external packages discovered via CMake's `find_package()`.
 
 ```groovy
 cmake {
   packages {
     '<name>' {
-      moduleMode = boolean              // optional, default: false
-      targetPrefix = String             // optional
-      components = List<String>         // optional
-      properties = Map<String, String>  // optional
+      targetPrefix = 'prefix::'         // optional
+      components = ['comp1', 'comp2']   // optional
+      properties = [key: 'value']       // optional
+      moduleMode = false                // optional
     }
   }
 }
@@ -41,29 +36,20 @@ cmake {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `moduleMode` | boolean | false | If true, uses `find_package()` in MODULE mode; if false, uses CONFIG mode |
-| `targetPrefix` | String | — | Custom prefix for the target names discovered by find_package |
-| `components` | List<String> | — | Specific components to request when finding the package (e.g., `['system', 'filesystem']` for Boost) |
-| `properties` | Map<String, String> | — | Additional CMake package properties or hints passed to find_package |
+| `moduleMode` | boolean | false | Use MODULE mode for `find_package()`; if false uses CONFIG mode |
+| `targetPrefix` | String | — | Custom prefix for target names discovered by find_package |
+| `components` | Set<String> | — | Specific components to request (e.g., `['system', 'filesystem']` for Boost) |
+| `properties` | Map<String,String> | — | Additional CMake hints passed to find_package |
 
-### Example: Multiple Packages
+### Example
 
 ```groovy
 cmake {
   packages {
-    opengl {
-      moduleMode = true
-    }
-    boost {
-      components = ['system', 'filesystem', 'thread']
-    }
-    qt {
-      components = ['Core', 'Gui', 'Widgets']
-    }
-    custom {
-      moduleMode = true
-      targetPrefix = 'Custom::'
-    }
+    opengl { moduleMode = true }
+    boost  { components = ['system', 'filesystem', 'thread'] }
+    qt     { components = ['Core', 'Gui', 'Widgets'] }
+    zlib   { targetPrefix = 'ZLIB::' }
   }
 }
 ```
@@ -72,39 +58,37 @@ cmake {
 
 ## Toolchains
 
-Define one or more build toolchains. Each toolchain represents a compiler/generator combination and can have different settings for libraries, applications, and tests.
-
-**Use Case:** Configure multiple compilers (gcc, clang, MSVC) or cross-compilation toolchains.
+Define one or more build toolchains. Each toolchain represents a compiler/generator combination.
 
 ```groovy
 cmake {
   toolchains {
     '<name>' {
-      operatingSystem = String                      // optional, default: auto-detect
-      generator = String                            // optional, default: CMake default for OS
-      buildConfigs = List<String>                   // optional, default: ['debug', 'release']
-      environment = Map<String, String>            // optional, default: empty
-      environmentFile = File                        // optional
-      toolchainFile = File                          // optional
-      
+      operatingSystem = Linux                    // optional
+      generator = 'Unix Makefiles'               // optional
+      buildConfigs 'Debug', 'Release', ...       // optional
+      environment = [CC: 'gcc', CXX: 'g++']      // optional
+      environmentFile = file('env.sh')           // optional
+      toolchainFile = file('toolchain.cmake')    // optional
+
       libraries {
-        buildVariants = List<CMakeBuildVariant>    // optional, default: [Shared]
-        compiling { ... }                           // compilation settings
-        linking { ... }                             // linking settings
-        stripDebug = boolean                        // optional, default: false
+        buildVariants SHARED, STATIC             // optional
+        compiling { ... }
+        linking { ... }
+        stripDebug = false                       // optional
       }
-      
+
       applications {
-        compiling { ... }                           // compilation settings
-        linking { ... }                             // linking settings
-        stripDebug = boolean                        // optional, default: false
+        compiling { ... }
+        linking { ... }
+        stripDebug = false                       // optional
       }
-      
+
       tests {
-        compiling { ... }                           // compilation settings
-        linking { ... }                             // linking settings
-        stripDebug = boolean                        // optional, default: false
-        testResultsXmlOutput = boolean             // optional, default: false
+        compiling { ... }
+        linking { ... }
+        stripDebug = false                       // optional, default: false
+        testResultsXmlOutput = false             // optional, default: false
       }
     }
   }
@@ -115,71 +99,93 @@ cmake {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `operatingSystem` | enum | auto-detect | Target OS: `Linux`, `Windows`, `MacOS` |
-| `generator` | String | platform default | CMake generator (e.g., `Unix Makefiles`, `Ninja`, `Visual Studio 16 2019`) |
-| `buildConfigs` | List<String> | `['debug', 'release']` | Build configurations per toolchain |
-| `environment` | Map<String, String> | — | Environment variables for CMake execution |
-| `environmentFile` | File | — | Script file to source for environment setup |
-| `toolchainFile` | File | — | CMake toolchain file for cross-compilation |
+| `operatingSystem` | `OperatingSystem` | auto-detect | Target OS: `CMakeToolchain.LINUX`, `CMakeToolchain.MAC_OS`, `CMakeToolchain.WINDOWS` |
+| `generator` | String | auto-detect | CMake generator (e.g., `'Ninja'`, `'Visual Studio 17 2022'`) |
+| `buildConfigs` | method | `'Debug','Release','RelWithDebInfo','MinSizeRel'` | Build configurations; call as `buildConfigs 'Debug', 'Release'` |
+| `environment` | Map<String,String> | — | Environment variables passed to CMake invocations |
+| `environmentFile` | File | — | Shell script sourced before each CMake invocation |
+| `toolchainFile` | File | — | CMake toolchain file (`-DCMAKE_TOOLCHAIN_FILE`) for cross-compilation |
 
-### Compilation Settings (compiling block)
+> **Note:** `buildConfigs` is a **method call**, not a property assignment:
+> ```groovy
+> buildConfigs('Debug', 'Release')   // correct
+> buildConfigs = ['Debug', 'Release'] // WRONG – does not compile
+> ```
+> Build config names are passed to CMake as-is and must match CMake conventions
+> (case-sensitive: `'Debug'`, `'Release'`, `'RelWithDebInfo'`, `'MinSizeRel'`).
 
-All component types (libraries, applications, tests) can have compilation settings:
+### Compilation Settings (`compiling` block)
+
+Available in the `libraries`, `applications`, and `tests` sub-blocks of a toolchain. Also available directly on library/application/test components (see below).
 
 ```groovy
 compiling {
-  options = List<String>    // Compiler flags: ['-Wall', '-O2', '-std=c++17']
-  defines = List<String>    // Preprocessor defines: ['VERSION_1_0', 'DEBUG_MODE']
+  options('-Wall', '-Wextra', [visibility: 'Public'])
+  options('-O2', [visibility: 'Private'])
+  defines('VERSION_1_0', 'ENABLE_LOGGING', [visibility: 'Public'])
+  defines('INTERNAL_BUILD', [visibility: 'Private'])
 }
 ```
 
-### Linking Settings (linking block)
+Both `options()` and `defines()` take one or more flag/define names as the first arguments followed by a spec map:
 
-Define link options and dependencies. Syntax varies slightly between sections.
+| Spec Key | Values | Default | Description |
+|----------|--------|---------|-------------|
+| `visibility` | `'Public'` \| `'Private'` | `'Public'` | CMake target property visibility |
 
-**For Toolchain-level settings (applies to all libraries/apps/tests):**
+Omit the visibility key to use the default (`Public`):
+```groovy
+options('-Wall', '-Wextra')
+defines('DEBUG_MODE')
+```
+
+### Linking Settings (`linking` block)
+
+#### Link options (linker flags)
+
 ```groovy
 linking {
-  options(List<String>)     // Linker flags: ['-Wl,-rpath=/custom/lib']
-  dependencies(List<String>)
-    .from(String)           // Dependency name
-    .build(String)          // Library variant: 'Shared'|'Static' (for libraries only)
-    .link(String)           // Link variant: 'Shared'|'Static'|'Interface'
-    .visibility(String)     // Visibility: 'Public'|'Private'
+  options('-Wl,-rpath,/usr/local/lib')
+  options('-static-libgcc', [visibility: 'Private'])
 }
 ```
 
-### Example: Multiple Toolchains with Compilation Settings
+Same map spec as `compiling` — only `visibility` key is supported.
+
+#### Link dependencies
+
+For the **toolchain-level** `libraries.linking` and `applications.linking` blocks the `link()` method is not available. Link dependencies are defined at the component level (see Libraries / Applications / Tests sections below).
+
+### Example: Multiple Toolchains
 
 ```groovy
 cmake {
   toolchains {
     gcc {
-      operatingSystem = 'Linux'
       generator = 'Unix Makefiles'
-      buildConfigs = ['debug', 'release', 'profile']
-      environment = ['CC': 'gcc', 'CXX': 'g++']
-      
+      buildConfigs 'Debug', 'Release'
+      environment = [CC: 'gcc', CXX: 'g++']
+
       libraries {
-        buildVariants = ['shared', 'static']
+        buildVariants SHARED, STATIC
         compiling {
-          options = ['-Wall', '-Wextra', '-fPIC']
-          defines = ['LINUX', 'USE_THREADS']
+          options('-Wall', '-Wextra', '-fPIC', [visibility: 'Public'])
+          defines('LINUX', [visibility: 'Public'])
         }
         linking {
-          options(['-Wl,-rpath,/usr/lib'])
+          options('-Wl,-rpath,\$ORIGIN')
         }
       }
     }
-    
+
     clang {
-      operatingSystem = 'Linux'
       generator = 'Ninja'
-      environment = ['CC': 'clang', 'CXX': 'clang++']
-      
+      buildConfigs 'Debug', 'Release'
+      environment = [CC: 'clang', CXX: 'clang++']
+
       applications {
         compiling {
-          options = ['-Wall', '-Wextra', '-O3']
+          options('-Wall', '-O3')
         }
       }
     }
@@ -191,43 +197,37 @@ cmake {
 
 ## Libraries
 
-Define library targets to be compiled. Libraries can be shared or static and can be linked by applications and tests.
-
-**Use Case:** Create reusable library components.
+Define library targets. Libraries can be shared, static, or interface (header-only).
 
 ```groovy
 cmake {
   libraries {
     '<name>' {
-      toolchains = List<String>                     // required
-      buildVariants = List<CMakeBuildVariant>      // optional, default: [Shared]
-      
+      toolchains 'gcc', 'clang'             // required – method call, not assignment
+      buildVariants SHARED, STATIC           // optional, default: [SHARED]
+      outputName = 'custom_output_name'      // optional
+
       headers {
-        srcDir = String                             // optional
-        srcDirs = List<String>                     // optional
+        srcDirs = ['include']               // defaults to src/<name>/headers
       }
-      
+
       sources {
-        srcDir = String                             // optional
-        srcDirs = List<String>                     // optional
+        srcDirs = ['src']                   // defaults to src/<name>/sources
       }
-      
+
       compiling {
-        options = List<String>                     // optional
-        defines = List<String>                     // optional
+        options('-Wall', [visibility: 'Public'])
+        defines('INTERNAL', [visibility: 'Private'])
       }
-      
+
       linking {
-        options(List<String>)                       // optional
-        link(List<String>)
-          .from(String)                             // optional
-          .forBuildVariant(String)                  // optional: 'Shared'|'Static'
-          .variant(String)                          // optional: 'Shared'|'Static'|'Interface'
-          .visibility(String)                       // optional: 'Public'|'Private'
+        options('-Wl,-rpath,\$ORIGIN')
+        link('utils', 'common', [variant: 'Shared', visibility: 'Public'])
+        link('remoteLib', [variant: 'Shared', visibility: 'Private', from: 'otherProject'])
+        link('sharedOnlyDep', [forBuild: 'Shared', variant: 'Shared', visibility: 'Private'])
       }
-      
-      outputName = String                           // optional
-      stripDebug = boolean                          // optional, default: false
+
+      stripDebug = false                    // optional, default: false
     }
   }
 }
@@ -237,44 +237,55 @@ cmake {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `toolchains` | List<String> | — | **Required.** Which toolchains to build this library for |
-| `buildVariants` | List<String> | `['Shared']` | Library types to build: `Shared`, `Static`, or both |
-| `headers.srcDir` | String | — | Single directory containing headers |
-| `headers.srcDirs` | List<String> | — | Multiple directories for headers |
-| `sources.srcDir` | String | — | Single directory containing sources |
-| `sources.srcDirs` | List<String> | — | Multiple directories for sources |
-| `compiling.options` | List<String> | — | Compiler flags specific to this library |
-| `compiling.defines` | List<String> | — | Preprocessor defines for this library |
-| `linking.options` | List<String> | — | Linker flags |
-| `outputName` | String | library name | Override the output binary name |
-| `stripDebug` | boolean | false | Strip debug symbols from release builds |
+| `toolchains(...)` | method | all defined toolchains | Toolchains to build this library for: `toolchains 'gcc', 'clang'` |
+| `buildVariants(...)` | method | `SHARED` | Library types: `SHARED`, `STATIC`, `MODULE` (from `CMakeBuildVariant`) |
+| `outputName` | String | component name | Override the CMake target output name |
+| `headers.srcDirs` | List<String> | `src/<name>/headers` | Header directories |
+| `sources.srcDirs` | List<String> | `src/<name>/sources` | Source directories |
+| `stripDebug` | boolean | false | Strip debug symbols |
 
-### Library Linking Details
+> `toolchains` and `buildVariants` are **method calls**:
+> ```groovy
+> toolchains 'gcc', 'clang'        // correct
+> toolchains = ['gcc', 'clang']    // WRONG
+> buildVariants SHARED, STATIC     // correct (enum constants)
+> buildVariants = ['Shared']       // WRONG
+> ```
 
-Libraries can depend on:
-- **System packages** (via `packages` section)
-- **Other libraries** in the project
-- Specify variant information for each dependency
+### Library `linking.link()` Spec Keys
+
+| Key | Values | Default | Description |
+|-----|--------|---------|-------------|
+| `from` | String | `''` | Project name for inter-project dependencies |
+| `variant` | `'Shared'` \| `'Static'` \| `'Interface'` | `'Shared'` | How to link the dependency |
+| `visibility` | `'Public'` \| `'Private'` | `'Public'` | CMake target link visibility |
+| `forBuild` | `'Shared'` \| `'Static'` \| `'Module'` | `'Shared'` | Apply this link spec only when building with the given build variant |
+
+### Example
 
 ```groovy
 libraries {
   utils {
-    toolchains = ['gcc']
-    sources { srcDirs = ['src'] }
-    headers { srcDirs = ['include'] }
+    toolchains 'gcc'
+    sources { srcDirs = ['src/utils'] }
+    headers { srcDirs = ['include/utils'] }
   }
-  
+
   core {
-    toolchains = ['gcc']
-    buildVariants = ['shared', 'static']
-    sources { srcDirs = ['src'] }
-    headers { srcDirs = ['include'] }
-    
+    toolchains 'gcc', 'clang'
+    buildVariants SHARED, STATIC
+
+    sources { srcDirs = ['src/core'] }
+    headers { srcDirs = ['include/core'] }
+
+    compiling {
+      options('-std=c++17', [visibility: 'Public'])
+      defines('CORE_VERSION_2', [visibility: 'Public'])
+    }
+
     linking {
-      link(['utils'])
-        .forBuildVariant('Shared')
-        .variant('Shared')
-        .visibility('Private')
+      link('utils', [variant: 'Shared', visibility: 'Private'])
+      link('system', 'filesystem', [variant: 'Shared', visibility: 'Public', from: 'boost'])
     }
   }
 }
@@ -284,129 +295,77 @@ libraries {
 
 ## Applications
 
-Define executable application targets. Applications cannot be linked by other components but can depend on libraries and packages.
-
-**Use Case:** Create command-line tools, GUI applications, or server executables.
+Define executable application targets.
 
 ```groovy
 cmake {
   applications {
     '<name>' {
-      toolchains = List<String>                     // required
-      
+      toolchains 'gcc'                       // required
+
       headers {
-        srcDir = String                             // optional
-        srcDirs = List<String>                     // optional
+        srcDirs = ['include']               // defaults to src/<name>/headers
       }
-      
       sources {
-        srcDir = String                             // optional
-        srcDirs = List<String>                     // optional
+        srcDirs = ['src']                   // defaults to src/<name>/sources
       }
-      
+
       compiling {
-        options = List<String>                     // optional
-        defines = List<String>                     // optional
+        options('-O3', [visibility: 'Private'])
+        defines('APP_BUILD', [visibility: 'Private'])
       }
-      
+
       linking {
-        options(List<String>)                       // optional
-        link(List<String>)
-          .from(String)                             // optional
-          .variant(String)                          // optional: 'Shared'|'Static'|'Interface'
-          .visibility(String)                       // optional, default: 'Private'
+        options('-Wl,--as-needed')
+        link('core', 'utils', [variant: 'Shared', visibility: 'Private'])
+        link('program_options', [from: 'boost', variant: 'Shared', visibility: 'Private'])
       }
-      
-      outputName = String                           // optional
-      stripDebug = boolean                          // optional, default: false
+
+      outputName = 'my-app'                  // optional
+      stripDebug = false                     // optional, default: false
     }
   }
 }
 ```
 
-### Application Configuration Options
+### Application `linking.link()` Spec Keys
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `toolchains` | List<String> | — | **Required.** Which toolchains to build this application for |
-| `headers.srcDir` | String | — | Single directory containing headers |
-| `headers.srcDirs` | List<String> | — | Multiple directories for headers |
-| `sources.srcDir` | String | — | Single directory containing sources |
-| `sources.srcDirs` | List<String> | — | Multiple directories for sources |
-| `compiling.options` | List<String> | — | Compiler flags for this application |
-| `compiling.defines` | List<String> | — | Preprocessor defines |
-| `linking.options` | List<String> | — | Linker flags |
-| `outputName` | String | app name | Override the output executable name |
-| `stripDebug` | boolean | false | Strip debug symbols from release builds |
-
-### Example: Multiple Applications
-
-```groovy
-cmake {
-  applications {
-    cli {
-      toolchains = ['gcc', 'clang']
-      sources { srcDirs = ['src/cli'] }
-      linking {
-        link(['core', 'utils'])
-          .variant('Shared')
-      }
-    }
-    
-    server {
-      toolchains = ['gcc']
-      sources { srcDirs = ['src/server'] }
-      compiling {
-        defines = ['ENABLE_ASYNC', 'USE_BOOST_ASIO']
-      }
-      linking {
-        link(['core', 'boost'])
-      }
-    }
-  }
-}
-```
+| Key | Values | Default | Description |
+|-----|--------|---------|-------------|
+| `from` | String | `''` | Project name for inter-project dependencies |
+| `variant` | `'Shared'` \| `'Static'` \| `'Interface'` | `'Shared'` | How to link the dependency |
+| `visibility` | `'Public'` \| `'Private'` | `'Public'` | CMake target link visibility |
 
 ---
 
 ## Tests
 
-Define test executable targets. Tests are built and executed via the `check` Gradle task and support JUnit XML output.
-
-**Use Case:** Create unit tests, integration tests, or performance benchmarks.
+Define test executable targets.
 
 ```groovy
 cmake {
   tests {
     '<name>' {
-      toolchains = List<String>                     // required
-      
+      toolchains 'gcc'                       // required
+
       headers {
-        srcDir = String                             // optional
-        srcDirs = List<String>                     // optional
+        srcDirs = ['include']               // defaults to src/<name>/headers
       }
-      
       sources {
-        srcDir = String                             // optional
-        srcDirs = List<String>                     // optional
+        srcDirs = ['src']                   // defaults to src/<name>/sources
       }
-      
+
       compiling {
-        options = List<String>                     // optional
-        defines = List<String>                     // optional
+        defines('TEST_BUILD', 'ENABLE_ASSERT', [visibility: 'Private'])
       }
-      
+
       linking {
-        options(List<String>)                       // optional
-        link(List<String>)
-          .from(String)                             // optional
-          .variant(String)                          // optional: 'Shared'|'Static'|'Interface'
-          .visibility(String)                       // optional, default: 'Private'
+        link('core', [variant: 'Shared', visibility: 'Private'])
       }
-      
-      outputName = String                           // optional
-      stripDebug = boolean                          // optional, default: false
-      testResultsXmlOutput = boolean               // optional, default: false
+
+      outputName = 'my-test'                 // optional
+      stripDebug = false                     // optional, default: false
+      testResultsXmlOutput = false           // optional, default: false
     }
   }
 }
@@ -416,38 +375,82 @@ cmake {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `toolchains` | List<String> | — | **Required.** Which toolchains to build this test for |
-| `headers.srcDir` | String | — | Single directory containing headers |
-| `headers.srcDirs` | List<String> | — | Multiple directories for headers |
-| `sources.srcDir` | String | — | Single directory containing sources |
-| `sources.srcDirs` | List<String> | — | Multiple directories for sources |
-| `compiling.options` | List<String> | — | Compiler flags for tests |
-| `compiling.defines` | List<String> | — | Preprocessor defines (useful for `TEST_BUILD`) |
-| `linking.options` | List<String> | — | Linker flags |
-| `outputName` | String | test name | Override the test executable name |
-| `stripDebug` | boolean | false | Strip debug symbols |
-| `testResultsXmlOutput` | boolean | false | Generate JUnit XML report of test results |
+| `testResultsXmlOutput` | boolean | false | Generate JUnit XML output via ctest's `--output-junit` |
 
-### Example: Test Configuration
+---
+
+## Custom Tasks
+
+Register custom exec tasks and archive tasks via `cmake.tasks`. Tasks are applied during configuration, per toolchain, build config, and/or component.
+
+### `cmake.tasks.registerExecTasks(Map spec, Action<CMakeCustomExec> action)`
+
+Registers a custom command that runs as a Gradle task. The spec map controls when the task is created:
 
 ```groovy
-cmake {
-  tests {
-    unit_tests {
-      toolchains = ['gcc']
-      sources { srcDirs = ['tests/unit'] }
-      compiling {
-        defines = ['TEST_BUILD', 'ENABLE_ASSERT']
-      }
-      linking {
-        link(['core'])
-      }
-      testResultsXmlOutput = true
-      stripDebug = false  // Keep debug info for test debugging
+cmake.tasks.registerExecTasks(
+    [name: 'my-task', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*library']],
+    { task ->
+        task.executable = 'mycommand'
+        task.args '--option', task.compileCommands
     }
-  }
-}
+)
 ```
+
+**Spec map keys:**
+
+| Key | Type | Required | Description |
+|-----|------|----------|-------------|
+| `name` | String | **yes** | Task name (must be unique per matching combination) |
+| `toolchains` | Collection<String> | no | Toolchain names to match; omit to match any toolchain (per-toolchain registration) |
+| `buildConfigs` | Collection<String> | no | Build configs to match; omit for per-toolchain (no build-config) registration |
+| `components` | Collection<String> | no | Component filter; omit for no-component registration |
+
+**Component filter wildcards:**
+
+| Value | Matches |
+|-------|---------|
+| `"*"` | All components |
+| `"*library"` | All libraries (shared, static, interface) |
+| `"*interface"` | Interface libraries only |
+| `"*shared"` | Shared libraries only |
+| `"*static"` | Static libraries only |
+| `"*executable"` | All executables (applications and tests) |
+| `"*application"` | Applications only |
+| `"*test"` | Tests only |
+| `"<name>"` | Exact component name |
+
+**In the action closure, the `CMakeCustomExec` task exposes:**
+- All standard `Exec` task properties (`executable`, `args`, `workingDir`, …)
+- `task.compileCommands` — absolute path to the `compile_commands.json` for the current toolchain/buildConfig
+
+> **Task name uniqueness:** The `name` from the spec is used directly as the Gradle task name. If the spec matches multiple toolchains, buildConfigs, or components in a single build, each match attempts to register the same name, causing a conflict. Use specific `toolchains` + `buildConfigs` + `components` filters so each spec resolves to exactly one task registration.
+
+### `cmake.tasks.registerRuntimeArchiveTasks(Map spec, Action<AbstractArchiveTask> action)`
+
+Registers a ZIP archive task (`zip-runtime-*`) that packages a component's runtime artifacts (binaries and their dependencies). Applies to libraries and executables.
+
+```groovy
+cmake.tasks.registerRuntimeArchiveTasks(
+    [toolchains: ['gcc'], buildConfigs: ['Release'], components: ['*shared']],
+    { task -> task.destinationDirectory.set(layout.buildDirectory.dir('dist')) }
+)
+```
+
+The archive is pre-configured with the built binaries; the action can add further files or override the destination.
+
+### `cmake.tasks.registerDevelopArchiveTasks(Map spec, Action<AbstractArchiveTask> action)`
+
+Registers a ZIP archive task (`zip-develop-*`) that packages a library's development artifacts (static library + headers). Applies to libraries only.
+
+```groovy
+cmake.tasks.registerDevelopArchiveTasks(
+    [toolchains: ['gcc'], buildConfigs: ['Release'], components: ['*static']],
+    { task -> task.destinationDirectory.set(layout.buildDirectory.dir('sdk')) }
+)
+```
+
+The archive is pre-configured with the static library (into `lib/`) and headers (into `include/`).
 
 ---
 
@@ -455,79 +458,74 @@ cmake {
 
 ```groovy
 cmake {
-  // System packages
   packages {
     opengl { moduleMode = true }
-    boost { components = ['system', 'filesystem'] }
+    boost  { components = ['system', 'filesystem'] }
   }
 
-  // Toolchains
   toolchains {
     gcc {
-      operatingSystem = 'Linux'
       generator = 'Unix Makefiles'
-      buildConfigs = ['debug', 'release']
-      
+      buildConfigs 'Debug', 'Release'
+
       libraries {
-        buildVariants = ['shared', 'static']
+        buildVariants SHARED, STATIC
         compiling {
-          options = ['-Wall', '-Wextra']
+          options('-Wall', '-Wextra', [visibility: 'Public'])
         }
       }
-      
-      applications {
-        compiling {
-          defines = ['RELEASE_VERSION']
-        }
-      }
-      
+
       tests {
         testResultsXmlOutput = true
       }
     }
   }
 
-  // Libraries
   libraries {
     graphics {
-      toolchains = ['gcc']
-      buildVariants = ['shared']
+      toolchains 'gcc'
+      buildVariants SHARED
       sources { srcDirs = ['src/graphics'] }
       headers { srcDirs = ['include/graphics'] }
       linking {
-        link(['opengl'])
-          .variant('Shared')
+        link('opengl', [variant: 'Shared', visibility: 'Public'])
       }
     }
-    
+
     utils {
-      toolchains = ['gcc']
+      toolchains 'gcc'
       sources { srcDirs = ['src/utils'] }
       headers { srcDirs = ['include/utils'] }
     }
   }
 
-  // Applications
   applications {
     viewer {
-      toolchains = ['gcc']
+      toolchains 'gcc'
       sources { srcDirs = ['src/viewer'] }
       linking {
-        link(['graphics', 'utils'])
+        link('graphics', 'utils', [variant: 'Shared', visibility: 'Private'])
       }
     }
   }
 
-  // Tests
   tests {
     graphics_tests {
-      toolchains = ['gcc']
+      toolchains 'gcc'
       sources { srcDirs = ['tests'] }
       linking {
-        link(['graphics'])
+        link('graphics', [variant: 'Shared', visibility: 'Private'])
       }
       testResultsXmlOutput = true
     }
   }
+
+  tasks.registerExecTasks(
+      [name: 'coverage-gcc-debug', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
+      { task ->
+          task.executable = 'ctest'
+          task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath
+      }
+  )
 }
 ```
