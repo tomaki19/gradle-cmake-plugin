@@ -246,4 +246,45 @@ class CMakeResolvedLibraryTest {
     CMakeResolvedLibrary resolved2 = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
     assertFalse(resolved1.equals(resolved2));
   }
+
+  @Test
+  void testEquals_sameObject() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeResolvedLibrary resolved = new CMakeResolvedLibrary(
+        new MockCMakeLibrary("test-library", project.getObjects()), CMakeLinkVariant.STATIC, false);
+    assertTrue(resolved.equals(resolved));
+  }
+
+  @Test
+  void testEquals_null() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeResolvedLibrary resolved = new CMakeResolvedLibrary(
+        new MockCMakeLibrary("test-library", project.getObjects()), CMakeLinkVariant.STATIC, false);
+    assertFalse(resolved.equals(null));
+  }
+
+  @Test
+  void testStripDebug_true() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeResolvedLibrary resolved = new CMakeResolvedLibrary(
+        new MockCMakeLibrary("test-library", project.getObjects()), CMakeLinkVariant.STATIC, true);
+    assertTrue(resolved.isStripDebug());
+  }
+
+  @Test
+  void testHashCode_nullLinkVariant() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeResolvedLibrary resolved = new CMakeResolvedLibrary(
+        new MockCMakeLibrary("test-library", project.getObjects()), null, false);
+    assertEquals(resolved.hashCode(), resolved.hashCode());
+  }
+
+  @Test
+  void testStripDebug_fromProperty() {
+    final Project project = ProjectBuilder.builder().build();
+    final MockCMakeLibrary library = new MockCMakeLibrary("test-library", project.getObjects());
+    library.getStripDebug().set(true);
+    final CMakeResolvedLibrary resolved = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
+    assertTrue(resolved.isStripDebug());
+  }
 }

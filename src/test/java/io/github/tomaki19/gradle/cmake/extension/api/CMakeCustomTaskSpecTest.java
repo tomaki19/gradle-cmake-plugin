@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -209,6 +210,12 @@ class CMakeCustomTaskSpecTest {
   }
 
   @Test
+  void matchesApplication_byExecutables() {
+    final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("components", Set.of("*executable")));
+    assertTrue(spec.matchesApplication(resolvedApplication("myApp")));
+  }
+
+  @Test
   void matchesApplication_byLibraries_noMatch() {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("components", Set.of("*library")));
     assertFalse(spec.matchesApplication(resolvedApplication("myApp")));
@@ -247,9 +254,29 @@ class CMakeCustomTaskSpecTest {
   }
 
   @Test
+  void matchesTest_byExecutables() {
+    final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("components", Set.of("*executable")));
+    assertTrue(spec.matchesTest(resolvedTest("myTest")));
+  }
+
+  @Test
   void matchesTest_byApplications_noMatch() {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("components", Set.of("*application")));
     assertFalse(spec.matchesTest(resolvedTest("myTest")));
+  }
+
+  // --- validateType / validateMandatory ---
+
+  @Test
+  void validateType_wrongType_throws() {
+    final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("name", 123));
+    assertThrows(IllegalArgumentException.class, spec::validate);
+  }
+
+  @Test
+  void validateMandatory_keyPresent_noThrow() {
+    final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("name", "myTask"));
+    spec.validate();
   }
 
   // --- equals / hashCode ---

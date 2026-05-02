@@ -90,6 +90,24 @@ class CMakeBinaryLinkSpecTest {
     assertFalse(deps.equals("not a dependency"));
   }
 
+  @Test
+  void testEqualsWithDifferentLinkVariant() {
+    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "static"), "mylib");
+    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "shared"), "mylib");
+    assertNotEquals(deps1, deps2);
+  }
+
+  @Test
+  void testEqualsWithDifferentVisibility() {
+    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.VISIBILITY, "PUBLIC"), "mylib");
+    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.VISIBILITY, "PRIVATE"), "mylib");
+    assertNotEquals(deps1, deps2);
+  }
+
   private static class TestCMakeBinaryLinkSpec extends CMakeBinaryLinkSpec {
 
     protected TestCMakeBinaryLinkSpec(Set<String> components, String project, CMakeLinkVariant linkVariant,

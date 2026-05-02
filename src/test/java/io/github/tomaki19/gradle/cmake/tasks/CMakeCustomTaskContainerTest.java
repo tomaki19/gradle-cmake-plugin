@@ -522,6 +522,395 @@ class CMakeCustomTaskContainerTest {
     assertFalse(project.getTasks().getNames().contains(TASK_NAME));
   }
 
+  // --- OR-branch coverage: hasNoToolchains / hasNoBuildConfigs paths ---
+
+  @Test
+  void applyExec_toolchainBuildConfig_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_toolchainBuildConfig_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("clang"), "release", t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_library_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*library"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
+        t -> {
+        });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_library_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*library"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.SHARED),
+        t -> {
+        });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_library_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*library"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("clang"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
+        t -> {
+        });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_application_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*application"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_application_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*application"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_application_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*application"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("clang"), "release", resolvedApplication("myApp"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_test_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*test"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_test_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*test"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_test_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*test"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("clang"), "release", resolvedTest("myTest"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyRuntimeArchive_library_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*library"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-mylib-static-gcc-release"));
+  }
+
+  @Test
+  void applyRuntimeArchive_library_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*library"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.SHARED), t -> {
+        });
+
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-mylib-shared-gcc-release"));
+  }
+
+  @Test
+  void applyRuntimeArchive_library_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*library"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("clang"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    assertFalse(project.getTasks().getNames().contains("zip-runtime-mylib-static-clang-release"));
+  }
+
+  @Test
+  void applyRuntimeArchive_application_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*application"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-myapp-gcc-release"));
+  }
+
+  @Test
+  void applyRuntimeArchive_application_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*application"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "debug", resolvedApplication("myApp"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-myapp-gcc-debug"));
+  }
+
+  @Test
+  void applyRuntimeArchive_application_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*application"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("clang"), "release", resolvedApplication("myApp"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains("zip-runtime-myapp-clang-release"));
+  }
+
+  @Test
+  void applyRuntimeArchive_test_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*test"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-mytest-gcc-release"));
+  }
+
+  @Test
+  void applyRuntimeArchive_test_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*test"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "debug", resolvedTest("myTest"), t -> {
+    });
+
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-mytest-gcc-debug"));
+  }
+
+  @Test
+  void applyRuntimeArchive_test_skipsWhenToolchainNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*test"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("clang"), "release", resolvedTest("myTest"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains("zip-runtime-mytest-clang-release"));
+  }
+
+  @Test
+  void applyDevelopArchive_library_registersWhenHasNoToolchains() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+        "components", Set.of("*static"));
+    handler.registerDevelopArchiveTasks(spec, t -> {
+    });
+
+    handler.applyDevelopArchiveTasks(resolvedToolchain("gcc"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    assertTrue(project.getTasks().getNames().contains("zip-develop-mylib-static-gcc-release"));
+  }
+
+  @Test
+  void applyExec_library_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*library"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "debug", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
+        t -> {
+        });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_application_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*application"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "debug", resolvedApplication("myApp"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyExec_test_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*test"));
+    handler.registerExecTasks(spec, t -> {
+    });
+
+    handler.applyExecTasks(resolvedToolchain("gcc"), "debug", resolvedTest("myTest"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains(TASK_NAME));
+  }
+
+  @Test
+  void applyRuntimeArchive_library_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*library"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "debug",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    assertFalse(project.getTasks().getNames().contains("zip-runtime-mylib-static-gcc-debug"));
+  }
+
+  @Test
+  void applyRuntimeArchive_application_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*application"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "debug", resolvedApplication("myApp"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains("zip-runtime-myapp-gcc-debug"));
+  }
+
+  @Test
+  void applyRuntimeArchive_test_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*test"));
+    handler.registerRuntimeArchiveTasks(spec, t -> {
+    });
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "debug", resolvedTest("myTest"), t -> {
+    });
+
+    assertFalse(project.getTasks().getNames().contains("zip-runtime-mytest-gcc-debug"));
+  }
+
+  @Test
+  void applyDevelopArchive_library_skipsWhenBuildConfigNoMatch() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("release"), "components", Set.of("*static"));
+    handler.registerDevelopArchiveTasks(spec, t -> {
+    });
+
+    handler.applyDevelopArchiveTasks(resolvedToolchain("gcc"), "debug",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    assertFalse(project.getTasks().getNames().contains("zip-develop-mylib-static-gcc-debug"));
+  }
+
+  @Test
+  void applyDevelopArchive_library_registersWhenHasNoBuildConfigs() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "components", Set.of("*static"));
+    handler.registerDevelopArchiveTasks(spec, t -> {
+    });
+
+    handler.applyDevelopArchiveTasks(resolvedToolchain("gcc"), "debug",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    assertTrue(project.getTasks().getNames().contains("zip-develop-mylib-static-gcc-debug"));
+  }
+
   // --- helpers ---
 
   private Map<String, Object> allMatchingSpec() {

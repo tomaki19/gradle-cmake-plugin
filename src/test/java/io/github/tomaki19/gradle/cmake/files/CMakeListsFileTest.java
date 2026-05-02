@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinaryLinkSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeApplication;
@@ -441,6 +441,71 @@ class CMakeListsFileTest {
           extension.getApplications(), extension.getTests());
 
       CMakeListsFile file = new CMakeListsFile(results, project);
+      File outputFile = new File(tempDir, "CMakeLists.txt");
+      try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+        file.writeTo(fos);
+      }
+      assertTrue(outputFile.exists());
+      assertTrue(outputFile.length() > 0);
+    } finally {
+      deleteRecursively(tempDir);
+    }
+  }
+
+  @Test
+  void testWriteToWithInterfaceLibraryWithPublicLinkOptions() throws IOException, URISyntaxException {
+    File tempDir = createTempDir();
+    try {
+      Project project = ProjectBuilder.builder().withProjectDir(tempDir).build();
+      final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
+          CMakeExtension.class, project.getTasks());
+
+      TestCMakeToolchain.register("Toolchain0", extension);
+
+      NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
+          extension);
+      libProvider.configure((lib) -> {
+        lib.getLinking().options(Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"), "-lz");
+      });
+
+      CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
+      Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+          extension.getApplications(), extension.getTests());
+
+      CMakeListsFile file = new CMakeListsFile(results, project);
+      File outputFile = new File(tempDir, "CMakeLists.txt");
+      try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+        file.writeTo(fos);
+      }
+      assertTrue(outputFile.exists());
+      assertTrue(outputFile.length() > 0);
+    } finally {
+      deleteRecursively(tempDir);
+    }
+  }
+
+  @Test
+  void testWriteToWithBinaryLibraryWithRemoteProjectDep() throws IOException, URISyntaxException {
+    File tempDir = createTempDir();
+    try {
+      Project rootProject = ProjectBuilder.builder().withProjectDir(tempDir).withName("root").build();
+      ProjectBuilder.builder().withParent(rootProject).withName("sub").build();
+      final CMakeExtension extension = rootProject.getExtensions().create(CMakeExtension.NAME,
+          CMakeExtension.class, rootProject.getTasks());
+
+      TestCMakeToolchain.register("Toolchain0", extension);
+
+      NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("BinaryLib0", extension,
+          CMakeBuildVariant.STATIC);
+      libProvider.configure((lib) -> {
+        lib.getLinking().link(Map.of(CMakeBinaryLinkSpec.PROJECT, "sub"), "subComp");
+      });
+
+      CMakeResolver resolver = new CMakeResolver(rootProject, extension.getPackages(), extension.getToolchains());
+      Collection<CMakeResolvedToolchain> results = resolver.process(extension.getLibraries(),
+          extension.getApplications(), extension.getTests());
+
+      CMakeListsFile file = new CMakeListsFile(results, rootProject);
       File outputFile = new File(tempDir, "CMakeLists.txt");
       try (FileOutputStream fos = new FileOutputStream(outputFile)) {
         file.writeTo(fos);

@@ -199,6 +199,39 @@ class CMakeResolvedProjectDependencyTest {
   }
 
   @Test
+  void testEquals_sameObject() {
+    final Project project = ProjectBuilder.builder().withName("test-project").build();
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    assertTrue(dependency.equals(dependency));
+  }
+
+  @Test
+  void testHashCode_nullLinkType() {
+    final Project project = ProjectBuilder.builder().withName("test-project").build();
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
+        null, project, false);
+    assertEquals(dependency.hashCode(), dependency.hashCode());
+  }
+
+  @Test
+  void testEquals_nullLinkType_bothNull() {
+    final Project project = ProjectBuilder.builder().withName("test-project").build();
+    final CMakeResolvedProjectDependency dep1 = new CMakeResolvedProjectDependency("test-lib", null, project, false);
+    final CMakeResolvedProjectDependency dep2 = new CMakeResolvedProjectDependency("test-lib", null, project, false);
+    assertEquals(dep1, dep2);
+  }
+
+  @Test
+  void testEquals_nullLinkType_otherNotNull() {
+    final Project project = ProjectBuilder.builder().withName("test-project").build();
+    final CMakeResolvedProjectDependency dep1 = new CMakeResolvedProjectDependency("test-lib", null, project, false);
+    final CMakeResolvedProjectDependency dep2 = new CMakeResolvedProjectDependency("test-lib",
+        CMakeLinkVariant.STATIC, project, false);
+    assertNotEquals(dep1, dep2);
+  }
+
+  @Test
   void testCompareToWithDifferentLinkVariant() {
     final Project project = ProjectBuilder.builder().withName("test-project").build();
 

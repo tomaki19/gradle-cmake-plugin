@@ -100,4 +100,16 @@ class CMakeLibraryDependenciesTest {
     CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(Map.of(), "mylib");
     assertNotEquals(new Object(), deps);
   }
+
+  @Test
+  void testEquals_sameObject() {
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(Map.of(), "mylib");
+    assertEquals(deps, deps);
+  }
+
+  @Test
+  void testEquals_notInstanceOf() {
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(Map.of(), "mylib");
+    assertNotEquals(deps, "not a link spec");
+  }
 }
