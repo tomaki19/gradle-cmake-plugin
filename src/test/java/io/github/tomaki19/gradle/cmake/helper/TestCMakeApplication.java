@@ -49,14 +49,14 @@ public final class TestCMakeApplication {
         Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
         Map<String, Object> spec = new HashMap<>(opt);
         spec.remove("names");
-        object.getLinking().options(names, spec);
+        object.getLinking().options(spec, names.toArray(new CharSequence[0]));
       });
       dependencies.forEach(dep -> {
         @SuppressWarnings("unchecked")
         Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
         Map<String, Object> spec = new HashMap<>(dep);
         spec.remove("components");
-        object.getLinking().link(components, spec);
+        object.getLinking().link(spec, components.toArray(new CharSequence[0]));
       });
     });
     return provider;

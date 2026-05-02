@@ -4,7 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -58,10 +58,10 @@ public final class CMakeBuildSpec extends CMakeApiSpecInit {
 
     private static final String VISIBILITY = "visibility";
 
-    public static CMakeBuildSpec create(final Collection<CharSequence> names, final Map<String, Object> entries)
+    public static CMakeBuildSpec create(final Map<String, Object> entries, final CharSequence... names)
         throws CMakeApiException {
       validateType(entries.get(VISIBILITY), VISIBILITY, CharSequence.class);
-      return new CMakeBuildSpec(names.stream().map((it) -> it.toString())
+      return new CMakeBuildSpec(Arrays.asList(names).stream().map((it) -> it.toString())
           .collect(Collectors.toSet()),
           entries.containsKey(VISIBILITY)
               ? CMakeVisibility.valueOf(((CharSequence) entries.get(VISIBILITY)).toString().toUpperCase())

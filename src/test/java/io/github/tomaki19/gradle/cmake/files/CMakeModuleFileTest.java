@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectProvider;
@@ -247,8 +246,8 @@ class CMakeModuleFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        lib.getLinking().link(List.of("AnotherLib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"));
-        lib.getLinking().link(List.of("target"), Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"));
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"), "AnotherLib");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"), "target");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());

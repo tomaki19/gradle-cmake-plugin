@@ -32,14 +32,14 @@ public final class TestCMakeToolchain {
         Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
         Map<String, Object> spec = new HashMap<>(opt);
         spec.remove("names");
-        object.getLibraries().getLinking().options(names, spec);
+        object.getLibraries().getLinking().options(spec, names.toArray(new CharSequence[0]));
       });
       dependencies.forEach(dep -> {
         @SuppressWarnings("unchecked")
         Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
         Map<String, Object> spec = new HashMap<>(dep);
         spec.remove("components");
-        object.getLibraries().getLinking().link(components, spec);
+        object.getLibraries().getLinking().link(spec, components.toArray(new CharSequence[0]));
       });
     });
     return provider;
@@ -55,14 +55,14 @@ public final class TestCMakeToolchain {
         Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
         Map<String, Object> spec = new HashMap<>(opt);
         spec.remove("names");
-        object.getApplications().getLinking().options(names, spec);
+        object.getApplications().getLinking().options(spec, names.toArray(new CharSequence[0]));
       });
       dependencies.forEach(dep -> {
         @SuppressWarnings("unchecked")
         Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
         Map<String, Object> spec = new HashMap<>(dep);
         spec.remove("components");
-        object.getApplications().getLinking().link(components, spec);
+        object.getApplications().getLinking().link(spec, components.toArray(new CharSequence[0]));
       });
     });
     return provider;
@@ -78,14 +78,14 @@ public final class TestCMakeToolchain {
         Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
         Map<String, Object> spec = new HashMap<>(opt);
         spec.remove("names");
-        object.getTests().getLinking().options(names, spec);
+        object.getTests().getLinking().options(spec, names.toArray(new CharSequence[0]));
       });
       dependencies.forEach(dep -> {
         @SuppressWarnings("unchecked")
         Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
         Map<String, Object> spec = new HashMap<>(dep);
         spec.remove("components");
-        object.getTests().getLinking().link(components, spec);
+        object.getTests().getLinking().link(spec, components.toArray(new CharSequence[0]));
       });
     });
     return provider;

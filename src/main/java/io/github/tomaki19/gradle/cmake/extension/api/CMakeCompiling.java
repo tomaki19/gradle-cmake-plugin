@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,24 +23,16 @@ abstract class CMakeCompiling {
     return Collections.unmodifiableCollection(options);
   }
 
-  public void options(final Collection<CharSequence> names, final Map<String, Object> spec) {
-    options.add(CMakeBuildSpec.Init.create(names, spec));
-  }
-
-  public void option(final CharSequence name, final Map<String, Object> spec) {
-    options(Arrays.asList(name), spec);
+  public void options(final Map<String, Object> spec, final CharSequence... names) {
+    options.add(CMakeBuildSpec.Init.create(spec, names));
   }
 
   public Collection<CMakeBuildSpec> getDefines() {
     return Collections.unmodifiableCollection(defines);
   }
 
-  public void defines(final Collection<CharSequence> names, final Map<String, Object> spec) {
-    defines.add(CMakeBuildSpec.Init.create(names, spec));
-  }
-
-  public void define(final CharSequence name, final Map<String, Object> spec) {
-    defines(Arrays.asList(name), spec);
+  public void defines(final Map<String, Object> spec, final CharSequence... names) {
+    defines.add(CMakeBuildSpec.Init.create(spec, names));
   }
 
 }

@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,13 +17,10 @@ public class CMakeLibraryLinking extends CMakeLinking {
     return Collections.unmodifiableCollection(dependencySpecs);
   }
 
-  public void link(final Collection<CharSequence> components, final Map<String, Object> entries) {
-    dependencySpecs.add(CMakeLibraryLinkSpec.Init.create(components, entries));
+  public void link(final Map<String, Object> entries, final CharSequence... components) {
+    dependencySpecs.add(CMakeLibraryLinkSpec.Init.create(entries, components));
   }
 
-  public void link(final CharSequence component, final Map<String, Object> entries) {
-    link(Arrays.asList(component), entries);
-  }
 }
 
 /*

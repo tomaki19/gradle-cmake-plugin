@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectProvider;
@@ -229,8 +228,8 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("StaticLib0", extension,
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
-        lib.getLinking().options(List.of("-lm"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
-        lib.getLinking().link(List.of("target"), Map.of("from", "Package0"));
+        lib.getLinking().options(Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "-lm");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"), "target");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -269,9 +268,9 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("StaticLib1", extension,
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
-        lib.getLinking().link(List.of("target"), Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0",
-            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
-        lib.getLinking().options(List.of("-lstdc++"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"));
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0",
+            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "target");
+        lib.getLinking().options(Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"), "-lstdc++");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -314,11 +313,11 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("StaticLib2", extension,
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
-        lib.getCompiling().options(List.of("-Wall"), Map.of());
-        lib.getCompiling().defines(List.of("NDEBUG"), Map.of());
-        lib.getLinking().link(List.of("Dep1"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
-            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
-        lib.getLinking().link(List.of("Dep2"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"));
+        lib.getCompiling().options(Map.of(), "-Wall");
+        lib.getCompiling().defines(Map.of(), "NDEBUG");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "Dep1");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"), "Dep2");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -354,8 +353,8 @@ class CMakeListsFileTest {
 
       NamedDomainObjectProvider<CMakeApplication> appProvider = TestCMakeApplication.register("App0", extension);
       appProvider.configure((app) -> {
-        app.getCompiling().options(List.of("-g"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
-        app.getCompiling().defines(List.of("DEBUG"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
+        app.getCompiling().options(Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "-g");
+        app.getCompiling().defines(Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "DEBUG");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -393,9 +392,9 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        lib.getCompiling().options(List.of("-Wall"), Map.of());
-        lib.getCompiling().defines(List.of("NDEBUG"), Map.of());
-        lib.getLinking().link(List.of("AnotherLib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"));
+        lib.getCompiling().options(Map.of(), "-Wall");
+        lib.getCompiling().defines(Map.of(), "NDEBUG");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"), "AnotherLib");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -434,7 +433,7 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        lib.getLinking().link(List.of("target"), Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"));
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"), "target");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());

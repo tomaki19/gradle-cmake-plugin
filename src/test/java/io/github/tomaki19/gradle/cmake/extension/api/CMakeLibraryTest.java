@@ -6,7 +6,6 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.Project;
@@ -30,7 +29,7 @@ class CMakeLibraryTest {
     final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
     library.compiling(compile -> {
-      compile.defines(List.of("TEST_DEFINE"), Map.of());
+      compile.defines(Map.of(), "TEST_DEFINE");
     });
   }
 
@@ -40,7 +39,7 @@ class CMakeLibraryTest {
     final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
 
     library.linking(linking -> {
-      linking.options(List.of("-Wl,--no-undefined"), Map.of());
+      linking.options(Map.of(), "-Wl,--no-undefined");
     });
   }
 

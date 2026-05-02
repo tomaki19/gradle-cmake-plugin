@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -40,32 +39,34 @@ class CMakeExecutableLinkingTest {
   @Test
   void testOption() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    linking.options(List.of("-L/usr/lib"), Map.of());
+    linking.options(Map.of(), "-L/usr/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals(CMakeBuildSpec.Init.create(List.of("-L/usr/lib"), Map.of()),
+    assertEquals(CMakeBuildSpec.Init.create(Map.of(), "-L/usr/lib"),
         linking.getOptions().iterator().next());
   }
 
   @Test
   void testOptionsVarargs() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    linking.options(List.of("-L/usr/lib", "-L/usr/local/lib"), Map.of());
+    linking.options(Map.of(), "-L/usr/lib", "-L/usr/local/lib");
     assertEquals(1, linking.getOptions().size());
-    assertEquals(CMakeBuildSpec.Init.create(List.of("-L/usr/lib", "-L/usr/local/lib"), Map.of()),
+    assertEquals(CMakeBuildSpec.Init.create(Map.of(), "-L/usr/lib", "-L/usr/local/lib"),
         linking.getOptions().iterator().next());
   }
 
   @Test
   void testDependency() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    linking.link(List.of("mylib"), Map.of());
+    linking.link(Map.of(), "mylib");
     assertEquals(1, linking.getDependencySpecs().size());
   }
 
   @Test
   void testDependenciesMultipleComponents() {
     CMakeExecutableLinking linking = new CMakeExecutableLinking();
-    linking.link(List.of("lib1", "lib2"), Map.of());
+    linking.link(Map.of(), "lib1", "lib2");
     assertEquals(1, linking.getDependencySpecs().size());
+    CMakeExecutableLinkSpec dep = linking.getDependencySpecs().iterator().next();
+    assertEquals(2, dep.getComponents().size());
   }
 }

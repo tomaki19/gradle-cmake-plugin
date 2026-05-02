@@ -4,7 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,10 +22,10 @@ public class CMakeExecutableLinkSpec extends CMakeBinaryLinkSpec {
 
   static class Init extends CMakeBinaryLinkSpec.Init {
 
-    public static CMakeExecutableLinkSpec create(final Collection<CharSequence> components,
-        final Map<String, Object> entries) throws CMakeApiException {
+    public static CMakeExecutableLinkSpec create(final Map<String, Object> entries, final CharSequence... components)
+        throws CMakeApiException {
       validateContentTypes(entries);
-      return new CMakeExecutableLinkSpec(components.stream().map((it) -> it.toString())
+      return new CMakeExecutableLinkSpec(Arrays.asList(components).stream().map((it) -> it.toString())
           .collect(Collectors.toSet()),
           entries.containsKey(PROJECT) ? ((CharSequence) entries.get(PROJECT)).toString() : "",
           entries.containsKey(LINK_VARIANT)

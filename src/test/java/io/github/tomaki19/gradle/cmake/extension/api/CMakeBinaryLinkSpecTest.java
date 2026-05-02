@@ -9,8 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,69 +24,69 @@ class CMakeBinaryLinkSpecTest {
 
   @Test
   void testConstructor() {
-    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
+    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
     assertNotNull(deps);
   }
 
   @Test
   void testGetNames() {
-    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(List.of("lib1", "lib2"), Map.of());
+    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "lib1", "lib2");
     assertEquals(2, deps.getComponents().size());
   }
 
   @Test
   void testFrom() {
-    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"),
-        Map.of(CMakeBinaryLinkSpec.PROJECT, "myproject"));
+    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.PROJECT, "myproject"), "mylib");
     assertEquals("myproject", deps.getProject());
   }
 
   @Test
   void testGetLinkage() {
-    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"),
-        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "static"));
+    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "static"), "mylib");
     assertEquals("static", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testHashCode() {
-    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
-    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
+    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
+    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
     assertEquals(deps1.hashCode(), deps2.hashCode());
   }
 
   @Test
   void testEquals() {
-    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
-    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
+    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
+    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
     assertEquals(deps1, deps2);
   }
 
   @Test
   void testEqualsWithDifferentNames() {
-    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(List.of("lib1"), Map.of());
-    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(List.of("lib2"), Map.of());
+    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "lib1");
+    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "lib2");
     assertNotEquals(deps1, deps2);
   }
 
   @Test
   void testEqualsWithDifferentFrom() {
-    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"),
-        Map.of(CMakeBinaryLinkSpec.PROJECT, "project1"));
-    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"),
-        Map.of(CMakeBinaryLinkSpec.PROJECT, "project2"));
+    CMakeBinaryLinkSpec deps1 = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.PROJECT, "project1"), "mylib");
+    CMakeBinaryLinkSpec deps2 = TestCMakeBinaryLinkSpec.Init.create(
+        Map.of(CMakeBinaryLinkSpec.PROJECT, "project2"), "mylib");
     assertNotEquals(deps1, deps2);
   }
 
   @Test
   void testEqualsWithNull() {
-    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
-    assertFalse(deps.equals(""));
+    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
+    assertFalse(deps.equals(null));
   }
 
   @Test
   void testEqualsWithDifferentClass() {
-    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(List.of("mylib"), Map.of());
+    CMakeBinaryLinkSpec deps = TestCMakeBinaryLinkSpec.Init.create(Map.of(), "mylib");
     assertFalse(deps.equals("not a dependency"));
   }
 
@@ -100,12 +99,12 @@ class CMakeBinaryLinkSpecTest {
 
     public static class Init extends CMakeBinaryLinkSpec.Init {
 
-      public static TestCMakeBinaryLinkSpec create(final Collection<CharSequence> components,
-          final Map<String, Object> entries) throws CMakeApiException {
+      public static TestCMakeBinaryLinkSpec create(final Map<String, Object> entries,
+          final String... components) throws CMakeApiException {
         validateContentTypes(entries);
-        return new TestCMakeBinaryLinkSpec(components.stream().map((it) -> it.toString())
+        return new TestCMakeBinaryLinkSpec(Arrays.asList(components).stream().map(Object::toString)
             .collect(Collectors.toSet()),
-            entries.containsKey(PROJECT) ? ((CharSequence) entries.get(PROJECT)).toString() : "",
+            entries.containsKey(PROJECT) ? ((CharSequence) entries.get(PROJECT)).toString() : null,
             entries.containsKey(LINK_VARIANT)
                 ? CMakeLinkVariant.valueOf(((CharSequence) entries.get(LINK_VARIANT)).toString().toUpperCase())
                 : CMakeLinkVariant.SHARED,

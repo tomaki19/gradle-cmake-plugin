@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,12 +17,8 @@ public class CMakeExecutableLinking extends CMakeLinking {
     return Collections.unmodifiableCollection(dependencySpecs);
   }
 
-  public void link(final Collection<CharSequence> components, final Map<String, Object> spec) {
-    dependencySpecs.add(CMakeExecutableLinkSpec.Init.create(components, spec));
-  }
-
-  public void link(final CharSequence component, final Map<String, Object> spec) {
-    link(Arrays.asList(component), spec);
+  public void link(final Map<String, Object> spec, final CharSequence... components) {
+    dependencySpecs.add(CMakeExecutableLinkSpec.Init.create(spec, components));
   }
 
 }
