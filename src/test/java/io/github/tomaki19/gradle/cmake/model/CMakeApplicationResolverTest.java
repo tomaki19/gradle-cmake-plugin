@@ -8,14 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
@@ -24,7 +25,7 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
 
 public class CMakeApplicationResolverTest {
 
-        @Test
+  @Test
         void resolveNoToolchainTest() throws Exception {
                 final Project project = ProjectBuilder.builder().build();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
@@ -35,14 +36,18 @@ public class CMakeApplicationResolverTest {
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                                 Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
                 TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-                                Arrays.asList(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-loption")),
+                                Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")),
                                 Arrays.asList(
-                                                new CMakeExecutableDependencies("target").from("Package0"),
-                                                new CMakeExecutableDependencies("InterfaceLibrary0")
-                                                                .variant(CMakeLinkVariant.INTERFACE),
-                                                new CMakeExecutableDependencies("BinaryLibrary0")
-                                                                .from(project.getName())
-                                                                .variant(CMakeLinkVariant.SHARED)));
+                                                Map.of("components", List.of("target"),
+                                                                CMakeLibraryLinkSpec.PROJECT, "Package0",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("InterfaceLibrary0"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("BinaryLibrary0"),
+                                                                CMakeLibraryLinkSpec.PROJECT, project.getName(),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")));
                 TestCMakeApplication.register("Application0", extension);
 
                 assertEquals(1, extension.getPackages().size());
@@ -67,7 +72,7 @@ public class CMakeApplicationResolverTest {
                 assertEquals(0, toolchains[0].getTests().size());
         }
 
-        @Test
+  @Test
         void resolveMultipleToolchainTest() throws Exception {
                 final Project project = ProjectBuilder.builder().build();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
@@ -80,24 +85,28 @@ public class CMakeApplicationResolverTest {
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                                 Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
                 TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-                                Arrays.asList(new CMakeBuildItems(CMakeVisibility.PUBLIC, "-loption")),
+                                Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC")),
                                 Arrays.asList(
-                                                new CMakeExecutableDependencies("target").from("Package0")
-                                                                .visibility(CMakeVisibility.PUBLIC),
-                                                new CMakeExecutableDependencies("InterfaceLibrary0")
-                                                                .variant(CMakeLinkVariant.INTERFACE)
-                                                                .visibility(CMakeVisibility.PUBLIC),
-                                                new CMakeExecutableDependencies("BinaryLibrary0")
-                                                                .from(project.getName())
-                                                                .variant(CMakeLinkVariant.SHARED)
-                                                                .visibility(CMakeVisibility.PUBLIC)));
+                                                Map.of("components", List.of("target"),
+                                                                CMakeLibraryLinkSpec.PROJECT, "Package0",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"),
+                                                Map.of("components", List.of("InterfaceLibrary0"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"),
+                                                Map.of("components", List.of("BinaryLibrary0"),
+                                                                CMakeLibraryLinkSpec.PROJECT, project.getName(),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC")));
                 TestCMakeToolchain.registerWithApplicationDependencies("Toolchain1", extension,
-                                Arrays.asList(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-loption")),
+                                Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")),
                                 Arrays.asList(
-                                                new CMakeExecutableDependencies("target").from("Package1"),
-                                                new CMakeExecutableDependencies("InterfaceLibrary1")
-                                                                .from(project.getName())
-                                                                .variant(CMakeLinkVariant.INTERFACE)));
+                                                Map.of("components", List.of("target"),
+                                                                CMakeLibraryLinkSpec.PROJECT, "Package1",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("InterfaceLibrary1"),
+                                                                CMakeLibraryLinkSpec.PROJECT, project.getName(),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")));
                 TestCMakeApplication.register("Application0", extension,
                                 Arrays.asList("Toolchain0", "Toolchain1"));
 
@@ -144,7 +153,7 @@ public class CMakeApplicationResolverTest {
                 assertEquals(0, toolchains[1].getTests().size());
         }
 
-        @Test
+  @Test
         void resolveNoDependenciesTest() throws Exception {
                 final Project project = ProjectBuilder.builder().build();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
@@ -156,8 +165,10 @@ public class CMakeApplicationResolverTest {
                 TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
                                 Arrays.asList(), Arrays.asList());
                 TestCMakeToolchain.registerWithTestDependencies("Toolchain1", extension,
-                                Arrays.asList(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-loption")),
-                                Arrays.asList(new CMakeExecutableDependencies("target").from("Package0")));
+                                Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")),
+                                Arrays.asList(Map.of("components", List.of("target"), CMakeLibraryLinkSpec.PROJECT,
+                                                "Package0",
+                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")));
                 TestCMakeApplication.register("Application0", extension,
                                 Arrays.asList("Toolchain0"));
 
@@ -190,7 +201,7 @@ public class CMakeApplicationResolverTest {
                 assertEquals(0, toolchains[0].getTests().size());
         }
 
-        @Test
+  @Test
         void resolveToolchainDependencyTest() throws Exception {
                 final Project project = ProjectBuilder.builder().build();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
@@ -201,14 +212,18 @@ public class CMakeApplicationResolverTest {
                 TestCMakeBinaryLibrary.register("BinaryLibrary0", extension,
                                 Arrays.asList("Toolchain0"), CMakeBuildVariant.SHARED);
                 TestCMakeToolchain.registerWithApplicationDependencies("Toolchain0", extension,
-                                Arrays.asList(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-loption")),
+                                Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")),
                                 Arrays.asList(
-                                                new CMakeExecutableDependencies("target").from("Package0"),
-                                                new CMakeExecutableDependencies("InterfaceLibrary0")
-                                                                .variant(CMakeLinkVariant.INTERFACE),
-                                                new CMakeExecutableDependencies("BinaryLibrary0")
-                                                                .from(project.getName())
-                                                                .variant(CMakeLinkVariant.SHARED)));
+                                                Map.of("components", List.of("target"),
+                                                                CMakeLibraryLinkSpec.PROJECT, "Package0",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("InterfaceLibrary0"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("BinaryLibrary0"),
+                                                                CMakeLibraryLinkSpec.PROJECT, project.getName(),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")));
                 TestCMakeApplication.register("Application0", extension,
                                 Arrays.asList("Toolchain0"));
 
@@ -241,7 +256,7 @@ public class CMakeApplicationResolverTest {
                 assertEquals(0, toolchains[0].getTests().size());
         }
 
-        @Test
+  @Test
         void resolveLinkDependenciesTest() throws Exception {
                 final Project project = ProjectBuilder.builder().build();
                 final CMakeExtension extension = project.getExtensions().create(CMakeExtension.NAME,
@@ -254,14 +269,18 @@ public class CMakeApplicationResolverTest {
                 TestCMakeToolchain.register("Toolchain0", extension);
                 TestCMakeApplication.registerWithDependencies("Application0", extension,
                                 Arrays.asList("Toolchain0"),
-                                Arrays.asList(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-loption")),
+                                Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")),
                                 Arrays.asList(
-                                                new CMakeExecutableDependencies("target").from("Package0"),
-                                                new CMakeExecutableDependencies("InterfaceLibrary0")
-                                                                .variant(CMakeLinkVariant.INTERFACE),
-                                                new CMakeExecutableDependencies("BinaryLibrary0")
-                                                                .from(project.getName())
-                                                                .variant(CMakeLinkVariant.SHARED)));
+                                                Map.of("components", List.of("target"),
+                                                                CMakeLibraryLinkSpec.PROJECT, "Package0",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("InterfaceLibrary0"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                Map.of("components", List.of("BinaryLibrary0"),
+                                                                CMakeLibraryLinkSpec.PROJECT, project.getName(),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
+                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")));
 
                 assertEquals(1, extension.getPackages().size());
                 assertEquals(1, extension.getToolchains().size());

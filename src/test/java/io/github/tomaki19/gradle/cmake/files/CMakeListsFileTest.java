@@ -12,8 +12,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
@@ -22,9 +23,9 @@ import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeApplication;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
@@ -32,10 +33,8 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeTest;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeListsFileTest {
 
@@ -230,12 +229,8 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("StaticLib0", extension,
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
-        // PRIVATE link option only (no private project/package deps) ->
-        // hasPrivateLinking C=true
-        lib.getLinking().options(Arrays.asList(new CMakeBuildItems(CMakeVisibility.PRIVATE, "-lm")));
-        // PUBLIC package dep only (no public project dep) -> hasPublicLinking E=true
-        lib.getLinking().link(Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0")));
+        lib.getLinking().options(List.of("-lm"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
+        lib.getLinking().link(List.of("target"), Map.of("from", "Package0"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -274,13 +269,9 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("StaticLib1", extension,
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
-        // PRIVATE package dep (no private project dep, no private link option) ->
-        // hasPrivateLinking B=true
-        lib.getLinking().link(Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0")
-                .visibility(CMakeVisibility.PRIVATE)));
-        // PUBLIC link option (no public project/package dep) -> hasPublicLinking F=true
-        lib.getLinking().options(Arrays.asList(new CMakeBuildItems(CMakeVisibility.PUBLIC, "-lstdc++")));
+        lib.getLinking().link(List.of("target"), Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0",
+            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
+        lib.getLinking().options(List.of("-lstdc++"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -323,16 +314,11 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeBinaryLibrary.register("StaticLib2", extension,
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
-        // PUBLIC compile options and definitions (PUBLIC is default for
-        // CMakeLibraryCompiling)
-        lib.getCompiling().options("-Wall");
-        lib.getCompiling().defines("NDEBUG");
-        // PRIVATE project dep (same project, no from) -> hasPrivateLinking A=true
-        // PUBLIC project dep (same project, no from) -> hasPublicLinking D=true
-        lib.getLinking().link(Arrays.asList(
-            new CMakeLibraryDependencies("Dep1").variant(CMakeLinkVariant.INTERFACE)
-                .visibility(CMakeVisibility.PRIVATE),
-            new CMakeLibraryDependencies("Dep2").variant(CMakeLinkVariant.INTERFACE)));
+        lib.getCompiling().options(List.of("-Wall"), Map.of());
+        lib.getCompiling().defines(List.of("NDEBUG"), Map.of());
+        lib.getLinking().link(List.of("Dep1"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
+            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
+        lib.getLinking().link(List.of("Dep2"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -368,9 +354,8 @@ class CMakeListsFileTest {
 
       NamedDomainObjectProvider<CMakeApplication> appProvider = TestCMakeApplication.register("App0", extension);
       appProvider.configure((app) -> {
-        // PRIVATE by default for CMakeExecutableCompiling
-        app.getCompiling().options("-g");
-        app.getCompiling().defines("DEBUG");
+        app.getCompiling().options(List.of("-g"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
+        app.getCompiling().defines(List.of("DEBUG"), Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -408,14 +393,9 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        // PUBLIC compile options and definitions (PUBLIC is default for
-        // CMakeLibraryCompiling)
-        lib.getCompiling().options("-Wall");
-        lib.getCompiling().defines("NDEBUG");
-        // PUBLIC project dep -> hasInterfaceLinking A=true (publicProjectDeps
-        // non-empty)
-        lib.getLinking().link(Arrays.asList(
-            new CMakeLibraryDependencies("AnotherLib").variant(CMakeLinkVariant.INTERFACE)));
+        lib.getCompiling().options(List.of("-Wall"), Map.of());
+        lib.getCompiling().defines(List.of("NDEBUG"), Map.of());
+        lib.getLinking().link(List.of("AnotherLib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -454,9 +434,7 @@ class CMakeListsFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        // PUBLIC package dep only (no public project dep) -> hasInterfaceLinking B=true
-        lib.getLinking().link(Arrays.asList(
-            new CMakeLibraryDependencies("target").from("Package0")));
+        lib.getLinking().link(List.of("target"), Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());

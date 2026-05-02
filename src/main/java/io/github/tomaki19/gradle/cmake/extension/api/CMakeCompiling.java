@@ -4,9 +4,11 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
@@ -15,32 +17,31 @@ abstract class CMakeCompiling {
   public static final CMakeVisibility PUBLIC = CMakeVisibility.PUBLIC;
   public static final CMakeVisibility PRIVATE = CMakeVisibility.PRIVATE;
 
-  private final Collection<CMakeBuildItems> defines = new HashSet<>();
-  private final Collection<CMakeBuildItems> options = new HashSet<>();
-  private CMakeVisibility defaultVisibilityType;
+  private final Collection<CMakeBuildSpec> defines = new HashSet<>();
+  private final Collection<CMakeBuildSpec> options = new HashSet<>();
 
-  CMakeCompiling(final CMakeVisibility defaultVisibilityType) {
-    this.defaultVisibilityType = defaultVisibilityType;
-  }
-
-  public Collection<CMakeBuildItems> getOptions() {
+  public Collection<CMakeBuildSpec> getOptions() {
     return Collections.unmodifiableCollection(options);
   }
 
-  public CMakeBuildItems options(CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
-    options.add(entry);
-    return entry;
+  public void options(final Collection<CharSequence> names, final Map<String, Object> spec) {
+    options.add(CMakeBuildSpec.Init.create(names, spec));
   }
 
-  public Collection<CMakeBuildItems> getDefines() {
+  public void option(final CharSequence name, final Map<String, Object> spec) {
+    options(Arrays.asList(name), spec);
+  }
+
+  public Collection<CMakeBuildSpec> getDefines() {
     return Collections.unmodifiableCollection(defines);
   }
 
-  public CMakeBuildItems defines(CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
-    defines.add(entry);
-    return entry;
+  public void defines(final Collection<CharSequence> names, final Map<String, Object> spec) {
+    defines.add(CMakeBuildSpec.Init.create(names, spec));
+  }
+
+  public void define(final CharSequence name, final Map<String, Object> spec) {
+    defines(Arrays.asList(name), spec);
   }
 
 }

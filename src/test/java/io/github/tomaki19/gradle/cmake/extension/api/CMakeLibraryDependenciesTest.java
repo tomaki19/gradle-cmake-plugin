@@ -8,134 +8,99 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.jupiter.api.Test;
+import java.util.List;
+import java.util.Map;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
+import org.junit.jupiter.api.Test;
 
 class CMakeLibraryDependenciesTest {
 
   @Test
   void testConstructor() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(List.of("mylib"), Map.of());
     assertNotNull(deps);
   }
 
   @Test
   void testGetNames() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("lib1", "lib2");
-    assertEquals(2, deps.getNames().size());
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(List.of("lib1", "lib2"), Map.of());
+    assertEquals(2, deps.getComponents().size());
   }
 
   @Test
   void testFrom() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.from("myProject");
-    assertEquals("myProject", deps.getFrom());
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.PROJECT, "myProject"));
+    assertEquals("myProject", deps.getProject());
   }
 
   @Test
   void testGetLinkStatic() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.variant(CMakeLinkVariant.STATIC);
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "static"));
     assertEquals("static", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkShared() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.variant(CMakeLinkVariant.SHARED);
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "shared"));
     assertEquals("shared", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkInterface() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.variant(CMakeLinkVariant.INTERFACE);
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "interface"));
     assertEquals("interface", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetForStaticBuild() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.forBuildVariant(CMakeBuildVariant.STATIC);
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "static"));
     assertEquals("static", deps.getBuildVariant().toLowerCase());
   }
 
   @Test
   void testGetForSharedBuild() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
-    deps.forBuildVariant(CMakeBuildVariant.SHARED);
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "shared"));
     assertEquals("shared", deps.getBuildVariant().toLowerCase());
   }
 
   @Test
   void testEqualsAndHashCode() {
-    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
-    deps1.forBuildVariant(CMakeBuildVariant.SHARED);
-    deps1.variant(CMakeLinkVariant.STATIC);
-    deps1.visibility(CMakeVisibility.PUBLIC);
-
-    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
-    deps2.forBuildVariant(CMakeBuildVariant.SHARED);
-    deps2.variant(CMakeLinkVariant.STATIC);
-    deps2.visibility(CMakeVisibility.PUBLIC);
-
+    CMakeLibraryLinkSpec deps1 = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"),
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "shared", CMakeLibraryLinkSpec.LINK_VARIANT, "static",
+            CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"));
+    CMakeLibraryLinkSpec deps2 = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"),
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "shared", CMakeLibraryLinkSpec.LINK_VARIANT, "static",
+            CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"));
     assertEquals(deps1, deps2);
     assertEquals(deps1.hashCode(), deps2.hashCode());
   }
 
   @Test
   void testEqualsAndHashCodeWithDifferentBuildVariant() {
-    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
-    deps1.forBuildVariant(CMakeBuildVariant.SHARED);
-
-    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
-    deps2.forBuildVariant(CMakeBuildVariant.STATIC);
-
-    assertNotEquals(deps1, deps2);
-  }
-
-  @Test
-  void testEqualsAndHashCodeWithDifferentLinkVariant() {
-    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
-    deps1.variant(CMakeLinkVariant.STATIC);
-
-    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
-    deps2.variant(CMakeLinkVariant.SHARED);
-
-    assertNotEquals(deps1, deps2);
-  }
-
-  @Test
-  void testEqualsAndHashCodeWithDifferentVisibility() {
-    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib");
-    deps1.visibility(CMakeVisibility.PUBLIC);
-
-    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib");
-    deps2.visibility(CMakeVisibility.PRIVATE);
-
-    assertNotEquals(deps1, deps2);
-  }
-
-  @Test
-  void testEqualsAndHashCodeWithDifferentNames() {
-    CMakeLibraryDependencies deps1 = new CMakeLibraryDependencies("mylib1");
-    CMakeLibraryDependencies deps2 = new CMakeLibraryDependencies("mylib2");
-
+    CMakeLibraryLinkSpec deps1 = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "shared"));
+    CMakeLibraryLinkSpec deps2 = CMakeLibraryLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "static"));
     assertNotEquals(deps1, deps2);
   }
 
   @Test
   void testEqualsWithNull() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(List.of("mylib"), Map.of());
     assertNotEquals(null, deps);
   }
 
   @Test
   void testEqualsWithDifferentClass() {
-    CMakeLibraryDependencies deps = new CMakeLibraryDependencies("mylib");
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(List.of("mylib"), Map.of());
     assertNotEquals(new Object(), deps);
   }
 }

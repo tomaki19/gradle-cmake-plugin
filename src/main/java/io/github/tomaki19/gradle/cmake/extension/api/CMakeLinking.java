@@ -4,9 +4,11 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
@@ -20,25 +22,18 @@ abstract class CMakeLinking {
   public static final CMakeVisibility PUBLIC = CMakeVisibility.PUBLIC;
   public static final CMakeVisibility PRIVATE = CMakeVisibility.PRIVATE;
 
-  private final Collection<CMakeBuildItems> options = new HashSet<>();
-  private CMakeVisibility defaultVisibilityType;
+  private final Collection<CMakeBuildSpec> options = new HashSet<>();
 
-  CMakeLinking(final CMakeVisibility defaultVisibilityType) {
-    this.defaultVisibilityType = defaultVisibilityType;
-  }
-
-  public Collection<CMakeBuildItems> getOptions() {
+  public Collection<CMakeBuildSpec> getOptions() {
     return Collections.unmodifiableCollection(options);
   }
 
-  public CMakeBuildItems options(final CharSequence... values) {
-    final CMakeBuildItems entry = new CMakeBuildItems(defaultVisibilityType, values);
-    options.add(entry);
-    return entry;
+  public void options(final Collection<CharSequence> names, final Map<String, Object> spec) {
+    options.add(CMakeBuildSpec.Init.create(names, spec));
   }
 
-  public void options(final Collection<CMakeBuildItems> entries) {
-    options.addAll(entries);
+  public void option(final CharSequence name, final Map<String, Object> spec) {
+    options(Arrays.asList(name), spec);
   }
 
 }

@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeLibraryLinkingTest {
 
@@ -24,7 +24,7 @@ class CMakeLibraryLinkingTest {
   @Test
   void testGetOptions() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    Collection<CMakeBuildItems> options = linking.getOptions();
+    Collection<CMakeBuildSpec> options = linking.getOptions();
     assertNotNull(options);
     assertEquals(0, options.size());
   }
@@ -32,7 +32,7 @@ class CMakeLibraryLinkingTest {
   @Test
   void testGetDependencies() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    Collection<CMakeLibraryDependencies> dependencies = linking.getDependencies();
+    Collection<CMakeLibraryLinkSpec> dependencies = linking.getDependencySpecs();
     assertNotNull(dependencies);
     assertEquals(0, dependencies.size());
   }
@@ -40,43 +40,32 @@ class CMakeLibraryLinkingTest {
   @Test
   void testOption() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    linking.options("-L/usr/lib");
+    linking.options(List.of("-L/usr/lib"), Map.of());
     assertEquals(1, linking.getOptions().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibility.PUBLIC, "-L/usr/lib"),
+    assertEquals(CMakeBuildSpec.Init.create(List.of("-L/usr/lib"), Map.of()),
         linking.getOptions().iterator().next());
   }
 
   @Test
   void testOptionsVarargs() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    linking.options("-L/usr/lib", "-L/usr/local/lib");
+    linking.options(List.of("-L/usr/lib", "-L/usr/local/lib"), Map.of());
     assertEquals(1, linking.getOptions().size());
-    assertEquals(new CMakeBuildItems(CMakeVisibility.PUBLIC, "-L/usr/lib", "-L/usr/local/lib"),
+    assertEquals(CMakeBuildSpec.Init.create(List.of("-L/usr/lib", "-L/usr/local/lib"), Map.of()),
         linking.getOptions().iterator().next());
   }
 
   @Test
-  void testDependencyCharSequence() {
+  void testDependency() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep = linking.link("mylib");
-    assertNotNull(dep);
-    assertEquals(1, linking.getDependencies().size());
+    linking.link(List.of("mylib"), Map.of());
+    assertEquals(1, linking.getDependencySpecs().size());
   }
 
   @Test
-  void testDependenciesVarargs() {
+  void testDependenciesMultipleComponents() {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep = linking.link("lib1", "lib2");
-    assertNotNull(dep);
-    assertEquals(1, linking.getDependencies().size());
-  }
-
-  @Test
-  void testDependenciesCollection() {
-    CMakeLibraryLinking linking = new CMakeLibraryLinking();
-    CMakeLibraryDependencies dep1 = new CMakeLibraryDependencies("lib1");
-    CMakeLibraryDependencies dep2 = new CMakeLibraryDependencies("lib2");
-    linking.link(java.util.Arrays.asList(dep1, dep2));
-    assertEquals(2, linking.getDependencies().size());
+    linking.link(List.of("lib1", "lib2"), Map.of());
+    assertEquals(1, linking.getDependencySpecs().size());
   }
 }

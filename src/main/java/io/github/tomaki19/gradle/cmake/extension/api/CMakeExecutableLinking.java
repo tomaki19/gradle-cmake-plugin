@@ -4,32 +4,26 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
+import java.util.Map;
 
 public class CMakeExecutableLinking extends CMakeLinking {
 
-  final Collection<CMakeExecutableDependencies> dependencies = new HashSet<>();
+  final Collection<CMakeExecutableLinkSpec> dependencySpecs = new HashSet<>();
 
-  public CMakeExecutableLinking() {
-    super(CMakeVisibility.PRIVATE);
+  public Collection<CMakeExecutableLinkSpec> getDependencySpecs() {
+    return Collections.unmodifiableCollection(dependencySpecs);
   }
 
-  public Collection<CMakeExecutableDependencies> getDependencies() {
-    return Collections.unmodifiableCollection(dependencies);
+  public void link(final Collection<CharSequence> components, final Map<String, Object> spec) {
+    dependencySpecs.add(CMakeExecutableLinkSpec.Init.create(components, spec));
   }
 
-  public CMakeExecutableDependencies link(final CharSequence... names) {
-    final CMakeExecutableDependencies entry = new CMakeExecutableDependencies(names);
-    dependencies.add(entry);
-    return entry;
-  }
-
-  public void link(final Collection<CMakeExecutableDependencies> entries) {
-    dependencies.addAll(entries);
+  public void link(final CharSequence component, final Map<String, Object> spec) {
+    link(Arrays.asList(component), spec);
   }
 
 }

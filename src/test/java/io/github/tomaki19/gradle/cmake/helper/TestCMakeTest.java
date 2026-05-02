@@ -6,12 +6,12 @@ package io.github.tomaki19.gradle.cmake.helper;
 
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 
 public final class TestCMakeTest {
@@ -38,13 +38,26 @@ public final class TestCMakeTest {
   }
 
   public static NamedDomainObjectProvider<CMakeTest> registerWithDependencies(final String name,
-      final CMakeExtension extension, final Collection<String> toolchains, final Collection<CMakeBuildItems> options,
-      final Collection<CMakeExecutableDependencies> dependencies)
+      final CMakeExtension extension, final Collection<String> toolchains,
+      final Collection<Map<String, Object>> options,
+      final Collection<Map<String, Object>> dependencies)
       throws URISyntaxException {
     final NamedDomainObjectProvider<CMakeTest> provider = register(name, extension, toolchains);
     provider.configure((object) -> {
-      object.getLinking().options(options);
-      object.getLinking().link(dependencies);
+      options.forEach(opt -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
+        Map<String, Object> spec = new HashMap<>(opt);
+        spec.remove("names");
+        object.getLinking().options(names, spec);
+      });
+      dependencies.forEach(dep -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
+        Map<String, Object> spec = new HashMap<>(dep);
+        spec.remove("components");
+        object.getLinking().link(components, spec);
+      });
     });
     return provider;
   }

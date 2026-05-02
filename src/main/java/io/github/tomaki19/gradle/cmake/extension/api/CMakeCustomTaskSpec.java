@@ -19,10 +19,6 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeCustomTaskSpec<T> {
 
-  private static final String TOOLCHAINS = "toolchains";
-  private static final String BUILD_CONFIGS = "buildConfigs";
-  private static final String COMPONENTS = "components";
-
   private static final String ALL = "*";
   private static final String LIBRARIES = "*library";
   private static final String INTERFACES = "*interface";
@@ -31,6 +27,10 @@ public abstract class CMakeCustomTaskSpec<T> {
   private static final String EXECUTABLES = "*executable";
   private static final String APPLICATIONS = "*application";
   private static final String TESTS = "*test";
+
+  private static final String TOOLCHAINS = "toolchains";
+  private static final String BUILD_CONFIGS = "buildConfigs";
+  private static final String COMPONENTS = "components";
 
   protected final Map<String, Object> spec;
 

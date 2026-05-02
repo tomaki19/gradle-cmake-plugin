@@ -4,34 +4,27 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-
-import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
+import java.util.Map;
 
 public class CMakeLibraryLinking extends CMakeLinking {
 
-  final Collection<CMakeLibraryDependencies> dependencies = new HashSet<>();
+  final Collection<CMakeLibraryLinkSpec> dependencySpecs = new HashSet<>();
 
-  public CMakeLibraryLinking() {
-    super(CMakeVisibility.PUBLIC);
+  public Collection<CMakeLibraryLinkSpec> getDependencySpecs() {
+    return Collections.unmodifiableCollection(dependencySpecs);
   }
 
-  public Collection<CMakeLibraryDependencies> getDependencies() {
-    return Collections.unmodifiableCollection(dependencies);
+  public void link(final Collection<CharSequence> components, final Map<String, Object> entries) {
+    dependencySpecs.add(CMakeLibraryLinkSpec.Init.create(components, entries));
   }
 
-  public CMakeLibraryDependencies link(final CharSequence... names) {
-    final CMakeLibraryDependencies entry = new CMakeLibraryDependencies(names);
-    dependencies.add(entry);
-    return entry;
+  public void link(final CharSequence component, final Map<String, Object> entries) {
+    link(Arrays.asList(component), entries);
   }
-
-  public void link(final Collection<CMakeLibraryDependencies> entries) {
-    dependencies.addAll(entries);
-  }
-
 }
 
 /*

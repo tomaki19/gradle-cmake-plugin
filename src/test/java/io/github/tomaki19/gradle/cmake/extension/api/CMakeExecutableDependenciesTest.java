@@ -7,49 +7,50 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.jupiter.api.Test;
+import java.util.List;
+import java.util.Map;
 
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
+import org.junit.jupiter.api.Test;
 
 class CMakeExecutableDependenciesTest {
 
   @Test
   void testConstructor() {
-    CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
+    CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(List.of("mylib"), Map.of());
     assertNotNull(deps);
   }
 
   @Test
   void testGetNames() {
-    CMakeExecutableDependencies deps = new CMakeExecutableDependencies("lib1", "lib2");
-    assertEquals(2, deps.getNames().size());
+    CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(List.of("lib1", "lib2"), Map.of());
+    assertEquals(2, deps.getComponents().size());
   }
 
   @Test
   void testFrom() {
-    CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.from("myProject");
-    assertEquals("myProject", deps.getFrom());
+    CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(List.of("mylib"),
+        Map.of(CMakeBinaryLinkSpec.PROJECT, "myProject"));
+    assertEquals("myProject", deps.getProject());
   }
 
   @Test
   void testGetLinkStatic() {
-    CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.variant(CMakeLinkVariant.STATIC);
+    CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "static"));
     assertEquals("static", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkShared() {
-    CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.variant(CMakeLinkVariant.SHARED);
+    CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "shared"));
     assertEquals("shared", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkInterface() {
-    CMakeExecutableDependencies deps = new CMakeExecutableDependencies("mylib");
-    deps.variant(CMakeLinkVariant.INTERFACE);
+    CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(
+        List.of("mylib"), Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "interface"));
     assertEquals("interface", deps.getLinkVariant().toLowerCase());
   }
 }

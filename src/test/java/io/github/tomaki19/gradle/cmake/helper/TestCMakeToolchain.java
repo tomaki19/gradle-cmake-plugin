@@ -5,13 +5,12 @@
 package io.github.tomaki19.gradle.cmake.helper;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectProvider;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildItems;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableDependencies;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryDependencies;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
 
 public final class TestCMakeToolchain {
@@ -24,34 +23,70 @@ public final class TestCMakeToolchain {
   }
 
   public static NamedDomainObjectProvider<CMakeToolchain> registerWithLibraryDependencies(final String name,
-      final CMakeExtension extension, final Collection<CMakeBuildItems> options,
-      final Collection<CMakeLibraryDependencies> dependencies) {
+      final CMakeExtension extension, final Collection<Map<String, Object>> options,
+      final Collection<Map<String, Object>> dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getLibraries().getLinking().options(options);
-      object.getLibraries().getLinking().link(dependencies);
+      options.forEach(opt -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
+        Map<String, Object> spec = new HashMap<>(opt);
+        spec.remove("names");
+        object.getLibraries().getLinking().options(names, spec);
+      });
+      dependencies.forEach(dep -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
+        Map<String, Object> spec = new HashMap<>(dep);
+        spec.remove("components");
+        object.getLibraries().getLinking().link(components, spec);
+      });
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeToolchain> registerWithApplicationDependencies(final String name,
-      final CMakeExtension extension, final Collection<CMakeBuildItems> options,
-      final Collection<CMakeExecutableDependencies> dependencies) {
+      final CMakeExtension extension, final Collection<Map<String, Object>> options,
+      final Collection<Map<String, Object>> dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getApplications().getLinking().options(options);
-      object.getApplications().getLinking().link(dependencies);
+      options.forEach(opt -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
+        Map<String, Object> spec = new HashMap<>(opt);
+        spec.remove("names");
+        object.getApplications().getLinking().options(names, spec);
+      });
+      dependencies.forEach(dep -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
+        Map<String, Object> spec = new HashMap<>(dep);
+        spec.remove("components");
+        object.getApplications().getLinking().link(components, spec);
+      });
     });
     return provider;
   }
 
   public static NamedDomainObjectProvider<CMakeToolchain> registerWithTestDependencies(final String name,
-      final CMakeExtension extension, final Collection<CMakeBuildItems> options,
-      final Collection<CMakeExecutableDependencies> dependencies) {
+      final CMakeExtension extension, final Collection<Map<String, Object>> options,
+      final Collection<Map<String, Object>> dependencies) {
     final NamedDomainObjectProvider<CMakeToolchain> provider = register(name, extension);
     provider.configure((object) -> {
-      object.getTests().getLinking().options(options);
-      object.getTests().getLinking().link(dependencies);
+      options.forEach(opt -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> names = (Collection<CharSequence>) opt.get("names");
+        Map<String, Object> spec = new HashMap<>(opt);
+        spec.remove("names");
+        object.getTests().getLinking().options(names, spec);
+      });
+      dependencies.forEach(dep -> {
+        @SuppressWarnings("unchecked")
+        Collection<CharSequence> components = (Collection<CharSequence>) dep.get("components");
+        Map<String, Object> spec = new HashMap<>(dep);
+        spec.remove("components");
+        object.getTests().getLinking().link(components, spec);
+      });
     });
     return provider;
   }

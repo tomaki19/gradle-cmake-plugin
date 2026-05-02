@@ -12,7 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
@@ -21,13 +22,12 @@ import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.extension.CMakeExtension;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryDependencies;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeBinaryLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
-import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
@@ -247,12 +247,8 @@ class CMakeModuleFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        // PUBLIC project dep (same project) -> covers allProjectDependencies and
-        // publicProjectDepTargets loops
-        // PUBLIC package dep -> covers publicPackageLinkLibraries loop
-        lib.getLinking().link(Arrays.asList(
-            new CMakeLibraryDependencies("AnotherLib").variant(CMakeLinkVariant.INTERFACE),
-            new CMakeLibraryDependencies("target").from("Package0")));
+        lib.getLinking().link(List.of("AnotherLib"), Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"));
+        lib.getLinking().link(List.of("target"), Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"));
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
