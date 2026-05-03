@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApiException;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeArchiveTaskSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecTaskSpec;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
@@ -36,27 +37,27 @@ public class CMakeCustomTaskContainer {
   }
 
   public void registerExecTasks(final Map<String, Object> entries, Action<CMakeCustomExec> action)
-      throws IllegalArgumentException {
+      throws CMakeApiException {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(entries);
     spec.validate();
     customExecProtos.put(spec, action);
   }
 
   public <T extends AbstractArchiveTask> void registerRuntimeArchiveTasks(final Map<String, Object> entries,
-      final Action<AbstractArchiveTask> action) throws IllegalArgumentException {
+      final Action<AbstractArchiveTask> action) throws CMakeApiException {
     final CMakeArchiveTaskSpec<? extends AbstractArchiveTask> spec = new CMakeArchiveTaskSpec<>(entries,
         CMakeCustomZip.class);
     spec.validate();
     customRuntimeArchiveProtos.put(spec, action);
   }
 
-  public void registerRuntimeArchiveTasks(final Map<String, Object> entries) throws IllegalArgumentException {
+  public void registerRuntimeArchiveTasks(final Map<String, Object> entries) throws CMakeApiException {
     registerRuntimeArchiveTasks(entries, (task) -> {
     });
   }
 
   public void registerDevelopArchiveTasks(final Map<String, Object> entries, final Action<AbstractArchiveTask> action)
-      throws IllegalArgumentException {
+      throws CMakeApiException {
     final CMakeArchiveTaskSpec<? extends AbstractArchiveTask> spec = new CMakeArchiveTaskSpec<>(entries,
         CMakeCustomZip.class);
     spec.validate();
@@ -64,7 +65,7 @@ public class CMakeCustomTaskContainer {
   }
 
   public <T extends AbstractArchiveTask> void registerDevelopArchiveTasks(final Map<String, Object> entries)
-      throws IllegalArgumentException {
+      throws CMakeApiException {
     registerDevelopArchiveTasks(entries, (task) -> {
     });
   }

@@ -10,8 +10,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.exceptions.CMakeApiException;
-
 class CMakeApiSpecInitTest {
 
   @Test

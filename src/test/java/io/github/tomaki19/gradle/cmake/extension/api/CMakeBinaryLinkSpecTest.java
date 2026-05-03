@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.tomaki19.gradle.cmake.exceptions.CMakeApiException;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 

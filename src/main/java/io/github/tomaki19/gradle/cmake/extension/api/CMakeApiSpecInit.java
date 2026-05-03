@@ -6,8 +6,6 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import java.util.Objects;
 
-import io.github.tomaki19.gradle.cmake.exceptions.CMakeApiException;
-
 abstract class CMakeApiSpecInit {
 
   protected static void validateType(final Object entry, final String name, final Class<?> type)

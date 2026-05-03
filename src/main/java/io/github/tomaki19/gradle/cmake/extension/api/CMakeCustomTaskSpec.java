@@ -38,21 +38,21 @@ public abstract class CMakeCustomTaskSpec<T> {
     this.spec = Collections.unmodifiableMap(entries);
   }
 
-  public void validateContentTypes() throws IllegalArgumentException {
+  public void validateContentTypes() throws CMakeApiException {
     validateType(TOOLCHAINS, Collection.class);
     validateType(BUILD_CONFIGS, Collection.class);
     validateType(COMPONENTS, Collection.class);
   }
 
-  protected void validateType(final String name, final Class<?> type) throws IllegalArgumentException {
+  protected void validateType(final String name, final Class<?> type) throws CMakeApiException {
     if (spec.containsKey(name) && !(type.isAssignableFrom(spec.get(name).getClass()))) {
-      throw new IllegalArgumentException("Invalid %s of type %s!".formatted(name, spec.get(name).getClass()));
+      throw new CMakeApiException("Invalid %s of type %s!".formatted(name, spec.get(name).getClass()));
     }
   }
 
-  protected void validateMandatory(final String name) throws IllegalArgumentException {
+  protected void validateMandatory(final String name) throws CMakeApiException {
     if (!spec.containsKey(name)) {
-      throw new IllegalArgumentException("Missing mandatory %s!".formatted(name));
+      throw new CMakeApiException("Missing mandatory %s!".formatted(name));
     }
   }
 

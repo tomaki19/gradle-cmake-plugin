@@ -270,7 +270,7 @@ class CMakeCustomTaskSpecTest {
   @Test
   void validateType_wrongType_throws() {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("name", 123));
-    assertThrows(IllegalArgumentException.class, spec::validate);
+    assertThrows(CMakeApiException.class, spec::validate);
   }
 
   @Test

@@ -246,13 +246,13 @@ public final class CMakeResolver {
       final Consumer<CMakeResolvedPackageDependency> privatePackageDependencyConsumer,
       final Consumer<CMakeResolvedPackageDependency> publicPackageDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
-      final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer) {
+      final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer) throws CMakeResolverException {
     for (final String linkingComponent : linking.getComponents()) {
       if (!resolvePackageReference(linkingComponent, linking.getProject(), linking.getVisibility(),
           privatePackageDependencyConsumer, publicPackageDependencyConsumer)
           && !resolveProjectReference(componentName, linkingComponent, linking.getProject(), linking.getLinkVariant(),
               linking.getVisibility(), privateProjectDependencyConsumer, publicProjectDependencyConsumer)) {
-        throw new IllegalArgumentException("Invalid link dependency '%s'!".formatted(linkingComponent));
+        throw new CMakeResolverException("Invalid link dependency '%s'!".formatted(linkingComponent));
       }
     }
   }
@@ -281,7 +281,7 @@ public final class CMakeResolver {
       final CMakeLinkVariant linkVariant, final CMakeVisibility visibilityType,
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer)
-      throws IllegalArgumentException {
+      throws CMakeResolverException {
     final boolean isCurrentProjectReferenced = from.isEmpty() || Objects.equals(currentProject.getName(), from);
     final boolean isSelfReference = Objects.equals(componentName, name) && isCurrentProjectReferenced;
     if (!isSelfReference) {

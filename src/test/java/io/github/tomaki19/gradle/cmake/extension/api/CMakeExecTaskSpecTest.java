@@ -37,19 +37,19 @@ class CMakeExecTaskSpecTest {
   @Test
   void testValidate_missingName_throws() {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of());
-    assertThrows(IllegalArgumentException.class, spec::validate);
+    assertThrows(CMakeApiException.class, spec::validate);
   }
 
   @Test
   void testValidate_blankName_throws() {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("name", "  "));
-    assertThrows(IllegalArgumentException.class, spec::validate);
+    assertThrows(CMakeApiException.class, spec::validate);
   }
 
   @Test
   void testValidate_emptyName_throws() {
     final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(Map.of("name", ""));
-    assertThrows(IllegalArgumentException.class, spec::validate);
+    assertThrows(CMakeApiException.class, spec::validate);
   }
 
   @Test

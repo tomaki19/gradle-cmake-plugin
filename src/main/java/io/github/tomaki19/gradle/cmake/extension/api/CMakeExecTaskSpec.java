@@ -16,7 +16,7 @@ public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec
     super(entries);
   }
 
-  public void validate() throws IllegalArgumentException {
+  public void validate() throws CMakeApiException {
     super.validateType(NAME, CharSequence.class);
     super.validateMandatory(NAME);
     validateNotEmptyName();
@@ -27,9 +27,9 @@ public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec
     return (String) spec.getOrDefault(NAME, "");
   }
 
-  private void validateNotEmptyName() throws IllegalArgumentException {
+  private void validateNotEmptyName() throws CMakeApiException {
     if (getName().isBlank()) {
-      throw new IllegalArgumentException("Missing mandatory %s!".formatted(NAME));
+      throw new CMakeApiException("Missing mandatory %s!".formatted(NAME));
     }
   }
 
