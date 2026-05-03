@@ -58,7 +58,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/app'] }
       linking {
-        link([variant: 'Shared', visibility: 'Private'], 'mylib')
+        link('mylib', [variant: 'Shared', visibility: 'Private'])
       }
     }
   }
@@ -68,7 +68,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/test'] }
       linking {
-        link([variant: 'Shared', visibility: 'Private'], 'mylib')
+        link('mylib', [variant: 'Shared', visibility: 'Private'])
       }
       testResultsXmlOutput = true
     }
@@ -163,8 +163,8 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src'] }
       linking {
-        link([variant: 'Shared', visibility: 'Private'], 'opengl')
-        link([variant: 'Shared', visibility: 'Private'], 'boost')
+        link('opengl', [variant: 'Shared', visibility: 'Private'])
+        link('boost', [variant: 'Shared', visibility: 'Private'])
       }
     }
   }
