@@ -81,10 +81,10 @@ public final class CMakeListsFile extends CMakeFileContent {
         sharedLibs.add(buildBinaryLibraryModel(lib, toolchain, buildConfig));
       }
       for (final CMakeResolvedApplication exec : toolchain.getApplications()) {
-        applications.add(buildExecutableModel(exec, toolchain, buildConfig));
+        applications.add(buildApplicationModel(exec, toolchain, buildConfig));
       }
       for (final CMakeResolvedTest exec : toolchain.getTests()) {
-        tests.add(buildExecutableModel(exec, toolchain, buildConfig));
+        tests.add(buildTestModel(exec, toolchain, buildConfig));
       }
     }
 
@@ -160,20 +160,39 @@ public final class CMakeListsFile extends CMakeFileContent {
     model.put("projectIncludes",
         buildFilteredProjectIncludes(executable.getAllProjectDependencies(), toolchain, buildConfig));
 
-    final Path projectPath = getProjectDirectory().getAsFile().toPath();
-    model.put("headerDirs", buildRelativePaths(executable.getHeaders(), projectPath));
-    model.put("sourcePaths", buildRelativeFilePaths(executable.getSources(), projectPath));
+    model.put("headerDirs", buildRelativePaths(executable.getHeaders(),
+        getProjectDirectory().getAsFile().toPath()));
+    model.put("sourcePaths", buildRelativeFilePaths(executable.getSources(),
+        getProjectDirectory().getAsFile().toPath()));
 
     populateCompileModel(model, executable);
     populateLinkModel(model, executable, toolchain, buildConfig, false);
 
     model.put("outputName", executable.getOutputName());
+    return model;
+  }
 
-    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectoryProperty(), executable,
+  private Map<String, Object> buildApplicationModel(final CMakeResolvedApplication application,
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    final Map<String, Object> model = buildExecutableModel(application, toolchain, buildConfig);
+
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectoryProperty(), application,
         toolchain, buildConfig).getAsFile().toPath();
-    model.put("targetRelPath", projectPath.relativize(targetPath));
+    model.put("targetRelPath", getProjectDirectory().getAsFile().toPath().relativize(targetPath));
     model.put("buildConfigs", toolchain.getBuildConfigs());
-    model.put("stripDebug", executable.isStripDebug());
+    model.put("stripDebug", application.isStripDebug());
+    return model;
+  }
+
+  private Map<String, Object> buildTestModel(final CMakeResolvedTest test, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    final Map<String, Object> model = buildExecutableModel(test, toolchain, buildConfig);
+
+    final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectoryProperty(), test,
+        toolchain, buildConfig).getAsFile().toPath();
+    model.put("targetRelPath", getProjectDirectory().getAsFile().toPath().relativize(targetPath));
+    model.put("buildConfigs", toolchain.getBuildConfigs());
+    model.put("stripDebug", test.isStripDebug());
     return model;
   }
 

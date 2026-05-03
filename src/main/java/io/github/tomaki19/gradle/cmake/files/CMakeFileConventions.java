@@ -8,9 +8,11 @@ import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedProjectDependency;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedTest;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public class CMakeFileConventions {
@@ -34,22 +36,26 @@ public class CMakeFileConventions {
   }
 
   public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
-      final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
-    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
+      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir("libraries")
+        .dir(library.getLinkVariant().toLowerCase()).dir(library.getName());
   }
 
   public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
-      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final String target = CMakeFileConventions.buildTarget(library, toolchain, buildConfig);
-    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
+      final CMakeResolvedApplication application, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir("applications").dir(application.getName());
+  }
+
+  public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
+      final CMakeResolvedTest test, final CMakeResolvedToolchain toolchain, final String buildConfig) {
+    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir("tests").dir(test.getName());
   }
 
   public static Directory targetBinaryDirectory(final DirectoryProperty buildDirectory,
       final CMakeResolvedProjectDependency dependency, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    final String target = CMakeFileConventions.buildTarget(dependency, toolchain, buildConfig);
-    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir(target);
+    return targetConfigDirectory(buildDirectory, toolchain, buildConfig).dir("libraries")
+        .dir(dependency.getLinkVariant().toLowerCase()).dir(dependency.getName());
   }
 
   private static String moduleTarget(final String projectName, final String libraryName,
