@@ -135,6 +135,8 @@ public class CMakePlugin implements Plugin<Project> {
           for (final CMakeResolvedLibrary library : toolchain.getInterfaceLibraries()) {
             final Configuration modulesConfiguration = configurations.createModulesConfiguration(library, toolchain,
                 buildConfig);
+            final Configuration runtimeConfiguration = configurations.createRuntimeConfiguration(library, toolchain,
+                buildConfig);
             final Configuration developConfiguration = configurations.createDevelopConfiguration(library, toolchain,
                 buildConfig);
 
@@ -143,6 +145,8 @@ public class CMakePlugin implements Plugin<Project> {
                 modulesConfiguration.getDependencies()
                     .add(dependency.createModulesDependency(project, toolchain, buildConfig));
               }
+              runtimeConfiguration.getDependencies()
+                  .add(dependency.createRuntimeDependency(project, toolchain, buildConfig));
               developConfiguration.getDependencies()
                   .add(dependency.createDevelopDependency(project, toolchain, buildConfig));
             }
