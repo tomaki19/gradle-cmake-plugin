@@ -36,9 +36,9 @@ public class CMakeCustomTaskContainer {
     this.taskContainer = taskContainer;
   }
 
-  public void registerExecTasks(final Map<String, Object> entries, final String name, Action<CMakeCustomExec> action)
+  public void registerExecTasks(final Map<String, Object> entries, final String prefix, Action<CMakeCustomExec> action)
       throws CMakeApiException {
-    customExecProtos.put(CMakeExecTaskSpec.Init.create(entries, name), action);
+    customExecProtos.put(CMakeExecTaskSpec.Init.create(entries, prefix), action);
   }
 
   public <T extends AbstractArchiveTask> void registerRuntimeArchiveTasks(final Map<String, Object> entries,
@@ -67,7 +67,7 @@ public class CMakeCustomTaskContainer {
       if (entry.getKey().matchesToolchain(toolchain)
           && entry.getKey().hasNoBuildConfigs()
           && entry.getKey().hasNoComponents()) {
-        taskContainer.register(entry.getKey().getName(), CMakeCustomExec.class, entry.getValue());
+        taskContainer.register(entry.getKey().getPrefix(), CMakeCustomExec.class, entry.getValue());
       }
     }
   }
@@ -78,7 +78,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && entry.getKey().matchesBuildConfig(buildConfig)
           && entry.getKey().hasNoComponents()) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
             CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
@@ -91,7 +91,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
             CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
@@ -111,8 +111,7 @@ public class CMakeCustomTaskContainer {
     }
   }
 
-  public void applyDevelopArchiveTasks(final CMakeResolvedToolchain toolchain,
-      final String buildConfig,
+  public void applyDevelopArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedLibrary library, final Action<AbstractArchiveTask> configureAction) {
     for (final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry : customDevelopArchiveProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
@@ -131,7 +130,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
             CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }
@@ -157,7 +156,7 @@ public class CMakeCustomTaskContainer {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
-        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getName(),
+        final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
             CMakeCustomExec.class, entry.getValue());
         provider.configure(configureAction);
       }

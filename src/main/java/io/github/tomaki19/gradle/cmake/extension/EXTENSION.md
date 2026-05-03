@@ -120,10 +120,10 @@ Available in the `libraries`, `applications`, and `tests` sub-blocks of a toolch
 
 ```groovy
 compiling {
-  options('-Wall', '-Wextra', [visibility: 'Public'])
-  options('-O2', [visibility: 'Private'])
-  defines('VERSION_1_0', 'ENABLE_LOGGING', [visibility: 'Public'])
-  defines('INTERNAL_BUILD', [visibility: 'Private'])
+  options('-Wall', '-Wextra', [visibility: PUBLIC])
+  options('-O2', [visibility: PRIVATE])
+  defines('VERSION_1_0', 'ENABLE_LOGGING', [visibility: PUBLIC])
+  defines('INTERNAL_BUILD', [visibility: PRIVATE])
 }
 ```
 
@@ -146,7 +146,7 @@ defines('DEBUG_MODE')
 ```groovy
 linking {
   options('-Wl,-rpath,/usr/local/lib')
-  options('-static-libgcc', [visibility: 'Private'])
+  options('-static-libgcc', [visibility: PRIVATE])
 }
 ```
 
@@ -169,8 +169,8 @@ cmake {
       libraries {
         buildVariants SHARED, STATIC
         compiling {
-          options('-Wall', '-Wextra', '-fPIC', [visibility: 'Public'])
-          defines('LINUX', [visibility: 'Public'])
+          options('-Wall', '-Wextra', '-fPIC', [visibility: PUBLIC])
+          defines('LINUX', [visibility: PUBLIC])
         }
         linking {
           options('-Wl,-rpath,\$ORIGIN')
@@ -216,15 +216,15 @@ cmake {
       }
 
       compiling {
-        options('-Wall', [visibility: 'Public'])
-        defines('INTERNAL', [visibility: 'Private'])
+        options('-Wall', [visibility: PUBLIC])
+        defines('INTERNAL', [visibility: PRIVATE])
       }
 
       linking {
         options('-Wl,-rpath,\$ORIGIN')
-        link('utils', 'common', [variant: 'Shared', visibility: 'Public'])
-        link('remoteLib', [variant: 'Shared', visibility: 'Private', from: 'otherProject'])
-        link('sharedOnlyDep', [forBuild: 'Shared', variant: 'Shared', visibility: 'Private'])
+        link('utils', 'common', [variant: SHARED, visibility: PUBLIC])
+        link('remoteLib', [variant: SHARED, visibility: PRIVATE, from: 'otherProject'])
+        link('sharedOnlyDep', [forBuild: 'Shared', variant: SHARED, visibility: PRIVATE])
       }
 
       stripDebug = false                    // optional, default: false
@@ -257,9 +257,9 @@ cmake {
 | Key | Values | Default | Description |
 |-----|--------|---------|-------------|
 | `from` | String | `''` | Project name for inter-project dependencies |
-| `variant` | `'Shared'` \| `'Static'` \| `'Interface'` | `'Shared'` | How to link the dependency |
-| `visibility` | `'Public'` \| `'Private'` | `'Public'` | CMake target link visibility |
-| `forBuild` | `'Shared'` \| `'Static'` \| `'Module'` | `'Shared'` | Apply this link spec only when building with the given build variant |
+| `variant` | `SHARED` \| `STATIC` \| `INTERFACE` | `SHARED` | How to link the dependency (from `CMakeLinkVariant`) |
+| `visibility` | `PUBLIC` \| `PRIVATE` | `PUBLIC` | CMake target link visibility (from `CMakeVisibility`) |
+| `forBuild` | `SHARED` \| `STATIC` | `SHARED` | Apply this link spec only when building with the given build variant (from `CMakeBuildVariant`) |
 
 ### Example
 
@@ -279,13 +279,13 @@ libraries {
     headers { srcDirs = ['include/core'] }
 
     compiling {
-      options('-std=c++17', [visibility: 'Public'])
-      defines('CORE_VERSION_2', [visibility: 'Public'])
+      options('-std=c++17', [visibility: PUBLIC])
+      defines('CORE_VERSION_2', [visibility: PUBLIC])
     }
 
     linking {
-      link('utils', [variant: 'Shared', visibility: 'Private'])
-      link('system', 'filesystem', [variant: 'Shared', visibility: 'Public', from: 'boost'])
+      link('utils', [variant: SHARED, visibility: PRIVATE])
+      link('system', 'filesystem', [from: 'boost', variant: SHARED, visibility: PUBLIC])
     }
   }
 }
@@ -311,14 +311,14 @@ cmake {
       }
 
       compiling {
-        options('-O3', [visibility: 'Private'])
-        defines('APP_BUILD', [visibility: 'Private'])
+        options('-O3', [visibility: PRIVATE])
+        defines('APP_BUILD', [visibility: PRIVATE])
       }
 
       linking {
         options('-Wl,--as-needed')
-        link('core', 'utils', [variant: 'Shared', visibility: 'Private'])
-        link('program_options', [from: 'boost', variant: 'Shared', visibility: 'Private'])
+        link('core', 'utils', [variant: SHARED, visibility: PRIVATE])
+        link('program_options', [from: 'boost', variant: SHARED, visibility: PRIVATE])
       }
 
       outputName = 'my-app'                  // optional
@@ -333,8 +333,8 @@ cmake {
 | Key | Values | Default | Description |
 |-----|--------|---------|-------------|
 | `from` | String | `''` | Project name for inter-project dependencies |
-| `variant` | `'Shared'` \| `'Static'` \| `'Interface'` | `'Shared'` | How to link the dependency |
-| `visibility` | `'Public'` \| `'Private'` | `'Public'` | CMake target link visibility |
+| `variant` | `SHARED` \| `STATIC` \| `INTERFACE` | `SHARED` | How to link the dependency (from `CMakeLinkVariant`) |
+| `visibility` | `PUBLIC` \| `PRIVATE` | `PUBLIC` | CMake target link visibility (from `CMakeVisibility`) |
 
 ---
 
@@ -356,11 +356,11 @@ cmake {
       }
 
       compiling {
-        defines('TEST_BUILD', 'ENABLE_ASSERT', [visibility: 'Private'])
+        defines('TEST_BUILD', 'ENABLE_ASSERT', [visibility: PRIVATE])
       }
 
       linking {
-        link('core', [variant: 'Shared', visibility: 'Private'])
+        link('core', [variant: SHARED, visibility: PRIVATE])
       }
 
       outputName = 'my-test'                 // optional
@@ -370,6 +370,14 @@ cmake {
   }
 }
 ```
+
+### Test `linking.link()` Spec Keys
+
+| Key | Values | Default | Description |
+|-----|--------|---------|-------------|
+| `from` | String | `''` | Project name for inter-project dependencies |
+| `variant` | `SHARED` \| `STATIC` \| `INTERFACE` | `SHARED` | How to link the dependency (from `CMakeLinkVariant`) |
+| `visibility` | `PUBLIC` \| `PRIVATE` | `PUBLIC` | CMake target link visibility (from `CMakeVisibility`) |
 
 ### Test Configuration Options
 
@@ -388,8 +396,8 @@ Register custom exec tasks and archive tasks via `cmake.tasks`. Tasks are applie
 Registers a custom command that runs as a Gradle task. The spec map controls when the task is created:
 
 ```groovy
-cmake.tasks.registerExecTasks(
-    [name: 'my-task', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*library']],
+cmake.tasks.registerExecTasks('my-task',
+    [toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*library']],
     { task ->
         task.executable = 'mycommand'
         task.args '--option', task.compileCommands
@@ -398,13 +406,19 @@ cmake.tasks.registerExecTasks(
 ```
 
 **Spec map keys:**
+| Parameter | Type | Required | Description |
+|-----|------|----------|-------------|
+| `prefix` | String | **yes** | Unique task name prefix |
+| `spec` | Map<String,Object> | **yes** | Filter specification for task generation |
+| `action` | Closure | **yes** | Task action for generated tasks |
+
+**Spec map keys:**
 
 | Key | Type | Required | Description |
 |-----|------|----------|-------------|
-| `name` | String | **yes** | Task name (must be unique per matching combination) |
-| `toolchains` | Collection<String> | no | Toolchain names to match; omit to match any toolchain (per-toolchain registration) |
-| `buildConfigs` | Collection<String> | no | Build configs to match; omit for per-toolchain (no build-config) registration |
-| `components` | Collection<String> | no | Component filter; omit for no-component registration |
+| `toolchains` | Collection<String> | no | Toolchain filter, omit to match any toolchain |
+| `buildConfigs` | Collection<String> | no | Build configs filter, omit to match any build-config |
+| `components` | Collection<String> | no | Component filter, omit to match any component |
 
 **Component filter wildcards:**
 
@@ -418,7 +432,6 @@ cmake.tasks.registerExecTasks(
 | `"*executable"` | All executables (applications and tests) |
 | `"*application"` | Applications only |
 | `"*test"` | Tests only |
-| `"<name>"` | Exact component name |
 
 **In the action closure, the `CMakeCustomExec` task exposes:**
 - All standard `Exec` task properties (`executable`, `args`, `workingDir`, …)
@@ -471,7 +484,7 @@ cmake {
       libraries {
         buildVariants SHARED, STATIC
         compiling {
-          options('-Wall', '-Wextra', [visibility: 'Public'])
+          options('-Wall', '-Wextra', [visibility: PUBLIC])
         }
       }
 
@@ -488,7 +501,7 @@ cmake {
       sources { srcDirs = ['src/graphics'] }
       headers { srcDirs = ['include/graphics'] }
       linking {
-        link('opengl', [variant: 'Shared', visibility: 'Public'])
+        link('opengl', [variant: SHARED, visibility: PUBLIC])
       }
     }
 
@@ -504,7 +517,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/viewer'] }
       linking {
-        link('graphics', 'utils', [variant: 'Shared', visibility: 'Private'])
+        link('graphics', 'utils', [variant: SHARED, visibility: PRIVATE])
       }
     }
   }
@@ -514,14 +527,14 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['tests'] }
       linking {
-        link('graphics', [variant: 'Shared', visibility: 'Private'])
+        link('graphics', [variant: SHARED, visibility: PRIVATE])
       }
       testResultsXmlOutput = true
     }
   }
 
-  tasks.registerExecTasks(
-      [name: 'coverage-gcc-debug', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
+  tasks.registerExecTasks('coverage',
+      [toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
       { task ->
           task.executable = 'ctest'
           task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath

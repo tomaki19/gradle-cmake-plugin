@@ -58,7 +58,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/app'] }
       linking {
-        link('mylib', [variant: 'Shared', visibility: 'Private'])
+        link('mylib', [variant: SHARED, visibility: PRIVATE])
       }
     }
   }
@@ -68,7 +68,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/test'] }
       linking {
-        link('mylib', [variant: 'Shared', visibility: 'Private'])
+        link('mylib', [variant: SHARED, visibility: PRIVATE])
       }
       testResultsXmlOutput = true
     }
@@ -139,8 +139,8 @@ cmake {
       sources { srcDirs = ['src'] }
       headers { srcDirs = ['include'] }
       compiling {
-        options([visibility: 'Public'], '-Wall', '-Wextra')
-        defines([visibility: 'Public'], 'CORE_VERSION_2')
+        options('-Wall', '-Wextra', [visibility: PUBLIC])
+        defines('CORE_VERSION_2', [visibility: PUBLIC])
       }
     }
   }
@@ -163,8 +163,8 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src'] }
       linking {
-        link('opengl', [variant: 'Shared', visibility: 'Private'])
-        link('boost', [variant: 'Shared', visibility: 'Private'])
+        link('opengl', [variant: SHARED, visibility: PRIVATE])
+        link('boost', [variant: SHARED, visibility: PRIVATE])
       }
     }
   }
@@ -179,8 +179,8 @@ See [Custom Tasks](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTEN
 cmake {
   // Register a cppcheck analysis task for each build config
   ['Debug', 'Release'].each { config ->
-    tasks.registerExecTasks(
-        [name: "cppcheck-gcc-${config.toLowerCase()}", toolchains: ['gcc'], buildConfigs: [config]],
+    tasks.registerExecTasks("cppcheck-gcc-${config.toLowerCase()}",
+        [toolchains: ['gcc'], buildConfigs: [config]],
         { task ->
             task.executable = 'cppcheck'
             task.args '--enable=all', '--project', task.compileCommands
@@ -197,20 +197,48 @@ cmake {
 ```groovy
 cmake {
   // ZIP runtime binaries for distribution
-  tasks.registerRuntimeArchiveTasks(
-      [toolchains: ['gcc'], buildConfigs: ['Release'], components: ['*shared']],
+  tasks.registerRuntimeArchiveTasks([
+          toolchains: ['gcc'],
+          buildConfigs: ['Release'],
+          components: ['*shared']
+      ],
+      { task -> task.destinationDirectory.set(layout.buildDirectory.dir('dist')) }
+  )
+
+  // TAR runtime binaries for distribution
+  tasks.registerRuntimeArchiveTasks([
+          type: io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTar,
+          toolchains: ['gcc'],
+          buildConfigs: ['Release'],
+          components: ['*shared']
+      ],
       { task -> task.destinationDirectory.set(layout.buildDirectory.dir('dist')) }
   )
 
   // ZIP development SDK (library + headers)
-  tasks.registerDevelopArchiveTasks(
-      [toolchains: ['gcc'], buildConfigs: ['Release'], components: ['*static']],
+  tasks.registerDevelopArchiveTasks([
+          toolchains: ['gcc'],
+          buildConfigs: ['Release'],
+          components: ['*static']
+      ],
+      { task -> task.destinationDirectory.set(layout.buildDirectory.dir('sdk')) }
+  )
+
+  // TAR development SDK (library + headers)
+  tasks.registerDevelopArchiveTasks([
+          type: io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTar,
+          toolchains: ['gcc'],
+          buildConfigs: ['Release'],
+          components: ['*static']
+      ],
       { task -> task.destinationDirectory.set(layout.buildDirectory.dir('sdk')) }
   )
 }
 
 // Run: ./gradlew zip-runtime-core-shared-gcc-release
+//      ./gradlew tar-runtime-core-static-gcc-release
 //      ./gradlew zip-develop-core-static-gcc-release
+//      ./gradlew tar-develop-core-static-gcc-release
 ```
 
 ## Build Output Structure

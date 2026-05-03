@@ -19,7 +19,7 @@ class CMakeExecTaskSpecTest {
   @Test
   void testGetName() {
     final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(), "myTask");
-    assertEquals("myTask", spec.getName());
+    assertEquals("myTask", spec.getPrefix());
   }
 
   @Test

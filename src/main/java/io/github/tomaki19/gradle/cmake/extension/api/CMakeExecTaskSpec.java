@@ -15,23 +15,23 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 
 public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec> {
 
-  private final String name;
+  private final String prefix;
 
   public CMakeExecTaskSpec(final Set<String> toolchains, final Set<String> buildConfigs,
-      final Set<String> components, final String name) {
+      final Set<String> components, final String prefix) {
     super(toolchains, buildConfigs, components);
-    this.name = name;
+    this.prefix = prefix;
   }
 
-  public String getName() {
-    return name;
+  public String getPrefix() {
+    return prefix;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + getName().hashCode();
+    result = prime * result + getPrefix().hashCode();
     return result;
   }
 
@@ -42,20 +42,20 @@ public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec
     if (!(obj instanceof CMakeExecTaskSpec))
       return false;
     final CMakeExecTaskSpec other = (CMakeExecTaskSpec) obj;
-    if (!getName().equals(other.getName()))
+    if (!getPrefix().equals(other.getPrefix()))
       return false;
     return super.equals(obj);
   }
 
   public static class Init extends CMakeCustomTaskSpec.Init {
 
-    public static CMakeExecTaskSpec create(final Map<String, Object> spec, final CharSequence name)
+    public static CMakeExecTaskSpec create(final Map<String, Object> spec, final CharSequence prefix)
         throws CMakeApiException {
-      if (Objects.isNull(name)) {
-        throw new CMakeApiException("Exec task name is missing!");
+      if (Objects.isNull(prefix)) {
+        throw new CMakeApiException("Exec task prefix is missing!");
       }
-      if (name.toString().isBlank()) {
-        throw new CMakeApiException("Exec task name is empty!");
+      if (prefix.toString().isBlank()) {
+        throw new CMakeApiException("Exec task prefix is empty!");
       }
       validateContentTypes(spec);
       return new CMakeExecTaskSpec(
@@ -65,7 +65,7 @@ public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec
               .map((it) -> it.toString()).collect(Collectors.toSet()),
           ((Collection<?>) spec.getOrDefault(COMPONENTS, Collections.emptyList())).stream()
               .map((it) -> it.toString()).collect(Collectors.toSet()),
-          name.toString());
+          prefix.toString());
     }
   }
 
