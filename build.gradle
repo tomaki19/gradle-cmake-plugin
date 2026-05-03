@@ -83,6 +83,7 @@ spotbugs {
 test {
     finalizedBy jacocoTestReport
     jvmArgs '-XX:+EnableDynamicAgentLoading'
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 }
 
 testing {
