@@ -27,6 +27,7 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakeInterfaceLibrary;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedLibrary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
@@ -246,7 +247,7 @@ class CMakeModuleFileTest {
       NamedDomainObjectProvider<CMakeLibrary> libProvider = TestCMakeInterfaceLibrary.register("InterfaceLib0",
           extension);
       libProvider.configure((lib) -> {
-        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"), "AnotherLib");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE), "AnotherLib");
         lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0"), "target");
       });
 

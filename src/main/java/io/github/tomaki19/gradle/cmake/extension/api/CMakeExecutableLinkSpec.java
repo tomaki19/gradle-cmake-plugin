@@ -28,10 +28,10 @@ public class CMakeExecutableLinkSpec extends CMakeBinaryLinkSpec {
           .collect(Collectors.toSet()),
           entries.containsKey(PROJECT) ? ((CharSequence) entries.get(PROJECT)).toString() : "",
           entries.containsKey(LINK_VARIANT)
-              ? CMakeLinkVariant.valueOf(((CharSequence) entries.get(LINK_VARIANT)).toString().toUpperCase())
+              ? (CMakeLinkVariant) entries.get(LINK_VARIANT)
               : CMakeLinkVariant.SHARED,
           entries.containsKey(VISIBILITY)
-              ? CMakeVisibility.valueOf(((CharSequence) entries.get(VISIBILITY)).toString().toUpperCase())
+              ? (CMakeVisibility) entries.get(VISIBILITY)
               : CMakeVisibility.PUBLIC);
     }
 

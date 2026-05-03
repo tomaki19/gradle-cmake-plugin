@@ -27,8 +27,8 @@ import io.github.tomaki19.gradle.cmake.tasks.CMakeTasksConventions;
 public class CMakeCustomTaskContainer {
 
   private final Map<CMakeExecTaskSpec, Action<CMakeCustomExec>> customExecProtos = new HashMap<>();
-  private final Map<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> customRuntimeArchiveProtos = new HashMap<>();
-  private final Map<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> customDevelopArchiveProtos = new HashMap<>();
+  private final Map<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> customRuntimeArchiveProtos = new HashMap<>();
+  private final Map<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> customDevelopArchiveProtos = new HashMap<>();
 
   private final TaskContainer taskContainer;
 
@@ -36,19 +36,14 @@ public class CMakeCustomTaskContainer {
     this.taskContainer = taskContainer;
   }
 
-  public void registerExecTasks(final Map<String, Object> entries, Action<CMakeCustomExec> action)
+  public void registerExecTasks(final Map<String, Object> entries, final String name, Action<CMakeCustomExec> action)
       throws CMakeApiException {
-    final CMakeExecTaskSpec spec = new CMakeExecTaskSpec(entries);
-    spec.validate();
-    customExecProtos.put(spec, action);
+    customExecProtos.put(CMakeExecTaskSpec.Init.create(entries, name), action);
   }
 
   public <T extends AbstractArchiveTask> void registerRuntimeArchiveTasks(final Map<String, Object> entries,
       final Action<AbstractArchiveTask> action) throws CMakeApiException {
-    final CMakeArchiveTaskSpec<? extends AbstractArchiveTask> spec = new CMakeArchiveTaskSpec<>(entries,
-        CMakeCustomZip.class);
-    spec.validate();
-    customRuntimeArchiveProtos.put(spec, action);
+    customRuntimeArchiveProtos.put(CMakeArchiveTaskSpec.Init.create(entries, CMakeCustomZip.class), action);
   }
 
   public void registerRuntimeArchiveTasks(final Map<String, Object> entries) throws CMakeApiException {
@@ -58,13 +53,11 @@ public class CMakeCustomTaskContainer {
 
   public void registerDevelopArchiveTasks(final Map<String, Object> entries, final Action<AbstractArchiveTask> action)
       throws CMakeApiException {
-    final CMakeArchiveTaskSpec<? extends AbstractArchiveTask> spec = new CMakeArchiveTaskSpec<>(entries,
-        CMakeCustomZip.class);
-    spec.validate();
-    customDevelopArchiveProtos.put(spec, action);
+    customDevelopArchiveProtos.put(CMakeArchiveTaskSpec.Init.create(entries, CMakeCustomZip.class), action);
   }
 
-  public <T extends AbstractArchiveTask> void registerDevelopArchiveTasks(final Map<String, Object> entries)
+  public <T extends AbstractArchiveTask> void registerDevelopArchiveTasks(final Map<String, Object> entries,
+      final Class<T> type)
       throws CMakeApiException {
     registerDevelopArchiveTasks(entries, (task) -> {
     });
@@ -108,8 +101,7 @@ public class CMakeCustomTaskContainer {
 
   public void applyRuntimeArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedLibrary library, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customRuntimeArchiveProtos
-        .entrySet()) {
+    for (final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry : customRuntimeArchiveProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
@@ -123,8 +115,7 @@ public class CMakeCustomTaskContainer {
   public void applyDevelopArchiveTasks(final CMakeResolvedToolchain toolchain,
       final String buildConfig,
       final CMakeResolvedLibrary library, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customDevelopArchiveProtos
-        .entrySet()) {
+    for (final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry : customDevelopArchiveProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
@@ -150,8 +141,7 @@ public class CMakeCustomTaskContainer {
 
   public void applyRuntimeArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedApplication application, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customRuntimeArchiveProtos
-        .entrySet()) {
+    for (final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry : customRuntimeArchiveProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
@@ -177,8 +167,7 @@ public class CMakeCustomTaskContainer {
 
   public void applyRuntimeArchiveTasks(final CMakeResolvedToolchain toolchain, final String buildConfig,
       final CMakeResolvedTest test, final Action<AbstractArchiveTask> configureAction) {
-    for (final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry : customRuntimeArchiveProtos
-        .entrySet()) {
+    for (final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry : customRuntimeArchiveProtos.entrySet()) {
       if ((entry.getKey().matchesToolchain(toolchain) || entry.getKey().hasNoToolchains())
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
@@ -189,9 +178,8 @@ public class CMakeCustomTaskContainer {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private TaskProvider<AbstractArchiveTask> registerArchiveTasks(final String taskName,
-      final Entry<CMakeArchiveTaskSpec<? extends AbstractArchiveTask>, Action<? extends AbstractArchiveTask>> entry) {
+      final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry) {
     final Class<AbstractArchiveTask> type = (Class<AbstractArchiveTask>) entry.getKey().getType();
     final Action<AbstractArchiveTask> action = (Action<AbstractArchiveTask>) entry.getValue();
     return taskContainer.register("%s-%s".formatted(type.getSuperclass().getSimpleName().toLowerCase(), taskName), type,

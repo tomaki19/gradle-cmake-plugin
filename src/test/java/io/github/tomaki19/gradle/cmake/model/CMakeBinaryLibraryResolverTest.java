@@ -37,11 +37,11 @@ public class CMakeBinaryLibraryResolverTest {
                                 Arrays.asList(
                                                 Map.of("components", List.of("target"),
                                                                 CMakeLibraryLinkSpec.PROJECT, "Package0",
-                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, "STATIC"),
+                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.STATIC),
                                                 Map.of("components", List.of("BinaryLibrary0"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
-                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, "STATIC")));
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED,
+                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.STATIC)));
                 TestCMakeBinaryLibrary.register("BinaryLibrary1", extension, CMakeBuildVariant.SHARED);
 
                 assertEquals(1, extension.getPackages().size());
@@ -83,31 +83,31 @@ public class CMakeBinaryLibraryResolverTest {
                                                 Map.of("components", List.of("target"),
                                                                 CMakeLibraryLinkSpec.PROJECT, "Package0"),
                                                 Map.of("components", List.of("InterfaceLibrary0"),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE),
                                                 Map.of("components", List.of("StaticLibrary0"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "STATIC"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.STATIC),
                                                 Map.of("components", List.of("SharedLibrary0"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED")));
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED)));
                 TestCMakeToolchain.registerWithLibraryDependencies("Toolchain1", extension,
                                 Arrays.asList(Map.of("names", List.of("-loption"), CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")),
                                 Arrays.asList(
                                                 Map.of("components", List.of("target"),
                                                                 CMakeLibraryLinkSpec.PROJECT, "Package1",
-                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                                CMakeLibraryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE),
                                                 Map.of("components", List.of("InterfaceLibrary1"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
-                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE,
+                                                                CMakeLibraryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE),
                                                 Map.of("components", List.of("StaticLibrary1"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "STATIC",
-                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.STATIC,
+                                                                CMakeLibraryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE),
                                                 Map.of("components", List.of("SharedLibrary1"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
-                                                                CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE")));
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED,
+                                                                CMakeLibraryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE)));
                 TestCMakeBinaryLibrary.register("Library0", extension,
                                 Arrays.asList("Toolchain0", "Toolchain1"), CMakeBuildVariant.SHARED);
 
@@ -284,13 +284,13 @@ public class CMakeBinaryLibraryResolverTest {
                                 Arrays.asList(
                                                 Map.of("components", List.of("target"),
                                                                 CMakeLibraryLinkSpec.PROJECT, "Package0",
-                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, "SHARED"),
+                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.SHARED),
                                                 Map.of("components", List.of("InterfaceLibrary0"),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
-                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, "SHARED"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE,
+                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.SHARED),
                                                 Map.of("components", List.of("BinaryLibrary0"),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED",
-                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, "SHARED")));
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED,
+                                                                CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.SHARED)));
                 TestCMakeBinaryLibrary.register("BinaryLibrary1", extension, Arrays.asList("Toolchain0"),
                                 CMakeBuildVariant.SHARED);
 
@@ -334,9 +334,9 @@ public class CMakeBinaryLibraryResolverTest {
                                                 Map.of("components", List.of("target"),
                                                                 CMakeLibraryLinkSpec.PROJECT, "Package0"),
                                                 Map.of("components", List.of("InterfaceLibrary0"),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE),
                                                 Map.of("components", List.of("BinaryLibrary0"),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED")));
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED)));
 
                 assertEquals(1, extension.getPackages().size());
                 assertEquals(1, extension.getToolchains().size());
@@ -379,9 +379,9 @@ public class CMakeBinaryLibraryResolverTest {
                                                                 CMakeLibraryLinkSpec.PROJECT, "Package0"),
                                                 Map.of("components", List.of("InterfaceLibrary0"),
                                                                 CMakeLibraryLinkSpec.PROJECT, project.getName(),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"),
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE),
                                                 Map.of("components", List.of("BinaryLibrary0"),
-                                                                CMakeLibraryLinkSpec.LINK_VARIANT, "SHARED")));
+                                                                CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED)));
 
                 assertEquals(1, extension.getPackages().size());
                 assertEquals(1, extension.getToolchains().size());

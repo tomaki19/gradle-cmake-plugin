@@ -146,7 +146,6 @@ class CMakeBinaryLinkSpecTest {
 
       public static TestCMakeBinaryLinkSpec create(final Map<String, Object> entries,
           final String... components) throws CMakeApiException {
-        validateContentTypes(entries);
         return new TestCMakeBinaryLinkSpec(Arrays.asList(components).stream().map(Object::toString)
             .collect(Collectors.toSet()),
             entries.containsKey(PROJECT) ? ((CharSequence) entries.get(PROJECT)).toString() : null,

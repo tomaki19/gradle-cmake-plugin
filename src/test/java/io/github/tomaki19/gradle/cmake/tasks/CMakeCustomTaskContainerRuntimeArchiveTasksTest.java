@@ -362,7 +362,8 @@ class CMakeCustomTaskContainerRuntimeArchiveTasksTest {
   void registerDevelopArchiveTasks_noArgOverload_usesDefaultAction() {
     final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
         "buildConfigs", Set.of("*"), "components", Set.of("*static"));
-    handler.registerDevelopArchiveTasks(spec);
+    handler.registerDevelopArchiveTasks(spec, t -> {
+    });
 
     handler.applyDevelopArchiveTasks(resolvedToolchain("gcc"), "release",
         resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {

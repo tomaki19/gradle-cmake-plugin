@@ -394,7 +394,7 @@ class CMakeResolverTest {
     TestCMakePackage.register("myPkg", extension);
     NamedDomainObjectProvider<CMakeLibrary> libProvider = extension.getLibraries().register("myLib");
     libProvider.configure(lib -> {
-      lib.getLinking().link(Map.of(CMakeBinaryLinkSpec.PROJECT, "myPkg", "visibility", "PRIVATE"), "target");
+      lib.getLinking().link(Map.of(CMakeBinaryLinkSpec.PROJECT, "myPkg", CMakeBinaryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE), "target");
       lib.getHeaders().srcDir(".");
     });
 

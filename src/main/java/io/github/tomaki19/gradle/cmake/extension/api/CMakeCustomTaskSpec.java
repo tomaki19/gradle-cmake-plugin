@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
@@ -19,56 +18,40 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 public abstract class CMakeCustomTaskSpec<T> {
 
-  private static final String ALL = "*";
-  private static final String LIBRARIES = "*library";
-  private static final String INTERFACES = "*interface";
-  private static final String SHARED = "*shared";
-  private static final String STATIC = "*static";
-  private static final String EXECUTABLES = "*executable";
-  private static final String APPLICATIONS = "*application";
-  private static final String TESTS = "*test";
+  public static final String ALL = "*";
+  public static final String LIBRARIES = "*library";
+  public static final String INTERFACES = "*interface";
+  public static final String SHARED = "*shared";
+  public static final String STATIC = "*static";
+  public static final String EXECUTABLES = "*executable";
+  public static final String APPLICATIONS = "*application";
+  public static final String TESTS = "*test";
 
-  private static final String TOOLCHAINS = "toolchains";
-  private static final String BUILD_CONFIGS = "buildConfigs";
-  private static final String COMPONENTS = "components";
+  protected static final String TOOLCHAINS = "toolchains";
+  protected static final String BUILD_CONFIGS = "buildConfigs";
+  protected static final String COMPONENTS = "components";
 
-  protected final Map<String, Object> spec;
+  private final Set<String> toolchains;
+  private final Set<String> buildConfigs;
+  private final Set<String> components;
 
-  public CMakeCustomTaskSpec(final Map<String, Object> entries) {
-    this.spec = Collections.unmodifiableMap(entries);
+  public CMakeCustomTaskSpec(final Set<String> toolchains, final Set<String> buildConfigs,
+      final Set<String> components) {
+    this.toolchains = Collections.unmodifiableSet(toolchains);
+    this.buildConfigs = Collections.unmodifiableSet(buildConfigs);
+    this.components = Collections.unmodifiableSet(components);
   }
 
-  public void validateContentTypes() throws CMakeApiException {
-    validateType(TOOLCHAINS, Collection.class);
-    validateType(BUILD_CONFIGS, Collection.class);
-    validateType(COMPONENTS, Collection.class);
-  }
-
-  protected void validateType(final String name, final Class<?> type) throws CMakeApiException {
-    if (spec.containsKey(name) && !(type.isAssignableFrom(spec.get(name).getClass()))) {
-      throw new CMakeApiException("Invalid %s of type %s!".formatted(name, spec.get(name).getClass()));
-    }
-  }
-
-  protected void validateMandatory(final String name) throws CMakeApiException {
-    if (!spec.containsKey(name)) {
-      throw new CMakeApiException("Missing mandatory %s!".formatted(name));
-    }
-  }
-
-  @SuppressWarnings("unchecked")
   private Set<String> getToolchains() {
-    return new HashSet<>((Collection<String>) spec.getOrDefault(TOOLCHAINS, Collections.emptyList()));
+    return toolchains;
   }
 
-  @SuppressWarnings("unchecked")
   private Set<String> getBuildConfigs() {
-    return new HashSet<>((Collection<String>) spec.getOrDefault(BUILD_CONFIGS, Collections.emptyList()));
+    return buildConfigs;
   }
 
-  @SuppressWarnings("unchecked")
   private Set<String> getComponents() {
-    return new HashSet<>((Collection<String>) spec.getOrDefault(COMPONENTS, Collections.emptyList()));
+    return components;
   }
 
   public boolean hasNoToolchains() {
@@ -139,6 +122,16 @@ public abstract class CMakeCustomTaskSpec<T> {
     if (!getComponents().equals(other.getComponents()))
       return false;
     return true;
+  }
+
+  static class Init extends CMakeApiSpecInit {
+
+    protected static void validateContentTypes(final Map<String, Object> entries) throws CMakeApiException {
+      validateType(entries.get(TOOLCHAINS), TOOLCHAINS, Collection.class);
+      validateType(entries.get(BUILD_CONFIGS), BUILD_CONFIGS, Collection.class);
+      validateType(entries.get(COMPONENTS), COMPONENTS, Collection.class);
+    }
+
   }
 
 }

@@ -67,7 +67,7 @@ class CMakeCustomTaskContainerIsolationTest {
   @Test
   void execSpec_doesNotTriggerRuntimeArchive() {
     final Map<String, Object> spec = allMatchingSpec();
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "release",
@@ -80,7 +80,7 @@ class CMakeCustomTaskContainerIsolationTest {
   // --- helpers ---
 
   private Map<String, Object> allMatchingSpec() {
-    return Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    return Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("*"),
         "components", Set.of("*"));
   }

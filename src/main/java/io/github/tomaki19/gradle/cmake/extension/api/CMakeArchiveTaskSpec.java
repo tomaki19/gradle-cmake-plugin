@@ -4,29 +4,28 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 
-public final class CMakeArchiveTaskSpec<T extends AbstractArchiveTask> extends CMakeCustomTaskSpec<T> {
+public final class CMakeArchiveTaskSpec extends CMakeCustomTaskSpec<AbstractArchiveTask> {
 
   private static final String TYPE = "type";
 
-  private final Class<T> defaultType;
+  private final Class<AbstractArchiveTask> type;
 
-  public CMakeArchiveTaskSpec(Map<String, Object> entries, Class<T> defaultType) {
-    super(entries);
-    this.defaultType = defaultType;
+  public CMakeArchiveTaskSpec(final Set<String> toolchains, final Set<String> buildConfigs,
+      final Set<String> components, Class<AbstractArchiveTask> type) {
+    super(toolchains, buildConfigs, components);
+    this.type = type;
   }
 
-  public void validate() throws IllegalArgumentException {
-    super.validateType(TYPE, AbstractArchiveTask.class);
-    super.validateContentTypes();
-  }
-
-  @SuppressWarnings("unchecked")
-  public Class<T> getType() {
-    return (Class<T>) spec.getOrDefault(TYPE, defaultType);
+  public Class<AbstractArchiveTask> getType() {
+    return type;
   }
 
   @Override
@@ -43,10 +42,29 @@ public final class CMakeArchiveTaskSpec<T extends AbstractArchiveTask> extends C
       return true;
     if (!(obj instanceof CMakeArchiveTaskSpec))
       return false;
-    final CMakeArchiveTaskSpec<?> other = (CMakeArchiveTaskSpec<?>) obj;
+    final CMakeArchiveTaskSpec other = (CMakeArchiveTaskSpec) obj;
     if (!getType().equals(other.getType()))
       return false;
     return super.equals(obj);
+  }
+
+  public static class Init extends CMakeCustomTaskSpec.Init {
+
+    @SuppressWarnings("unchecked")
+    public static CMakeArchiveTaskSpec create(final Map<String, Object> spec,
+        final Class<?> defaultType)
+        throws CMakeApiException {
+      validateContentTypes(spec);
+      return new CMakeArchiveTaskSpec(
+          ((Collection<?>) spec.getOrDefault(TOOLCHAINS, Collections.emptyList())).stream()
+              .map((it) -> it.toString()).collect(Collectors.toSet()),
+          ((Collection<?>) spec.getOrDefault(BUILD_CONFIGS, Collections.emptyList())).stream()
+              .map((it) -> it.toString()).collect(Collectors.toSet()),
+          ((Collection<?>) spec.getOrDefault(COMPONENTS, Collections.emptyList())).stream()
+              .map((it) -> it.toString()).collect(Collectors.toSet()),
+          (Class<AbstractArchiveTask>) spec.getOrDefault(TYPE, defaultType));
+    }
+
   }
 
 }

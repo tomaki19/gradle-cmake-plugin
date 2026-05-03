@@ -54,18 +54,18 @@ public class CMakeLibraryLinkSpec extends CMakeBinaryLinkSpec {
     public static CMakeLibraryLinkSpec create(final Map<String, Object> entries, final CharSequence... components)
         throws CMakeApiException {
       validateContentTypes(entries);
-      validateType(entries.get(BUILD_VARIANT), BUILD_VARIANT, CharSequence.class);
+      validateType(entries.get(BUILD_VARIANT), BUILD_VARIANT, CMakeBuildVariant.class);
       return new CMakeLibraryLinkSpec(Arrays.asList(components).stream().map((it) -> it.toString())
           .collect(Collectors.toSet()),
           entries.containsKey(PROJECT) ? ((CharSequence) entries.get(PROJECT)).toString() : "",
           entries.containsKey(LINK_VARIANT)
-              ? CMakeLinkVariant.valueOf(((CharSequence) entries.get(LINK_VARIANT)).toString().toUpperCase())
+              ? (CMakeLinkVariant) entries.get(LINK_VARIANT)
               : CMakeLinkVariant.SHARED,
           entries.containsKey(VISIBILITY)
-              ? CMakeVisibility.valueOf(((CharSequence) entries.get(VISIBILITY)).toString().toUpperCase())
+              ? (CMakeVisibility) entries.get(VISIBILITY)
               : CMakeVisibility.PUBLIC,
           entries.containsKey(BUILD_VARIANT)
-              ? CMakeBuildVariant.valueOf(((CharSequence) entries.get(BUILD_VARIANT)).toString().toUpperCase())
+              ? (CMakeBuildVariant) entries.get(BUILD_VARIANT)
               : CMakeBuildVariant.SHARED);
     }
   }

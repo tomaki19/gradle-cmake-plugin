@@ -4,33 +4,27 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.github.tomaki19.gradle.cmake.tasks.CMakeCustomExec;
 
 public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec> {
 
-  public static final String NAME = "name";
+  private final String name;
 
-  public CMakeExecTaskSpec(Map<String, Object> entries) {
-    super(entries);
-  }
-
-  public void validate() throws CMakeApiException {
-    super.validateType(NAME, CharSequence.class);
-    super.validateMandatory(NAME);
-    validateNotEmptyName();
-    super.validateContentTypes();
+  public CMakeExecTaskSpec(final Set<String> toolchains, final Set<String> buildConfigs,
+      final Set<String> components, final String name) {
+    super(toolchains, buildConfigs, components);
+    this.name = name;
   }
 
   public String getName() {
-    return (String) spec.getOrDefault(NAME, "");
-  }
-
-  private void validateNotEmptyName() throws CMakeApiException {
-    if (getName().isBlank()) {
-      throw new CMakeApiException("Missing mandatory %s!".formatted(NAME));
-    }
+    return name;
   }
 
   @Override
@@ -51,6 +45,28 @@ public final class CMakeExecTaskSpec extends CMakeCustomTaskSpec<CMakeCustomExec
     if (!getName().equals(other.getName()))
       return false;
     return super.equals(obj);
+  }
+
+  public static class Init extends CMakeCustomTaskSpec.Init {
+
+    public static CMakeExecTaskSpec create(final Map<String, Object> spec, final CharSequence name)
+        throws CMakeApiException {
+      if (Objects.isNull(name)) {
+        throw new CMakeApiException("Exec task name is missing!");
+      }
+      if (name.toString().isBlank()) {
+        throw new CMakeApiException("Exec task name is empty!");
+      }
+      validateContentTypes(spec);
+      return new CMakeExecTaskSpec(
+          ((Collection<?>) spec.getOrDefault(TOOLCHAINS, Collections.emptyList())).stream()
+              .map((it) -> it.toString()).collect(Collectors.toSet()),
+          ((Collection<?>) spec.getOrDefault(BUILD_CONFIGS, Collections.emptyList())).stream()
+              .map((it) -> it.toString()).collect(Collectors.toSet()),
+          ((Collection<?>) spec.getOrDefault(COMPONENTS, Collections.emptyList())).stream()
+              .map((it) -> it.toString()).collect(Collectors.toSet()),
+          name.toString());
+    }
   }
 
 }

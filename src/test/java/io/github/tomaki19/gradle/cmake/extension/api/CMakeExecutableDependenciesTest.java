@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
+
 class CMakeExecutableDependenciesTest {
 
   @Test
@@ -35,21 +37,21 @@ class CMakeExecutableDependenciesTest {
   @Test
   void testGetLinkStatic() {
     CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(
-        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "static"), "mylib");
+        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, CMakeLinkVariant.STATIC), "mylib");
     assertEquals("static", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkShared() {
     CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(
-        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "shared"), "mylib");
+        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, CMakeLinkVariant.SHARED), "mylib");
     assertEquals("shared", deps.getLinkVariant().toLowerCase());
   }
 
   @Test
   void testGetLinkInterface() {
     CMakeExecutableLinkSpec deps = CMakeExecutableLinkSpec.Init.create(
-        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, "interface"), "mylib");
+        Map.of(CMakeBinaryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE), "mylib");
     assertEquals("interface", deps.getLinkVariant().toLowerCase());
   }
 }

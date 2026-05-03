@@ -43,8 +43,8 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchain_registersWhenToolchainMatches() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"));
-    handler.registerExecTasks(spec, t -> {
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"));
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"));
@@ -54,8 +54,8 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchain_registersWithAllWildcard() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"));
-    handler.registerExecTasks(spec, t -> {
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"));
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"));
@@ -65,8 +65,8 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchain_skipsWhenToolchainNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"));
-    handler.registerExecTasks(spec, t -> {
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"));
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"));
@@ -76,9 +76,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchain_skipsWhenSpecHasBuildConfigs() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"));
@@ -88,9 +88,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchain_skipsWhenSpecHasComponents() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "components",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "components",
         Set.of("myLib"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"));
@@ -102,9 +102,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchainBuildConfig_registersWhenMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", t -> {
@@ -115,9 +115,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchainBuildConfig_registersWithAllWildcards() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("*"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "debug", t -> {
@@ -128,9 +128,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchainBuildConfig_skipsWhenBuildConfigNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "debug", t -> {
@@ -141,10 +141,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchainBuildConfig_skipsWhenSpecHasComponents() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("myLib"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", t -> {
@@ -155,8 +155,8 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchainBuildConfig_registersWhenHasNoToolchains() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"));
-    handler.registerExecTasks(spec, t -> {
+    final Map<String, Object> spec = Map.of("buildConfigs", Set.of("release"));
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", t -> {
@@ -167,9 +167,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_toolchainBuildConfig_skipsWhenToolchainNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"),
         "buildConfigs", Set.of("release"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "release", t -> {
@@ -182,10 +182,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_registersWhenMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("myLib"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
@@ -197,9 +197,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_registersWithLibrariesWildcard() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("*"), "components", Set.of("*library"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("anyLib", CMakeLinkVariant.SHARED),
@@ -211,10 +211,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_skipsWhenLibraryNameNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("otherLib"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
@@ -226,9 +226,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_registersWhenHasNoToolchains() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+    final Map<String, Object> spec = Map.of("buildConfigs", Set.of("release"),
         "components", Set.of("*library"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
@@ -240,9 +240,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_registersWhenHasNoBuildConfigs() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "components", Set.of("*library"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedLibrary("myLib", CMakeLinkVariant.SHARED),
@@ -254,9 +254,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_skipsWhenToolchainNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"),
         "buildConfigs", Set.of("release"), "components", Set.of("*library"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "release", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
@@ -268,9 +268,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_library_skipsWhenBuildConfigNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"),
         "buildConfigs", Set.of("release"), "components", Set.of("*library"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "debug", resolvedLibrary("myLib", CMakeLinkVariant.STATIC),
@@ -284,10 +284,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_registersWhenMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("myApp"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
@@ -298,9 +298,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_registersWithApplicationsWildcard() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("*"), "components", Set.of("*application"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "debug", resolvedApplication("myApp"), t -> {
@@ -311,10 +311,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_skipsWhenApplicationNameNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("otherApp"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
@@ -325,9 +325,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_registersWhenHasNoToolchains() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+    final Map<String, Object> spec = Map.of("buildConfigs", Set.of("release"),
         "components", Set.of("*application"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
@@ -338,9 +338,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_registersWhenHasNoBuildConfigs() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "components", Set.of("*application"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedApplication("myApp"), t -> {
@@ -351,9 +351,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_skipsWhenToolchainNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"),
         "buildConfigs", Set.of("release"), "components", Set.of("*application"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "release", resolvedApplication("myApp"), t -> {
@@ -364,9 +364,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_application_skipsWhenBuildConfigNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("release"), "components", Set.of("*application"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "debug", resolvedApplication("myApp"), t -> {
@@ -379,10 +379,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_registersWhenMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("myTest"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
@@ -393,9 +393,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_registersWithTestsWildcard() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("*"), "components", Set.of("*test"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "debug", resolvedTest("myTest"), t -> {
@@ -406,10 +406,10 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_skipsWhenTestNameNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"), "buildConfigs",
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"), "buildConfigs",
         Set.of("release"),
         "components", Set.of("otherTest"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
@@ -420,9 +420,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_registersWhenHasNoToolchains() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "buildConfigs", Set.of("release"),
+    final Map<String, Object> spec = Map.of("buildConfigs", Set.of("release"),
         "components", Set.of("*test"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
@@ -433,9 +433,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_registersWhenHasNoBuildConfigs() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "components", Set.of("*test"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "release", resolvedTest("myTest"), t -> {
@@ -446,9 +446,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_skipsWhenToolchainNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("gcc"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("gcc"),
         "buildConfigs", Set.of("release"), "components", Set.of("*test"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("clang"), "release", resolvedTest("myTest"), t -> {
@@ -459,9 +459,9 @@ class CMakeCustomTaskContainerExecTasksTest {
 
   @Test
   void applyExec_test_skipsWhenBuildConfigNoMatch() {
-    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"),
         "buildConfigs", Set.of("release"), "components", Set.of("*test"));
-    handler.registerExecTasks(spec, t -> {
+    handler.registerExecTasks(spec, TASK_NAME, t -> {
     });
 
     handler.applyExecTasks(resolvedToolchain("gcc"), "debug", resolvedTest("myTest"), t -> {

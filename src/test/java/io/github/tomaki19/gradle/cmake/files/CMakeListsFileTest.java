@@ -32,8 +32,10 @@ import io.github.tomaki19.gradle.cmake.helper.TestCMakePackage;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeTest;
 import io.github.tomaki19.gradle.cmake.helper.TestCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeBuildVariant;
+import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolver;
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeListsFileTest {
 
@@ -269,7 +271,7 @@ class CMakeListsFileTest {
           CMakeBuildVariant.STATIC);
       libProvider.configure((lib) -> {
         lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.PROJECT, "Package0",
-            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "target");
+            CMakeLibraryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE), "target");
         lib.getLinking().options(Map.of(CMakeLibraryLinkSpec.VISIBILITY, "PUBLIC"), "-lstdc++");
       });
 
@@ -315,9 +317,9 @@ class CMakeListsFileTest {
       libProvider.configure((lib) -> {
         lib.getCompiling().options(Map.of(), "-Wall");
         lib.getCompiling().defines(Map.of(), "NDEBUG");
-        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE",
-            CMakeLibraryLinkSpec.VISIBILITY, "PRIVATE"), "Dep1");
-        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"), "Dep2");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE,
+            CMakeLibraryLinkSpec.VISIBILITY, CMakeVisibility.PRIVATE), "Dep1");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE), "Dep2");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
@@ -394,7 +396,7 @@ class CMakeListsFileTest {
       libProvider.configure((lib) -> {
         lib.getCompiling().options(Map.of(), "-Wall");
         lib.getCompiling().defines(Map.of(), "NDEBUG");
-        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, "INTERFACE"), "AnotherLib");
+        lib.getLinking().link(Map.of(CMakeLibraryLinkSpec.LINK_VARIANT, CMakeLinkVariant.INTERFACE), "AnotherLib");
       });
 
       CMakeResolver resolver = new CMakeResolver(project, extension.getPackages(), extension.getToolchains());
