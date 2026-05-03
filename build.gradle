@@ -52,6 +52,7 @@ spotless {
 
 tasks.withType(JavaCompile) {
     dependsOn(tasks.spotlessApply)
+    options.fork = true
 }
 
 // signing {
@@ -84,6 +85,9 @@ test {
     finalizedBy jacocoTestReport
     jvmArgs '-XX:+EnableDynamicAgentLoading'
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    forkEvery = 100
+    reports.junitXml.required = true
+    reports.html.required = false
 }
 
 testing {
