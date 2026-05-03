@@ -138,4 +138,33 @@ class CMakeTasksConventionsTest {
         CMakeTasksConventions.checkAllBuildConfigTaskName("MyToolchain", "Debug"));
   }
 
+  @Test
+  void testCustomExecTaskName() {
+    assertEquals("mytask-gcc-release",
+        CMakeTasksConventions.customExecTaskName("myTask", "gcc", "Release"));
+  }
+
+  @Test
+  void testBuildTaskNameProjectDependency() {
+    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
+    assertEquals(":MyProject:build-mylib-shared-mytoolchain-debug",
+        CMakeTasksConventions.buildTaskName(
+            new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
+  }
+
+  @Test
+  void testArchiveDevelopTaskNameBinary() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+    final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
+
+    assertEquals("develop-myapp-mytoolchain-debug",
+        CMakeTasksConventions.archiveDevelopTaskName(
+            new CMakeResolvedApplication(application, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
+  }
+
 }

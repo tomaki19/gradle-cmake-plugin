@@ -157,4 +157,17 @@ class CMakeConfigurationConventionsTest {
     assertEquals("mylib-shared-mytoolchain-debug-runtime", result);
   }
 
+  @Test
+  void testCreateDevelopNameForProjectDependency() {
+    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("MyLib",
+        CMakeLinkVariant.SHARED, project, false);
+    final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
+
+    final String result = CMakeConfigurationConventions.createDevelopName(dependency, resolvedToolchain, "Debug");
+    assertEquals("mylib-shared-mytoolchain-debug-develop", result);
+  }
+
 }

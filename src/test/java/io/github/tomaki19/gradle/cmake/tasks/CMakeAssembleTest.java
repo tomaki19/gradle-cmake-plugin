@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -97,5 +98,26 @@ class CMakeAssembleTest {
   void testDependencyResolution() {
     CMakeAssemble task = project.getTasks().register("assemble", CMakeAssemble.class, fileContent).get();
     assertNotNull(task.getTaskDependencies());
+  }
+
+  @Test
+  void testAssemble_writesFileToOutputDirectory() throws IOException {
+    final java.nio.file.Path tempDir = Files.createTempDirectory("cmake-assemble-test");
+    try {
+      final CMakeAssemble task = project.getTasks().register("assembleAction", CMakeAssemble.class, fileContent).get();
+      task.getOutputDirectory().set(tempDir.toFile());
+      task.assemble();
+      assertTrue(Files.exists(tempDir.resolve("test.cmake")));
+    } finally {
+      try (final java.util.stream.Stream<java.nio.file.Path> stream = Files.walk(tempDir)) {
+        stream.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+          try {
+            Files.delete(p);
+          } catch (IOException e) {
+            // ignore cleanup errors
+          }
+        });
+      }
+    }
   }
 }

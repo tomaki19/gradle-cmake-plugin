@@ -107,6 +107,34 @@ class CMakeBinaryLinkSpecTest {
     assertNotEquals(deps1, deps2);
   }
 
+  @Test
+  void binaryLinkSpec_initConstructor() {
+    assertNotNull(new CMakeBinaryLinkSpec.Init() {});
+  }
+
+  @Test
+  void buildSpec_initConstructor() {
+    assertNotNull(new CMakeBuildSpec.Init());
+  }
+
+  @Test
+  void executableLinkSpec_initConstructor() {
+    assertNotNull(new CMakeExecutableLinkSpec.Init());
+  }
+
+  @Test
+  void libraryLinkSpec_initConstructor() {
+    assertNotNull(new CMakeLibraryLinkSpec.Init());
+  }
+
+  @Test
+  void cmakeApiException_messageAndCause() {
+    final Throwable cause = new RuntimeException("root cause");
+    final CMakeApiException ex = new CMakeApiException("test message", cause);
+    assertEquals("test message", ex.getMessage());
+    assertEquals(cause, ex.getCause());
+  }
+
   private static class TestCMakeBinaryLinkSpec extends CMakeBinaryLinkSpec {
 
     protected TestCMakeBinaryLinkSpec(Set<String> components, String project, CMakeLinkVariant linkVariant,

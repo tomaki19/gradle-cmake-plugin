@@ -14,6 +14,8 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
+
 class CMakeResolvedProjectDependencyTest {
 
   @Test
@@ -241,5 +243,47 @@ class CMakeResolvedProjectDependencyTest {
         CMakeLinkVariant.STATIC, project, false);
 
     assertNotEquals(0, dep1.compareTo(dep2));
+  }
+
+  @Test
+  void testCreateModulesDependency() {
+    final Project rootProject = ProjectBuilder.builder().withName("root").build();
+    final Project childProject = ProjectBuilder.builder().withParent(rootProject).withName("mylib").build();
+    final CMakeResolvedToolchain toolchain = new CMakeResolvedToolchain(
+        new MockCMakeToolchain("gcc", rootProject.getObjects()));
+
+    final CMakeResolvedProjectDependency dep = new CMakeResolvedProjectDependency(
+        "myLib", CMakeLinkVariant.STATIC, childProject, false);
+    final org.gradle.api.artifacts.ProjectDependency result = dep.createModulesDependency(rootProject, toolchain,
+        "release");
+    assertNotNull(result);
+  }
+
+  @Test
+  void testCreateRuntimeDependency() {
+    final Project rootProject = ProjectBuilder.builder().withName("root").build();
+    final Project childProject = ProjectBuilder.builder().withParent(rootProject).withName("mylib").build();
+    final CMakeResolvedToolchain toolchain = new CMakeResolvedToolchain(
+        new MockCMakeToolchain("gcc", rootProject.getObjects()));
+
+    final CMakeResolvedProjectDependency dep = new CMakeResolvedProjectDependency(
+        "myLib", CMakeLinkVariant.STATIC, childProject, false);
+    final org.gradle.api.artifacts.ProjectDependency result = dep.createRuntimeDependency(rootProject, toolchain,
+        "release");
+    assertNotNull(result);
+  }
+
+  @Test
+  void testCreateDevelopDependency() {
+    final Project rootProject = ProjectBuilder.builder().withName("root").build();
+    final Project childProject = ProjectBuilder.builder().withParent(rootProject).withName("mylib").build();
+    final CMakeResolvedToolchain toolchain = new CMakeResolvedToolchain(
+        new MockCMakeToolchain("gcc", rootProject.getObjects()));
+
+    final CMakeResolvedProjectDependency dep = new CMakeResolvedProjectDependency(
+        "myLib", CMakeLinkVariant.STATIC, childProject, false);
+    final org.gradle.api.artifacts.ProjectDependency result = dep.createDevelopDependency(rootProject, toolchain,
+        "release");
+    assertNotNull(result);
   }
 }

@@ -342,6 +342,36 @@ class CMakeCustomTaskContainerRuntimeArchiveTasksTest {
     assertFalse(project.getTasks().getNames().contains("zip-runtime-mytest-gcc-debug"));
   }
 
+  // --- no-arg overload tests ---
+
+  @Test
+  void registerRuntimeArchiveTasks_noArgOverload_usesDefaultAction() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("*"), "components", Set.of("*library"));
+    handler.registerRuntimeArchiveTasks(spec);
+
+    handler.applyRuntimeArchiveTasks(resolvedToolchain("gcc"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.SHARED), t -> {
+        });
+
+    project.getTasks().named("zip-runtime-mylib-shared-gcc-release").get();
+    assertTrue(project.getTasks().getNames().contains("zip-runtime-mylib-shared-gcc-release"));
+  }
+
+  @Test
+  void registerDevelopArchiveTasks_noArgOverload_usesDefaultAction() {
+    final Map<String, Object> spec = Map.of("name", TASK_NAME, "toolchains", Set.of("*"),
+        "buildConfigs", Set.of("*"), "components", Set.of("*static"));
+    handler.registerDevelopArchiveTasks(spec);
+
+    handler.applyDevelopArchiveTasks(resolvedToolchain("gcc"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    project.getTasks().named("zip-develop-mylib-static-gcc-release").get();
+    assertTrue(project.getTasks().getNames().contains("zip-develop-mylib-static-gcc-release"));
+  }
+
   // --- helpers ---
 
   private CMakeResolvedToolchain resolvedToolchain(final String name) {
