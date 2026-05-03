@@ -56,8 +56,7 @@ public class CMakeCustomTaskContainer {
     customDevelopArchiveProtos.put(CMakeArchiveTaskSpec.Init.create(entries, CMakeCustomZip.class), action);
   }
 
-  public <T extends AbstractArchiveTask> void registerDevelopArchiveTasks(final Map<String, Object> entries,
-      final Class<T> type)
+  public <T extends AbstractArchiveTask> void registerDevelopArchiveTasks(final Map<String, Object> entries)
       throws CMakeApiException {
     registerDevelopArchiveTasks(entries, (task) -> {
     });
