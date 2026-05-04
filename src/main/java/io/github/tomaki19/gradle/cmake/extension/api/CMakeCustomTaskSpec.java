@@ -27,9 +27,9 @@ public abstract class CMakeCustomTaskSpec<T> {
   public static final String APPLICATIONS = "*application";
   public static final String TESTS = "*test";
 
-  protected static final String TOOLCHAINS = "toolchains";
-  protected static final String BUILD_CONFIGS = "buildConfigs";
-  protected static final String COMPONENTS = "components";
+  public static final String TOOLCHAINS = "toolchains";
+  public static final String BUILD_CONFIGS = "buildConfigs";
+  public static final String COMPONENTS = "components";
 
   private final Set<String> toolchains;
   private final Set<String> buildConfigs;

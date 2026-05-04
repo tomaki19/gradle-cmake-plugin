@@ -36,8 +36,13 @@ public class CMakeCustomTaskContainer {
     this.taskContainer = taskContainer;
   }
 
-  public void registerExecTasks(final Map<String, Object> entries, final String prefix, Action<CMakeCustomExec> action)
+  public void registerExecTasks(final Map<String, Object> entries, Action<CMakeCustomExec> action)
       throws CMakeApiException {
+    customExecProtos.put(CMakeExecTaskSpec.Init.create(entries), action);
+  }
+
+  public void registerExecTasks(final Map<String, Object> entries, final String prefix,
+      final Action<CMakeCustomExec> action) throws CMakeApiException {
     customExecProtos.put(CMakeExecTaskSpec.Init.create(entries, prefix), action);
   }
 

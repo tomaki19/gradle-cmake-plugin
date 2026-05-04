@@ -71,7 +71,7 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void hasNoComponents_whenNotEmpty() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("myLib")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("myLib")), "myExec");
     assertFalse(spec.hasNoComponents());
   }
 
@@ -122,20 +122,20 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesLibrary_byName() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("myLib")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("myLib")), "myExec");
     final CMakeResolvedLibrary library = resolvedLibrary("myLib", CMakeLinkVariant.STATIC);
     assertTrue(spec.matchesLibrary(library));
   }
 
   @Test
   void matchesLibrary_byAll() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*")), "myExec");
     assertTrue(spec.matchesLibrary(resolvedLibrary("anyLib", CMakeLinkVariant.SHARED)));
   }
 
   @Test
   void matchesLibrary_byLibraries() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*library")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*library")), "myExec");
     assertTrue(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.STATIC)));
     assertTrue(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.SHARED)));
     assertTrue(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.INTERFACE)));
@@ -143,7 +143,7 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesLibrary_byInterfaces() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*interface")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*interface")), "myExec");
     assertTrue(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.INTERFACE)));
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.STATIC)));
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.SHARED)));
@@ -151,7 +151,7 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesLibrary_byShared() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*shared")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*shared")), "myExec");
     assertTrue(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.SHARED)));
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.STATIC)));
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.INTERFACE)));
@@ -159,7 +159,8 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesLibrary_byStatic() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*static")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init
+        .create(Map.of(CMakeExecTaskSpec.PREFIX, "myExec", CMakeExecTaskSpec.COMPONENTS, Set.of("*static")));
     assertTrue(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.STATIC)));
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.SHARED)));
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.INTERFACE)));
@@ -167,7 +168,7 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesLibrary_noMatch_wrongName() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("other")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("other")), "myExec");
     assertFalse(spec.matchesLibrary(resolvedLibrary("myLib", CMakeLinkVariant.STATIC)));
   }
 
@@ -181,25 +182,26 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesApplication_byName() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("myApp")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("myApp")), "myExec");
     assertTrue(spec.matchesApplication(resolvedApplication("myApp")));
   }
 
   @Test
   void matchesApplication_byAll() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*")), "myExec");
     assertTrue(spec.matchesApplication(resolvedApplication("anyApp")));
   }
 
   @Test
   void matchesApplication_byApplications() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*application")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*application")),
+        "myExec");
     assertTrue(spec.matchesApplication(resolvedApplication("myApp")));
   }
 
   @Test
   void matchesApplication_noMatch_wrongName() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("other")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("other")), "myExec");
     assertFalse(spec.matchesApplication(resolvedApplication("myApp")));
   }
 
@@ -211,13 +213,13 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesApplication_byExecutables() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*executable")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*executable")), "myExec");
     assertTrue(spec.matchesApplication(resolvedApplication("myApp")));
   }
 
   @Test
   void matchesApplication_byLibraries_noMatch() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*library")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*library")), "myExec");
     assertFalse(spec.matchesApplication(resolvedApplication("myApp")));
   }
 
@@ -225,25 +227,25 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesTest_byName() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("myTest")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("myTest")), "myExec");
     assertTrue(spec.matchesTest(resolvedTest("myTest")));
   }
 
   @Test
   void matchesTest_byAll() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*")), "myExec");
     assertTrue(spec.matchesTest(resolvedTest("anyTest")));
   }
 
   @Test
   void matchesTest_byTests() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*test")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*test")), "myExec");
     assertTrue(spec.matchesTest(resolvedTest("myTest")));
   }
 
   @Test
   void matchesTest_noMatch_wrongName() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("other")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("other")), "myExec");
     assertFalse(spec.matchesTest(resolvedTest("myTest")));
   }
 
@@ -255,13 +257,14 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void matchesTest_byExecutables() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*executable")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*executable")), "myExec");
     assertTrue(spec.matchesTest(resolvedTest("myTest")));
   }
 
   @Test
   void matchesTest_byApplications_noMatch() {
-    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("*application")), "myExec");
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("*application")),
+        "myExec");
     assertFalse(spec.matchesTest(resolvedTest("myTest")));
   }
 
@@ -295,11 +298,11 @@ class CMakeCustomTaskSpecTest {
   @Test
   void equals_sameContent() {
     final CMakeExecTaskSpec a = CMakeExecTaskSpec.Init.create(
-        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), "components",
+        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), CMakeExecTaskSpec.COMPONENTS,
             Set.of("myLib")),
         "myExec");
     final CMakeExecTaskSpec b = CMakeExecTaskSpec.Init.create(
-        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), "components",
+        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), CMakeExecTaskSpec.COMPONENTS,
             Set.of("myLib")),
         "myExec");
     assertEquals(a, b);
@@ -321,8 +324,8 @@ class CMakeCustomTaskSpecTest {
 
   @Test
   void equals_differentComponents() {
-    final CMakeExecTaskSpec a = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("myLib")), "myExec");
-    final CMakeExecTaskSpec b = CMakeExecTaskSpec.Init.create(Map.of("components", Set.of("otherLib")), "myExec");
+    final CMakeExecTaskSpec a = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("myLib")), "myExec");
+    final CMakeExecTaskSpec b = CMakeExecTaskSpec.Init.create(Map.of(CMakeExecTaskSpec.COMPONENTS, Set.of("otherLib")), "myExec");
     assertNotEquals(a, b);
   }
 
@@ -335,11 +338,11 @@ class CMakeCustomTaskSpecTest {
   @Test
   void hashCode_equalSpecs() {
     final CMakeExecTaskSpec a = CMakeExecTaskSpec.Init.create(
-        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), "components",
+        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), CMakeExecTaskSpec.COMPONENTS,
             Set.of("myLib")),
         "myExec");
     final CMakeExecTaskSpec b = CMakeExecTaskSpec.Init.create(
-        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), "components",
+        Map.of("toolchains", Set.of("gcc"), "buildConfigs", Set.of("release"), CMakeExecTaskSpec.COMPONENTS,
             Set.of("myLib")),
         "myExec");
     assertEquals(a.hashCode(), b.hashCode());

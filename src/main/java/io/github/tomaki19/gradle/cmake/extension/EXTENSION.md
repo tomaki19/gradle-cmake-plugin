@@ -396,8 +396,8 @@ Register custom exec tasks and archive tasks via `cmake.tasks`. Tasks are applie
 Registers a custom command that runs as a Gradle task. The spec map controls when the task is created:
 
 ```groovy
-cmake.tasks.registerExecTasks('my-task',
-    [toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*library']],
+cmake.tasks.registerExecTasks(
+    [prefix: 'my-task-prefix', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*library']],
     { task ->
         task.executable = 'mycommand'
         task.args '--option', task.compileCommands
@@ -408,14 +408,14 @@ cmake.tasks.registerExecTasks('my-task',
 **Spec map keys:**
 | Parameter | Type | Required | Description |
 |-----|------|----------|-------------|
-| `prefix` | String | **yes** | Unique task name prefix |
-| `spec` | Map<String,Object> | **yes** | Filter specification for task generation |
+| `spec` | Map<String,Object> | **yes** | Specifications for task generation |
 | `action` | Closure | **yes** | Task action for generated tasks |
 
 **Spec map keys:**
 
 | Key | Type | Required | Description |
 |-----|------|----------|-------------|
+| `prefix` | String | **yes** | Unique task name prefix |
 | `toolchains` | Collection<String> | no | Toolchain filter, omit to match any toolchain |
 | `buildConfigs` | Collection<String> | no | Build configs filter, omit to match any build-config |
 | `components` | Collection<String> | no | Component filter, omit to match any component |
@@ -533,8 +533,8 @@ cmake {
     }
   }
 
-  tasks.registerExecTasks('coverage',
-      [toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
+  tasks.registerExecTasks(
+      [prefix: 'coverage', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
       { task ->
           task.executable = 'ctest'
           task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath

@@ -243,8 +243,8 @@ Custom exec tasks are registered with the `name` key from the spec. When registe
 
 ```groovy
 // Register for each build config individually to get unique names
-cmake.tasks.registerExecTasks("cppcheck",
-    [toolchains: ['gcc'], buildConfigs: ['Debug', 'Release']],
+cmake.tasks.registerExecTasks(
+    [prefix: 'cppcheck', toolchains: ['gcc'], buildConfigs: ['Debug', 'Release']],
     { task ->
         task.executable = 'cppcheck'
         task.args '--enable=all', '--project', task.compileCommands
@@ -260,8 +260,8 @@ cmake.tasks.registerExecTasks("cppcheck",
 ### Example: Test coverage with gcov/lcov
 
 ```groovy
-cmake.tasks.registerExecTasks('coverage',
-    [toolchains: ['gcc'], buildConfigs: ['Debug']],
+cmake.tasks.registerExecTasks(
+    [prefix: 'coverage', toolchains: ['gcc'], buildConfigs: ['Debug']],
     { task ->
         task.executable = 'ctest'
         task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath

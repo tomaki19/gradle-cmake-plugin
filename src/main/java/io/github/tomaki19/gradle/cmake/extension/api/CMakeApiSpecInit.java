@@ -21,4 +21,10 @@ abstract class CMakeApiSpecInit {
     }
   }
 
+  protected static void validateNotBlank(final String entry, final String name) throws CMakeApiException {
+    if (entry != null && entry.isBlank()) {
+      throw new CMakeApiException("Invalid %s: must not be blank!".formatted(name));
+    }
+  }
+
 }

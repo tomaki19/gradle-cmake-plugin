@@ -179,8 +179,8 @@ See [Custom Tasks](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTEN
 cmake {
   // Register a cppcheck analysis task for each build config
   ['Debug', 'Release'].each { config ->
-    tasks.registerExecTasks("cppcheck-gcc-${config.toLowerCase()}",
-        [toolchains: ['gcc'], buildConfigs: [config]],
+    tasks.registerExecTasks(
+        [prefix: 'cppcheck', toolchains: ['gcc'], buildConfigs: [config]],
         { task ->
             task.executable = 'cppcheck'
             task.args '--enable=all', '--project', task.compileCommands
