@@ -31,7 +31,7 @@ class CMakeCustomTasksTest {
   @Test
   void cmakeCustomTar_setsGroupOnConstruction() {
     final CMakeCustomTar task = project.getTasks().register("myTar", CMakeCustomTar.class).get();
-    assertEquals(CMakeTaskContainer.GROUP_PACKAGE, task.getGroup());
+    assertEquals(CMakeTaskContainer.GROUP_DEPLOY, task.getGroup());
   }
 
   @Test
