@@ -7,6 +7,7 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -73,5 +74,10 @@ class CMakeArchiveTaskSpecTest {
     final CMakeArchiveTaskSpec spec1 = CMakeArchiveTaskSpec.Init.create(Map.of(), CMakeCustomZip.class);
     final CMakeArchiveTaskSpec spec2 = CMakeArchiveTaskSpec.Init.create(Map.of(), CMakeCustomZip.class);
     assertEquals(spec1.hashCode(), spec2.hashCode());
+  }
+
+  @Test
+  void testInit_canBeInstantiated() {
+    assertNotNull(new CMakeArchiveTaskSpec.Init());
   }
 }

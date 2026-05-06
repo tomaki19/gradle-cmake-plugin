@@ -6,6 +6,10 @@ package io.github.tomaki19.gradle.cmake.tasks;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,5 +125,27 @@ class CMakeExecTest {
     CMakeBuildExecutable task = project.getTasks()
         .register("build", CMakeBuildExecutable.class, resolvedApplication, resolvedToolchain, "Debug").get();
     assertNotNull(task.getOutputs());
+  }
+
+  @Test
+  void testExec_withEnvironmentFile_coversEnvFileLambda() throws Exception {
+    File envFile = File.createTempFile("env", ".sh");
+    try {
+      MockCMakeToolchain toolchain = new MockCMakeToolchain("TestToolchain", project.getObjects());
+      toolchain.getEnvironmentFile().set(envFile);
+      CMakeResolvedToolchain tcWithEnv = new CMakeResolvedToolchain(toolchain);
+      CMakeResolvedApplication app = new CMakeResolvedApplication(
+          new MockCMakeApplication("App", project.getObjects()), false);
+
+      CMakeBuildExecutable task = project.getTasks()
+          .register("buildWithEnv", CMakeBuildExecutable.class, app, tcWithEnv, "Debug").get();
+      task.setExecutable("true");
+
+      Method execMethod = CMakeExec.class.getDeclaredMethod("exec");
+      execMethod.setAccessible(true);
+      execMethod.invoke(task);
+    } finally {
+      Files.deleteIfExists(envFile.toPath());
+    }
   }
 }

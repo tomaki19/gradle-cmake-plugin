@@ -72,7 +72,9 @@ public class CMakeCustomTaskContainer {
       if (entry.getKey().matchesToolchain(toolchain)
           && entry.getKey().hasNoBuildConfigs()
           && entry.getKey().hasNoComponents()) {
-        taskContainer.register(entry.getKey().getPrefix(), CMakeCustomExec.class, entry.getValue());
+        taskContainer.register(entry.getKey().getPrefix(), CMakeCustomExec.class,
+            toolchain.getName(), "", toolchain.getEnvironmentFile())
+            .configure(entry.getValue());
       }
     }
   }
@@ -84,7 +86,8 @@ public class CMakeCustomTaskContainer {
           && entry.getKey().matchesBuildConfig(buildConfig)
           && entry.getKey().hasNoComponents()) {
         final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
-            CMakeCustomExec.class, entry.getValue());
+            CMakeCustomExec.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+        provider.configure(entry.getValue());
         provider.configure(configureAction);
       }
     }
@@ -97,7 +100,8 @@ public class CMakeCustomTaskContainer {
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesLibrary(library)) {
         final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
-            CMakeCustomExec.class, entry.getValue());
+            CMakeCustomExec.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+        provider.configure(entry.getValue());
         provider.configure(configureAction);
       }
     }
@@ -136,7 +140,8 @@ public class CMakeCustomTaskContainer {
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesApplication(application)) {
         final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
-            CMakeCustomExec.class, entry.getValue());
+            CMakeCustomExec.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+        provider.configure(entry.getValue());
         provider.configure(configureAction);
       }
     }
@@ -162,7 +167,8 @@ public class CMakeCustomTaskContainer {
           && (entry.getKey().matchesBuildConfig(buildConfig) || entry.getKey().hasNoBuildConfigs())
           && entry.getKey().matchesTest(test)) {
         final TaskProvider<CMakeCustomExec> provider = taskContainer.register(entry.getKey().getPrefix(),
-            CMakeCustomExec.class, entry.getValue());
+            CMakeCustomExec.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+        provider.configure(entry.getValue());
         provider.configure(configureAction);
       }
     }

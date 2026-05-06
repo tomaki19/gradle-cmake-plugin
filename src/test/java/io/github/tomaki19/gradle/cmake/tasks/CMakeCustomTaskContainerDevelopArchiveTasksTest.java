@@ -125,6 +125,21 @@ class CMakeCustomTaskContainerDevelopArchiveTasksTest {
     assertFalse(project.getTasks().getNames().contains("zip-develop-mylib-static-gcc-debug"));
   }
 
+  @Test
+  void registerDevelopArchive_noAction_registersTaskWithDefaultEmptyAction() {
+    final Map<String, Object> spec = Map.of("toolchains", Set.of("*"), "buildConfigs", Set.of("*"),
+        "components", Set.of("*static"));
+    handler.registerDevelopArchiveTasks(spec); // no-action overload: covers registerDevelopArchiveTasks(Map)
+
+    handler.applyDevelopArchiveTasks(resolvedToolchain("gcc"), "release",
+        resolvedLibrary("myLib", CMakeLinkVariant.STATIC), t -> {
+        });
+
+    // Realizing the task triggers the default empty-action lambda
+    project.getTasks().named("zip-develop-mylib-static-gcc-release").get();
+    assertTrue(project.getTasks().getNames().contains("zip-develop-mylib-static-gcc-release"));
+  }
+
   // --- helpers ---
 
   private CMakeResolvedToolchain resolvedToolchain(final String name) {

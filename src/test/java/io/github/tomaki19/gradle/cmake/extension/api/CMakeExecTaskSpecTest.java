@@ -7,10 +7,12 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -73,5 +75,17 @@ class CMakeExecTaskSpecTest {
     final CMakeExecTaskSpec spec1 = CMakeExecTaskSpec.Init.create(Map.of(), "myTask");
     final CMakeExecTaskSpec spec2 = CMakeExecTaskSpec.Init.create(Map.of(), "myTask");
     assertEquals(spec1.hashCode(), spec2.hashCode());
+  }
+
+  @Test
+  void testInit_canBeInstantiated() {
+    assertNotNull(new CMakeExecTaskSpec.Init());
+  }
+
+  @Test
+  void testCreate_withBuildConfigs_populatesBuildConfigs() {
+    final CMakeExecTaskSpec spec = CMakeExecTaskSpec.Init.create(
+        Map.of(CMakeExecTaskSpec.PREFIX, "myTask", "buildConfigs", Set.of("release")));
+    assertFalse(spec.hasNoBuildConfigs());
   }
 }
