@@ -69,16 +69,12 @@ public class CMakePlugin implements Plugin<Project> {
       final TaskProvider<CMakeClean> cleanListsTask = tasks.cleanListsTask();
       tasks.cleanTask().configure((task) -> task.dependsOn(cleanListsTask));
 
-      final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
-          project.getLayout().getBuildDirectory());
-
       final TaskProvider<CMakeAssemble> assembleListsTask = tasks.assembleListsTask(
           toolchains, project);
-      assembleListsTask.configure((task) -> {
-        task.getOutputDirectory().set(project.getLayout().getProjectDirectory());
-      });
       tasks.assembleTask().configure((task) -> task.dependsOn(assembleListsTask));
 
+      final Directory moduleDirectory = CMakeFileConventions.targetConfigDirectory(
+          project.getLayout().getBuildDirectory());
       for (final CMakeResolvedToolchain toolchain : toolchains) {
         registerToolchainTasks(toolchain, extension, tasks, configurations, artifacts,
             moduleDirectory, assembleListsTask, project);
@@ -218,11 +214,8 @@ public class CMakePlugin implements Plugin<Project> {
     registerProjectDependencies(library.getAllProjectDependencies(), modulesConfiguration,
         runtimeConfiguration, developConfiguration, project, toolchain, buildConfig);
 
-    final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(
+    final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(moduleDirectory,
         library, toolchain, buildConfig, project);
-    assembleModulesTask.configure((task) -> {
-      task.getOutputDirectory().set(moduleDirectory);
-    });
     assembleListsTask.configure((task) -> {
       task.dependsOn(assembleModulesTask);
     });
@@ -268,11 +261,8 @@ public class CMakePlugin implements Plugin<Project> {
     registerProjectDependencies(library.getAllProjectDependencies(), modulesConfiguration,
         runtimeConfiguration, developConfiguration, project, toolchain, buildConfig);
 
-    final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(library, toolchain,
-        buildConfig, project);
-    assembleModulesTask.configure((task) -> {
-      task.getOutputDirectory().set(moduleDirectory);
-    });
+    final TaskProvider<CMakeAssemble> assembleModulesTask = tasks.assembleModuleTask(moduleDirectory,
+        library, toolchain, buildConfig, project);
     assembleListsTask.configure((task) -> {
       task.dependsOn(assembleModulesTask);
     });

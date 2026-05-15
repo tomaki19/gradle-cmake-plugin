@@ -4,15 +4,14 @@
  */
 package io.github.tomaki19.gradle.cmake.tasks;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.gradle.api.DefaultTask;
-import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.file.Directory;
 import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileContent;
@@ -20,23 +19,21 @@ import io.github.tomaki19.gradle.cmake.files.CMakeFileContent;
 @CacheableTask
 public abstract class CMakeAssemble extends DefaultTask {
 
+  private final Directory outpuDirectory;
   private final CMakeFileContent fileContent;
 
   @javax.inject.Inject
-  public CMakeAssemble(final CMakeFileContent fileContent) {
+  public CMakeAssemble(final Directory outputDirectory, final CMakeFileContent fileContent) {
+    this.outpuDirectory = outputDirectory;
     this.fileContent = fileContent;
-    // if gradle build file changes, configure needs to be run
     getInputs().file(getProject().getBuildFile());
   }
 
-  @OutputDirectory
-  public abstract DirectoryProperty getOutputDirectory();
-
   @TaskAction
   protected void assemble() throws IOException {
-    final File outputFile = getOutputDirectory().get().file(fileContent.getName()).getAsFile();
-    Files.createDirectories(outputFile.getParentFile().toPath());
-    try (final FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+    final Path outputDirectory = outpuDirectory.getAsFile().toPath();
+    Files.createDirectories(outputDirectory);
+    try (final FileOutputStream outputStream = new FileOutputStream(outpuDirectory.file(fileContent.getName()).getAsFile())) {
       fileContent.writeTo(outputStream);
       outputStream.flush();
     }

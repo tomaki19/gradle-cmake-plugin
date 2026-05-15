@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.file.Directory;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
@@ -57,16 +58,19 @@ public final class CMakeTaskContainer {
     return tasks.register(taskName, CMakeClean.class);
   }
 
-  public TaskProvider<CMakeAssemble> assembleListsTask(
-      final Collection<CMakeResolvedToolchain> toolchains, final Project project) {
+  public TaskProvider<CMakeAssemble> assembleListsTask(final Collection<CMakeResolvedToolchain> toolchains,
+      final Project project) {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project));
+    return tasks.register(taskName, CMakeAssemble.class, project.getLayout().getProjectDirectory(),
+        new CMakeListsFile(toolchains, project));
   }
 
-  public TaskProvider<CMakeAssemble> assembleModuleTask(final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project) {
+  public TaskProvider<CMakeAssemble> assembleModuleTask(final Directory outputDirectory,
+      final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain, final String buildConfig,
+      final Project project) {
     final String taskName = CMakeTasksConventions.assembleModuleTaskName(library, toolchain, buildConfig);
-    return tasks.register(taskName, CMakeAssemble.class, new CMakeModuleFile(library, toolchain, buildConfig, project));
+    return tasks.register(taskName, CMakeAssemble.class, outputDirectory,
+        new CMakeModuleFile(library, toolchain, buildConfig, project));
   }
 
   public TaskProvider<CMakeConfigure> configureTask(final CMakeResolvedToolchain toolchain,
