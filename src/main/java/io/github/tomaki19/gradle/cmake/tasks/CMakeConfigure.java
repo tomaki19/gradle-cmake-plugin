@@ -13,11 +13,11 @@ import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 @CacheableTask
-public abstract class CMakeConfigure extends CMakeExec {
+public abstract class CMakeConfigure extends CMakeExec<CMakeConfigure> {
 
   @javax.inject.Inject
   public CMakeConfigure(final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+    super(CMakeConfigure.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
     // tasks with same output directory are not run in parallel
     setWorkingDir(getProject().getProjectDir());
     // if gradle build file changes, configure needs to be run

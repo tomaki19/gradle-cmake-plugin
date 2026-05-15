@@ -139,7 +139,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     model.put("sourcePaths", buildRelativeFilePaths(library.getSources(), projectPath));
 
     populateCompileModel(model, library);
-    populateLinkModel(model, library, toolchain, buildConfig, false);
+    populateLinkModel(model, library, toolchain, buildConfig);
 
     model.put("outputName", library.getOutputName());
 
@@ -166,7 +166,7 @@ public final class CMakeListsFile extends CMakeFileContent {
         getProjectDirectory().getAsFile().toPath()));
 
     populateCompileModel(model, executable);
-    populateLinkModel(model, executable, toolchain, buildConfig, false);
+    populateLinkModel(model, executable, toolchain, buildConfig);
 
     model.put("outputName", executable.getOutputName());
     return model;
@@ -208,7 +208,7 @@ public final class CMakeListsFile extends CMakeFileContent {
   }
 
   private void populateLinkModel(final Map<String, Object> model, final CMakeResolvedBinary<?> binary,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final boolean interfaceType) {
+      final CMakeResolvedToolchain toolchain, final String buildConfig) {
     final boolean hasPrivateLinking = !binary.getPrivateProjectDependencies().isEmpty()
         || !binary.getPrivatePackageDependencies().isEmpty()
         || !binary.getPrivateLinkOptions().isEmpty();

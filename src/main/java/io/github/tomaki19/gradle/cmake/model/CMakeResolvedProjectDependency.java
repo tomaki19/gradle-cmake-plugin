@@ -111,17 +111,14 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   @Override
   public int compareTo(CMakeResolvedProjectDependency other) {
-    int comparator = 0;
-    if ((comparator = getProjectName().compareTo(other.getProjectName())) != 0) {
-      return comparator;
+    int result;
+    if ((result = getProjectName().compareTo(other.getProjectName())) != 0) {
+      return result;
     }
-    if ((comparator = getName().compareTo(other.getName())) != 0) {
-      return comparator;
+    if ((result = getName().compareTo(other.getName())) != 0) {
+      return result;
     }
-    if ((comparator = getLinkVariant().compareTo(other.getLinkVariant())) != 0) {
-      return comparator;
-    }
-    return comparator;
+    return getLinkVariant().compareTo(other.getLinkVariant());
   }
 
 }

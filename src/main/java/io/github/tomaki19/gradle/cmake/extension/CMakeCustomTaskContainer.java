@@ -189,10 +189,8 @@ public class CMakeCustomTaskContainer {
 
   private TaskProvider<AbstractArchiveTask> registerArchiveTasks(final String taskName,
       final Entry<CMakeArchiveTaskSpec, Action<AbstractArchiveTask>> entry) {
-    final Class<AbstractArchiveTask> type = (Class<AbstractArchiveTask>) entry.getKey().getType();
-    final Action<AbstractArchiveTask> action = (Action<AbstractArchiveTask>) entry.getValue();
-    return taskContainer.register("%s-%s".formatted(type.getSuperclass().getSimpleName().toLowerCase(), taskName), type,
-        action);
+    return taskContainer.register("%s-%s".formatted(entry.getKey().getType().getSuperclass()
+        .getSimpleName().toLowerCase(), taskName), entry.getKey().getType(), entry.getValue());
   }
 
 }

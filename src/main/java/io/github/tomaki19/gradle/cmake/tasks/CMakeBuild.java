@@ -12,13 +12,13 @@ import io.github.tomaki19.gradle.cmake.files.CMakeFileConventions;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 @CacheableTask
-public abstract class CMakeBuild extends CMakeExec {
+public abstract class CMakeBuild extends CMakeExec<CMakeBuild> {
 
   protected final String buildTarget;
 
   @javax.inject.Inject
   CMakeBuild(final String buildTarget, final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+    super(CMakeBuild.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
     setExecutable(OperatingSystem.current().getExecutableName("cmake"));
     args("--build");
     args(CMakeFileConventions.targetConfigDirectory(getProject().getLayout().getBuildDirectory(),

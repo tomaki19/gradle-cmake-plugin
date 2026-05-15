@@ -13,14 +13,14 @@ import io.github.tomaki19.gradle.cmake.model.CMakeResolvedBinary;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 @CacheableTask
-public abstract class CMakeCheck extends CMakeExec {
+public abstract class CMakeCheck extends CMakeExec<CMakeCheck> {
 
   protected final String checkTarget;
 
   @javax.inject.Inject
   public CMakeCheck(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
       final String buildConfig) {
-    super(toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
+    super(CMakeCheck.class, toolchain.getName(), buildConfig, toolchain.getEnvironmentFile());
     this.checkTarget = CMakeFileConventions.buildTarget(executable, toolchain, buildConfig);
     setExecutable(OperatingSystem.current().getExecutableName("ctest"));
     args("-T");

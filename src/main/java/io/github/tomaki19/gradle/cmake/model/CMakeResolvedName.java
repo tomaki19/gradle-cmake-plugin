@@ -43,11 +43,7 @@ public abstract class CMakeResolvedName<T extends CMakeResolvedName<T>> implemen
 
     @Override
     public int compareTo(T other) {
-        int comparator = 0;
-        if ((comparator = getName().compareTo(other.getName())) != 0) {
-            return comparator;
-        }
-        return comparator;
+        return getName().compareTo(other.getName());
     }
 
 }

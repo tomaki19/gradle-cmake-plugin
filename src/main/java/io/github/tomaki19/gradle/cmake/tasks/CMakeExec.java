@@ -12,7 +12,7 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.AbstractExecTask;
 import org.gradle.internal.os.OperatingSystem;
 
-abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
+abstract class CMakeExec<T extends CMakeExec<?>> extends AbstractExecTask<T> {
 
   protected final String toolchainName;
   protected final String buildConfig;
@@ -20,8 +20,9 @@ abstract class CMakeExec extends AbstractExecTask<CMakeExec> {
   private final Optional<RegularFile> environmentFile;
 
   @javax.inject.Inject
-  CMakeExec(final String toolchainName, final String buildConfig, final Optional<RegularFile> environmentFile) {
-    super(CMakeExec.class);
+  CMakeExec(final Class<T> type, final String toolchainName, final String buildConfig,
+      final Optional<RegularFile> environmentFile) {
+    super(type);
     this.toolchainName = toolchainName;
     this.buildConfig = buildConfig;
     this.environmentFile = environmentFile;

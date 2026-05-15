@@ -83,6 +83,8 @@ public class CMakePlugin implements Plugin<Project> {
         registerToolchainTasks(toolchain, extension, tasks, configurations, artifacts,
             moduleDirectory, assembleListsTask, project);
       }
+    } catch (GradleException e) {
+      throw e;
     } catch (Exception e) {
       throw new GradleException(e.getMessage(), e);
     }
