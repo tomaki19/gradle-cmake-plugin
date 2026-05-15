@@ -23,16 +23,20 @@ public abstract class CMakeConfigure extends CMakeExec {
     // if gradle build file changes, configure needs to be run
     getInputs().file(getProject().getBuildFile());
     setExecutable(OperatingSystem.current().getExecutableName("cmake"));
-    args("-S \"%s\"".formatted(getProject().getLayout().getProjectDirectory()
+    args("-S");
+    args("\"%s\"".formatted(getProject().getLayout().getProjectDirectory()
         .getAsFile().getAbsolutePath()));
-    args("-B \"%s\"".formatted(CMakeFileConventions
+    args("-B");
+    args("\"%s\"".formatted(CMakeFileConventions
         .targetConfigDirectory(getProject().getLayout().getBuildDirectory(), toolchain, buildConfig)
         .getAsFile().getAbsolutePath()));
-    args("-G \"%s\"".formatted(toolchain.getGenerator()));
+    args("-G");
+    args("\"%s\"".formatted(toolchain.getGenerator()));
     args("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
     args("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
     toolchain.getToolchainFile().ifPresent((toolchainFile) -> {
-      args("--toolchain \"%s\"".formatted(toolchainFile.getAsFile().getAbsolutePath()));
+      args("--toolchain");
+      args("\"%s\"".formatted(toolchainFile.getAsFile().getAbsolutePath()));
     });
   }
 

@@ -35,7 +35,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     return remote;
   }
 
-  public boolean equals(final Project other) {
+  public boolean matchesProject(final Project other) {
     if (other == null) {
       return false;
     }

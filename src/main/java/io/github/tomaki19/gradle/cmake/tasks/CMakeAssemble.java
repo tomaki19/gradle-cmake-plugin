@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
 import io.github.tomaki19.gradle.cmake.files.CMakeFileContent;
@@ -29,7 +29,7 @@ public abstract class CMakeAssemble extends DefaultTask {
     getInputs().file(getProject().getBuildFile());
   }
 
-  @Internal
+  @OutputDirectory
   public abstract DirectoryProperty getOutputDirectory();
 
   @TaskAction

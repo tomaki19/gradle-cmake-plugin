@@ -22,13 +22,9 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinaryLinkSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildSpec;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableCompiling;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinkSpec;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeExecutableLinking;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompiling;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryCompiling;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
-import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinking;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLinking;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeToolchain;
@@ -95,11 +91,11 @@ public final class CMakeResolver {
 
   private void resolveCompilingLinking(final CMakeLibrary component, final CMakeResolvedLibrary resolvedLibrary,
       final CMakeToolchain toolchain, final CMakeResolvedToolchain resolvedToolchain) {
-    resolveLibraryCompiling(Arrays.asList(toolchain.getLibraries().getCompiling(),
+    resolveCompiling(Arrays.asList(toolchain.getLibraries().getCompiling(),
         component.getCompiling()), resolvedLibrary::addPrivateCompileDefinitions,
         resolvedLibrary::addPublicCompileDefinitions, resolvedLibrary::addPrivateCompileOptions,
         resolvedLibrary::addPublicCompileOptions);
-    resolveLibraryLinking(Arrays.asList(toolchain.getLibraries().getLinking(), component.getLinking()),
+    resolveLinking(Arrays.asList(toolchain.getLibraries().getLinking(), component.getLinking()),
         component.getName(), resolvedToolchain,
         resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPublicLinkOption,
         resolvedLibrary::addPrivatePackageDependency, resolvedLibrary::addPublicPackageDependency,
@@ -113,11 +109,11 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(component,
               toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
-          resolveExecutableCompiling(Arrays.asList(toolchain.getApplications().getCompiling(),
+          resolveCompiling(Arrays.asList(toolchain.getApplications().getCompiling(),
               component.getCompiling()), resolvedApplication::addPrivateCompileDefinitions,
               resolvedApplication::addPublicCompileDefinitions, resolvedApplication::addPrivateCompileOptions,
               resolvedApplication::addPublicCompileOptions);
-          resolveExecutableLinking(Arrays.asList(toolchain.getApplications().getLinking(), component.getLinking()),
+          resolveLinking(Arrays.asList(toolchain.getApplications().getLinking(), component.getLinking()),
               component.getName(), resolvedToolchain,
               resolvedApplication::addPrivateLinkOption, resolvedApplication::addPublicLinkOption,
               resolvedApplication::addPrivatePackageDependency, resolvedApplication::addPublicPackageDependency,
@@ -132,10 +128,10 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(component,
               toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
-          resolveExecutableCompiling(Arrays.asList(toolchain.getTests().getCompiling(), component.getCompiling()),
+          resolveCompiling(Arrays.asList(toolchain.getTests().getCompiling(), component.getCompiling()),
               resolvedTest::addPrivateCompileDefinitions, resolvedTest::addPublicCompileDefinitions,
               resolvedTest::addPrivateCompileOptions, resolvedTest::addPublicCompileOptions);
-          resolveExecutableLinking(Arrays.asList(toolchain.getTests().getLinking(), component.getLinking()),
+          resolveLinking(Arrays.asList(toolchain.getTests().getLinking(), component.getLinking()),
               component.getName(), resolvedToolchain,
               resolvedTest::addPrivateLinkOption, resolvedTest::addPublicLinkOption,
               resolvedTest::addPrivatePackageDependency, resolvedTest::addPublicPackageDependency,
@@ -160,20 +156,11 @@ public final class CMakeResolver {
     void resolve(final CMakeToolchain toolchain, final CMakeResolvedToolchain resolvedToolchain);
   }
 
-  private void resolveExecutableCompiling(final Collection<CMakeExecutableCompiling> compileDefinitions,
+  private void resolveCompiling(final Collection<? extends CMakeCompiling> sources,
       final Consumer<String> privateDefinitionConsumer, final Consumer<String> publicDefinitionConsumer,
       final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer) {
-    for (final CMakeExecutableCompiling compileDefinition : compileDefinitions) {
-      resolveCompiling(compileDefinition.getDefines(), compileDefinition.getOptions(), privateDefinitionConsumer,
-          publicDefinitionConsumer, privateOptionConsumer, publicOptionConsumer);
-    }
-  }
-
-  private void resolveLibraryCompiling(final Collection<CMakeLibraryCompiling> compileDefinitions,
-      final Consumer<String> privateDefinitionConsumer, final Consumer<String> publicDefinitionConsumer,
-      final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer) {
-    for (final CMakeLibraryCompiling compileDefinition : compileDefinitions) {
-      resolveCompiling(compileDefinition.getDefines(), compileDefinition.getOptions(), privateDefinitionConsumer,
+    for (final CMakeCompiling source : sources) {
+      resolveCompiling(source.getDefines(), source.getOptions(), privateDefinitionConsumer,
           publicDefinitionConsumer, privateOptionConsumer, publicOptionConsumer);
     }
   }
@@ -197,32 +184,16 @@ public final class CMakeResolver {
     }
   }
 
-  private void resolveExecutableLinking(final Collection<CMakeExecutableLinking> linkDefinitions,
+  private void resolveLinking(final Collection<? extends CMakeLinking> sources,
       final String componentName, final CMakeResolvedToolchain toolchain,
       final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer,
       final Consumer<CMakeResolvedPackageDependency> privatePackageDependencyConsumer,
       final Consumer<CMakeResolvedPackageDependency> publicPackageDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer) {
-    for (final CMakeExecutableLinking linkDefinition : linkDefinitions) {
-      resolveLinkingOptions(linkDefinition.getOptions(), toolchain, privateOptionConsumer, publicOptionConsumer);
-      for (final CMakeExecutableLinkSpec dependency : linkDefinition.getDependencySpecs()) {
-        resolveLinkingDependencies(componentName, dependency, toolchain, privatePackageDependencyConsumer,
-            publicPackageDependencyConsumer, privateProjectDependencyConsumer, publicProjectDependencyConsumer);
-      }
-    }
-  }
-
-  private void resolveLibraryLinking(final Collection<CMakeLibraryLinking> linkDefinitions,
-      final String componentName, final CMakeResolvedToolchain toolchain,
-      final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer,
-      final Consumer<CMakeResolvedPackageDependency> privatePackageDependencyConsumer,
-      final Consumer<CMakeResolvedPackageDependency> publicPackageDependencyConsumer,
-      final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
-      final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer) {
-    for (final CMakeLibraryLinking linkDefinition : linkDefinitions) {
-      resolveLinkingOptions(linkDefinition.getOptions(), toolchain, privateOptionConsumer, publicOptionConsumer);
-      for (final CMakeLibraryLinkSpec dependency : linkDefinition.getDependencySpecs()) {
+    for (final CMakeLinking source : sources) {
+      resolveLinkingOptions(source.getOptions(), toolchain, privateOptionConsumer, publicOptionConsumer);
+      for (final CMakeBinaryLinkSpec dependency : source.getDependencySpecs()) {
         resolveLinkingDependencies(componentName, dependency, toolchain, privatePackageDependencyConsumer,
             publicPackageDependencyConsumer, privateProjectDependencyConsumer, publicProjectDependencyConsumer);
       }

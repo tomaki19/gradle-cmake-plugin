@@ -12,7 +12,7 @@ import java.util.Map;
 import io.github.tomaki19.gradle.cmake.model.CMakeLinkVariant;
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
-abstract class CMakeLinking {
+public abstract class CMakeLinking {
 
   public static final CMakeLinkVariant STATIC = CMakeLinkVariant.STATIC;
   public static final CMakeLinkVariant SHARED = CMakeLinkVariant.SHARED;
@@ -30,5 +30,7 @@ abstract class CMakeLinking {
   public void options(final Map<String, Object> spec, final CharSequence... names) {
     options.add(CMakeBuildSpec.Init.create(spec, names));
   }
+
+  public abstract Collection<? extends CMakeBinaryLinkSpec> getDependencySpecs();
 
 }

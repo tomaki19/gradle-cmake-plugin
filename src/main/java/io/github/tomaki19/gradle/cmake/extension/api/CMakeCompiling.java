@@ -11,7 +11,7 @@ import java.util.Map;
 
 import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
-abstract class CMakeCompiling {
+public abstract class CMakeCompiling {
 
   public static final CMakeVisibility PUBLIC = CMakeVisibility.PUBLIC;
   public static final CMakeVisibility PRIVATE = CMakeVisibility.PRIVATE;
