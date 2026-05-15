@@ -121,7 +121,7 @@ class CMakeResolvedProjectDependencyTest {
     }
 
     @Test
-    void testEqualsWithDifferentClass() {
+    void testObjectEquals_differentType() {
         final Project project = ProjectBuilder.builder().withName("test-project").build();
 
         final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("test-lib",
@@ -246,6 +246,20 @@ class CMakeResolvedProjectDependencyTest {
                 CMakeLinkVariant.STATIC, project, false);
 
         assertNotEquals(0, dep1.compareTo(dep2));
+    }
+
+    @Test
+    void testCompareTo_nullLinkType_sortsBeforeNonNull() {
+        final Project project = ProjectBuilder.builder().withName("test-project").build();
+
+        final CMakeResolvedProjectDependency nullLink = new CMakeResolvedProjectDependency("test-lib",
+                null, project, false);
+        final CMakeResolvedProjectDependency withLink = new CMakeResolvedProjectDependency("test-lib",
+                CMakeLinkVariant.STATIC, project, false);
+
+        assertTrue(nullLink.compareTo(withLink) < 0);
+        assertTrue(withLink.compareTo(nullLink) > 0);
+        assertEquals(0, nullLink.compareTo(new CMakeResolvedProjectDependency("test-lib", null, project, false)));
     }
 
     @Test

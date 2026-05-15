@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake;
 
-import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -97,7 +96,7 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeArtifactHandler artifacts,
       final Directory moduleDirectory,
       final TaskProvider<CMakeAssemble> assembleListsTask,
-      final Project project) throws FileNotFoundException {
+      final Project project) {
 
     Optional<TaskProvider<?>> buildAllToolchainTask = Optional.empty();
     if (toolchain.hasBinaries()) {
@@ -136,7 +135,7 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeArtifactHandler artifacts,
       final Directory moduleDirectory,
       final TaskProvider<CMakeAssemble> assembleListsTask,
-      final Project project) throws FileNotFoundException {
+      final Project project) {
 
     Optional<TaskProvider<?>> buildAllBuildConfigTask = Optional.empty();
     if (toolchain.hasBinaries()) {
@@ -205,7 +204,7 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeTaskContainer tasks,
       final CMakeConfigurationContainer configurations,
       final CMakeArtifactHandler artifacts,
-      final Project project) throws FileNotFoundException {
+      final Project project) {
 
     final Configuration modulesConfiguration = configurations.createModulesConfiguration(library, toolchain,
         buildConfig);
@@ -255,7 +254,7 @@ public class CMakePlugin implements Plugin<Project> {
       final CMakeTaskContainer tasks,
       final CMakeConfigurationContainer configurations,
       final CMakeArtifactHandler artifacts,
-      final Project project) throws FileNotFoundException {
+      final Project project) {
 
     final Configuration modulesConfiguration = configurations.createModulesConfiguration(library, toolchain,
         buildConfig);

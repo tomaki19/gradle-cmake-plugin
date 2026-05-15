@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import org.gradle.api.Project;
@@ -11,14 +12,14 @@ import org.gradle.api.artifacts.ProjectDependency;
 
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
-  private final CMakeLinkVariant linkType;
+  private final CMakeLinkVariant linkVariant;
   private final String projectName;
   private final boolean remote;
 
-  public CMakeResolvedProjectDependency(final String name, final CMakeLinkVariant linkType, final Project project,
+  public CMakeResolvedProjectDependency(final String name, final CMakeLinkVariant linkVariant, final Project project,
       final boolean remote) {
     super(name);
-    this.linkType = linkType;
+    this.linkVariant = linkVariant;
     this.projectName = project.getName();
     this.remote = remote;
   }
@@ -28,7 +29,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
   }
 
   public CMakeLinkVariant getLinkVariant() {
-    return linkType;
+    return linkVariant;
   }
 
   public boolean isRemote() {
@@ -74,7 +75,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
-    result = prime * result + ((linkType == null) ? 0 : linkType.hashCode());
+    result = prime * result + ((linkVariant == null) ? 0 : linkVariant.hashCode());
     return result;
   }
 
@@ -94,7 +95,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
         return false;
     } else if (!projectName.equals(other.projectName))
       return false;
-    if (linkType != other.linkType)
+    if (linkVariant != other.linkVariant)
       return false;
     return true;
   }
@@ -108,10 +109,8 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     if ((comparator = getName().compareTo(other.getName())) != 0) {
       return comparator;
     }
-    if ((comparator = getLinkVariant().compareTo(other.getLinkVariant())) != 0) {
-      return comparator;
-    }
-    return comparator;
+    return Comparator.<CMakeLinkVariant>nullsFirst(Comparator.naturalOrder())
+        .compare(getLinkVariant(), other.getLinkVariant());
   }
 
 }

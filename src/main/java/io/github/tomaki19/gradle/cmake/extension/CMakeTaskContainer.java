@@ -4,7 +4,6 @@
  */
 package io.github.tomaki19.gradle.cmake.extension;
 
-import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import org.gradle.api.Project;
@@ -59,14 +58,13 @@ public final class CMakeTaskContainer {
   }
 
   public TaskProvider<CMakeAssemble> assembleListsTask(
-      final Collection<CMakeResolvedToolchain> toolchains, final Project project) throws FileNotFoundException {
+      final Collection<CMakeResolvedToolchain> toolchains, final Project project) {
     final String taskName = CMakeTasksConventions.assembleListsTaskName();
     return tasks.register(taskName, CMakeAssemble.class, new CMakeListsFile(toolchains, project));
   }
 
   public TaskProvider<CMakeAssemble> assembleModuleTask(final CMakeResolvedLibrary library,
-      final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project)
-      throws FileNotFoundException {
+      final CMakeResolvedToolchain toolchain, final String buildConfig, final Project project) {
     final String taskName = CMakeTasksConventions.assembleModuleTaskName(library, toolchain, buildConfig);
     return tasks.register(taskName, CMakeAssemble.class, new CMakeModuleFile(library, toolchain, buildConfig, project));
   }
