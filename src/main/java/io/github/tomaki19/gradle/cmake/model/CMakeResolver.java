@@ -173,6 +173,8 @@ public final class CMakeResolver {
         items.getNames().forEach(privateDefinitionConsumer);
       } else if (Objects.equals(CMakeVisibility.PUBLIC, items.getVisibility())) {
         items.getNames().forEach(publicDefinitionConsumer);
+      } else {
+        throw new CMakeResolverException("Unsupported visibility '%s' on compile definition.".formatted(items.getVisibility()));
       }
     }
     for (final CMakeBuildSpec items : options) {
@@ -180,6 +182,8 @@ public final class CMakeResolver {
         items.getNames().forEach(privateOptionConsumer);
       } else if (Objects.equals(CMakeVisibility.PUBLIC, items.getVisibility())) {
         items.getNames().forEach(publicOptionConsumer);
+      } else {
+        throw new CMakeResolverException("Unsupported visibility '%s' on compile option.".formatted(items.getVisibility()));
       }
     }
   }
@@ -208,6 +212,8 @@ public final class CMakeResolver {
         options.getNames().forEach(privateOptionConsumer);
       } else if (Objects.equals(CMakeVisibility.PUBLIC, options.getVisibility())) {
         options.getNames().forEach(publicOptionConsumer);
+      } else {
+        throw new CMakeResolverException("Unsupported visibility '%s' on link option.".formatted(options.getVisibility()));
       }
     }
   }

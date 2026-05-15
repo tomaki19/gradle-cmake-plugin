@@ -4,11 +4,12 @@
  */
 package io.github.tomaki19.gradle.cmake.model;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ProjectDependency;
+
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeApiException;
 
 public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMakeResolvedProjectDependency> {
 
@@ -19,6 +20,8 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
   public CMakeResolvedProjectDependency(final String name, final CMakeLinkVariant linkVariant, final Project project,
       final boolean remote) {
     super(name);
+    Objects.requireNonNull(linkVariant, "Link variant must not be null!");
+    Objects.requireNonNull(project, "Project must not be null!");
     this.linkVariant = linkVariant;
     this.projectName = project.getName();
     this.remote = remote;
@@ -45,8 +48,11 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createModulesDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final ProjectDependency projectDependency = project.getDependencyFactory()
-        .create(project.findProject(":%s".formatted(projectName)));
+    final Project targetProject = project.findProject(":%s".formatted(projectName));
+    if (targetProject == null) {
+      throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
+    }
+    final ProjectDependency projectDependency = project.getDependencyFactory().create(targetProject);
     projectDependency.setTargetConfiguration(CMakeConfigurationConventions
         .createModulesName(this, toolchain, buildConfig));
     return projectDependency;
@@ -54,8 +60,11 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createRuntimeDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final ProjectDependency projectDependency = project.getDependencyFactory()
-        .create(project.findProject(":%s".formatted(projectName)));
+    final Project targetProject = project.findProject(":%s".formatted(projectName));
+    if (targetProject == null) {
+      throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
+    }
+    final ProjectDependency projectDependency = project.getDependencyFactory().create(targetProject);
     projectDependency.setTargetConfiguration(CMakeConfigurationConventions
         .createRuntimeName(this, toolchain, buildConfig));
     return projectDependency;
@@ -63,8 +72,11 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createDevelopDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final ProjectDependency projectDependency = project.getDependencyFactory()
-        .create(project.findProject(":%s".formatted(projectName)));
+    final Project targetProject = project.findProject(":%s".formatted(projectName));
+    if (targetProject == null) {
+      throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
+    }
+    final ProjectDependency projectDependency = project.getDependencyFactory().create(targetProject);
     projectDependency.setTargetConfiguration(CMakeConfigurationConventions
         .createDevelopName(this, toolchain, buildConfig));
     return projectDependency;
@@ -74,8 +86,8 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
-    result = prime * result + ((linkVariant == null) ? 0 : linkVariant.hashCode());
+    result = prime * result + projectName.hashCode();
+    result = prime * result + linkVariant.hashCode();
     return result;
   }
 
@@ -90,10 +102,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     if (getClass() != obj.getClass())
       return false;
     CMakeResolvedProjectDependency other = (CMakeResolvedProjectDependency) obj;
-    if (projectName == null) {
-      if (other.projectName != null)
-        return false;
-    } else if (!projectName.equals(other.projectName))
+    if (!projectName.equals(other.projectName))
       return false;
     if (linkVariant != other.linkVariant)
       return false;
@@ -109,8 +118,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     if ((comparator = getName().compareTo(other.getName())) != 0) {
       return comparator;
     }
-    return Comparator.<CMakeLinkVariant>nullsFirst(Comparator.naturalOrder())
-        .compare(getLinkVariant(), other.getLinkVariant());
+    if ((comparator = getLinkVariant().compareTo(other.getLinkVariant())) != 0) {
+      return comparator;
+    }
+    return comparator;
   }
 
 }
