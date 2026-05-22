@@ -4,19 +4,20 @@ shadow-plugin = "9.4.1"
 versions-plugin = "0.54.0"
 spotless-plugin = "8.5.1"
 jacocolog-plugin = "4.0.2"
-spotbugs-plugin = "6.5.4"
+spotbugs-plugin = "6.5.5"
 spotbugs = "4.9.8"
+junit = "6.1.0"
 mockito = "5.23.0"
 freemarker = "2.3.34"
 
 [libraries]
 spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
 
 [bundles]
-mockito = ["mockito-core", "mockito-junit-jupiter"]
 
 [plugins]
 publish = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }

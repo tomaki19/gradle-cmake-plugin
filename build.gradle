@@ -18,10 +18,35 @@ repositories {
     mavenCentral()
 }
 
+// configurations.configureEach {
+//     resolutionStrategy {
+//         failOnNonReproducibleResolution()
+//         failOnDynamicVersions()
+//         failOnChangingVersions()
+//         failOnVersionConflict()
+//     }
+// }
+configurations {
+  named(JavaPlugin.TEST_COMPILE_CLASSPATH_CONFIGURATION_NAME) {
+    resolutionStrategy {
+        force libs.junit.jupiter
+    }
+  }
+  named(JavaPlugin.TEST_RUNTIME_CLASSPATH_CONFIGURATION_NAME) {
+    resolutionStrategy {
+        force libs.junit.platform.launcher
+    }
+  }
+}
+
 dependencies {
-    compileOnly gradleApi()
+    implementation gradleApi()
     implementation libs.freemarker
-    testImplementation libs.bundles.mockito
+
+    testImplementation libs.mockito.junit.jupiter
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.platform.launcher
+
     spotbugs(libs.spotbugs)
 }
 
@@ -55,12 +80,6 @@ tasks.withType(JavaCompile) {
     options.fork = true
 }
 
-// signing {
-//   required = { hasProperty('signingPassword') && gradle.taskGraph.hasTask('publish') }
-//   useGpgCmd()
-//   sign publishing.publications
-// }
-
 tasks.withType(Javadoc).configureEach {
     options.addStringOption('Xdoclint:-missing', '-quiet')
 }
@@ -81,28 +100,39 @@ spotbugs {
     excludeFilter.set(file("${projectDir}/spotbugs-exclude.xml"))
 }
 
-test {
-    finalizedBy jacocoTestReport
-    jvmArgs '-XX:+EnableDynamicAgentLoading'
-    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    forkEvery = 100
-    reports.junitXml.required = true
-    reports.html.required = false
-}
-
 testing {
     suites {
         test {
             useJUnitJupiter()
+            targets {
+                all {
+                    testTask.configure {
+                        finalizedBy jacocoTestReport
+                        jvmArgs '-XX:+EnableDynamicAgentLoading'
+                        maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+                        forkEvery = 100
+                        reports.junitXml.required = true
+                        reports.html.required = false
+                    }
+                }
+            }
         }
         integrationTest(JvmTestSuite) {
+            configurations  {
+                named(sources.implementationConfigurationName) {
+                  extendsFrom(getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME))
+                }
+                named(sources.runtimeOnlyConfigurationName) {
+                  extendsFrom(getByName(JavaPlugin.TEST_RUNTIME_ONLY_CONFIGURATION_NAME))
+                }
+            }
             dependencies {
                 implementation project()
             }
             targets {
                 all {
                     testTask.configure {
-                        shouldRunAfter(tasks.test)
+                        shouldRunAfter(test)
                     }
                 }
             }
