@@ -93,6 +93,18 @@ public class CMakeFileConventions {
         buildConfig.toLowerCase());
   }
 
+  public static String outputTarget(final CMakeResolvedLibrary library, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    return "%s-%s-%s-%s".formatted(library.getOutputName().toLowerCase(), library.getLinkVariant().toLowerCase(),
+        toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+  }
+
+  public static String outputTarget(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,
+      final String buildConfig) {
+    return "%s-%s-%s".formatted(executable.getOutputName().toLowerCase(), toolchain.getName().toLowerCase(),
+        buildConfig.toLowerCase());
+  }
+
   private CMakeFileConventions() {
   }
 }

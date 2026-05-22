@@ -17,12 +17,14 @@ public class MockCMakeApplication extends CMakeApplication {
 
   private final String name;
   private final Property<String> outputName;
+  private final Property<String> outputVersion;
   private final Property<Boolean> stripDebug;
 
   public MockCMakeApplication(final String name, final ObjectFactory factory) {
     super(factory);
     this.name = name;
     this.outputName = factory.property(String.class);
+    this.outputVersion = factory.property(String.class);
     this.stripDebug = factory.property(Boolean.class);
   }
 
@@ -34,6 +36,11 @@ public class MockCMakeApplication extends CMakeApplication {
   @Override
   public Property<String> getOutputName() {
     return outputName;
+  }
+
+  @Override
+  public Property<String> getOutputVersion() {
+    return outputVersion;
   }
 
   @Override

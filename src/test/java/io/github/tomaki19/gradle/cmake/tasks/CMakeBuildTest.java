@@ -26,7 +26,7 @@ class CMakeBuildTest {
   void setUp() {
     project = ProjectBuilder.builder().build();
     resolvedToolchain = new CMakeResolvedToolchain(new MockCMakeToolchain("TestToolchain", project.getObjects()));
-    resolvedApplication = new CMakeResolvedApplication(new MockCMakeApplication("MyApp", project.getObjects()), false);
+    resolvedApplication = new CMakeResolvedApplication(new MockCMakeApplication("MyApp", project.getObjects()), false, "unspecified");
   }
 
   @Test

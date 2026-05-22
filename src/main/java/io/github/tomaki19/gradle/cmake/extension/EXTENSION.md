@@ -206,6 +206,7 @@ cmake {
       toolchains 'gcc', 'clang'             // required – method call, not assignment
       buildVariants SHARED, STATIC           // optional, default: [SHARED]
       outputName = 'custom_output_name'      // optional
+      outputVersion = '1.2.3'               // optional
 
       headers {
         srcDirs = ['include']               // defaults to src/<name>/headers
@@ -240,6 +241,7 @@ cmake {
 | `toolchains(...)` | method | all defined toolchains | Toolchains to build this library for: `toolchains 'gcc', 'clang'` |
 | `buildVariants(...)` | method | `SHARED` | Library types: `SHARED`, `STATIC`, `MODULE` (from `CMakeBuildVariant`) |
 | `outputName` | String | component name | Override the CMake target output name |
+| `outputVersion` | String | project version | Override the CMake target `VERSION` property |
 | `headers.srcDirs` | List<String> | `src/<name>/headers` | Header directories |
 | `sources.srcDirs` | List<String> | `src/<name>/sources` | Source directories |
 | `stripDebug` | boolean | false | Strip debug symbols |
@@ -322,6 +324,7 @@ cmake {
       }
 
       outputName = 'my-app'                  // optional
+      outputVersion = '2.0.0'               // optional, default: project version
       stripDebug = false                     // optional, default: false
     }
   }
@@ -364,6 +367,7 @@ cmake {
       }
 
       outputName = 'my-test'                 // optional
+      outputVersion = '1.0.0'               // optional, default: project version
       stripDebug = false                     // optional, default: false
       testResultsXmlOutput = false           // optional, default: false
     }
@@ -383,6 +387,8 @@ cmake {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
+| `outputName` | String | component name | Override the CMake target output name |
+| `outputVersion` | String | project version | Override the CMake target `VERSION` property |
 | `testResultsXmlOutput` | boolean | false | Generate JUnit XML output via ctest's `--output-junit` |
 
 ---

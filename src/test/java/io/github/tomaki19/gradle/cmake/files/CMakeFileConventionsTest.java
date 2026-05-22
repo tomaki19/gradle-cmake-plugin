@@ -44,7 +44,7 @@ class CMakeFileConventionsTest {
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
     assertEquals("myproject-mytarget-static-mytoolchain-debug-module",
-        CMakeFileConventions.moduleTarget(project, new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false),
+        CMakeFileConventions.moduleTarget(project, new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -55,7 +55,7 @@ class CMakeFileConventionsTest {
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
     assertEquals("mytarget-static-mytoolchain-debug",
-        CMakeFileConventions.buildTarget(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false),
+        CMakeFileConventions.buildTarget(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -65,7 +65,7 @@ class CMakeFileConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
     assertEquals("mytarget-mytoolchain-debug",
-        CMakeFileConventions.buildTarget(new CMakeResolvedApplication(application, false),
+        CMakeFileConventions.buildTarget(new CMakeResolvedApplication(application, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -85,7 +85,7 @@ class CMakeFileConventionsTest {
     final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeLibrary library = new MockCMakeLibrary("MyLibrary", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
-    final CMakeResolvedLibrary resolvedComponent = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedLibrary resolvedComponent = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
     final Directory result = CMakeFileConventions.targetBinaryDirectory(buildDir, resolvedComponent, resolvedToolchain,
         "Debug");
@@ -114,7 +114,7 @@ class CMakeFileConventionsTest {
     final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
-    final CMakeResolvedApplication resolvedExec = new CMakeResolvedApplication(application, false);
+    final CMakeResolvedApplication resolvedExec = new CMakeResolvedApplication(application, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
     final Directory result = CMakeFileConventions.targetBinaryDirectory(buildDir, resolvedExec, resolvedToolchain,
         "Debug");
@@ -128,7 +128,7 @@ class CMakeFileConventionsTest {
     final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
     final CMakeTest test = new MockCMakeTest("MyTest", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
-    final CMakeResolvedTest resolvedExec = new CMakeResolvedTest(test, false);
+    final CMakeResolvedTest resolvedExec = new CMakeResolvedTest(test, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
     final Directory result = CMakeFileConventions.targetBinaryDirectory(buildDir, resolvedExec, resolvedToolchain,
         "Debug");

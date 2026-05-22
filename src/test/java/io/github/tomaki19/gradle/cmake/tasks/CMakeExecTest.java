@@ -30,7 +30,7 @@ class CMakeExecTest {
   void setUp() {
     project = ProjectBuilder.builder().build();
     resolvedToolchain = new CMakeResolvedToolchain(new MockCMakeToolchain("TestToolchain", project.getObjects()));
-    resolvedApplication = new CMakeResolvedApplication(new MockCMakeApplication("MyApp", project.getObjects()), false);
+    resolvedApplication = new CMakeResolvedApplication(new MockCMakeApplication("MyApp", project.getObjects()), false, "unspecified");
   }
 
   @Test
@@ -135,7 +135,7 @@ class CMakeExecTest {
       toolchain.getEnvironmentFile().set(envFile);
       CMakeResolvedToolchain tcWithEnv = new CMakeResolvedToolchain(toolchain);
       CMakeResolvedApplication app = new CMakeResolvedApplication(
-          new MockCMakeApplication("App", project.getObjects()), false);
+          new MockCMakeApplication("App", project.getObjects()), false, "unspecified");
 
       CMakeBuildExecutable task = project.getTasks()
           .register("buildWithEnv", CMakeBuildExecutable.class, app, tcWithEnv, "Debug").get();

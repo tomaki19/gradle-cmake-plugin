@@ -37,7 +37,7 @@ class CMakeTasksConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
 
     assertEquals("assemble-mylib-shared-mytoolchain-debug-module",
-        CMakeTasksConventions.assembleModuleTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false),
+        CMakeTasksConventions.assembleModuleTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -79,7 +79,7 @@ class CMakeTasksConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyTarget", project.getObjects());
 
     assertEquals("build-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false),
+        CMakeTasksConventions.buildTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -90,7 +90,7 @@ class CMakeTasksConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
 
     assertEquals("build-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.buildTaskName(new CMakeResolvedApplication(application, false),
+        CMakeTasksConventions.buildTaskName(new CMakeResolvedApplication(application, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -112,7 +112,7 @@ class CMakeTasksConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyTarget", project.getObjects());
 
     assertEquals("check-mytarget-static-mytoolchain-debug",
-        CMakeTasksConventions.checkTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false),
+        CMakeTasksConventions.checkTaskName(new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -123,7 +123,7 @@ class CMakeTasksConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyTarget", project.getObjects());
 
     assertEquals("check-mytarget-mytoolchain-debug",
-        CMakeTasksConventions.checkTaskName(new CMakeResolvedApplication(application, false),
+        CMakeTasksConventions.checkTaskName(new CMakeResolvedApplication(application, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 
@@ -163,7 +163,7 @@ class CMakeTasksConventionsTest {
 
     assertEquals("develop-myapp-mytoolchain-debug",
         CMakeTasksConventions.archiveDevelopTaskName(
-            new CMakeResolvedApplication(application, false),
+            new CMakeResolvedApplication(application, false, "unspecified"),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 

@@ -230,7 +230,8 @@ public class CMakePlugin implements Plugin<Project> {
     });
     extension.getTasks().applyDevelopArchiveTasks(toolchain, buildConfig, library, (task) -> {
       task.dependsOn(configureTask);
-      task.getArchiveBaseName().set(CMakeFileConventions.buildTarget(library, toolchain, buildConfig));
+      task.getArchiveBaseName().set(CMakeFileConventions.outputTarget(library, toolchain, buildConfig));
+      task.getArchiveVersion().set(library.getOutputVersion());
       task.from(developConfiguration).into("lib");
       library.getHeaders().forEach((headers) -> task.from(headers).into("include"));
     });
@@ -290,13 +291,15 @@ public class CMakePlugin implements Plugin<Project> {
     });
     extension.getTasks().applyRuntimeArchiveTasks(toolchain, buildConfig, library, (task) -> {
       task.dependsOn(buildTask);
-      task.getArchiveBaseName().set(CMakeFileConventions.buildTarget(library, toolchain, buildConfig));
+      task.getArchiveBaseName().set(CMakeFileConventions.outputTarget(library, toolchain, buildConfig));
+      task.getArchiveVersion().set(library.getOutputVersion());
       task.from(runtimeConfiguration);
       task.from(libraryDirectory);
     });
     extension.getTasks().applyDevelopArchiveTasks(toolchain, buildConfig, library, (task) -> {
       task.dependsOn(buildTask);
-      task.getArchiveBaseName().set(CMakeFileConventions.buildTarget(library, toolchain, buildConfig));
+      task.getArchiveBaseName().set(CMakeFileConventions.outputTarget(library, toolchain, buildConfig));
+      task.getArchiveVersion().set(library.getOutputVersion());
       task.from(developConfiguration).into("lib");
       library.getHeaders().forEach((headers) -> task.from(headers).into("include"));
     });
@@ -344,7 +347,8 @@ public class CMakePlugin implements Plugin<Project> {
     });
     extension.getTasks().applyRuntimeArchiveTasks(toolchain, buildConfig, application, (task) -> {
       task.dependsOn(buildTask);
-      task.getArchiveBaseName().set(CMakeFileConventions.buildTarget(application, toolchain, buildConfig));
+      task.getArchiveBaseName().set(CMakeFileConventions.outputTarget(application, toolchain, buildConfig));
+      task.getArchiveVersion().set(application.getOutputVersion());
       task.from(runtimeConfiguration);
       task.from(CMakeFileConventions.targetBinaryDirectory(project.getLayout().getBuildDirectory(), application,
           toolchain, buildConfig));
@@ -404,7 +408,8 @@ public class CMakePlugin implements Plugin<Project> {
     });
     extension.getTasks().applyRuntimeArchiveTasks(toolchain, buildConfig, test, (task) -> {
       task.dependsOn(buildTask);
-      task.getArchiveBaseName().set(CMakeFileConventions.buildTarget(test, toolchain, buildConfig));
+      task.getArchiveBaseName().set(CMakeFileConventions.outputTarget(test, toolchain, buildConfig));
+      task.getArchiveVersion().set(test.getOutputVersion());
       task.from(runtimeConfiguration);
       task.from(CMakeFileConventions.targetBinaryDirectory(project.getLayout().getBuildDirectory(), test, toolchain,
           buildConfig));

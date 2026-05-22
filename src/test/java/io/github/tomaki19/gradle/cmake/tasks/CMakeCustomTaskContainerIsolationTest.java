@@ -90,6 +90,6 @@ class CMakeCustomTaskContainerIsolationTest {
   }
 
   private CMakeResolvedLibrary resolvedLibrary(final String name, final CMakeLinkVariant variant) {
-    return new CMakeResolvedLibrary(new MockCMakeLibrary(name, project.getObjects()), variant, false);
+    return new CMakeResolvedLibrary(new MockCMakeLibrary(name, project.getObjects()), variant, false, "unspecified");
   }
 }

@@ -16,6 +16,7 @@ public abstract class CMakeCustomTar extends Tar {
   public CMakeCustomTar() {
     setGroup(CMakeTaskContainer.GROUP_DEPLOY);
     getArchiveBaseName().set(getProject().getName());
+    getArchiveVersion().set(getProject().getVersion().toString());
   }
 
 }

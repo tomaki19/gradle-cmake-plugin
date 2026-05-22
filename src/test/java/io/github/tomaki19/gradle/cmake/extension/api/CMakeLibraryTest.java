@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Map;
@@ -41,6 +42,21 @@ class CMakeLibraryTest {
     library.linking(linking -> {
       linking.options(Map.of(), "-Wl,--no-undefined");
     });
+  }
+
+  @Test
+  void testGetOutputVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
+    assertNotNull(library.getOutputVersion());
+  }
+
+  @Test
+  void testSetOutputVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeLibrary library = new MockCMakeLibrary("test", project.getObjects());
+    library.getOutputVersion().set("1.2.3");
+    assertEquals("1.2.3", library.getOutputVersion().get());
   }
 
 }

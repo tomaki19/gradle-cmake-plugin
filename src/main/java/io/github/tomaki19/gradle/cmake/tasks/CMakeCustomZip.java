@@ -16,6 +16,7 @@ public abstract class CMakeCustomZip extends Zip {
   public CMakeCustomZip() {
     setGroup(CMakeTaskContainer.GROUP_DEPLOY);
     getArchiveBaseName().set(getProject().getName());
+    getArchiveVersion().set(getProject().getVersion().toString());
   }
 
 }

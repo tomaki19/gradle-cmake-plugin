@@ -25,7 +25,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedApplication executable = new CMakeResolvedApplication(application, false);
+    final CMakeResolvedApplication executable = new CMakeResolvedApplication(application, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createModulesName(executable, resolvedToolchain, "Debug");
@@ -38,7 +38,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createModulesName(resolvedLibrary, resolvedToolchain,
@@ -52,7 +52,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createModulesName(resolvedLibrary, resolvedToolchain,
@@ -66,7 +66,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false);
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createModulesName(resolvedLibrary, resolvedToolchain,
@@ -94,7 +94,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeApplication application = new MockCMakeApplication("MyApp", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedApplication executable = new CMakeResolvedApplication(application, false);
+    final CMakeResolvedApplication executable = new CMakeResolvedApplication(application, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createRuntimeName(executable, resolvedToolchain, "Debug");
@@ -107,7 +107,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false);
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.STATIC, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createRuntimeName(resolvedLibrary, resolvedToolchain,
@@ -121,7 +121,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false);
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.SHARED, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createRuntimeName(resolvedLibrary, resolvedToolchain,
@@ -135,7 +135,7 @@ class CMakeConfigurationConventionsTest {
     final CMakeLibrary library = new MockCMakeLibrary("MyLib", project.getObjects());
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
-    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false);
+    final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(library, CMakeLinkVariant.INTERFACE, false, "unspecified");
     final CMakeResolvedToolchain resolvedToolchain = new CMakeResolvedToolchain(toolchain);
 
     final String result = CMakeConfigurationConventions.createRuntimeName(resolvedLibrary, resolvedToolchain,

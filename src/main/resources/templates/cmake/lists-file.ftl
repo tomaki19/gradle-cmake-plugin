@@ -60,9 +60,10 @@
 </#list>
     )
 </#macro>
-<#macro targetProperties target outputName targetRelPath buildConfigs>
+<#macro targetProperties target outputName outputVersion targetRelPath buildConfigs>
     set_target_properties( [=target] PROPERTIES
         OUTPUT_NAME "[=outputName]"
+        VERSION "[=outputVersion]"
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
 <#list buildConfigs as cfg>
         ARCHIVE_OUTPUT_DIRECTORY_[=cfg?upper_case] "${CMAKE_CURRENT_SOURCE_DIR}/[=targetRelPath]"
@@ -136,7 +137,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if lib.hasPublicLinking>
 <@targetLinkLibraries lib.target "PUBLIC" lib.publicLinkLibraries/>
 </#if>
-<@targetProperties lib.target lib.outputName lib.targetRelPath lib.buildConfigs/>
+<@targetProperties lib.target lib.outputName lib.outputVersion lib.targetRelPath lib.buildConfigs/>
 <#if lib.stripDebug>
 <@stripDebugCmd lib.target/>
 </#if>
@@ -166,7 +167,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if lib.hasPublicLinking>
 <@targetLinkLibraries lib.target "PUBLIC" lib.publicLinkLibraries/>
 </#if>
-<@targetProperties lib.target lib.outputName lib.targetRelPath lib.buildConfigs/>
+<@targetProperties lib.target lib.outputName lib.outputVersion lib.targetRelPath lib.buildConfigs/>
 <#if lib.stripDebug>
 <@stripDebugCmd lib.target/>
 </#if>
@@ -199,7 +200,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if exec.hasPublicLinking>
 <@targetLinkLibraries exec.target "PUBLIC" exec.publicLinkLibraries/>
 </#if>
-<@targetProperties exec.target exec.outputName exec.targetRelPath exec.buildConfigs/>
+<@targetProperties exec.target exec.outputName exec.outputVersion exec.targetRelPath exec.buildConfigs/>
 <#if exec.stripDebug>
 <@stripDebugCmd exec.target/>
 </#if>
@@ -234,7 +235,7 @@ if( ${CMAKE_TOOLCHAIN_NAME} STREQUAL "[=tc.name]" )
 <#if exec.hasPublicLinking>
 <@targetLinkLibraries exec.target "PUBLIC" exec.publicLinkLibraries/>
 </#if>
-<@targetProperties exec.target exec.outputName exec.targetRelPath exec.buildConfigs/>
+<@targetProperties exec.target exec.outputName exec.outputVersion exec.targetRelPath exec.buildConfigs/>
 <#if exec.stripDebug>
 <@stripDebugCmd exec.target/>
 </#if>

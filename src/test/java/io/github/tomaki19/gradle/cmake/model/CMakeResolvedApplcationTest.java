@@ -27,7 +27,7 @@ class CMakeResolvedExecutableTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
     assertEquals("test-executable", resolvedExecutable.getName());
   }
@@ -37,7 +37,7 @@ class CMakeResolvedExecutableTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     // Test default values
@@ -54,7 +54,7 @@ class CMakeResolvedExecutableTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateCompileDefinitions("TEST_DEFINE");
@@ -67,7 +67,7 @@ class CMakeResolvedExecutableTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateCompileOptions("-O2");
@@ -80,7 +80,7 @@ class CMakeResolvedExecutableTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateLinkOption("-ltest");
@@ -94,7 +94,7 @@ class CMakeResolvedExecutableTest {
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
     final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
@@ -110,12 +110,29 @@ class CMakeResolvedExecutableTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
 
-    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false);
+    CMakeResolvedApplication resolvedExecutable = new CMakeResolvedApplication(application, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     // This would require a CMakeResolvedProjectDependency object, so we'll just
     // test that it doesn't throw
     // The actual implementation would be tested in integration tests
     assertTrue(true); // Placeholder test
+  }
+
+  @Test
+  void testOutputVersion_defaultsToProjectVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
+    final CMakeResolvedApplication resolved = new CMakeResolvedApplication(application, false, "3.1.0");
+    assertEquals("3.1.0", resolved.getOutputVersion());
+  }
+
+  @Test
+  void testOutputVersion_overridesProjectVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final MockCMakeApplication application = new MockCMakeApplication("test-executable", project.getObjects());
+    application.getOutputVersion().set("4.0.0");
+    final CMakeResolvedApplication resolved = new CMakeResolvedApplication(application, false, "3.1.0");
+    assertEquals("4.0.0", resolved.getOutputVersion());
   }
 }

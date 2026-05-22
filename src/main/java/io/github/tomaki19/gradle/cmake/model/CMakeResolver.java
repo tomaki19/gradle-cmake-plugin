@@ -63,16 +63,17 @@ public final class CMakeResolver {
       final Map<String, CMakeToolchain> availableToolchains, final Set<CMakeLibrary> libraries) {
     libraries.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
+          final String projectVersion = currentProject.getVersion().toString();
           if (component.getSources().isEmpty()) {
             final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.INTERFACE,
-                toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
+                toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE), projectVersion);
             resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
             resolvedToolchain.addInterfaceLibrary(resolvedLibrary);
           } else {
             if (toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.STATIC)
                 || component.getBuildVariants().get().contains(CMakeBuildVariant.STATIC)) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.STATIC,
-                  toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
+                  toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE), projectVersion);
               resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addStaticLibrary(resolvedLibrary);
             }
@@ -81,7 +82,7 @@ public final class CMakeResolver {
                 || toolchain.getLibraries().getBuildVariants().get().contains(CMakeBuildVariant.SHARED)
                 || component.getBuildVariants().get().contains(CMakeBuildVariant.SHARED)) {
               final CMakeResolvedLibrary resolvedLibrary = new CMakeResolvedLibrary(component, CMakeLinkVariant.SHARED,
-                  toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE));
+                  toolchain.getLibraries().getStripDebug().getOrElse(Boolean.FALSE), projectVersion);
               resolveCompilingLinking(component, resolvedLibrary, toolchain, resolvedToolchain);
               resolvedToolchain.addSharedLibrary(resolvedLibrary);
             }
@@ -108,7 +109,8 @@ public final class CMakeResolver {
     applications.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedApplication resolvedApplication = new CMakeResolvedApplication(component,
-              toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE));
+              toolchain.getApplications().getStripDebug().getOrElse(Boolean.FALSE),
+              currentProject.getVersion().toString());
           resolveCompiling(Arrays.asList(toolchain.getApplications().getCompiling(),
               component.getCompiling()), resolvedApplication::addPrivateCompileDefinitions,
               resolvedApplication::addPublicCompileDefinitions, resolvedApplication::addPrivateCompileOptions,
@@ -127,7 +129,8 @@ public final class CMakeResolver {
     tests.forEach((component) -> processObject(component, availableToolchains, resolvedToolchains,
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(component,
-              toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE));
+              toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE),
+              currentProject.getVersion().toString());
           resolveCompiling(Arrays.asList(toolchain.getTests().getCompiling(), component.getCompiling()),
               resolvedTest::addPrivateCompileDefinitions, resolvedTest::addPublicCompileDefinitions,
               resolvedTest::addPrivateCompileOptions, resolvedTest::addPublicCompileOptions);

@@ -138,7 +138,7 @@ class CMakeResolvedToolchainTest {
         new MockCMakeToolchain("TestToolchain", project.getObjects()));
     resolvedToolchain.addInterfaceLibrary(
         new CMakeResolvedLibrary(new MockCMakeLibrary("myLib", project.getObjects()), CMakeLinkVariant.INTERFACE,
-            false));
+            false, "unspecified"));
     assertTrue(resolvedToolchain.hasInterfaceLibraries());
   }
 }

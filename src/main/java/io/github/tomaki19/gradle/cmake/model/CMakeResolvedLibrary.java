@@ -11,8 +11,8 @@ public final class CMakeResolvedLibrary extends CMakeResolvedBinary<CMakeResolve
   private final CMakeLinkVariant linkVariant;
 
   public CMakeResolvedLibrary(final CMakeLibrary library, final CMakeLinkVariant linkVariant,
-      final boolean stripDebug) {
-    super(library, stripDebug);
+      final boolean stripDebug, final String projectVersion) {
+    super(library, stripDebug, projectVersion);
     this.linkVariant = linkVariant;
   }
 

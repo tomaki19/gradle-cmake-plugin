@@ -67,4 +67,19 @@ class CMakeApplicationTest {
       assertNotNull(sources);
     });
   }
+
+  @Test
+  void testGetOutputVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    assertNotNull(application.getOutputVersion());
+  }
+
+  @Test
+  void testSetOutputVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeApplication application = new MockCMakeApplication("test", project.getObjects());
+    application.getOutputVersion().set("2.1.0");
+    assertEquals("2.1.0", application.getOutputVersion().get());
+  }
 }

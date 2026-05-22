@@ -27,7 +27,7 @@ class CMakeResolvedTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
     assertEquals("test-executable", resolvedExecutable.getName());
   }
@@ -37,7 +37,7 @@ class CMakeResolvedTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     // Test default values
@@ -54,7 +54,7 @@ class CMakeResolvedTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateCompileDefinitions("TEST_DEFINE");
@@ -67,7 +67,7 @@ class CMakeResolvedTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateCompileOptions("-O2");
@@ -80,7 +80,7 @@ class CMakeResolvedTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     resolvedExecutable.addPrivateLinkOption("-ltest");
@@ -94,7 +94,7 @@ class CMakeResolvedTestTest {
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
     final CMakePackage pkg = new MockCMakePackage("test-pkg", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     CMakeResolvedPackage resolvedPackage = new CMakeResolvedPackage(pkg);
@@ -110,12 +110,29 @@ class CMakeResolvedTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
 
-    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false);
+    CMakeResolvedTest resolvedExecutable = new CMakeResolvedTest(test, false, "1.0.0");
     assertNotNull(resolvedExecutable);
 
     // This would require a CMakeResolvedProjectDependency object, so we'll just
     // test that it doesn't throw
     // The actual implementation would be tested in integration tests
     assertTrue(true); // Placeholder test
+  }
+
+  @Test
+  void testOutputVersion_defaultsToProjectVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    final CMakeResolvedTest resolved = new CMakeResolvedTest(test, false, "1.5.0");
+    assertEquals("1.5.0", resolved.getOutputVersion());
+  }
+
+  @Test
+  void testOutputVersion_overridesProjectVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final MockCMakeTest test = new MockCMakeTest("test-executable", project.getObjects());
+    test.getOutputVersion().set("9.0.0");
+    final CMakeResolvedTest resolved = new CMakeResolvedTest(test, false, "1.5.0");
+    assertEquals("9.0.0", resolved.getOutputVersion());
   }
 }

@@ -19,6 +19,7 @@ public class MockCMakeLibrary extends CMakeLibrary {
 
   private final String name;
   private final Property<String> outputName;
+  private final Property<String> outputVersion;
   private final Property<Boolean> stripDebug;
   private final SetProperty<CMakeBuildVariant> libraryTypes;
 
@@ -26,6 +27,7 @@ public class MockCMakeLibrary extends CMakeLibrary {
     super(factory);
     this.name = name;
     this.outputName = factory.property(String.class);
+    this.outputVersion = factory.property(String.class);
     this.stripDebug = factory.property(Boolean.class);
     this.libraryTypes = factory.setProperty(CMakeBuildVariant.class);
   }
@@ -38,6 +40,11 @@ public class MockCMakeLibrary extends CMakeLibrary {
   @Override
   public Property<String> getOutputName() {
     return outputName;
+  }
+
+  @Override
+  public Property<String> getOutputVersion() {
+    return outputVersion;
   }
 
   @Override

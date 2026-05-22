@@ -4,6 +4,7 @@
  */
 package io.github.tomaki19.gradle.cmake.extension.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.gradle.api.Project;
@@ -19,5 +20,20 @@ class CMakeTestTest {
     final Project project = ProjectBuilder.builder().build();
     final CMakeTest test = new MockCMakeTest("test", project.getObjects());
     assertNotNull(test);
+  }
+
+  @Test
+  void testGetOutputVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeTest test = new MockCMakeTest("test", project.getObjects());
+    assertNotNull(test.getOutputVersion());
+  }
+
+  @Test
+  void testSetOutputVersion() {
+    final Project project = ProjectBuilder.builder().build();
+    final CMakeTest test = new MockCMakeTest("test", project.getObjects());
+    test.getOutputVersion().set("1.0.0");
+    assertEquals("1.0.0", test.getOutputVersion().get());
   }
 }

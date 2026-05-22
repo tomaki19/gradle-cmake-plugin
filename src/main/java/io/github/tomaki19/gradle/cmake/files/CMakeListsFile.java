@@ -142,6 +142,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     populateLinkModel(model, library, toolchain, buildConfig);
 
     model.put("outputName", library.getOutputName());
+    model.put("outputVersion", library.getOutputVersion());
 
     final Path targetPath = CMakeFileConventions.targetBinaryDirectory(getBuildDirectoryProperty(), library,
         toolchain, buildConfig).getAsFile().toPath();
@@ -169,6 +170,7 @@ public final class CMakeListsFile extends CMakeFileContent {
     populateLinkModel(model, executable, toolchain, buildConfig);
 
     model.put("outputName", executable.getOutputName());
+    model.put("outputVersion", executable.getOutputVersion());
     return model;
   }
 

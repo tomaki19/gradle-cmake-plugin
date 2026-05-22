@@ -14,6 +14,7 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinary;
 public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> extends CMakeResolvedName<T> {
 
   private final String outputName;
+  private final String outputVersion;
   private final Collection<File> headers;
   private final Collection<File> sources;
   private final Collection<String> privateCompileDefinitions = new TreeSet<>();
@@ -30,9 +31,11 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
   private final Collection<CMakeResolvedProjectDependency> allProjectDependencies = new TreeSet<>();
   private final boolean stripDebug;
 
-  CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug) throws IllegalArgumentException {
+  CMakeResolvedBinary(final CMakeBinary binary, final boolean stripDebug, final String projectVersion)
+      throws IllegalArgumentException {
     super(binary.getName());
     this.outputName = binary.getOutputName().getOrElse(binary.getName());
+    this.outputVersion = binary.getOutputVersion().getOrElse(projectVersion);
     this.headers = new TreeSet<>(binary.getHeaders().getSrcDirs().stream().filter((p) -> p.exists()).toList());
     this.sources = new TreeSet<>(binary.getSources().getFiles().stream().filter((p) -> p.exists()).toList());
     this.stripDebug = stripDebug || binary.getStripDebug().getOrElse(Boolean.FALSE);
@@ -40,6 +43,10 @@ public abstract class CMakeResolvedBinary<T extends CMakeResolvedBinary<T>> exte
 
   public String getOutputName() {
     return outputName;
+  }
+
+  public String getOutputVersion() {
+    return outputVersion;
   }
 
   public Collection<File> getHeaders() {

@@ -31,6 +31,8 @@ public abstract class CMakeBinary extends CMakeNamedObject implements CMakeBinar
 
   public abstract Property<String> getOutputName();
 
+  public abstract Property<String> getOutputVersion();
+
   public Collection<String> getToolchains() {
     return Collections.unmodifiableCollection(toolchains);
   }

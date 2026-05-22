@@ -8,8 +8,9 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeApplication;
 
 public final class CMakeResolvedApplication extends CMakeResolvedBinary<CMakeResolvedApplication> {
 
-  public CMakeResolvedApplication(final CMakeApplication application, final boolean stripDebug) {
-    super(application, stripDebug);
+  public CMakeResolvedApplication(final CMakeApplication application, final boolean stripDebug,
+      final String projectVersion) {
+    super(application, stripDebug, projectVersion);
   }
 
 }

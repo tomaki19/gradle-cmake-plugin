@@ -355,14 +355,14 @@ class CMakeCustomTaskSpecTest {
   }
 
   private CMakeResolvedLibrary resolvedLibrary(final String name, final CMakeLinkVariant variant) {
-    return new CMakeResolvedLibrary(new MockCMakeLibrary(name, project.getObjects()), variant, false);
+    return new CMakeResolvedLibrary(new MockCMakeLibrary(name, project.getObjects()), variant, false, "unspecified");
   }
 
   private CMakeResolvedApplication resolvedApplication(final String name) {
-    return new CMakeResolvedApplication(new MockCMakeApplication(name, project.getObjects()), false);
+    return new CMakeResolvedApplication(new MockCMakeApplication(name, project.getObjects()), false, "unspecified");
   }
 
   private CMakeResolvedTest resolvedTest(final String name) {
-    return new CMakeResolvedTest(new MockCMakeTest(name, project.getObjects()), false);
+    return new CMakeResolvedTest(new MockCMakeTest(name, project.getObjects()), false, "unspecified");
   }
 }
