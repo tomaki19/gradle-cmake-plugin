@@ -6,7 +6,7 @@ spotless-plugin = "8.7.0"
 jacocolog-plugin = "4.0.2"
 spotbugs-plugin = "6.5.8"
 spotbugs = "4.10.2"
-junit = "6.1.0"
+junit = "6.1.1"
 mockito = "5.23.0"
 freemarker = "2.3.34"
 
