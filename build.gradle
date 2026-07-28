@@ -18,14 +18,6 @@ repositories {
     mavenCentral()
 }
 
-// configurations.configureEach {
-//     resolutionStrategy {
-//         failOnNonReproducibleResolution()
-//         failOnDynamicVersions()
-//         failOnChangingVersions()
-//         failOnVersionConflict()
-//     }
-// }
 configurations {
   named(JavaPlugin.TEST_COMPILE_CLASSPATH_CONFIGURATION_NAME) {
     resolutionStrategy {
@@ -150,4 +142,5 @@ tasks.withType(AbstractPublishToMaven) {
 
 shadowJar {
     archiveClassifier = ''
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
