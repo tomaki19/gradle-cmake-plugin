@@ -48,11 +48,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createModulesDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final Project targetProject = project.findProject(":%s".formatted(projectName));
-    if (targetProject == null) {
+     final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(":%s".formatted(projectName));
+    if (projectDependency == null) {
       throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
     }
-    final ProjectDependency projectDependency = project.getDependencyFactory().create(targetProject);
     projectDependency.setTargetConfiguration(CMakeConfigurationConventions
         .createModulesName(this, toolchain, buildConfig));
     return projectDependency;
@@ -60,11 +59,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createRuntimeDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final Project targetProject = project.findProject(":%s".formatted(projectName));
-    if (targetProject == null) {
+    final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(":%s".formatted(projectName));
+    if (projectDependency == null) {
       throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
     }
-    final ProjectDependency projectDependency = project.getDependencyFactory().create(targetProject);
     projectDependency.setTargetConfiguration(CMakeConfigurationConventions
         .createRuntimeName(this, toolchain, buildConfig));
     return projectDependency;
@@ -72,11 +70,10 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createDevelopDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final Project targetProject = project.findProject(":%s".formatted(projectName));
-    if (targetProject == null) {
+    final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(":%s".formatted(projectName));
+    if (projectDependency == null) {
       throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
     }
-    final ProjectDependency projectDependency = project.getDependencyFactory().create(targetProject);
     projectDependency.setTargetConfiguration(CMakeConfigurationConventions
         .createDevelopName(this, toolchain, buildConfig));
     return projectDependency;
