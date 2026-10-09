@@ -1,8 +1,8 @@
 [versions]
 publish-plugin = "2.2.1"
 shadow-plugin = "9.6.1"
-versions-plugin = "0.64.0"
-spotless-plugin = "8.10.3"
+versions-plugin = "0.65.0"
+spotless-plugin = "8.10.4"
 jacocolog-plugin = "4.0.2"
 spotbugs-plugin = "6.5.12"
 spotbugs = "4.10.4"
