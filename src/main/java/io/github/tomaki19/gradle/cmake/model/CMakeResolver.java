@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import io.github.tomaki19.gradle.cmake.extension.api.CMakeBinaryLinkSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeBuildSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeCompiling;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibrary;
+import io.github.tomaki19.gradle.cmake.extension.api.CMakeLibraryLinkSpec;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeLinking;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakePackage;
 import io.github.tomaki19.gradle.cmake.extension.api.CMakeTest;
@@ -98,6 +100,8 @@ public final class CMakeResolver {
         resolvedLibrary::addPublicCompileOptions);
     resolveLinking(Arrays.asList(toolchain.getLibraries().getLinking(), component.getLinking()),
         component.getName(), resolvedToolchain,
+        (spec) -> !(spec instanceof CMakeLibraryLinkSpec librarySpec)
+            || librarySpec.appliesTo(resolvedLibrary.getLinkVariant()),
         resolvedLibrary::addPrivateLinkOption, resolvedLibrary::addPublicLinkOption,
         resolvedLibrary::addPrivatePackageDependency, resolvedLibrary::addPublicPackageDependency,
         resolvedLibrary::addPrivateProjectDependency, resolvedLibrary::addPublicProjectDependency);
@@ -116,7 +120,7 @@ public final class CMakeResolver {
               resolvedApplication::addPublicCompileDefinitions, resolvedApplication::addPrivateCompileOptions,
               resolvedApplication::addPublicCompileOptions);
           resolveLinking(Arrays.asList(toolchain.getApplications().getLinking(), component.getLinking()),
-              component.getName(), resolvedToolchain,
+              component.getName(), resolvedToolchain, (spec) -> true,
               resolvedApplication::addPrivateLinkOption, resolvedApplication::addPublicLinkOption,
               resolvedApplication::addPrivatePackageDependency, resolvedApplication::addPublicPackageDependency,
               resolvedApplication::addPrivateProjectDependency, resolvedApplication::addPublicProjectDependency);
@@ -138,7 +142,7 @@ public final class CMakeResolver {
               resolvedTest::addPrivateCompileDefinitions, resolvedTest::addPublicCompileDefinitions,
               resolvedTest::addPrivateCompileOptions, resolvedTest::addPublicCompileOptions);
           resolveLinking(Arrays.asList(toolchain.getTests().getLinking(), component.getLinking()),
-              component.getName(), resolvedToolchain,
+              component.getName(), resolvedToolchain, (spec) -> true,
               resolvedTest::addPrivateLinkOption, resolvedTest::addPublicLinkOption,
               resolvedTest::addPrivatePackageDependency, resolvedTest::addPublicPackageDependency,
               resolvedTest::addPrivateProjectDependency, resolvedTest::addPublicProjectDependency);
@@ -196,6 +200,7 @@ public final class CMakeResolver {
 
   private void resolveLinking(final Collection<? extends CMakeLinking> sources,
       final String componentName, final CMakeResolvedToolchain toolchain,
+      final Predicate<CMakeBinaryLinkSpec> appliesToBuild,
       final Consumer<String> privateOptionConsumer, final Consumer<String> publicOptionConsumer,
       final Consumer<CMakeResolvedPackageDependency> privatePackageDependencyConsumer,
       final Consumer<CMakeResolvedPackageDependency> publicPackageDependencyConsumer,
@@ -204,6 +209,9 @@ public final class CMakeResolver {
     for (final CMakeLinking source : sources) {
       resolveLinkingOptions(source.getOptions(), toolchain, privateOptionConsumer, publicOptionConsumer);
       for (final CMakeBinaryLinkSpec dependency : source.getDependencySpecs()) {
+        if (!appliesToBuild.test(dependency)) {
+          continue;
+        }
         resolveLinkingDependencies(componentName, dependency, toolchain, privatePackageDependencyConsumer,
             publicPackageDependencyConsumer, privateProjectDependencyConsumer, publicProjectDependencyConsumer);
       }

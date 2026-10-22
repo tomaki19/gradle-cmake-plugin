@@ -246,6 +246,7 @@ cmake {
         options('-Wl,-rpath,\$ORIGIN')
         link('utils', 'common', variant: SHARED, visibility: PUBLIC)
         link('remoteLib', variant: SHARED, visibility: PRIVATE, from: 'otherProject')
+        link('sharedOnlyDep', variant: SHARED, visibility: PRIVATE, forBuild: SHARED)  // only for the shared build
       }
 
       stripDebug = false                    // optional, default: false
@@ -281,7 +282,7 @@ cmake {
 | `from` | String | this project | A `packages` entry, or another project: its name (`'core'`) or path (`':libs:core'`) |
 | `variant` | `SHARED` \| `STATIC` \| `INTERFACE` | `SHARED` | How to link the dependency (from `CMakeLinkVariant`) |
 | `visibility` | `PUBLIC` \| `PRIVATE` | `PUBLIC` | CMake target link visibility (from `CMakeVisibility`) |
-| `forBuild` | `CMakeBuildVariant` | — | Accepted, but currently has no effect |
+| `forBuild` | `SHARED` \| `STATIC`, or a list of them | all variants | Apply this dependency only when the library is built as the given variant(s); also accepts `'shared'` / `'static'`. Interface libraries only receive dependencies without `forBuild` |
 
 A name without `from:` refers to a component of this project. Linking another project requires that project to
 apply this plugin as well.

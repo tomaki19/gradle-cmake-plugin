@@ -5,10 +5,15 @@
 package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -62,14 +67,59 @@ class CMakeLibraryDependenciesTest {
   void testGetForStaticBuild() {
     CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
         Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.STATIC), "mylib");
-    assertEquals("static", deps.getBuildVariant().toLowerCase());
+    assertEquals(Set.of(CMakeBuildVariant.STATIC), deps.getBuildVariants());
   }
 
   @Test
   void testGetForSharedBuild() {
     CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
         Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.SHARED), "mylib");
-    assertEquals("shared", deps.getBuildVariant().toLowerCase());
+    assertEquals(Set.of(CMakeBuildVariant.SHARED), deps.getBuildVariants());
+  }
+
+  @Test
+  void testForBuildDefaultsToAllVariants() {
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(Map.of(), "mylib");
+    assertTrue(deps.getBuildVariants().isEmpty());
+    assertTrue(deps.appliesTo(CMakeLinkVariant.SHARED));
+    assertTrue(deps.appliesTo(CMakeLinkVariant.STATIC));
+    assertTrue(deps.appliesTo(CMakeLinkVariant.INTERFACE));
+  }
+
+  @Test
+  void testForBuildAppliesOnlyToGivenVariant() {
+    CMakeLibraryLinkSpec deps = CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.STATIC), "mylib");
+    assertTrue(deps.appliesTo(CMakeLinkVariant.STATIC));
+    assertFalse(deps.appliesTo(CMakeLinkVariant.SHARED));
+    assertFalse(deps.appliesTo(CMakeLinkVariant.INTERFACE));
+  }
+
+  @Test
+  void testForBuildAcceptsLinkVariantConstantsStringsAndCollections() {
+    assertEquals(Set.of(CMakeBuildVariant.STATIC), CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeLinkVariant.STATIC), "mylib").getBuildVariants());
+    assertEquals(Set.of(CMakeBuildVariant.SHARED), CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, "Shared"), "mylib").getBuildVariants());
+    assertEquals(Set.of(CMakeBuildVariant.SHARED, CMakeBuildVariant.STATIC), CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, List.of(CMakeLinkVariant.SHARED, "static")), "mylib")
+        .getBuildVariants());
+  }
+
+  @Test
+  void testForBuildRejectsInvalidVariants() {
+    assertThrows(CMakeApiException.class, () -> CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeLinkVariant.INTERFACE), "mylib"));
+    assertThrows(CMakeApiException.class, () -> CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, CMakeBuildVariant.MODULE), "mylib"));
+    assertThrows(CMakeApiException.class, () -> CMakeLibraryLinkSpec.Init.create(
+        Map.of(CMakeLibraryLinkSpec.BUILD_VARIANT, 1), "mylib"));
+  }
+
+  @Test
+  void testNotEqualWithDifferentComponents() {
+    assertNotEquals(CMakeLibraryLinkSpec.Init.create(Map.of(), "liba"),
+        CMakeLibraryLinkSpec.Init.create(Map.of(), "libb"));
   }
 
   @Test

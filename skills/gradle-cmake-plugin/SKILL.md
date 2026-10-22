@@ -126,7 +126,7 @@ Notes:
 | `variant` | `SHARED`, `STATIC`, `INTERFACE` | `SHARED` |
 | `visibility` | `PUBLIC`, `PRIVATE` (or `'Public'`, `'Private'`) | `PUBLIC` |
 | `from` | a `packages` entry, or another project's name (`'core'`) or path (`':libs:core'`) | this project |
-| `forBuild` | accepted but has no effect; do not rely on it | — |
+| `forBuild` (libraries only) | `SHARED`, `STATIC` or a list — link only when the library is built as that variant | all variants |
 
 A name without `from:` is a component of this project and is not validated,
 so a typo only fails later inside CMake. A project named in `from:` must
@@ -266,3 +266,4 @@ CI test reporting at `build/cmake/config/**/*-junit.xml`.
   generator`); always set one.
 - `testResultsXmlOutput` has no effect, and package `properties` are set
   after `find_package` with upper-cased values, so they are no use as hints.
+- `forBuild` has no effect: a library's links apply to all its variants.
