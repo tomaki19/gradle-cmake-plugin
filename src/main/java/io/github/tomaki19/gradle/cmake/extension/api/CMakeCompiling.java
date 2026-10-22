@@ -27,12 +27,20 @@ public abstract class CMakeCompiling {
     options.add(CMakeBuildSpec.Init.create(spec, names));
   }
 
+  public void options(final CharSequence... names) {
+    options(Map.of(), names);
+  }
+
   public Collection<CMakeBuildSpec> getDefines() {
     return Collections.unmodifiableCollection(defines);
   }
 
   public void defines(final Map<String, Object> spec, final CharSequence... names) {
     defines.add(CMakeBuildSpec.Init.create(spec, names));
+  }
+
+  public void defines(final CharSequence... names) {
+    defines(Map.of(), names);
   }
 
 }

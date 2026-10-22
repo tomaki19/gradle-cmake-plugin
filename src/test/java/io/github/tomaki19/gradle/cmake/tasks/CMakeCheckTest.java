@@ -12,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeApplication;
+import io.github.tomaki19.gradle.cmake.helper.MockCMakeTest;
 import io.github.tomaki19.gradle.cmake.helper.MockCMakeToolchain;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedApplication;
+import io.github.tomaki19.gradle.cmake.model.CMakeResolvedTest;
 import io.github.tomaki19.gradle.cmake.model.CMakeResolvedToolchain;
 
 class CMakeCheckTest {
@@ -101,4 +103,26 @@ class CMakeCheckTest {
         .register("check", CMakeCheck.class, resolvedApplication, resolvedToolchain, "Debug").get();
     assertNotNull(task.getOutputs());
   }
+
+  @Test
+  void testJUnitOutputWhenEnabled() {
+    final CMakeResolvedTest test = new CMakeResolvedTest(new MockCMakeTest("MyTest", project.getObjects()), false,
+        "unspecified", true);
+    CMakeCheck task = project.getTasks()
+        .register("check", CMakeCheck.class, test, resolvedToolchain, "Debug").get();
+    final int index = task.getArgs().indexOf("--output-junit");
+    assertTrue(index >= 0);
+    assertTrue(task.getArgs().get(index + 1).endsWith("mytest-testtoolchain-debug-junit.xml"),
+        task.getArgs().get(index + 1));
+  }
+
+  @Test
+  void testNoJUnitOutputByDefault() {
+    final CMakeResolvedTest test = new CMakeResolvedTest(new MockCMakeTest("MyTest", project.getObjects()), false,
+        "unspecified");
+    CMakeCheck task = project.getTasks()
+        .register("check", CMakeCheck.class, test, resolvedToolchain, "Debug").get();
+    assertFalse(task.getArgs().contains("--output-junit"));
+  }
+
 }

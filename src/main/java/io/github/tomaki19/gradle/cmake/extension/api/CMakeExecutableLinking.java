@@ -21,4 +21,8 @@ public class CMakeExecutableLinking extends CMakeLinking {
     dependencySpecs.add(CMakeExecutableLinkSpec.Init.create(spec, components));
   }
 
+  public void link(final CharSequence... components) {
+    link(Map.of(), components);
+  }
+
 }

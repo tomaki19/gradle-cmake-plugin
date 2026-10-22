@@ -130,7 +130,10 @@ public final class CMakeResolver {
         (CMakeToolchain toolchain, CMakeResolvedToolchain resolvedToolchain) -> {
           final CMakeResolvedTest resolvedTest = new CMakeResolvedTest(component,
               toolchain.getTests().getStripDebug().getOrElse(Boolean.FALSE),
-              currentProject.getVersion().toString());
+              currentProject.getVersion().toString(),
+              component.getTestResultsXmlOutput()
+                  .orElse(toolchain.getTests().getTestResultsXmlOutput())
+                  .getOrElse(Boolean.FALSE));
           resolveCompiling(Arrays.asList(toolchain.getTests().getCompiling(), component.getCompiling()),
               resolvedTest::addPrivateCompileDefinitions, resolvedTest::addPublicCompileDefinitions,
               resolvedTest::addPrivateCompileOptions, resolvedTest::addPublicCompileOptions);
@@ -262,12 +265,15 @@ public final class CMakeResolver {
       final Consumer<CMakeResolvedProjectDependency> privateProjectDependencyConsumer,
       final Consumer<CMakeResolvedProjectDependency> publicProjectDependencyConsumer)
       throws CMakeResolverException {
-    final boolean isCurrentProjectReferenced = from.isEmpty() || Objects.equals(currentProject.getName(), from);
+    // `from` is a project name directly below the root (`core`) or a project path (`:libs:core`)
+    final String fromPath = from.startsWith(":") ? from : ":" + from;
+    final boolean isCurrentProjectReferenced = from.isEmpty() || Objects.equals(currentProject.getName(), from)
+        || Objects.equals(currentProject.getPath(), fromPath);
     final boolean isSelfReference = Objects.equals(componentName, name) && isCurrentProjectReferenced;
     if (!isSelfReference) {
       final Project referencedProject = isCurrentProjectReferenced
           ? currentProject
-          : currentProject.findProject(":%s".formatted(from));
+          : currentProject.findProject(fromPath);
       if (Objects.nonNull(referencedProject)) {
         final CMakeResolvedProjectDependency resolvedDependency = new CMakeResolvedProjectDependency(name, linkVariant,
             referencedProject, !isCurrentProjectReferenced);

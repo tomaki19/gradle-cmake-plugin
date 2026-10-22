@@ -31,6 +31,10 @@ public abstract class CMakeLinking {
     options.add(CMakeBuildSpec.Init.create(spec, names));
   }
 
+  public void options(final CharSequence... names) {
+    options(Map.of(), names);
+  }
+
   public abstract Collection<? extends CMakeBinaryLinkSpec> getDependencySpecs();
 
 }

@@ -148,4 +148,23 @@ class CMakeConfigureTest {
       Files.deleteIfExists(inputDir.toPath());
     }
   }
+
+  @Test
+  void testNoGeneratorArgumentByDefault() {
+    CMakeConfigure task = project.getTasks()
+        .register("configure", CMakeConfigure.class, resolvedToolchain, "Debug").get();
+    assertFalse(task.getArgs().contains("-G"));
+  }
+
+  @Test
+  void testGeneratorArgument() {
+    final MockCMakeToolchain toolchain = new MockCMakeToolchain("NinjaToolchain", project.getObjects());
+    toolchain.getGenerator().set("Ninja");
+    CMakeConfigure task = project.getTasks()
+        .register("configure", CMakeConfigure.class, new CMakeResolvedToolchain(toolchain), "Debug").get();
+    final int index = task.getArgs().indexOf("-G");
+    assertTrue(index >= 0);
+    assertEquals("\"Ninja\"", task.getArgs().get(index + 1));
+  }
+
 }

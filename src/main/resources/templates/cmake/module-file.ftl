@@ -1,6 +1,9 @@
 if( NOT TARGET [=target] )
 <#list packageDependencies as dep>
 <#assign pkg = dep.resolvedPackage>
+<#list pkg.properties?keys as propKey>
+set( [=pkg.name]_[=propKey?upper_case] "[=pkg.properties[propKey]]" )
+</#list>
 find_package( [=pkg.name] REQUIRED
 <#if pkg.moduleMode>
     MODULE
@@ -14,9 +17,6 @@ find_package( [=pkg.name] REQUIRED
 </#list>
 </#if>
 )
-<#list pkg.properties?keys as propKey>
-set( [=pkg.name]_[=propKey?upper_case] [=pkg.properties[propKey]?upper_case] )
-</#list>
 </#list>
 <#list projectIncludes as include>
 include( [=include] )

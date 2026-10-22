@@ -43,7 +43,8 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testAssembleFindTaskNameProjectToolchain() {
-    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final Project project = ProjectBuilder.builder().withName("MyProject")
+        .withParent(ProjectBuilder.builder().build()).build();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
     assertEquals(":MyProject:assemble-mylib-shared-mytoolchain-debug-module",
@@ -54,7 +55,8 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testConfigureTaskNameProjectToolchainBuildConfig() {
-    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final Project project = ProjectBuilder.builder().withName("MyProject")
+        .withParent(ProjectBuilder.builder().build()).build();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
     assertEquals(":MyProject:configure-mytoolchain-debug",
@@ -146,7 +148,8 @@ class CMakeTasksConventionsTest {
 
   @Test
   void testBuildTaskNameProjectDependency() {
-    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final Project project = ProjectBuilder.builder().withName("MyProject")
+        .withParent(ProjectBuilder.builder().build()).build();
     final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
 
     assertEquals(":MyProject:build-mylib-shared-mytoolchain-debug",
@@ -164,6 +167,30 @@ class CMakeTasksConventionsTest {
     assertEquals("develop-myapp-mytoolchain-debug",
         CMakeTasksConventions.archiveDevelopTaskName(
             new CMakeResolvedApplication(application, false, "unspecified"),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
+  }
+
+  @Test
+  void testBuildTaskNameRootProjectDependency() {
+    final Project project = ProjectBuilder.builder().withName("MyProject").build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
+    assertEquals(":build-mylib-shared-mytoolchain-debug",
+        CMakeTasksConventions.buildTaskName(
+            new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false),
+            new CMakeResolvedToolchain(toolchain), "Debug"));
+  }
+
+  @Test
+  void testBuildTaskNameNestedProjectDependency() {
+    final Project parent = ProjectBuilder.builder().withName("libs")
+        .withParent(ProjectBuilder.builder().build()).build();
+    final Project project = ProjectBuilder.builder().withName("MyProject").withParent(parent).build();
+    final CMakeToolchain toolchain = new MockCMakeToolchain("MyToolchain", project.getObjects());
+
+    assertEquals(":libs:MyProject:build-mylib-shared-mytoolchain-debug",
+        CMakeTasksConventions.buildTaskName(
+            new CMakeResolvedProjectDependency("MyLib", CMakeLinkVariant.SHARED, project, false),
             new CMakeResolvedToolchain(toolchain), "Debug"));
   }
 

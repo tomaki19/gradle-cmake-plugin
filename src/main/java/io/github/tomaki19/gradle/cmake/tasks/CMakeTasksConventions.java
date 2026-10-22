@@ -31,8 +31,8 @@ public final class CMakeTasksConventions {
 
   public static String assembleModuleTaskName(final CMakeResolvedProjectDependency dependency,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return ":%s:assemble-%s-%s-%s-%s-module".formatted(dependency.getProjectName(), dependency.getName().toLowerCase(),
-        dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+    return dependency.taskPath("assemble-%s-%s-%s-%s-module".formatted(dependency.getName().toLowerCase(),
+        dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase()));
   }
 
   public static String configureTaskName(final CMakeResolvedToolchain toolchain, final String buildConfig) {
@@ -41,8 +41,8 @@ public final class CMakeTasksConventions {
 
   public static String configureTaskName(final CMakeResolvedProjectDependency dependency,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return ":%s:configure-%s-%s".formatted(dependency.getProjectName(), toolchain.getName().toLowerCase(),
-        buildConfig.toLowerCase());
+    return dependency.taskPath("configure-%s-%s".formatted(toolchain.getName().toLowerCase(),
+        buildConfig.toLowerCase()));
   }
 
   public static String buildAllToolchainTaskName(final String toolchainName) {
@@ -61,8 +61,8 @@ public final class CMakeTasksConventions {
 
   public static String buildTaskName(final CMakeResolvedProjectDependency dependency,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    return ":%s:build-%s-%s-%s-%s".formatted(dependency.getProjectName(), dependency.getName().toLowerCase(),
-        dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase());
+    return dependency.taskPath("build-%s-%s-%s-%s".formatted(dependency.getName().toLowerCase(),
+        dependency.getLinkVariant().toLowerCase(), toolchain.getName().toLowerCase(), buildConfig.toLowerCase()));
   }
 
   public static String buildTaskName(final CMakeResolvedBinary<?> executable, final CMakeResolvedToolchain toolchain,

@@ -6,11 +6,14 @@ package io.github.tomaki19.gradle.cmake.extension.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collection;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
 
 class CMakeCompileTest {
 
@@ -62,5 +65,46 @@ class CMakeCompileTest {
     assertEquals(1, compile.getOptions().size());
     assertEquals(CMakeBuildSpec.Init.create(Map.of(), "-Wall", "-Wextra"),
         compile.getOptions().iterator().next());
+  }
+
+  @Test
+  void testOptionsWithoutSpec() {
+    CMakeExecutableCompiling compile = new CMakeExecutableCompiling();
+    compile.options("-Wall", "-Wextra");
+    assertEquals(CMakeBuildSpec.Init.create(Map.of(), "-Wall", "-Wextra"), compile.getOptions().iterator().next());
+    assertEquals(CMakeVisibility.PUBLIC, compile.getOptions().iterator().next().getVisibility());
+  }
+
+  @Test
+  void testDefinesWithoutSpec() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    compile.defines("DEBUG");
+    assertEquals(CMakeBuildSpec.Init.create(Map.of(), "DEBUG"), compile.getDefines().iterator().next());
+  }
+
+  @Test
+  void testVisibilityAsString() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    compile.options(Map.of("visibility", "private"), "-O2");
+    assertEquals(CMakeVisibility.PRIVATE, compile.getOptions().iterator().next().getVisibility());
+  }
+
+  @Test
+  void testVisibilityAsConstant() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    compile.defines(Map.of("visibility", CMakeCompiling.PRIVATE), "INTERNAL");
+    assertEquals(CMakeVisibility.PRIVATE, compile.getDefines().iterator().next().getVisibility());
+  }
+
+  @Test
+  void testInvalidVisibilityName() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    assertThrows(CMakeApiException.class, () -> compile.options(Map.of("visibility", "protected"), "-O2"));
+  }
+
+  @Test
+  void testInvalidVisibilityType() {
+    CMakeLibraryCompiling compile = new CMakeLibraryCompiling();
+    assertThrows(CMakeApiException.class, () -> compile.options(Map.of("visibility", 1), "-O2"));
   }
 }

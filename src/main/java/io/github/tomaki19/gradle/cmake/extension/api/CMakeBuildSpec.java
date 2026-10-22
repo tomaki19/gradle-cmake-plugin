@@ -59,12 +59,9 @@ public final class CMakeBuildSpec extends CMakeApiSpecInit {
 
     public static CMakeBuildSpec create(final Map<String, Object> entries, final CharSequence... names)
         throws CMakeApiException {
-      validateType(entries.get(VISIBILITY), VISIBILITY, CharSequence.class);
       return new CMakeBuildSpec(Arrays.asList(names).stream().map((it) -> it.toString())
           .collect(Collectors.toSet()),
-          entries.containsKey(VISIBILITY)
-              ? CMakeVisibility.valueOf(((CharSequence) entries.get(VISIBILITY)).toString().toUpperCase())
-              : CMakeVisibility.PUBLIC);
+          toVisibility(entries.get(VISIBILITY), VISIBILITY));
     }
 
   }

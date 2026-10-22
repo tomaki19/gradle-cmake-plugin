@@ -15,6 +15,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   private final CMakeLinkVariant linkVariant;
   private final String projectName;
+  private final String projectPath;
   private final boolean remote;
 
   public CMakeResolvedProjectDependency(final String name, final CMakeLinkVariant linkVariant, final Project project,
@@ -24,11 +25,24 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
     Objects.requireNonNull(project, "Project must not be null!");
     this.linkVariant = linkVariant;
     this.projectName = project.getName();
+    this.projectPath = project.getPath();
     this.remote = remote;
   }
 
   public String getProjectName() {
     return projectName;
+  }
+
+  public String getProjectPath() {
+    return projectPath;
+  }
+
+  /**
+   * Returns the absolute path of a task in the dependency's project, e.g. {@code :lib:build-…}, or {@code :build-…}
+   * when the dependency lives in the root project.
+   */
+  public String taskPath(final String taskName) {
+    return ":".equals(projectPath) ? ":" + taskName : projectPath + ":" + taskName;
   }
 
   public CMakeLinkVariant getLinkVariant() {
@@ -48,7 +62,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createModulesDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-     final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(":%s".formatted(projectName));
+     final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(projectPath);
     if (projectDependency == null) {
       throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
     }
@@ -59,7 +73,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createRuntimeDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(":%s".formatted(projectName));
+    final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(projectPath);
     if (projectDependency == null) {
       throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
     }
@@ -70,7 +84,7 @@ public final class CMakeResolvedProjectDependency extends CMakeResolvedName<CMak
 
   public ProjectDependency createDevelopDependency(final Project project,
       final CMakeResolvedToolchain toolchain, final String buildConfig) {
-    final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(":%s".formatted(projectName));
+    final ProjectDependency projectDependency = project.getDependencyFactory().createProjectDependency(projectPath);
     if (projectDependency == null) {
       throw new CMakeApiException("Project '%s' not found in the build.".formatted(projectName));
     }

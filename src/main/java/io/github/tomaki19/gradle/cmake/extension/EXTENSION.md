@@ -13,6 +13,15 @@ cmake {
 }
 ```
 
+### Calling Conventions
+
+- List-valued settings are **method calls**: `buildConfigs 'Debug', 'Release'`,
+  `toolchains 'gcc'`, `buildVariants SHARED, STATIC` (not `= [...]`).
+- `options()`, `defines()` and `link()` take their spec as **named arguments**, which may appear before or after
+  the names: `link('core', variant: SHARED, visibility: PRIVATE)`. Without a spec, call them with the names only:
+  `options('-Wall')`, `link('core')`. A trailing map literal (`link('core', [variant: SHARED])`) is not supported.
+- `visibility` accepts the constants `PUBLIC` / `PRIVATE` or the strings `'Public'` / `'Private'` (any case).
+
 ---
 
 ## Packages
@@ -22,8 +31,8 @@ Define system libraries and external packages discovered via CMake's `find_packa
 ```groovy
 cmake {
   packages {
-    '<name>' {
-      targetPrefix = 'prefix::'         // optional
+    '<name>' {                          // exact find_package() name, e.g. 'OpenGL', 'Boost'
+      targetPrefix = 'prefix'           // optional, without '::'
       components = ['comp1', 'comp2']   // optional
       properties = [key: 'value']       // optional
       moduleMode = false                // optional
@@ -37,19 +46,31 @@ cmake {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `moduleMode` | boolean | false | Use MODULE mode for `find_package()`; if false uses CONFIG mode |
-| `targetPrefix` | String | — | Custom prefix for target names discovered by find_package |
+| `targetPrefix` | String | package name | Namespace of the imported targets, without `::` (e.g. `'foo'` for `foo::bar`) |
 | `components` | Set<String> | — | Specific components to request (e.g., `['system', 'filesystem']` for Boost) |
-| `properties` | Map<String,String> | — | Additional CMake hints passed to find_package |
+| `properties` | Map<String,String> | — | Hints set before `find_package()`: `ROOT: '/opt/zlib'` becomes `set( ZLIB_ROOT "/opt/zlib" )` (key upper-cased, value unchanged) |
+
+The package name is passed to `find_package()` unchanged, so use CMake's exact spelling.
+
+Link a package's targets from a component with `from:` set to the package name. The linked target is
+`<targetPrefix or package name>::<link name>`:
+
+```groovy
+linking {
+  link('GL', from: 'OpenGL', visibility: PRIVATE)                  // OpenGL::GL
+  link('system', 'filesystem', from: 'Boost', visibility: PRIVATE) // Boost::system, Boost::filesystem
+}
+```
 
 ### Example
 
 ```groovy
 cmake {
   packages {
-    opengl { moduleMode = true }
-    boost  { components = ['system', 'filesystem', 'thread'] }
-    qt     { components = ['Core', 'Gui', 'Widgets'] }
-    zlib   { targetPrefix = 'ZLIB::' }
+    OpenGL { moduleMode = true }
+    Boost  { components = ['system', 'filesystem', 'thread'] }
+    Qt6    { components = ['Core', 'Gui', 'Widgets'] }
+    ZLIB   { moduleMode = true; properties = [ROOT: '/opt/zlib'] }
   }
 }
 ```
@@ -100,7 +121,7 @@ cmake {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `operatingSystem` | `OperatingSystem` | auto-detect | Target OS: `CMakeToolchain.LINUX`, `CMakeToolchain.MAC_OS`, `CMakeToolchain.WINDOWS` |
-| `generator` | String | auto-detect | CMake generator (e.g., `'Ninja'`, `'Visual Studio 17 2022'`) |
+| `generator` | String | CMake's default | CMake generator (e.g., `'Ninja'`, `'Visual Studio 17 2022'`); omitted from the `cmake` call when not set |
 | `buildConfigs` | method | `'Debug','Release','RelWithDebInfo','MinSizeRel'` | Build configurations; call as `buildConfigs 'Debug', 'Release'` |
 | `environment` | Map<String,String> | — | Environment variables passed to CMake invocations |
 | `environmentFile` | File | — | Shell script sourced before each CMake invocation |
@@ -120,20 +141,20 @@ Available in the `libraries`, `applications`, and `tests` sub-blocks of a toolch
 
 ```groovy
 compiling {
-  options('-Wall', '-Wextra', [visibility: PUBLIC])
-  options('-O2', [visibility: PRIVATE])
-  defines('VERSION_1_0', 'ENABLE_LOGGING', [visibility: PUBLIC])
-  defines('INTERNAL_BUILD', [visibility: PRIVATE])
+  options('-Wall', '-Wextra', visibility: PUBLIC)
+  options('-O2', visibility: PRIVATE)
+  defines('VERSION_1_0', 'ENABLE_LOGGING', visibility: PUBLIC)
+  defines('INTERNAL_BUILD', visibility: PRIVATE)
 }
 ```
 
-Both `options()` and `defines()` take one or more flag/define names as the first arguments followed by a spec map:
+Both `options()` and `defines()` take one or more flag/define names and an optional named `visibility` argument:
 
 | Spec Key | Values | Default | Description |
 |----------|--------|---------|-------------|
-| `visibility` | `'Public'` \| `'Private'` | `'Public'` | CMake target property visibility |
+| `visibility` | `PUBLIC` \| `PRIVATE` (or `'Public'` \| `'Private'`) | `PUBLIC` | CMake target property visibility |
 
-Omit the visibility key to use the default (`Public`):
+Omit the visibility to use the default (`PUBLIC`):
 ```groovy
 options('-Wall', '-Wextra')
 defines('DEBUG_MODE')
@@ -146,11 +167,11 @@ defines('DEBUG_MODE')
 ```groovy
 linking {
   options('-Wl,-rpath,/usr/local/lib')
-  options('-static-libgcc', [visibility: PRIVATE])
+  options('-static-libgcc', visibility: PRIVATE)
 }
 ```
 
-Same map spec as `compiling` — only `visibility` key is supported.
+Same spec as `compiling` — only the `visibility` key is supported.
 
 #### Link dependencies
 
@@ -169,8 +190,8 @@ cmake {
       libraries {
         buildVariants SHARED, STATIC
         compiling {
-          options('-Wall', '-Wextra', '-fPIC', [visibility: PUBLIC])
-          defines('LINUX', [visibility: PUBLIC])
+          options('-Wall', '-Wextra', '-fPIC', visibility: PUBLIC)
+          defines('LINUX', visibility: PUBLIC)
         }
         linking {
           options('-Wl,-rpath,\$ORIGIN')
@@ -203,7 +224,7 @@ Define library targets. Libraries can be shared, static, or interface (header-on
 cmake {
   libraries {
     '<name>' {
-      toolchains 'gcc', 'clang'             // required – method call, not assignment
+      toolchains 'gcc', 'clang'             // optional, default: all toolchains – method call, not assignment
       buildVariants SHARED, STATIC           // optional, default: [SHARED]
       outputName = 'custom_output_name'      // optional
       outputVersion = '1.2.3'               // optional
@@ -217,15 +238,14 @@ cmake {
       }
 
       compiling {
-        options('-Wall', [visibility: PUBLIC])
-        defines('INTERNAL', [visibility: PRIVATE])
+        options('-Wall', visibility: PUBLIC)
+        defines('INTERNAL', visibility: PRIVATE)
       }
 
       linking {
         options('-Wl,-rpath,\$ORIGIN')
-        link('utils', 'common', [variant: SHARED, visibility: PUBLIC])
-        link('remoteLib', [variant: SHARED, visibility: PRIVATE, from: 'otherProject'])
-        link('sharedOnlyDep', [forBuild: 'Shared', variant: SHARED, visibility: PRIVATE])
+        link('utils', 'common', variant: SHARED, visibility: PUBLIC)
+        link('remoteLib', variant: SHARED, visibility: PRIVATE, from: 'otherProject')
       }
 
       stripDebug = false                    // optional, default: false
@@ -239,7 +259,7 @@ cmake {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `toolchains(...)` | method | all defined toolchains | Toolchains to build this library for: `toolchains 'gcc', 'clang'` |
-| `buildVariants(...)` | method | `SHARED` | Library types: `SHARED`, `STATIC`, `MODULE` (from `CMakeBuildVariant`) |
+| `buildVariants(...)` | method | `SHARED` | Library types: `SHARED`, `STATIC` (from `CMakeBuildVariant`); combined with the toolchain's `libraries.buildVariants`. A library without sources is always an `INTERFACE` library |
 | `outputName` | String | component name | Override the CMake target output name |
 | `outputVersion` | String | project version | Override the CMake target `VERSION` property |
 | `headers.srcDirs` | List<String> | `src/<name>/headers` | Header directories |
@@ -258,10 +278,13 @@ cmake {
 
 | Key | Values | Default | Description |
 |-----|--------|---------|-------------|
-| `from` | String | `''` | Project name for inter-project dependencies |
+| `from` | String | this project | A `packages` entry, or another project: its name (`'core'`) or path (`':libs:core'`) |
 | `variant` | `SHARED` \| `STATIC` \| `INTERFACE` | `SHARED` | How to link the dependency (from `CMakeLinkVariant`) |
 | `visibility` | `PUBLIC` \| `PRIVATE` | `PUBLIC` | CMake target link visibility (from `CMakeVisibility`) |
-| `forBuild` | `SHARED` \| `STATIC` | `SHARED` | Apply this link spec only when building with the given build variant (from `CMakeBuildVariant`) |
+| `forBuild` | `CMakeBuildVariant` | — | Accepted, but currently has no effect |
+
+A name without `from:` refers to a component of this project. Linking another project requires that project to
+apply this plugin as well.
 
 ### Example
 
@@ -281,13 +304,13 @@ libraries {
     headers { srcDirs = ['include/core'] }
 
     compiling {
-      options('-std=c++17', [visibility: PUBLIC])
-      defines('CORE_VERSION_2', [visibility: PUBLIC])
+      options('-std=c++17', visibility: PUBLIC)
+      defines('CORE_VERSION_2', visibility: PUBLIC)
     }
 
     linking {
-      link('utils', [variant: SHARED, visibility: PRIVATE])
-      link('system', 'filesystem', [from: 'boost', variant: SHARED, visibility: PUBLIC])
+      link('utils', variant: SHARED, visibility: PRIVATE)
+      link('system', 'filesystem', from: 'Boost', visibility: PUBLIC)
     }
   }
 }
@@ -303,7 +326,7 @@ Define executable application targets.
 cmake {
   applications {
     '<name>' {
-      toolchains 'gcc'                       // required
+      toolchains 'gcc'                       // optional, default: all toolchains
 
       headers {
         srcDirs = ['include']               // defaults to src/<name>/headers
@@ -313,14 +336,14 @@ cmake {
       }
 
       compiling {
-        options('-O3', [visibility: PRIVATE])
-        defines('APP_BUILD', [visibility: PRIVATE])
+        options('-O3', visibility: PRIVATE)
+        defines('APP_BUILD', visibility: PRIVATE)
       }
 
       linking {
         options('-Wl,--as-needed')
-        link('core', 'utils', [variant: SHARED, visibility: PRIVATE])
-        link('program_options', [from: 'boost', variant: SHARED, visibility: PRIVATE])
+        link('core', 'utils', variant: SHARED, visibility: PRIVATE)
+        link('program_options', from: 'Boost', visibility: PRIVATE)
       }
 
       outputName = 'my-app'                  // optional
@@ -349,7 +372,7 @@ Define test executable targets.
 cmake {
   tests {
     '<name>' {
-      toolchains 'gcc'                       // required
+      toolchains 'gcc'                       // optional, default: all toolchains
 
       headers {
         srcDirs = ['include']               // defaults to src/<name>/headers
@@ -359,11 +382,11 @@ cmake {
       }
 
       compiling {
-        defines('TEST_BUILD', 'ENABLE_ASSERT', [visibility: PRIVATE])
+        defines('TEST_BUILD', 'ENABLE_ASSERT', visibility: PRIVATE)
       }
 
       linking {
-        link('core', [variant: SHARED, visibility: PRIVATE])
+        link('core', variant: SHARED, visibility: PRIVATE)
       }
 
       outputName = 'my-test'                 // optional
@@ -389,7 +412,7 @@ cmake {
 |--------|------|---------|-------------|
 | `outputName` | String | component name | Override the CMake target output name |
 | `outputVersion` | String | project version | Override the CMake target `VERSION` property |
-| `testResultsXmlOutput` | boolean | false | Generate JUnit XML output via ctest's `--output-junit` |
+| `testResultsXmlOutput` | boolean | toolchain `tests` setting, else false | Write a JUnit XML report via ctest's `--output-junit` to `build/cmake/config/<toolchain>/<BuildConfig>/<name>-<toolchain>-<buildconfig>-junit.xml` |
 
 ---
 
@@ -411,7 +434,8 @@ cmake.tasks.registerExecTasks(
 )
 ```
 
-**Spec map keys:**
+**Parameters:**
+
 | Parameter | Type | Required | Description |
 |-----|------|----------|-------------|
 | `spec` | Map<String,Object> | **yes** | Specifications for task generation |
@@ -421,7 +445,7 @@ cmake.tasks.registerExecTasks(
 
 | Key | Type | Required | Description |
 |-----|------|----------|-------------|
-| `prefix` | String | **yes** | Unique task name prefix |
+| `prefix` | String | **yes** | The Gradle task name, used as-is |
 | `toolchains` | Collection<String> | no | Toolchain filter, omit to match any toolchain |
 | `buildConfigs` | Collection<String> | no | Build configs filter, omit to match any build-config |
 | `components` | Collection<String> | no | Component filter, omit to match any component |
@@ -443,11 +467,19 @@ cmake.tasks.registerExecTasks(
 - All standard `Exec` task properties (`executable`, `args`, `workingDir`, …)
 - `task.compileCommands` — absolute path to the `compile_commands.json` for the current toolchain/buildConfig
 
-> **Task name uniqueness:** The `name` from the spec is used directly as the Gradle task name. If the spec matches multiple toolchains, buildConfigs, or components in a single build, each match attempts to register the same name, causing a conflict. Use specific `toolchains` + `buildConfigs` + `components` filters so each spec resolves to exactly one task registration.
+> **Task name uniqueness:** The `prefix` from the spec is used directly as the Gradle task name; nothing is appended. If the spec matches multiple toolchains, buildConfigs, or components in a single build, each match attempts to register the same name, causing a conflict. Use specific `toolchains` + `buildConfigs` + `components` filters so each spec resolves to exactly one task registration, for example one spec per build config:
+>
+> ```groovy
+> ['Debug', 'Release'].each { config ->
+>   cmake.tasks.registerExecTasks(
+>       [prefix: "cppcheck-gcc-${config.toLowerCase()}", toolchains: ['gcc'], buildConfigs: [config]],
+>       { task -> task.executable = 'cppcheck'; task.args '--project=' + task.compileCommands })
+> }
+> ```
 
 ### `cmake.tasks.registerRuntimeArchiveTasks(Map spec, Action<AbstractArchiveTask> action)`
 
-Registers a ZIP archive task (`zip-runtime-*`) that packages a component's runtime artifacts (binaries and their dependencies). Applies to libraries and executables.
+Registers an archive task (`zip-runtime-*`, or `tar-runtime-*` with `type: io.github.tomaki19.gradle.cmake.tasks.CMakeCustomTar` in the spec) that packages a component's runtime artifacts (binaries and their dependencies). Applies to libraries and executables. The spec takes the same `toolchains`, `buildConfigs` and `components` filters as above; task names are generated per component, so wildcards are fine.
 
 ```groovy
 cmake.tasks.registerRuntimeArchiveTasks(
@@ -460,7 +492,7 @@ The archive is pre-configured with the built binaries; the action can add furthe
 
 ### `cmake.tasks.registerDevelopArchiveTasks(Map spec, Action<AbstractArchiveTask> action)`
 
-Registers a ZIP archive task (`zip-develop-*`) that packages a library's development artifacts (static library + headers). Applies to libraries only.
+Registers an archive task (`zip-develop-*`, or `tar-develop-*` with the `type` spec key) that packages a library's development artifacts (library + headers). Applies to libraries only.
 
 ```groovy
 cmake.tasks.registerDevelopArchiveTasks(
@@ -478,8 +510,8 @@ The archive is pre-configured with the static library (into `lib/`) and headers 
 ```groovy
 cmake {
   packages {
-    opengl { moduleMode = true }
-    boost  { components = ['system', 'filesystem'] }
+    OpenGL { moduleMode = true }
+    Boost  { components = ['system', 'filesystem'] }
   }
 
   toolchains {
@@ -490,7 +522,7 @@ cmake {
       libraries {
         buildVariants SHARED, STATIC
         compiling {
-          options('-Wall', '-Wextra', [visibility: PUBLIC])
+          options('-Wall', '-Wextra', visibility: PUBLIC)
         }
       }
 
@@ -507,7 +539,7 @@ cmake {
       sources { srcDirs = ['src/graphics'] }
       headers { srcDirs = ['include/graphics'] }
       linking {
-        link('opengl', [variant: SHARED, visibility: PUBLIC])
+        link('GL', from: 'OpenGL', visibility: PUBLIC)
       }
     }
 
@@ -523,7 +555,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/viewer'] }
       linking {
-        link('graphics', 'utils', [variant: SHARED, visibility: PRIVATE])
+        link('graphics', 'utils', variant: SHARED, visibility: PRIVATE)
       }
     }
   }
@@ -533,14 +565,14 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['tests'] }
       linking {
-        link('graphics', [variant: SHARED, visibility: PRIVATE])
+        link('graphics', variant: SHARED, visibility: PRIVATE)
       }
       testResultsXmlOutput = true
     }
   }
 
   tasks.registerExecTasks(
-      [prefix: 'coverage', toolchains: ['gcc'], buildConfigs: ['Debug'], components: ['*test']],
+      [prefix: 'coverage-gcc-debug', toolchains: ['gcc'], buildConfigs: ['Debug']],
       { task ->
           task.executable = 'ctest'
           task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath

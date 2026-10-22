@@ -61,9 +61,7 @@ public class CMakeLibraryLinkSpec extends CMakeBinaryLinkSpec {
           entries.containsKey(LINK_VARIANT)
               ? (CMakeLinkVariant) entries.get(LINK_VARIANT)
               : CMakeLinkVariant.SHARED,
-          entries.containsKey(VISIBILITY)
-              ? (CMakeVisibility) entries.get(VISIBILITY)
-              : CMakeVisibility.PUBLIC,
+          toVisibility(entries.get(VISIBILITY), VISIBILITY),
           entries.containsKey(BUILD_VARIANT)
               ? (CMakeBuildVariant) entries.get(BUILD_VARIANT)
               : CMakeBuildVariant.SHARED);

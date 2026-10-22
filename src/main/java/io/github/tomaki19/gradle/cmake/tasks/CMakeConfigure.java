@@ -30,8 +30,10 @@ public abstract class CMakeConfigure extends CMakeExec<CMakeConfigure> {
     args("\"%s\"".formatted(CMakeFileConventions
         .targetConfigDirectory(getProject().getLayout().getBuildDirectory(), toolchain, buildConfig)
         .getAsFile().getAbsolutePath()));
-    args("-G");
-    args("\"%s\"".formatted(toolchain.getGenerator()));
+    if (!toolchain.getGenerator().isBlank()) {
+      args("-G");
+      args("\"%s\"".formatted(toolchain.getGenerator()));
+    }
     args("-DCMAKE_TOOLCHAIN_NAME=\"%s\"".formatted(toolchain.getName()));
     args("-DCMAKE_CONFIGURATION_TYPES=\"%s\"".formatted(buildConfig));
     toolchain.getToolchainFile().ifPresent((toolchainFile) -> {

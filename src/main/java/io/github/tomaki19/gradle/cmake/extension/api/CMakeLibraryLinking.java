@@ -21,6 +21,10 @@ public class CMakeLibraryLinking extends CMakeLinking {
     dependencySpecs.add(CMakeLibraryLinkSpec.Init.create(entries, components));
   }
 
+  public void link(final CharSequence... components) {
+    link(Map.of(), components);
+  }
+
 }
 
 /*

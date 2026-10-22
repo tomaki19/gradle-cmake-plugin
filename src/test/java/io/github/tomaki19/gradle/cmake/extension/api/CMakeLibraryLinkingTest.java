@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.tomaki19.gradle.cmake.model.CMakeVisibility;
+
 class CMakeLibraryLinkingTest {
 
   @Test
@@ -66,5 +68,26 @@ class CMakeLibraryLinkingTest {
     CMakeLibraryLinking linking = new CMakeLibraryLinking();
     linking.link(Map.of(), "lib1", "lib2");
     assertEquals(1, linking.getDependencySpecs().size());
+  }
+
+  @Test
+  void testDependencyWithoutSpec() {
+    CMakeLibraryLinking linking = new CMakeLibraryLinking();
+    linking.link("mylib");
+    assertEquals(CMakeLibraryLinkSpec.Init.create(Map.of(), "mylib"), linking.getDependencySpecs().iterator().next());
+  }
+
+  @Test
+  void testOptionsWithoutSpec() {
+    CMakeLibraryLinking linking = new CMakeLibraryLinking();
+    linking.options("-L/usr/lib");
+    assertEquals(CMakeBuildSpec.Init.create(Map.of(), "-L/usr/lib"), linking.getOptions().iterator().next());
+  }
+
+  @Test
+  void testDependencyVisibilityAsString() {
+    CMakeLibraryLinking linking = new CMakeLibraryLinking();
+    linking.link(Map.of("visibility", "Private"), "mylib");
+    assertEquals(CMakeVisibility.PRIVATE, linking.getDependencySpecs().iterator().next().getVisibility());
   }
 }

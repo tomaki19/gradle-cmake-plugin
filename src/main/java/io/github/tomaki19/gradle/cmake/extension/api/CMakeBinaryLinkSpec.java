@@ -81,7 +81,7 @@ public abstract class CMakeBinaryLinkSpec {
     protected static void validateContentTypes(final Map<String, Object> entries) throws CMakeApiException {
       validateType(entries.get(PROJECT), PROJECT, CharSequence.class);
       validateType(entries.get(LINK_VARIANT), LINK_VARIANT, CMakeLinkVariant.class);
-      validateType(entries.get(VISIBILITY), VISIBILITY, CMakeVisibility.class);
+      toVisibility(entries.get(VISIBILITY), VISIBILITY);
     }
 
   }

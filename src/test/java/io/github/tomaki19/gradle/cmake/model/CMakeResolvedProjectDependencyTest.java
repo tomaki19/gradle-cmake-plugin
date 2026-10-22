@@ -304,4 +304,24 @@ class CMakeResolvedProjectDependencyTest {
         "release");
     assertNotNull(result);
   }
+
+  @Test
+  void testTaskPathInRootProject() {
+    final Project project = ProjectBuilder.builder().withName("test-project").build();
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("lib", CMakeLinkVariant.SHARED,
+        project, false);
+    assertEquals(":", dependency.getProjectPath());
+    assertEquals(":build-lib", dependency.taskPath("build-lib"));
+  }
+
+  @Test
+  void testTaskPathInSubproject() {
+    final Project project = ProjectBuilder.builder().withName("test-project")
+        .withParent(ProjectBuilder.builder().build()).build();
+    final CMakeResolvedProjectDependency dependency = new CMakeResolvedProjectDependency("lib", CMakeLinkVariant.SHARED,
+        project, true);
+    assertEquals(":test-project", dependency.getProjectPath());
+    assertEquals(":test-project:build-lib", dependency.taskPath("build-lib"));
+  }
+
 }

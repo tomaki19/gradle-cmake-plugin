@@ -24,13 +24,12 @@ The gradle-cmake-plugin registers Gradle tasks that manage the full CMake build 
 | Runtime tar archive | `tar-runtime-<name>-<toolchain>-<buildconfig>` (application/test) |
 | Develop zip archive | `zip-develop-<name>-<linkvariant>-<toolchain>-<buildconfig>` |
 | Develop tar archive | `tar-develop-<name>-<linkvariant>-<toolchain>-<buildconfig>` |
-| Custom exec | `<name>-<toolchain>-<buildconfig>` (when registered per buildConfig) |
+| Custom exec | `<prefix>`, exactly as given in the spec |
 | Clean CMakeLists | `clean-cmake-lists` |
 
 **Example names** for a library `core` (shared), toolchain `gcc`, build config `Debug`:
 
 - `build-core-shared-gcc-debug`
-- `check-core-shared-gcc-debug` (if core is a test library)
 - `assemble-core-shared-gcc-debug-module`
 - `configure-gcc-debug`
 - `zip-runtime-core-shared-gcc-debug`
@@ -53,7 +52,7 @@ Generates the `CMakeLists.txt` file in the project root directory. This file def
 
 Generates a CMake module configuration file that exposes a library for use by other CMake projects. Created for each library variant/toolchain/buildConfig combination.
 
-**Output:** `build/cmake/config/<name>-<linkvariant>-<toolchain>-<buildconfig>-module.cmake`
+**Output:** `build/cmake/config/<project>-<name>-<linkvariant>-<toolchain>-<buildconfig>-module.cmake`
 
 **Usage in another CMake project:**
 ```cmake
@@ -177,7 +176,7 @@ cmake {
 }
 ```
 
-ctest writes the JUnit XML to the CMake build directory. Integrate with CI by pointing your test results parser at `build/cmake/config/<toolchain>/<buildconfig>/`.
+The check task then passes `--output-junit` to ctest, which writes `build/cmake/config/<toolchain>/<BuildConfig>/<name>-<toolchain>-<buildconfig>-junit.xml`. Point your CI's test results parser at `build/cmake/config/**/*-junit.xml`. The setting can also be made for all tests of a toolchain in `toolchains { <name> { tests { testResultsXmlOutput = true } } }`.
 
 ---
 
@@ -237,18 +236,19 @@ The task is run in a shell (`sh -c` on Unix, `cmd /c` on Windows) and will sourc
 
 ### Task name
 
-Custom exec tasks are registered with the `name` key from the spec. When registered **per toolchain** (no `buildConfigs` in spec), the name is used as-is. It is the caller's responsibility to ensure the name is unique across all matching combinations.
+Custom exec tasks are registered with the `prefix` from the spec as their exact task name; the toolchain and build config are **not** appended. If a spec matches more than one toolchain, build config or component, every match tries to register the same name and the build fails, so register one spec per combination with its own prefix.
 
 ### Example: Static analysis with cppcheck
 
 ```groovy
 // Register for each build config individually to get unique names
-cmake.tasks.registerExecTasks(
-    [prefix: 'cppcheck', toolchains: ['gcc'], buildConfigs: ['Debug', 'Release']],
-    { task ->
-        task.executable = 'cppcheck'
-        task.args '--enable=all', '--project', task.compileCommands
-    }
+['Debug', 'Release'].each { config ->
+  cmake.tasks.registerExecTasks(
+      [prefix: "cppcheck-gcc-${config.toLowerCase()}", toolchains: ['gcc'], buildConfigs: [config]],
+      { task ->
+          task.executable = 'cppcheck'
+          task.args '--enable=all', '--project=' + task.compileCommands
+      })
 }
 ```
 
@@ -261,7 +261,7 @@ cmake.tasks.registerExecTasks(
 
 ```groovy
 cmake.tasks.registerExecTasks(
-    [prefix: 'coverage', toolchains: ['gcc'], buildConfigs: ['Debug']],
+    [prefix: 'coverage-gcc-debug', toolchains: ['gcc'], buildConfigs: ['Debug']],
     { task ->
         task.executable = 'ctest'
         task.args '-T', 'Coverage', '--test-dir', task.workingDir.absolutePath
@@ -326,11 +326,11 @@ clean (lifecycle)
 build/cmake/
 └── config/
     ├── <toolchain>/
-    │   └── <buildconfig>/                      # CMake build directory (configure output)
+    │   └── <BuildConfig>/                      # CMake build directory; keeps the config's case (gcc/Debug)
     │       ├── CMakeCache.txt
     │       ├── compile_commands.json
     │       ├── libraries/<variant>/<name>/     # Build output per library
     │       ├── applications/<name>/            # Build output per application
     │       └── tests/<name>/                   # Build output per test
-    └── <name>-<variant>-<toolchain>-<buildconfig>-module.cmake  # Module files
+    └── <project>-<name>-<variant>-<toolchain>-<buildconfig>-module.cmake  # Module files
 ```
