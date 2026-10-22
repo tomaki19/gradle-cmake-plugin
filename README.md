@@ -58,7 +58,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/app'] }
       linking {
-        link('mylib', [variant: SHARED, visibility: PRIVATE])
+        link('mylib', variant: SHARED, visibility: PRIVATE)
       }
     }
   }
@@ -68,7 +68,7 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src/test'] }
       linking {
-        link('mylib', [variant: SHARED, visibility: PRIVATE])
+        link('mylib', variant: SHARED, visibility: PRIVATE)
       }
       testResultsXmlOutput = true
     }
@@ -139,8 +139,8 @@ cmake {
       sources { srcDirs = ['src'] }
       headers { srcDirs = ['include'] }
       compiling {
-        options('-Wall', '-Wextra', [visibility: PUBLIC])
-        defines('CORE_VERSION_2', [visibility: PUBLIC])
+        options('-Wall', '-Wextra', visibility: PUBLIC)
+        defines('CORE_VERSION_2', visibility: PUBLIC)
       }
     }
   }
@@ -154,8 +154,8 @@ See [Packages](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTENSION
 ```groovy
 cmake {
   packages {
-    opengl { moduleMode = true }
-    boost  { components = ['system', 'filesystem'] }
+    OpenGL { moduleMode = true }                    // find_package(OpenGL REQUIRED MODULE)
+    Boost  { components = ['system', 'filesystem'] }
   }
 
   applications {
@@ -163,8 +163,8 @@ cmake {
       toolchains 'gcc'
       sources { srcDirs = ['src'] }
       linking {
-        link('opengl', [variant: SHARED, visibility: PRIVATE])
-        link('boost', [variant: SHARED, visibility: PRIVATE])
+        link('GL', from: 'OpenGL', visibility: PRIVATE)                  // OpenGL::GL
+        link('system', 'filesystem', from: 'Boost', visibility: PRIVATE) // Boost::system, Boost::filesystem
       }
     }
   }
@@ -177,10 +177,11 @@ See [Custom Tasks](src/main/java/io/github/tomaki19/gradle/cmake/extension/EXTEN
 
 ```groovy
 cmake {
-  // Register a cppcheck analysis task for each build config
+  // Register a cppcheck analysis task for each build config.
+  // The task name is exactly the prefix, so make it unique per build config.
   ['Debug', 'Release'].each { config ->
     tasks.registerExecTasks(
-        [prefix: 'cppcheck', toolchains: ['gcc'], buildConfigs: [config]],
+        [prefix: "cppcheck-gcc-${config.toLowerCase()}", toolchains: ['gcc'], buildConfigs: [config]],
         { task ->
             task.executable = 'cppcheck'
             task.args '--enable=all', '--project', task.compileCommands
@@ -244,18 +245,49 @@ cmake {
 ## Build Output Structure
 
 ```
-<project root>/
+<project dir>/
 └── CMakeLists.txt                  # Generated; deleted by clean
 
 build/cmake/
 └── config/
     ├── <toolchain>/
-    │   └── <buildconfig>/          # CMake build directory
+    │   └── <BuildConfig>/          # CMake build directory; keeps the config's case (gcc/Debug)
     │       ├── CMakeCache.txt
     │       ├── compile_commands.json
-    │       └── <target>/           # Per-component build output
-    └── <name>-<variant>-<toolchain>-<buildconfig>-module.cmake
+    │       ├── <test>-<toolchain>-<buildconfig>-junit.xml   # if testResultsXmlOutput = true
+    │       └── libraries/, applications/, tests/            # Per-component build output
+    └── <project>-<name>-<variant>-<toolchain>-<buildconfig>-module.cmake
 ```
+
+## Agent Skill
+
+`skills/gradle-cmake-plugin/` contains an [Agent Skill](https://agentskills.io)
+that teaches AI coding agents how to configure and build projects with this
+plugin: the `cmake { }` DSL, task names, and how to diagnose failing builds.
+
+Install it into the shared `.agents/skills/` directory that agents
+supporting Agent Skills look in. For your user, so it is available in every
+project:
+
+    mkdir -p ~/.agents/skills
+    cp -r skills/gradle-cmake-plugin ~/.agents/skills/
+
+or only for one project:
+
+    mkdir -p .agents/skills
+    cp -r /path/to/gradle-cmake-plugin/skills/gradle-cmake-plugin .agents/skills/
+
+On Windows (PowerShell):
+
+    New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
+    Copy-Item -Recurse skills\gradle-cmake-plugin "$HOME\.agents\skills\"
+
+Some agents use their own directory instead; copy the same folder there,
+for example `~/.claude/skills/` (or `.claude/skills/`) for Claude Code. Check
+your agent's documentation if the skill is not picked up.
+
+Start a new agent session afterwards. To update the skill, copy the folder
+again.
 
 ## Contributing
 
